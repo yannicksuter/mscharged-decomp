@@ -9,6 +9,31 @@
 class TLComponentInstance;
 class FEPageControls;
 
+enum eCupStandingsPhase
+{
+    CUP_STANDINGS_ENTERING = 0,
+    CUP_STANDINGS_ACTIVE = 1,
+    CUP_STANDINGS_TRANSITIONING = 2,
+    CUP_STANDINGS_EXITING_BACK = 3,
+};
+
+enum eCupStandingsColumn
+{
+    CUP_STANDINGS_POSITION = 0,
+    CUP_STANDINGS_WINS = 1,
+    CUP_STANDINGS_LOSSES = 2,
+    CUP_STANDINGS_OVERTIME_LOSSES = 3,
+    CUP_STANDINGS_GOALS_FOR = 4,
+    CUP_STANDINGS_GOALS_AGAINST = 5,
+    CUP_STANDINGS_POINTS = 6,
+};
+
+enum eCupStandingsButton
+{
+    CUP_STANDINGS_BUTTON_BRACKET = 0,
+    CUP_STANDINGS_BUTTON_HELP = 1,
+};
+
 class StrikerCupStandingsScene : public BaseSceneHandler
 {
 public:

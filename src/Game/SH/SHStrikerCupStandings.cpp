@@ -48,10 +48,10 @@ StrikerCupStandingsScene::StrikerCupStandingsScene()
     , mBracketButton()
     , mTeamButtons()
     , mBracketButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(CUP_STANDINGS_ENTERING)
 {
-    mBracketButton.mContext = 0;
-    mHelpButton.mContext = (void*)1;
+    mBracketButton.mContext = (void*)CUP_STANDINGS_BUTTON_BRACKET;
+    mHelpButton.mContext = (void*)CUP_STANDINGS_BUTTON_HELP;
 
     mPointerHoverCounts[0] = 0;
     mPointerHoverCounts[1] = 0;
@@ -168,7 +168,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
         mScrollBar.Initialize();
 
     CupManager::s_pInstance->GetNumPlayingTeams();
-    if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
+    if (mTransitionState == CUP_STANDINGS_ENTERING || mTransitionState == CUP_STANDINGS_TRANSITIONING || mTransitionState == CUP_STANDINGS_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -177,7 +177,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mTransitionState == 0)
+        if (mTransitionState == CUP_STANDINGS_ENTERING)
         {
             if (!mPointerButtonsInitialized)
             {
@@ -187,9 +187,9 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
-            mTransitionState = 1;
+            mTransitionState = CUP_STANDINGS_ACTIVE;
         }
-        else if (mTransitionState == 2)
+        else if (mTransitionState == CUP_STANDINGS_TRANSITIONING)
         {
             if (mPreviousPagePressed)
             {
@@ -204,7 +204,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             AdvanceCupFlow(false);
             return;
         }
-        else if (mTransitionState == 3)
+        else if (mTransitionState == CUP_STANDINGS_EXITING_BACK)
         {
             HandleCupBack(4);
             return;
@@ -244,7 +244,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mTransitionState = 3;
+            mTransitionState = CUP_STANDINGS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();
@@ -260,7 +260,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
-                mTransitionState = 2;
+                mTransitionState = CUP_STANDINGS_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
                 mPresentation->Update(0.0f);
                 if (mPageControls->IsButtonPressed(1))
@@ -365,25 +365,25 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
         int value = 0;
         switch (i)
         {
-        case 0:
+        case CUP_STANDINGS_POSITION:
             value = teamPosition + 1;
             break;
-        case 1:
+        case CUP_STANDINGS_WINS:
             value = stats.mNumWins;
             break;
-        case 2:
+        case CUP_STANDINGS_LOSSES:
             value = stats.mNumLosses;
             break;
-        case 3:
+        case CUP_STANDINGS_OVERTIME_LOSSES:
             value = stats.mNumOTLosses;
             break;
-        case 4:
+        case CUP_STANDINGS_GOALS_FOR:
             value = stats.mPlayerTotalStats.mNumGoalsFor;
             break;
-        case 5:
+        case CUP_STANDINGS_GOALS_AGAINST:
             value = stats.mPlayerTotalStats.mNumGoalsAgainst;
             break;
-        case 6:
+        case CUP_STANDINGS_POINTS:
             value = stats.mNumPoints;
             break;
         }
@@ -458,7 +458,7 @@ void StrikerCupStandingsScene::InitializePointerButtons()
 void StrikerCupStandingsScene::OnButtonPointerEnter(unsigned int index, void* context)
 {
     ++mPointerHoverCounts[index];
-    if (context == 0)
+    if (context == (void*)CUP_STANDINGS_BUTTON_BRACKET)
     {
         if (!mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
@@ -468,7 +468,7 @@ void StrikerCupStandingsScene::OnButtonPointerEnter(unsigned int index, void* co
         }
         return;
     }
-    if (context == (void*)1)
+    if (context == (void*)CUP_STANDINGS_BUTTON_HELP)
     {
         if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
@@ -482,7 +482,7 @@ void StrikerCupStandingsScene::OnButtonPointerEnter(unsigned int index, void* co
 void StrikerCupStandingsScene::OnButtonPointerLeave(unsigned int index, void* context)
 {
     --mPointerHoverCounts[index];
-    if (context == 0)
+    if (context == (void*)CUP_STANDINGS_BUTTON_BRACKET)
     {
         if (!mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
@@ -491,7 +491,7 @@ void StrikerCupStandingsScene::OnButtonPointerLeave(unsigned int index, void* co
         }
         return;
     }
-    if (context == (void*)1)
+    if (context == (void*)CUP_STANDINGS_BUTTON_HELP)
     {
         if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
@@ -511,11 +511,11 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
 
     switch ((unsigned int)context)
     {
-    case 0:
+    case CUP_STANDINGS_BUTTON_BRACKET:
     {
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = CUP_STANDINGS_TRANSITIONING;
 
         SHNavigation* object = GetNavigationScene();
         if (object != 0)
@@ -527,7 +527,7 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
         mPresentation->Update(0.0f);
         break;
     }
-    case 1:
+    case CUP_STANDINGS_BUTTON_HELP:
     {
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
