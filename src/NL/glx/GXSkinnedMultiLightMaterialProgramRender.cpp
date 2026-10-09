@@ -43,7 +43,7 @@ void GXMaterialProgramImpl<GXSkinnedMultiLightMaterialProgram>::Prepare(
     glSetMaterialTextureAlphaState(this, packet, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->diffuseTexture.texture);
 }
 
-extern "C" void glxConfigureSkinnedMultiLightBlend(float blendAmount)
+void glxConfigureSkinnedMultiLightBlend(float blendAmount)
 {
     if (blendAmount >= 0.999f)
     {

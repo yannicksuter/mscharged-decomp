@@ -30,7 +30,7 @@ bool sScrollingShadowedDetailBlendShadowsActive;
 int sScrollingShadowedDetailBlendLightCount;
 int sScrollingShadowedDetailBlendLightingMode;
 
-extern "C" void glxConfigureScrollingShadowedDetailBlendLighting(
+void glxConfigureScrollingShadowedDetailBlendLighting(
     int mode, GXScrollingShadowedDetailBlendMaterialProgram*)
 {
     sScrollingShadowedDetailBlendLightingMode = mode;
