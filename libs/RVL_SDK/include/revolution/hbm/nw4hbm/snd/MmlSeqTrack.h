@@ -27,8 +27,8 @@ public:
     MmlParserParam& GetMmlParserParam() { return mMmlParserParam; }
 
 private:
-    /* 0xC0 */ const MmlParser* mParser;
-    /* 0xC4 */ MmlParserParam mMmlParserParam;
+    /* 0xBC */ const MmlParser* mParser;
+    /* 0xC0 */ MmlParserParam mMmlParserParam;
 };
 
 } // namespace detail
