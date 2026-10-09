@@ -50,35 +50,35 @@ void glxConfigureMegaSpecularFresnelLighting(bool enabled)
     gxSetNumChans(1);
     gxSetNumTexGens(6);
     gxSetNumTevStages(7);
-    gxSetTevOrder(0, 1, 1, 255);
-    gxSetTevOrder(1, 0, 0, 255);
-    gxSetTevOrder(2, 255, 255, enabled ? 4 : 255);
-    gxSetTevOrder(3, 2, 2, 255);
-    gxSetTevOrder(4, 3, 3, 255);
-    gxSetTevOrder(5, 5, 5, 255);
-    gxSetTevOrder(6, 4, 4, 255);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, enabled ? GX_COLOR0A0 : GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD3, GX_TEXMAP3, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE5, GX_TEXCOORD5, GX_TEXMAP5, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE6, GX_TEXCOORD4, GX_TEXMAP4, GX_COLOR_NULL);
     GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX0);
     GXSetTexCoordGen2(GX_TEXCOORD5, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, GX_TRUE, GX_PTTEXMTX1);
-    gxSetTevColourOp(2, 0, 0, 0, true, 1);
+    gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVREG0);
     if (enabled && ShouldDoubleGameObjectLighting() != 0)
-        gxSetTevColourOp(1, 0, 0, 1, true, 0);
+        gxSetTevColourOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, true, GX_TEVPREV);
     GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
     GXSetTevKColorSel(GX_TEVSTAGE6, GX_TEV_KCSEL_K3);
-    gxSetTevColourIn(0, 15, 12, 8, 14);
-    gxSetTevColourIn(1, 15, 0, 8, 15);
-    gxSetTevColourIn(2, 15, 0, enabled ? 10 : 12, 15);
-    gxSetTevColourIn(3, 15, 14, 8, 15);
-    gxSetTevColourIn(4, 15, 0, 8, 15);
-    gxSetTevColourIn(5, 15, 0, 8, 2);
-    gxSetTevColourIn(6, 0, 8, 14, 15);
-    gxSetTevAlphaIn(0, 7, 7, 7, 7);
-    gxSetTevAlphaIn(1, 7, 7, 7, 4);
-    gxSetTevAlphaIn(2, 7, 7, 7, 0);
-    gxSetTevAlphaIn(3, 7, 7, 7, 0);
-    gxSetTevAlphaIn(4, 7, 7, 7, 0);
-    gxSetTevAlphaIn(5, 7, 7, 7, 0);
-    gxSetTevAlphaIn(6, 7, 7, 7, 0);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+    gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, enabled ? GX_CC_RASC : GX_CC_ONE, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_KONST, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE4, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE5, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_C0);
+    gxSetTevColourIn(GX_TEVSTAGE6, GX_CC_CPREV, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE4, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE5, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE6, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetVtxDesc(GX_VA_PNMTXIDX, GX_DIRECT);
 }
 
@@ -93,7 +93,7 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Activate(GLVie
     sMegaSpecularLookupScale[0] = -1.0f;
     sMegaSpecularLookupScale[1] = -1.0f;
     sMegaSpecularFresnelBoundTexture = -1;
-    GXLoadTexMtxImm(sMegaFresnelLookupMatrix, 67, GX_MTX3x4);
+    GXLoadTexMtxImm(sMegaFresnelLookupMatrix, GX_PTTEXMTX1, GX_MTX3x4);
     sMegaSpecularFresnelLightCount = GetGameObjectLightCount(0, 1);
     LoadGameObjectLights(sMegaSpecularFresnelLightCount, view, 0);
     sMegaSpecularFresnelLightingEnabled = true;
@@ -105,10 +105,10 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Deactivate()
 {
     SetGameObjectAmbientLightingEnabled(0);
     SetGameObjectLightingEnabled(0, sMegaSpecularFresnelLightCount, 1);
-    gxSetTevColourOp(1, 0, 0, 0, true, 0);
-    gxSetTexCoordGen(2, 1, 6, 60);
-    gxSetTexCoordGen(5, 1, 9, 60);
-    gxSetTevColourOp(2, 0, 0, 0, true, 0);
+    gxSetTevColourOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY);
+    gxSetTexCoordGen(GX_TEXCOORD5, GX_TG_MTX2x4, GX_TG_TEX5, GX_IDENTITY);
+    gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
     gxSetCurrentMtx(0, true);
 }
 
@@ -169,7 +169,7 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Draw(
         };
         specularTextureMatrix[0][0] = 0.5f * specularScaleX;
         specularTextureMatrix[1][1] = -0.5f * specularScaleY;
-        GXLoadTexMtxImm(specularTextureMatrix, 64, GX_MTX3x4);
+        GXLoadTexMtxImm(specularTextureMatrix, GX_PTTEXMTX0, GX_MTX3x4);
         sMegaSpecularLookupScale[0] = specularScaleX;
         sMegaSpecularLookupScale[1] = specularScaleY;
     }
@@ -196,7 +196,7 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Draw(
         sMegaSpecularFresnelModelMatrix = modelMatrix;
         glxCopyMatrix(modelViewTransform, modelview);
         PSMTXInvXpose(modelViewTransform, normalMatrix);
-        GXLoadTexMtxImm(normalMatrix, 30, GX_MTX3x4);
+        GXLoadTexMtxImm(normalMatrix, GX_TEXMTX0, GX_MTX3x4);
     }
 
     if (packet->skinnedVertices == 0)
@@ -224,7 +224,7 @@ void GXMaterialProgramImpl<GXMegaSpecularFresnelMaterialProgram>::Draw(
         gxSaveBlendMode();
         gxSetBlendMode(true, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, false);
         GXSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_K1_A);
-        gxSetTevAlphaIn(1, 7, 7, 7, 6);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
         gxRestoreBlendMode();
         gxRestoreZMode();
