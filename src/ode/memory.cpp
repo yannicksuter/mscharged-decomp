@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <ode/memory.h>
 
-extern "C" void* malloc(size_t size);
-
 static dAllocFunction* allocfn = 0;
 static dReallocFunction* reallocfn = 0;
 static dFreeFunction* freefn = 0;
