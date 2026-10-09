@@ -899,7 +899,7 @@ bool ObstacleAvoidance::AgentResponse(
     if (bDesiredPosBlocked)
     {
         const nlVector3& v3Normal = context.mObstacleNormal;
-        context.mContactState = 2;
+        context.mContactState = AVOID_CONTACT_TARGET_BLOCKED;
         nlVec3Scale(context.mRepulsionDir, v3Normal, context.mClosingSpeed);
         if (!(-nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir) >= 0.7f))
         {
@@ -938,7 +938,7 @@ bool ObstacleAvoidance::MobileObstacleResponse(
     float fRadius = mpObstacle->GetRadius();
     bool bDesiredPosBlocked = fDistanceSquared < fRadius * fRadius;
     if (context.mContactState)
-        return OverlapResponse(bDesiredPosBlocked ? 0 : 2, context, fDeltaT);
+        return OverlapResponse(bDesiredPosBlocked ? (int)OVERLAP_ALONG_NORMAL : (int)OVERLAP_AROUND_VELOCITY, context, fDeltaT);
 
     nlVector3 v3Velocity = mpObstacle->GetVelocity();
     v3Velocity.z = 0.0f;
@@ -965,11 +965,11 @@ bool ObstacleAvoidance::StaticObstacleResponse(
     float fRadius = mpObstacle->GetRadius();
     bool bDesiredPosBlocked = fDistanceSquared < fRadius * fRadius;
     if (context.mContactState)
-        return OverlapResponse(1, context, fDeltaT);
+        return OverlapResponse(OVERLAP_AROUND_NORMAL, context, fDeltaT);
     if (bDesiredPosBlocked)
     {
         const nlVector3& v3Normal = context.mObstacleNormal;
-        context.mContactState = 2;
+        context.mContactState = AVOID_CONTACT_TARGET_BLOCKED;
         nlVec3Scale(context.mRepulsionDir, v3Normal, context.mClosingSpeed);
         if (-nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir) >= 0.0f)
         {
@@ -1002,9 +1002,9 @@ bool ObstacleAvoidance::OverlapResponse(
     int mode, AvoidanceContext& context, float fDeltaT)
 {
     context.mRepulsionDir = context.mObstacleNormal;
-    if (mode != 0 && context.mDesiredSpeed > 0.5f)
+    if (mode != OVERLAP_ALONG_NORMAL && context.mDesiredSpeed > 0.5f)
     {
-        if (mode == 1)
+        if (mode == OVERLAP_AROUND_NORMAL)
         {
             float fWeight = InterpolateRangeClamped(1.0f, 0.0f, 0.0f, 1.0f,
                 -nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir));
@@ -1015,7 +1015,7 @@ bool ObstacleAvoidance::OverlapResponse(
                 nlVec3Scale(context.mRepulsionDir, nlRecipSqrt(nlVec3LengthSquared(context.mRepulsionDir), true));
             }
         }
-        else if (mode == 2)
+        else if (mode == OVERLAP_AROUND_VELOCITY)
         {
             nlVector3 v3Velocity = mpObstacle->GetVelocity();
             float fLengthSquared = nlVec3LengthSquared(v3Velocity);
@@ -1026,7 +1026,7 @@ bool ObstacleAvoidance::OverlapResponse(
             }
         }
     }
-    context.mContactState = 1;
+    context.mContactState = AVOID_CONTACT_OVERLAPPING;
     context.mRepulsionMag = ((AvoidableFielder*)mpAvoider)->m_pFielder->GetRunningSpeed();
     nlVec3Scale(context.mRepulsionDir, context.mRepulsionMag);
     nlVec3ScaleAdd(context.mRepulsionDir, -context.mDesiredSpeed, context.mDesiredDir, context.mRepulsionDir);

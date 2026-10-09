@@ -15,6 +15,20 @@ class cPlayer;
 class DesireSteering;
 class AvoidableObject;
 
+enum eAvoidContactState
+{
+    AVOID_CONTACT_SEPARATE = 0,
+    AVOID_CONTACT_OVERLAPPING = 1,
+    AVOID_CONTACT_TARGET_BLOCKED = 2,
+};
+
+enum eOverlapResponseMode
+{
+    OVERLAP_ALONG_NORMAL = 0,
+    OVERLAP_AROUND_NORMAL = 1,
+    OVERLAP_AROUND_VELOCITY = 2,
+};
+
 enum eAvoidableThings
 {
     AVOID_NOTHING = 0,
