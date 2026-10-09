@@ -1,7 +1,9 @@
-#include <revolution/vf.h>
-
-
-void* VFiPFAPI_convertReturnValue2NULL(s32 err, void* p_stream);
+#include <revolution/vf/vf_struct.h>
+#include <revolution/vf/pf_fopen.h>
+#include <revolution/vf/pf_api_util.h>
+#include <revolution/vf/pf_file.h>
+#include <revolution/vf/pf_str.h>
+#include <revolution/vf/pf_volume.h>
 
 struct PF_FILE* VFipf2_fopen(const s8* path, const s8* mode) {
     s32 open_mode;
