@@ -1,3 +1,4 @@
+#include <MetroTRK/dolphin_trk.h>
 #include <revolution/base.h>
 #include <revolution/db.h>
 #include <revolution/dvd.h>
@@ -8,7 +9,7 @@
 #include <revolution/sc.h>
 #include <revolution/si.h>
 
-#include <mem.h>
+#include <string.h>
 
 OSExecParams __OSRebootParams;
 static DVDDriveInfo DriveInfo __attribute__((aligned(32)));

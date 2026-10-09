@@ -3,6 +3,8 @@
 
 #include <revolution/os/OSContext.h>
 #include <revolution/os/OSExec.h>
+#include <revolution/os/OSIpc.h>
+#include <revolution/os/OSLink.h>
 #include <revolution/os/OS_fwd.h>
 #include <revolution/types.h>
 
@@ -83,8 +85,6 @@ void OSDefaultExceptionHandler(u8 type, OSContext* context);
 void __OSPSInit(void);
 void __OSInitNet(void);
 void __OSInitSystemCall(void);
-void __OSModuleInit(void);
-void __OSInitIPCBuffer(void);
 u32 __OSGetDIConfig(void);
 void OSRegisterVersion(const char* version);
 const char* OSGetAppGamename(void);

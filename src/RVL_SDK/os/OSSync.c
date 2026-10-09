@@ -3,7 +3,6 @@
 
 static void __OSSystemCallVectorStart(void);
 static void __OSSystemCallVectorEnd(void);
-void __OSInitSystemCall(void);
 
 // clang-format off
 static asm void SystemCallVector(void) {
