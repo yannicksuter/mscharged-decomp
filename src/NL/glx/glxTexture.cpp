@@ -14,16 +14,10 @@
 #include "NL/nlPrint.h"
 
 #include <revolution/os/OSCache_fwd.h>
+#include <revolution/gx/GXTexture_fwd.h>
 #include <stdio.h>
 #include <string.h>
 
-enum GXTexWrapMode
-{
-    GX_CLAMP,
-    GX_REPEAT,
-    GX_MIRROR,
-    GX_MAX_TEXWRAPMODE
-};
 
 enum eGLTextureMode
 {
@@ -34,26 +28,6 @@ enum eGLTextureMode
     GLTM_Num = 4
 };
 
-extern "C"
-{
-    void GXInitTlutObj(
-        void* object, void* palette, int format, unsigned short entries);
-    void GXInitTexObjCI(void* object, void* image, unsigned short width,
-        unsigned short height, int format, int wrapS, int wrapT,
-        unsigned char mipmap, unsigned long tlutName);
-    void GXInitTexObj(void* object, void* image, unsigned short width,
-        unsigned short height, int format, int wrapS, int wrapT,
-        unsigned char mipmap);
-    void GXInitTexObjLOD(void* object, int minFilter, int magFilter,
-        float minLod, float maxLod, float lodBias, unsigned char biasClamp,
-        unsigned char edgeLod, int maxAnisotropy);
-    void GXInitTexObjWrapMode(
-        void* object, GXTexWrapMode wrapS, GXTexWrapMode wrapT);
-    void GXInitTexObjTlut(void* object, unsigned long tlutName);
-    void GXLoadTlut(void* object, unsigned long tlutName);
-    void GXLoadTexObj(void* object, unsigned long textureMap);
-    void GXInvalidateTexAll();
-}
 
 TweakValueBool gbReduceTextures("gbReduceTextures", "/Rendering/Engine", false);
 
@@ -79,7 +53,7 @@ static PlatTexture* glx_MakeGridTexture(int width, int height)
     unsigned char bits[4] = { 5, 6, 5, 0 };
     PlatTexture* texture = new (nlMalloc(sizeof(PlatTexture), 8, false)) PlatTexture();
     texture->Create(width, height, GXTex_RGB565,
-        (MemoryAllocator*)glGetCurrentResourcePool(), 1, true, true);
+        glGetCurrentResourcePool(), 1, true, true);
     memcpy(texture->m_Bits, bits, sizeof(texture->m_Bits));
 
     unsigned short gridColor = 0xFFFF;
@@ -394,18 +368,18 @@ void PlatTexture::Prepare()
     {
         DCStoreRange(m_PaletteData, m_nPaletteEntries * 2);
         GXInitTlutObj(
-            m_TlutObj, m_PaletteData, 2, m_nPaletteEntries);
+            (GXTlutObj*)m_TlutObj, m_PaletteData, GX_TL_RGB5A3, m_nPaletteEntries);
     }
 
     if (m_Format == GXTex_CI8)
     {
-        GXInitTexObjCI(m_TexObj, m_SwizzledData, m_Width, m_Height, glx_GetGXFormatTable()[m_Format], 0, 0, m_Levels > 1, 0);
-        GXInitTexObjLOD(m_TexObj, m_Levels == 1 ? 1 : 3, 1, 0.0f, (float)(m_MaxLevel - 1), 0.0f, false, false, 0);
+        GXInitTexObjCI((GXTexObj*)m_TexObj, m_SwizzledData, m_Width, m_Height, (GXCITexFmt)glx_GetGXFormatTable()[m_Format], GX_CLAMP, GX_CLAMP, m_Levels > 1, 0);
+        GXInitTexObjLOD((GXTexObj*)m_TexObj, m_Levels == 1 ? GX_LINEAR : GX_LIN_MIP_NEAR, GX_LINEAR, 0.0f, (float)(m_MaxLevel - 1), 0.0f, false, false, GX_ANISO_1);
         return;
     }
 
-    GXInitTexObj(m_TexObj, m_SwizzledData, m_Width, m_Height, glx_GetGXFormatTable()[m_Format], 0, 0, m_Levels > 1);
-    GXInitTexObjLOD(m_TexObj, m_Levels == 1 ? 1 : 5, 1, 0.0f, (float)(m_MaxLevel - 1), 0.0f, false, false, 0);
+    GXInitTexObj((GXTexObj*)m_TexObj, m_SwizzledData, m_Width, m_Height, (GXTexFmt)glx_GetGXFormatTable()[m_Format], GX_CLAMP, GX_CLAMP, m_Levels > 1);
+    GXInitTexObjLOD((GXTexObj*)m_TexObj, m_Levels == 1 ? GX_LINEAR : GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, (float)(m_MaxLevel - 1), 0.0f, false, false, GX_ANISO_1);
 }
 
 PlatTexture* glplatTextureAddFromBundle(glTexBundleDict* entry,
@@ -522,15 +496,15 @@ void glx_BindTexture(
 
     unsigned long textureObject[8];
     memcpy(textureObject, pTex->m_TexObj, sizeof(textureObject));
-    GXInitTexObjWrapMode(textureObject, wrapS, wrapT);
+    GXInitTexObjWrapMode((GXTexObj*)textureObject, wrapS, wrapT);
 
     if (pTex->m_nPaletteEntries != 0)
     {
         unsigned long tlutObject[3];
         memcpy(tlutObject, pTex->m_TlutObj, sizeof(tlutObject));
-        GXInitTexObjTlut(textureObject, textureMap);
-        GXLoadTlut(tlutObject, textureMap);
+        GXInitTexObjTlut((GXTexObj*)textureObject, textureMap);
+        GXLoadTlut((GXTlutObj*)tlutObject, textureMap);
     }
 
-    GXLoadTexObj(textureObject, textureMap);
+    GXLoadTexObj((GXTexObj*)textureObject, (GXTexMapID)textureMap);
 }
