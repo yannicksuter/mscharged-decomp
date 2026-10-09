@@ -520,7 +520,7 @@ static inline void PopupNetworkErrorOverlay(
         return;
     }
     session->mPoppedOverlay = overlay;
-    if (NetTournManager::Instance()->mState != 0)
+    if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
     {
         NetTournManager::Instance()->NotifyOverlayPopped(overlay);
     }
@@ -1924,7 +1924,7 @@ static inline void RegisterLoadedGameActions(NetworkSession* session)
         = &g_pGame->mEventQueue.mResumingGameEvent;
     resumingEvent->Add(second, (unsigned int)&session->mResumingEventOwner, -1);
 
-    if (NetTournManager::Instance()->mState != 0)
+    if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
     {
         NetTournManager::Instance()->NotifyGameStarted();
     }

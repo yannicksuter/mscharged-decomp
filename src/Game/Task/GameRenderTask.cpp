@@ -440,13 +440,13 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     }
 
     u32 currState = nlTaskManager::m_pInstance->mCurrentState;
-    if (currState == 2
-        || (currState == 1 && nlTaskManager::m_pInstance->mPreviousState == TASK_GAMEPLAY))
+    if (currState == TASK_GAMEPLAY
+        || (currState == TASK_PAUSED && nlTaskManager::m_pInstance->mPreviousState == TASK_GAMEPLAY))
     {
         if (g_pGame->mbCaptainShotToScoreOn)
         {
             float indicatorDt;
-            if (currState == 2)
+            if (currState == TASK_GAMEPLAY)
             {
                 indicatorDt = fDeltaT;
             }
@@ -459,7 +459,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         else
         {
             float indicatorDt;
-            if (currState == 2)
+            if (currState == TASK_GAMEPLAY)
             {
                 indicatorDt = fDeltaT;
             }
@@ -473,7 +473,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         ShootToScoreMeter::instance.UpdateAndRender(fDeltaT);
         gMegastrikeBackgroundOverlay.UpdateAndRender(fDeltaT);
     }
-    else if (currState == 0x10)
+    else if (currState == TASK_NIS)
     {
         if (!init)
         {

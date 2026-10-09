@@ -270,7 +270,7 @@ void HBMManager::Show()
     HBMInit();
 
     mPreviousTaskState = nlTaskManager::m_pInstance->mCurrentState;
-    if (mPreviousTaskState != 1)
+    if (mPreviousTaskState != TASK_PAUSED)
     {
         PauseAllAudio();
     }
@@ -334,7 +334,7 @@ void HBMManager::Update()
         {
             gpHBMManager->mActive = false;
             g_pAudioBackend->ResumeControllerSpeakers();
-            if (gpHBMManager->mPreviousTaskState != 1)
+            if (gpHBMManager->mPreviousTaskState != TASK_PAUSED)
             {
                 ResumeAllAudio();
             }

@@ -198,7 +198,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
         SetPointerEnabled(false);
         SHNavigation* navigation = GetNavigationScene();
         navigation->mTimer->m_bVisible = false;
-        if (NetTournManager::Instance()->mState != 0)
+        if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
         {
             g_pOverlayManager->Push(OVERLAY_ONLINE_RANKING, SCREEN_NOTHING, true);
         }

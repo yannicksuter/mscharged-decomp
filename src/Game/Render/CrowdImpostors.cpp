@@ -7,6 +7,7 @@
 #include "Game/BasicStadium.h"
 #include "Game/World/WorldObjectLoadContext.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/World.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Field.h"
 #include "Game/GameInfo.h"
@@ -471,7 +472,7 @@ void SetCrowdModelTexture(u32 textureHash, unsigned long texture)
     for (; iterator.hasNext(); iterator.next())
     {
         DrawableObject* pObject = (DrawableObject*)*iterator;
-        if (pObject->m_uObjectType == 0x10002)
+        if (pObject->m_uObjectType == WORLD_OBJECT_STADIUM_DRAWABLE)
         {
             glModel* pGlModel = pObject->GetModel();
             for (glModelPacket* pPacket = pGlModel->packets;

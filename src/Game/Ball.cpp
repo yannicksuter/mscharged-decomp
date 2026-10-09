@@ -425,7 +425,7 @@ void cBall::CollideWithCharacterCallback(
                         = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
-                        || pReceivePass->meDesireSubState != 0)
+                        || pReceivePass->meDesireSubState != RECEIVE_PASS_APPROACH)
                     {
                         fn_80015C38(this, BALL_STATE_LOOSE);
                     }
@@ -498,7 +498,7 @@ void cBall::CollideWithCharacterCallback(
                             pPassTarget, FIELDER_DESIRE_RECEIVE_PASS);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
-                        || pReceivePass->meDesireSubState != 0)
+                        || pReceivePass->meDesireSubState != RECEIVE_PASS_APPROACH)
                     {
                         fn_80015C38(this, BALL_STATE_LOOSE);
                     }
@@ -545,7 +545,7 @@ void cBall::CollideWithCharacterCallback(
                     = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
                 if (pReceivePass == NULL
                     || !pReceivePass->IsActive()
-                    || pReceivePass->meDesireSubState != 0)
+                    || pReceivePass->meDesireSubState != RECEIVE_PASS_APPROACH)
                 {
                     fn_80015C38(this, BALL_STATE_LOOSE);
                 }
@@ -759,7 +759,7 @@ static inline void fn_80014494Impl(cBall* pBall)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -826,7 +826,7 @@ extern "C" void fn_800145A4(cBall* pBall)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -1047,7 +1047,7 @@ static inline bool fn_80014D38Impl(cBall* pBall)
         if (pReceivePass != NULL
             && pReceivePass->IsActive())
         {
-            bPassLockedIn = pReceivePass->meDesireSubState != 0;
+            bPassLockedIn = pReceivePass->meDesireSubState != RECEIVE_PASS_APPROACH;
         }
     }
 
@@ -1559,7 +1559,7 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -2784,7 +2784,7 @@ void OnBallGameOver()
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -2834,7 +2834,7 @@ void OnBallResetEffects(void*)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -2958,7 +2958,7 @@ void OnBallTronWallCollision(void*)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -3003,7 +3003,7 @@ void OnBallEggCollision(CollisionEggData*)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -3025,7 +3025,7 @@ static inline cBall*& GetPatchBall()
 void OnBallPatchCollision(PhysicsPatch* pPatch)
 {
     int patchType = pPatch->GetType();
-    if (patchType == 1 && g_pBall->m_pOwner == NULL
+    if (patchType == PATCH_FIRE_BALL && g_pBall->m_pOwner == NULL
         && !fn_800167A8(g_pBall))
     {
         fn_80015B38(GetPatchBall(), false);
@@ -3052,7 +3052,7 @@ void OnBallPatchCollision(PhysicsPatch* pPatch)
         pPhysicsBall->mbUseMagnusEffect = false;
         pPhysicsBall->mfChargeBonus = 0.0f;
     }
-    else if (patchType == 10)
+    else if (patchType == PATCH_CHAIN_LIGHTNING)
     {
         SetBallChargeWithScale(g_pBall, 4.0f);
     }
@@ -3161,7 +3161,7 @@ void OnBallDebrisCollision(void*)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }
@@ -3206,7 +3206,7 @@ void OnBallThwompCollision(void*)
                 = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
-                && pReceivePass->meDesireSubState == 0)
+                && pReceivePass->meDesireSubState == RECEIVE_PASS_APPROACH)
             {
                 return;
             }

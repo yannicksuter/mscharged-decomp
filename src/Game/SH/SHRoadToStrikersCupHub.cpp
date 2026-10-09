@@ -291,7 +291,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
 
-    if (roundType == 0)
+    if (roundType == CUP_ROUND_LEAGUE)
     {
         int numRounds = CupManager::s_pInstance->GetNumRegularRounds();
         int round = CupManager::s_pInstance->GetCurrentRoundNumber() + 1;
@@ -308,7 +308,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
             currentWide,
             totalWide);
     }
-    else if (roundType == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT)
     {
         int numRounds = CupManager::s_pInstance->GetNumPlayoffRounds();
         int round = CupManager::s_pInstance->GetCurrentRoundNumber();
@@ -319,7 +319,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
         else
             formatted = WideString(LookupLocString("CUP_STATUS_FINAL"));
     }
-    else if (roundType == 2)
+    else if (roundType == CUP_ROUND_FINALS)
     {
         int wins = 0;
         int losses = 0;

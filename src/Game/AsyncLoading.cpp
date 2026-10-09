@@ -1455,7 +1455,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
                 GameInfoManager::Instance()->SetPlayingSide(i, -1);
             }
         }
-        if (NetTournManager::Instance()->mState != 0)
+        if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
         {
             NetTournManager::Instance()->NotifyFinishedLoadingToKnockout();
             FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineTournament");

@@ -2500,7 +2500,7 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     float rightFootZ = GetJointPosition(m_nRightFootJointIndex).z;
     bool bRunning = false;
     eFielderActionState eActionState = m_eActionState;
-    if (eActionState == ACTION_RUNNING || eActionState == 0x13
+    if (eActionState == ACTION_RUNNING || eActionState == ACTION_RUNNING_PASS
         || IsRunningWithBall())
     {
         bRunning = true;
@@ -2780,7 +2780,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case ACTION_LAUNCHED:
-        if (actionState != 3 && actionState != 0x18)
+        if (actionState != ACTION_FALL && actionState != ACTION_SUCKED_AWAY)
         {
             m_DetChar.m_v3Position.z = 0.0f;
             m_DetChar.m_v3Velocity.z = 0.0f;
@@ -2816,7 +2816,7 @@ void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballS
     float distance = GetShotTargetDistance(ball->m_v3Position, target);
     float speed = distance * inverseTime;
     float accuracy;
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
         accuracy = (1.1f - shotValue) * (1.5f * distance);
     else
         accuracy = distance * (1.0f - 0.3f * shotValue);
@@ -2825,10 +2825,10 @@ void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballS
     heightVariance = accuracy * tweaks->fShotHeightVariance.GetValue();
     target.y += 0.5f * widthVariance - nlRandomf(widthVariance);
     target.z += nlRandomf(heightVariance);
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
         g_pBall->m_pPhysicsBall->mfBallAirResistance = gChipShotAirResistance;
     g_pBall->ShootAtFast(velocity, target, speed);
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
     {
         float maxHeightVelocity = Interpolate(gChipShotMinVerticalSpeed, gChipShotMaxVerticalSpeed, m_pTweaks->fShooting);
         if (velocity.z > maxHeightVelocity)

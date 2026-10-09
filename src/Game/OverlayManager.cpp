@@ -157,7 +157,7 @@ void OverlayManager::HandleStateTransition(u32 from, u32 to)
             continue;
         }
 
-        if (sceneType == 90 && mIsInHighlights)
+        if (sceneType == OVERLAY_IN_GAME_TEXT && mIsInHighlights)
         {
             continue;
         }

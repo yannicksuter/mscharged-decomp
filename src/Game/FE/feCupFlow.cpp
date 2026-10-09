@@ -511,39 +511,39 @@ void ShowCupRulesPopup()
     int cupMode = CupManager::s_pInstance->GetCurrentMode();
     int roundType = CupManager::s_pInstance->GetCurrentRoundType();
     int menuType = -1;
-    if (roundType == CUP_ROUND_LEAGUE && cupMode == 0)
+    if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_FIRE)
     {
         menuType = POPUP_FIRE_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 1)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_CRYSTAL)
     {
         menuType = POPUP_CRYSTAL_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 2)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_STRIKER)
     {
         menuType = POPUP_STRIKER_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 0)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_FIRE)
     {
         menuType = POPUP_FIRE_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_CRYSTAL)
     {
         menuType = POPUP_CRYSTAL_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 2)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_STRIKER)
     {
         menuType = POPUP_STRIKER_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 0)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_FIRE)
     {
         menuType = POPUP_FIRE_FINAL_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 1)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_CRYSTAL)
     {
         menuType = POPUP_CRYSTAL_FINAL_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 2)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_STRIKER)
     {
         menuType = POPUP_STRIKER_FINAL_RULES;
     }

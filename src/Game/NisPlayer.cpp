@@ -765,7 +765,7 @@ void NisPlayer::Render(int pass) const
     nlTaskManager* taskManager = nlTaskManager::m_pInstance;
     unsigned long currentState = taskManager->mCurrentState;
 
-    if (currentState != 0x10 || ((taskManager->mPreviousState == 0x10) && (currentState != 1)))
+    if (currentState != TASK_NIS || ((taskManager->mPreviousState == TASK_NIS) && (currentState != TASK_PAUSED)))
     {
         return;
     }

@@ -4,6 +4,7 @@
 #include "Game/Render/StadiumLoading.h"
 #include "Game/GameObjectLighting.h"
 #include "Game/Character.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Player.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Render/PeachPhoto.h"
@@ -201,7 +202,7 @@ void DrawableCharacter::Grab(cCharacter& source)
     }
     packetAVisible = source.m_bPacketAVisible;
     packetBVisible = source.m_bPacketBVisible;
-    useShockModel = source.m_ModelType == 1;
+    useShockModel = source.m_ModelType == CHAR_MODEL_SHOCK;
     blendAmount = source.m_fOpacity;
     megaBlend = source.m_fMegaBlend;
     shadowLevel = source.m_bShadowVisible ? 1.0f : 0.0f;

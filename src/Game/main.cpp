@@ -264,7 +264,7 @@ bool IsAlternateOnlineCountryGroup()
 void MemCheckTask::Run(float)
 {
     static u32 sPreviousVirtualFree;
-    static u32 sPreviousTaskState = 1;
+    static u32 sPreviousTaskState = TASK_PAUSED;
 
     const float bytesPerMiB = 1048576.0f;
     const u32 virtualAllocationCount = VirtualAllocator.m_allocation_count;
@@ -294,7 +294,7 @@ void MemCheckTask::Run(float)
     sAudioM10MiB = audioAllocator->m_10 / bytesPerMiB;
 
     if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY &&
-        sPreviousTaskState == 2 && !g_bTweaking)
+        sPreviousTaskState == TASK_GAMEPLAY && !g_bTweaking)
     {
         mAccumulatedDelta += sLastVirtualFreeDelta;
         ++mSampleCount;

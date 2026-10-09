@@ -624,7 +624,7 @@ void cPlayer::PickupBall(cBall* pBall)
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
     }
-    else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != 26)
+    else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != GOALIEACTION_MEGA_STRIKE)
     {
         PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     }

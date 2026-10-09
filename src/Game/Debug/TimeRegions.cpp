@@ -42,7 +42,7 @@ inline bool IsInCenterZone()
     unsigned long curState = nlTaskManager::m_pInstance->mCurrentState;
     bool isCenter = false;
 
-    if (curState == 2 && fabsf(v.x) < 5.7f)
+    if (curState == TASK_GAMEPLAY && fabsf(v.x) < 5.7f)
     {
         isCenter = true;
     }
@@ -55,7 +55,7 @@ static bool LeftSideOfField()
         cCameraManager::m_cameraStack)->GetTargetPosition();
     unsigned long curState = nlTaskManager::m_pInstance->mCurrentState;
 
-    return curState == 2 && !IsInCenterZone() && v.x < 0.0f;
+    return curState == TASK_GAMEPLAY && !IsInCenterZone() && v.x < 0.0f;
 }
 
 static bool RightSideOfField()
@@ -64,7 +64,7 @@ static bool RightSideOfField()
         cCameraManager::m_cameraStack)->GetTargetPosition();
     unsigned long curState = nlTaskManager::m_pInstance->mCurrentState;
 
-    return curState == 2 && !IsInCenterZone() && v.x > 0.0f;
+    return curState == TASK_GAMEPLAY && !IsInCenterZone() && v.x > 0.0f;
 }
 
 static bool IsDuringNIS()

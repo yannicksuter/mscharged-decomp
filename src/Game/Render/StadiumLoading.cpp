@@ -870,8 +870,8 @@ HighRangeTweaks* GetHighRangeTweaks()
 
 bool ShouldRenderStadiumNPC(ImpostorModel* model)
 {
-    if (cCameraManager::m_BeginFrameCameraType == 1
-        || cCameraManager::m_BeginFrameCameraType == 6)
+    if (cCameraManager::m_BeginFrameCameraType == eCameraType_Gameplay
+        || cCameraManager::m_BeginFrameCameraType == eCameraType_Goal)
     {
         return model->mWorldMatrix.m42 > 0.0f;
     }

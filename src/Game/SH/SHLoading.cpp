@@ -159,7 +159,7 @@ void SuperLoadingScene::SceneCreated()
                 FEAudio::PlayAnimAudioEvent(0x7FEC4468, 0, 0, 1);
                 FrontEndPresentation::GetInstance()->Call("StartOnlineGrudgeMatchSequence");
             }
-            else if (NetTournManager::Instance()->mState != 0)
+            else if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
             {
                 FrontEndPresentation::GetInstance()->Call("TransitionOnlineTournamentToGame");
             }
@@ -358,16 +358,16 @@ void MatchLoadingScene::DisplayCupInfo()
 
     const unsigned short* cupName;
     int cupType = cup->GetCurrentMode();
-    if (cupType == 0)
+    if (cupType == CUP_FIRE)
         cupName = g_pLocalization->GetString("FIRE_CUP");
-    else if (cupType == 1)
+    else if (cupType == CUP_CRYSTAL)
         cupName = g_pLocalization->GetString("CRYSTAL_CUP");
-    else if (cupType == 2)
+    else if (cupType == CUP_STRIKER)
         cupName = g_pLocalization->GetString("STRIKER_CUP");
     WideString formatted;
     int roundType = CupManager::Instance()->GetCurrentRoundType();
     FEPresentation* pres = mFEScene->GetPackage()->GetPresentation();
-    if (roundType == 0)
+    if (roundType == CUP_ROUND_LEAGUE)
     {
         int numRounds = CupManager::Instance()->GetNumRegularRounds();
         int round = CupManager::Instance()->GetCurrentRoundNumber() + 1;
@@ -379,7 +379,7 @@ void MatchLoadingScene::DisplayCupInfo()
         nlStrToWcs(current, currentWide, 4);
         formatted = Format(WideString(g_pLocalization->GetString("CUP_LOADING_QUALIFY")), cupName, currentWide, totalWide);
     }
-    else if (roundType == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT)
     {
         int numRounds = CupManager::Instance()->GetNumPlayoffRounds();
         int round = CupManager::Instance()->GetCurrentRoundNumber();
@@ -392,7 +392,7 @@ void MatchLoadingScene::DisplayCupInfo()
             unformatted = g_pLocalization->GetString("CUP_LOADING_FINAL");
         formatted = Format(WideString(unformatted), cupName);
     }
-    else if (roundType == 2)
+    else if (roundType == CUP_ROUND_FINALS)
     {
         unsigned short game[4];
         nlSNPrintf(game, 4, (const unsigned short*)L"%d", CupManager::Instance()->GetCurrentRoundNumber() + 1);

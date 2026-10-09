@@ -106,7 +106,7 @@ void SHOnlineFriends::UpdateFriend(int index)
         row->mStatus = ONLINE_ROW_OFFLINE;
         break;
     case 1:
-        if (g_pFriendManager->GetFriendStatusPayload(index)->mHeader.mStatus == 1)
+        if (g_pFriendManager->GetFriendStatusPayload(index)->mHeader.mStatus == EFriendStatus_Initial_Available)
         {
             if (row->mStatus != ONLINE_ROW_AVAILABLE)
                 FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);

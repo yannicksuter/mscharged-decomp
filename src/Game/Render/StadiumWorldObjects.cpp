@@ -206,7 +206,7 @@ void StadiumWorldDrawable::Initialize(WorldObjectLoadContext* context)
     }
 
     unsigned long taskState = nlTaskManager::m_pInstance->mCurrentState;
-    if (taskState == 2 || taskState == 0x18 || taskState == 0x200000 || taskState == 0x800000)
+    if (taskState == TASK_GAMEPLAY || taskState == 0x18 || taskState == TASK_FE_TO_GAME || taskState == TASK_BOOT_TO_GAME)
         UpdateModelMaterials(m_pModel);
 
     sTeamBannerTexture = 0;
@@ -351,7 +351,7 @@ void StadiumWorldDrawable::UpdateBlend()
     if ((flags & 0x20) != 0)
     {
         unsigned long taskState = nlTaskManager::m_pInstance->mCurrentState;
-        if (taskState == 0x10 || taskState == 8 || taskState == 0x20000)
+        if (taskState == TASK_NIS || taskState == TASK_REPLAY || taskState == TASK_DEBUG_REPLAY)
         {
             SetObjectBlend(this, 0.0f);
             return;
