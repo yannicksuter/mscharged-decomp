@@ -2978,7 +2978,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
     g_pGame->ResetMegaStrikeMeterQueues();
 
-    m_nMegaStrikeResultState = 0;
+    m_nMegaStrikeResultState = MEGA_RESULT_NONE;
 
     if (m_pBall == 0)
     {
@@ -3223,7 +3223,7 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
 
 void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 {
-    if (m_nMegaStrikeResultState == 0)
+    if (m_nMegaStrikeResultState == MEGA_RESULT_NONE)
     {
         if (nParam != 0)
         {
@@ -3259,22 +3259,22 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         }
     }
 
-    if (m_nMegaStrikeResultState == 2)
+    if (m_nMegaStrikeResultState == MEGA_RESULT_RECEIVED)
     {
         if (!IsNetworkOrRecordedGame())
         {
-            m_nMegaStrikeResultState = 3;
+            m_nMegaStrikeResultState = MEGA_RESULT_READY;
         }
         else
         {
             float fEndTime = m_fMegaStrikeReceivedTimestamp + lbl_806DB974;
             if (GetFixedUpdateTask()->mSimulationTime >= fEndTime)
             {
-                m_nMegaStrikeResultState = 3;
+                m_nMegaStrikeResultState = MEGA_RESULT_READY;
             }
         }
     }
-    else if (m_nMegaStrikeResultState == 3)
+    else if (m_nMegaStrikeResultState == MEGA_RESULT_READY)
     {
         MegaStrikeMeterOverlay* pScene
             = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
@@ -3402,7 +3402,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             g_pGame->SendMegaStrike(m_pTeam->m_nSide, m_DetPlayer.m_ID, m_fLocalMegaStrikeNumBalls, m_fLocalMegaStrikeAccuracy);
         }
 
-        m_nMegaStrikeResultState = 1;
+        m_nMegaStrikeResultState = MEGA_RESULT_WAITING;
     }
 
     StopSound(0xBF541A4C, this);

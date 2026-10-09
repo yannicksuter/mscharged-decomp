@@ -807,7 +807,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     mtPostDekeTimer.Clear();
     mtPowerupThrowTime.Clear();
     muInvincibleStatus = 0;
-    m_nMegaStrikeResultState = 0;
+    m_nMegaStrikeResultState = MEGA_RESULT_NONE;
     m_pNormalTweaks = pCharTweaks;
     m_pTweaks = pCharTweaks;
     m_pSuperPowerTweaks = pSuperPowerTweaks;
@@ -4423,7 +4423,7 @@ void cFielder::CleanActionShootToScore()
 {
     if (!IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
         muInvincibleStatus = 0;
-    m_nMegaStrikeResultState = 0;
+    m_nMegaStrikeResultState = MEGA_RESULT_NONE;
     if (m_pTeam->GetOtherTeam()->GetGoalie()->mGoalieActionState != GOALIEACTION_MEGA_STRIKE)
         g_pGame->mpWeatherManager->Resume();
     StopSound(0x05C8E379, this);
@@ -6023,7 +6023,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mtPostDekeTimer.Clear();
     mtPowerupThrowTime.Clear();
     muInvincibleStatus = 0;
-    m_nMegaStrikeResultState = 0;
+    m_nMegaStrikeResultState = MEGA_RESULT_NONE;
     m_fOpacity = 1.0f;
     mActionCrowdVars.bHasBeenSuckedToMiddle = false;
     mActionCrowdVars.fStuckInRiotTime = -1.0f;
@@ -6106,7 +6106,7 @@ void cFielder::ResetEffects()
 void cFielder::SetMegaStrikeResult(float numBalls, float accuracy)
 {
     m_fMegaStrikeNumBalls = numBalls;
-    m_nMegaStrikeResultState = 2;
+    m_nMegaStrikeResultState = MEGA_RESULT_RECEIVED;
     m_fMegaStrikeAccuracy = accuracy;
     m_fMegaStrikeReceivedTimestamp = GetFixedUpdateTask()->mSimulationTime;
 }

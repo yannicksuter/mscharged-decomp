@@ -22,6 +22,14 @@ enum eTurboRequest
     TR_FORCED_OFF = 3,
 };
 
+enum eMegaStrikeResultState
+{
+    MEGA_RESULT_NONE = 0,
+    MEGA_RESULT_WAITING = 1,
+    MEGA_RESULT_RECEIVED = 2,
+    MEGA_RESULT_READY = 3,
+};
+
 enum eSlideAttackState
 {
     SLIDE_ATTACK_SLIDING = 0,
@@ -806,7 +814,7 @@ private:
     /* 0x477 */ u8 mUnknown477;
 
 public:
-    /* 0x478 */ int m_nMegaStrikeResultState;
+    /* 0x478 */ eMegaStrikeResultState m_nMegaStrikeResultState;
 
     /* 0x47C */ ShotMeter* m_pShotMeter;
 private:
