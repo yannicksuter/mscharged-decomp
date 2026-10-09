@@ -42,8 +42,8 @@ public:
 
 private:
     /* 0x0D8 */ StrmPlayer mStrmPlayer;
-    /* 0x1F4 */ StrmSoundHandle* mTempSpecialHandle;
-    /* 0x1F8 */ SoundInstanceManager<StrmSound>* mManager;
+    /* 0x5F4 */ StrmSoundHandle* mTempSpecialHandle;
+    /* 0x5F8 */ SoundInstanceManager<StrmSound>* mManager;
     /* 0x5FC */ u8 mNumChannels;
     /* 0x600 */ void* mBuffer[CHANNEL_MAX];
     /* 0x608 */ u32 mBufSize;
