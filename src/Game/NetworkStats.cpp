@@ -200,6 +200,15 @@ bool NetworkStatsReporter::GetLeaderboardStats(int category,
     return true;
 }
 
+enum eLeaderboardResponseColumn
+{
+    LEADERBOARD_RESPONSE_RANK = 0,
+    LEADERBOARD_RESPONSE_NAME = 1,
+    LEADERBOARD_RESPONSE_SCORE = 2,
+    LEADERBOARD_RESPONSE_WINS = 4,
+    LEADERBOARD_RESPONSE_LOSSES = 5,
+};
+
 void NetworkStatsReporter::ParseLeaderboardResponse(
     char* data, int size)
 {
@@ -215,21 +224,21 @@ void NetworkStatsReporter::ParseLeaderboardResponse(
         {
             switch (column)
             {
-            case 0:
+            case LEADERBOARD_RESPONSE_RANK:
                 mLeaderboardMetadata[row].mOnlineRegion = GetOnlineRegion();
                 mLeaderboardMetadata[row].mDisplayRank = atoi(token);
                 break;
-            case 1:
+            case LEADERBOARD_RESPONSE_NAME:
                 nlStrToWcs(token, mLeaderboardPlayers[row].mName, 11);
                 mLeaderboardPlayers[row].mProfileId = 0;
                 break;
-            case 2:
+            case LEADERBOARD_RESPONSE_SCORE:
                 mLeaderboardMetadata[row].mScore = atoi(token);
                 break;
-            case 4:
+            case LEADERBOARD_RESPONSE_WINS:
                 mLeaderboardMetadata[row].mWins = atoi(token);
                 break;
-            case 5:
+            case LEADERBOARD_RESPONSE_LOSSES:
                 mLeaderboardMetadata[row].mLosses = atoi(token);
                 break;
             }

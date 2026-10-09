@@ -15,6 +15,17 @@
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
+enum eMatchSummaryRow
+{
+    SUMMARY_SHOTS_ON_GOAL = 0,
+    SUMMARY_SKILLSHOT_ATTEMPTS = 1,
+    SUMMARY_HITS = 2,
+    SUMMARY_STEALS = 3,
+    SUMMARY_MEGA_STRIKES = 4,
+    SUMMARY_POSSESSION = 5,
+    SUMMARY_GOALS = 6,
+};
+
 static const char* STAT_INSTANCES[7][2] = {
     { "STAT_1_LEFT", "STAT_1_RIGHT" },
     { "STAT_2_LEFT", "STAT_2_RIGHT" },
@@ -76,30 +87,30 @@ void MatchSummary::DisplayMatchSummary(TeamStats home, TeamStats away, FEPresent
         int value = 0;
         int extra = 0;
 
-        for (int row = 0; row < 7; row++)
+        for (int row = SUMMARY_SHOTS_ON_GOAL; row < 7; row++)
         {
             switch (row)
             {
-            case 0:
+            case SUMMARY_SHOTS_ON_GOAL:
                 value = displayedStats[side]->mNumShotsOnGoal;
                 break;
-            case 1:
+            case SUMMARY_SKILLSHOT_ATTEMPTS:
                 value = displayedStats[side]->mNumSTSAttempts;
                 break;
-            case 2:
+            case SUMMARY_HITS:
                 value = displayedStats[side]->mNumHitsMade;
                 break;
-            case 3:
+            case SUMMARY_STEALS:
                 value = displayedStats[side]->mNumSteals;
                 break;
-            case 4:
+            case SUMMARY_MEGA_STRIKES:
                 value = displayedStats[side]->mNumMegaStrikeGoals;
                 extra = displayedStats[side]->mNumMegaStrikeAttempts;
                 break;
-            case 5:
+            case SUMMARY_POSSESSION:
                 value = percents[side];
                 break;
-            case 6:
+            case SUMMARY_GOALS:
                 value = displayedStats[side]->mNumGoalsFor;
                 break;
             default:

@@ -28,6 +28,15 @@
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
+enum eLeaderboardDisplayColumn
+{
+    LEADERBOARD_DISPLAY_RANK = 0,
+    LEADERBOARD_DISPLAY_NAME = 1,
+    LEADERBOARD_DISPLAY_RECORD = 2,
+    LEADERBOARD_DISPLAY_TROPHY = 3,
+    LEADERBOARD_DISPLAY_SCORE = 4,
+};
+
 static const char* sLeaderboardTextNames[5] = {
     "stat_0", "stat_1", "stat_2_INFO", "stat_2_INFO2", "stat_3"
 };
@@ -409,19 +418,19 @@ bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
                ->GetCategory(mLeaderboardCategory)
                ->mMetadata[leaderboardIndex];
 
-    for (int stat = 0; stat < 5; ++stat)
+    for (int stat = LEADERBOARD_DISPLAY_RANK; stat < 5; ++stat)
     {
         switch (stat)
         {
-        case 0:
+        case LEADERBOARD_DISPLAY_RANK:
             nlSNPrintf(mRowText[row][stat], 40, (const u16*)L"%d",
                 metadata->mDisplayRank);
             break;
-        case 1:
+        case LEADERBOARD_DISPLAY_NAME:
             nlSNPrintf(mRowText[row][stat], 40, (const u16*)L"%ls",
                 player->mName);
             break;
-        case 2:
+        case LEADERBOARD_DISPLAY_RECORD:
             nlStrNCpy(mRowText[row][stat],
                 Format(WideString(LookupLocString(
                            "ONLINE_LEADERBOARD_RECORD")),
@@ -429,7 +438,7 @@ bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
                     .c_str(),
                 40);
             break;
-        case 3:
+        case LEADERBOARD_DISPLAY_TROPHY:
             nlStrNCpy(mRowText[row][stat],
                 Format(WideString(LookupLocString(
                            "ONLINE_LEADERBOARD_TROPHY_STAT")),
@@ -437,13 +446,13 @@ bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
                     .c_str(),
                 40);
             break;
-        case 4:
+        case LEADERBOARD_DISPLAY_SCORE:
             nlSNPrintf(mRowText[row][stat], 40, (const u16*)L"%d",
                 metadata->mScore);
             break;
         }
 
-        if (stat == 2 || stat == 3)
+        if (stat == LEADERBOARD_DISPLAY_RECORD || stat == LEADERBOARD_DISPLAY_TROPHY)
         {
             FEFinder<TLTextInstance, 3>::FindOrDefault(mRowInstances[row],
                 "Team_0", "STAT_2", sLeaderboardTextNames[stat])
