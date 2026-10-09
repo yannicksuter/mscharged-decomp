@@ -115,7 +115,7 @@ void CycleCupRoundPage(int currentPage, bool advance)
     int pageCount = 0;
     const int* pages = 0;
 
-    int roundType = CupManager::s_pInstance->mState == 0x10
+    int roundType = CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
                       ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
 
@@ -182,7 +182,7 @@ void ShowFirstCupPage()
 void ShowCurrentCupRoundPage()
 {
     int scene = -2;
-    int roundType = CupManager::s_pInstance->mState == 0x10
+    int roundType = CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
                       ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
 
@@ -207,12 +207,12 @@ void AdvanceCupFlow(bool pad)
     CupManager* cupManager = CupManager::s_pInstance;
     if (cupManager->GetCurrentRoundNumber() == -5)
     {
-        if (cupManager->mState == 4)
+        if (cupManager->mState == CUP_STATE_WON)
         {
             if (cupManager->GetCurrentMode() == CUP_FIRE)
             {
                 cupManager->SetMode(CUP_CRYSTAL);
-                cupManager->mState = -1;
+                cupManager->mState = CUP_STATE_NONE;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
@@ -222,7 +222,7 @@ void AdvanceCupFlow(bool pad)
             else if (cupManager->GetCurrentMode() == CUP_CRYSTAL)
             {
                 cupManager->SetMode(CUP_STRIKER);
-                cupManager->mState = -1;
+                cupManager->mState = CUP_STATE_NONE;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
@@ -349,7 +349,7 @@ void UpdateCupBreadcrumbs(int currentPage)
         }
         else
         {
-            int roundType = CupManager::s_pInstance->mState == 0x10
+            int roundType = CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
                                 ? 0
                                 : CupManager::s_pInstance->GetCurrentRoundType();
             switch (roundType)
@@ -439,7 +439,7 @@ void StartNewCup()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    CupManager::s_pInstance->mState = -1;
+    CupManager::s_pInstance->mState = CUP_STATE_NONE;
     CupManager::s_pInstance->ResetCupRecord();
     CupManager::s_pInstance->SetMode(CUP_NONE);
     CupManager::s_pInstance->mGameInProgress = false;
@@ -687,7 +687,7 @@ void UpdatePlayButtonText()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation && cupManager->GetCurrentRoundNumber() == -5)
     {
-        if (cupManager->mState == 4)
+        if (cupManager->mState == CUP_STATE_WON)
         {
             navigation->SetPlayButtonText(2);
         }
@@ -794,7 +794,7 @@ void SetLockedTrophyVisibility(bool visible)
 void ResetCupFlow()
 {
     CupManager* cupManager = CupManager::s_pInstance;
-    cupManager->mState = -1;
+    cupManager->mState = CUP_STATE_NONE;
     cupManager->ResetCupRecord();
     cupManager->SetMode(CUP_NONE);
     SaveLoad::StartSave(false);

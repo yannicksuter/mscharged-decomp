@@ -146,7 +146,7 @@ void CupNewsScene::SceneCreated()
         break;
     case 3:
         mShowAwardsOnClose = true;
-        if (GetCupState(cupManager) == 0x10)
+        if (GetCupState(cupManager) == CUP_STATE_NOT_QUALIFIED)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_NOT_QUALIFY_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_NOT_QUALIFY_%s_%d", cupName, character.GetName(), 0);
@@ -161,7 +161,7 @@ void CupNewsScene::SceneCreated()
         }
         break;
     case 4:
-        if (GetCupState(cupManager) == 0x11)
+        if (GetCupState(cupManager) == CUP_STATE_ELIMINATED)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
@@ -177,7 +177,7 @@ void CupNewsScene::SceneCreated()
         }
         break;
     case 5:
-        if (GetCupState(cupManager) == 0x12)
+        if (GetCupState(cupManager) == CUP_STATE_FINAL_LOST)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_LOSE_CUP_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_LOSE_CUP_%s_%d", cupName, character.GetName(), 0);

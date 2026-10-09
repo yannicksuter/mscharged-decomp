@@ -61,7 +61,7 @@ CupHubScene::CupHubScene()
     }
 
     BuildMatchupStates();
-    if (CupManager::s_pInstance->mState == 0x10
+    if (CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
         || CupManager::s_pInstance->GetCurrentRoundType() == 0)
     {
         mPagingEnabled = false;

@@ -169,7 +169,7 @@ inline void CupManager::IncreaseRoundNumber()
     if (previousType != CUP_ROUND_KNOCKOUT && nextType == CUP_ROUND_KNOCKOUT)
     {
         SetupPlayoffSchedule();
-        if (mState == 16)
+        if (mState == CUP_STATE_NOT_QUALIFIED)
         {
             mCurrentCup->mRoundNumber = -5;
         }
@@ -527,7 +527,7 @@ void CupManager::SetupRoundRobinSchedule(int* lineup, CupSidekicks* sklineup)
     int numplayingteams = mCurrentCup->GetNumTeams();
     int numRounds = mCurrentCup->GetNumRegularRounds();
     int numGamesPerRound = GetNumGamesPerRound(0, 0);
-    mState = 15;
+    mState = CUP_STATE_ACTIVE;
     BasicGameInfo* g;
     int home;
     int away;
@@ -637,7 +637,7 @@ void CupManager::SetupPlayoffSchedule()
     }
     if (!human)
     {
-        mState = 16;
+        mState = CUP_STATE_NOT_QUALIFIED;
     }
 }
 
@@ -687,7 +687,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
             }
             else
             {
-                mState = 17;
+                mState = CUP_STATE_ELIMINATED;
                 mCurrentCup->mRoundNumber = -5;
             }
         }
@@ -698,7 +698,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
             int side = -1;
             if (loser == team)
             {
-                mState = 17;
+                mState = CUP_STATE_ELIMINATED;
                 mCurrentCup->mRoundNumber = -5;
             }
             if (round == numRounds - 2)
@@ -772,12 +772,12 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
         }
         if (wins >= 2)
         {
-            mState = 4;
+            mState = CUP_STATE_WON;
             mCurrentCup->mRoundNumber = -5;
         }
         else if (losses >= 2)
         {
-            mState = 18;
+            mState = CUP_STATE_FINAL_LOST;
             mCurrentCup->mRoundNumber = -5;
         }
     }
@@ -1170,7 +1170,7 @@ bool CupManager::IsCupWinningGame(int team) const
 {
     if (GetCurrentRoundType() == 2 && team == mCurrentCup->mUserSelectedTeam)
     {
-        return mState == 4;
+        return mState == CUP_STATE_WON;
     }
     return false;
 }
@@ -1213,12 +1213,12 @@ void CupManager::ShowRoundNews()
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(2);
     }
-    else if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == 16)
+    else if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == CUP_STATE_NOT_QUALIFIED)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(3);
     }
-    else if ((roundType == CUP_ROUND_FINALS && round == 0) || state == 17)
+    else if ((roundType == CUP_ROUND_FINALS && round == 0) || state == CUP_STATE_ELIMINATED)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(4);
@@ -1260,7 +1260,7 @@ void CupManager::AwardGoalTrophies()
     int roundType = GetCurrentRoundType();
     int round = GetCurrentRoundNumber();
     int state = mState;
-    if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == 16)
+    if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == CUP_STATE_NOT_QUALIFIED)
     {
         int statistic0 = 0;
         int statistic1 = 0;

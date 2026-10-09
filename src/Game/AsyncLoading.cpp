@@ -1490,7 +1490,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         else if (GameInfoManager::Instance()->IsInMode3())
         {
             CupManager* cup = CupManager::Instance();
-            if (cup->GetCurrentRoundNumber() == -5 && cup->mState == 4)
+            if (cup->GetCurrentRoundNumber() == -5 && cup->mState == CUP_STATE_WON)
             {
                 if (cup->GetCurrentMode() == 0)
                 {

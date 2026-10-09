@@ -357,7 +357,7 @@ void RoadToStrikersCupHubScene::UpdateRoundMessage()
     FEPresentation* presentation = GetPresentation();
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
-    if (CupManager::s_pInstance->mState == 4)
+    if (CupManager::s_pInstance->mState == CUP_STATE_WON)
         currentRound->SetStringId("HUB_CONGRATS");
     else
         currentRound->SetStringId("HUB_ELIMINATED");
@@ -373,7 +373,7 @@ void RoadToStrikersCupHubScene::UpdateCupHeading()
     CupManager* cupManager = CupManager::s_pInstance;
     int captain;
     if (cupManager->GetCurrentRoundNumber() == -5
-        && cupManager->mState == 4)
+        && cupManager->mState == CUP_STATE_WON)
     {
         captain = cupManager->GetUserSelectedCupTeam();
     }
