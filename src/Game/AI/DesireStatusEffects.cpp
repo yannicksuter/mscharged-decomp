@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Desire.h"
 #include "Game/AI/AIContext.h"
@@ -235,7 +236,7 @@ void DesireSlippery::Cleanup()
  * Offset/Address/Size: 0xFB4 | 0x800BD078 | size: 0x78
  */
 DesireGooey::DesireGooey()
-    : Desire(27, UnsetTransitionFunc(g_UnsetTransitionFunc))
+    : Desire(FIELDER_DESIRE_GOOEY, UnsetTransitionFunc(g_UnsetTransitionFunc))
     , mfGooPercentage(1.0f)
     , mfMaxGooEffect(1.0f)
     , mfAdditionalGooEffect(-1.0f)
@@ -674,7 +675,7 @@ void DesireFrozen::Activate(float duration, int state)
     FuzzyVariantCollection params;
     params.Set(7, FuzzyVariant(duration));
     params.Set(0, FuzzyVariant(state));
-    ActivateConcurrentState(mScriptMachine, 29, &params, mActive);
+    ActivateConcurrentState(mScriptMachine, FIELDER_DESIRE_FROZEN, &params, mActive);
 }
 
 /**

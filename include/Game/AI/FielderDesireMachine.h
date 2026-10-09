@@ -1,6 +1,7 @@
 #ifndef GAME_AI_FIELDER_DESIRE_MACHINE_H
 #define GAME_AI_FIELDER_DESIRE_MACHINE_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/ScriptMachine.h"
 
 class FielderDesireMachine : public ScriptMachine

@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "NL/nlIntersection.h"
 #include "Game/AI/FielderAbility.h"
@@ -161,7 +162,7 @@ int gWarioRunTransitionHash = 0;
  * Offset/Address/Size: 0x0 | 0x800C86FC | size: 0x60
  */
 DesireSuperPower::DesireSuperPower()
-    : Desire(23, UnsetTransitionFunc(g_UnsetTransitionFunc))
+    : Desire(FIELDER_DESIRE_SUPER_POWER, UnsetTransitionFunc(g_UnsetTransitionFunc))
     , mpDKShockAvoidable(0)
     , mpTarget(0)
 {
@@ -1186,7 +1187,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(1, FuzzyVariant(count));
             params.Set(13, FuzzyVariant(gFollowPathSpeed));
             params.Set(10, FuzzyVariant((void*)FollowPathTransition));
-            m_pFielder->ActivateDesire(12, &params);
+            m_pFielder->ActivateDesire(FIELDER_DESIRE_RUN_IN_DIRECTION, &params);
         }
         else if (m_pFielder->m_bSuperPowerTankOn)
         {
@@ -1213,7 +1214,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 params.Set(18, FuzzyVariant(gChooseDirectionMaxDistance));
                 params.Set(13, FuzzyVariant(gChooseDirectionSpeed));
                 params.Set(10, FuzzyVariant((void*)ChooseDirectionTransition));
-                m_pFielder->ActivateDesire(12, &params);
+                m_pFielder->ActivateDesire(FIELDER_DESIRE_RUN_IN_DIRECTION, &params);
             }
         }
         else if (!(bool)Offensive(m_pFielder->m_pTeam)
@@ -1226,7 +1227,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(gInterceptBallSpeed));
             params.Set(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireInterceptBall")));
-            m_pFielder->ActivateDesire(13, &params);
+            m_pFielder->ActivateDesire(FIELDER_DESIRE_RUN_TO_TARGET, &params);
         }
     }
 }
@@ -1238,7 +1239,7 @@ DesireUpdate DesireSuperPower::FollowPathTransition(
     if (GetStateMachineState(machine) != 12)
         return DesireUpdate(gFollowPathFinishedResult, -1.0f, -1.0f);
     cFielder* fielder = (cFielder*)value.GetPlayer();
-    DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, 23);
+    DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, FIELDER_DESIRE_SUPER_POWER);
     int index = GetStateMachineParameters(machine)->Get(0)->fn_800C2BD4();
     int count = GetStateMachineParameters(machine)->Get(1)->fn_800C2BD4();
     nlVector2& current = desire->mvPathPoints[index];
@@ -1306,10 +1307,10 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
     DesireUpdate result(FT_INT, gChooseDirectionContinueResult);
-    if (machine->GetState() != 12)
+    if (machine->GetState() != FIELDER_DESIRE_RUN_IN_DIRECTION)
         return DesireUpdate(FT_INT, gChooseDirectionFinishedResult);
     FielderRef fielder = { (cFielder*)value.mData.pointer };
-    GetFielderDesire(fielder.mFielder, 23);
+    GetFielderDesire(fielder.mFielder, FIELDER_DESIRE_SUPER_POWER);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
     float danger = CallFielderFuzzyFunction(((FuzzyRuntimeContext*)&value)->GetRuntime(),
@@ -1395,7 +1396,7 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
                 result.SetParameter(13, FuzzyVariant(gChooseDirectionNextSpeed));
                 result.SetParameter(10, FuzzyVariant((void*)ChooseDirectionTransition));
             }
-            if (fielder.mFielder->m_bSuperPowerTankOn && machine->GetState() == 12)
+            if (fielder.mFielder->m_bSuperPowerTankOn && machine->GetState() == FIELDER_DESIRE_RUN_IN_DIRECTION)
             {
                 unsigned short absolute = nlAbsAngle(nlAbsAngle(
                     nlAngleDelta(fielder.mFielder->m_DetChar.m_aActualFacingDirection, angle)));
@@ -1589,7 +1590,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         params.Set(18, FuzzyVariant(distance));
                         params.Set(13, FuzzyVariant(gWarioRunSpeed));
                         params.Set(10, FuzzyVariant(gWarioRunTransitionHash));
-                        m_pFielder->ActivateDesire(12, &params);
+                        m_pFielder->ActivateDesire(FIELDER_DESIRE_RUN_IN_DIRECTION, &params);
                     }
                 }
             }

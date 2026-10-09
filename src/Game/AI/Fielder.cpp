@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/DesireUpdate.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -468,7 +469,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->m_DetChar.m_eCharacterClass == DAISY
-               && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
             if (!bExcluded)
             {
                 bCondition4 = true;
@@ -479,7 +480,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->m_DetChar.m_eCharacterClass == BOWSERJR
-               && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
             if (!bExcluded)
             {
                 bCondition5 = true;
@@ -671,11 +672,11 @@ inline bool cFielder::ShouldSkipHardStopAnim()
     bool specialMovement = ((IsCharacterSuperPowerActive(this, WALUIGI)
             || IsCharacterSuperPowerActive(this, BOWSER))
             || (IsCharacterSuperPowerActive(this, PETEY) && m_bSuperPowerTankOn))
-        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 27);
+        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY);
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
     if (!skip && GetDesireState() == (eFielderDesireState)20)
     {
-        Desire* desire = GetFielderDesire(this, 20);
+        Desire* desire = GetFielderDesire(this, FIELDER_DESIRE_USER_CONTROLLED);
         if (desire->mAgeTimer.GetSeconds() < 0.05f)
             skip = true;
     }
@@ -903,7 +904,7 @@ void cFielder::EndAllDesires()
 
 AvoidController* cFielder::GetAvoidController()
 {
-    return ((DesireSteering*)GetFielderDesire(this, 34))->m_pAvoidance;
+    return ((DesireSteering*)GetFielderDesire(this, FIELDER_DESIRE_STEERING))->m_pAvoidance;
 }
 
 FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
@@ -932,9 +933,9 @@ float cFielder::GetRunningSpeed()
 
 bool cFielder::EndMushroom()
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 25))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM))
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 25);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM);
         return true;
     }
     return false;
@@ -942,9 +943,9 @@ bool cFielder::EndMushroom()
 
 bool cFielder::EndShrink()
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 28))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK))
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 28);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK);
         return true;
     }
     return false;
@@ -952,9 +953,9 @@ bool cFielder::EndShrink()
 
 bool cFielder::EndStar()
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 24);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR);
         return true;
     }
     return false;
@@ -974,7 +975,7 @@ void cFielder::EndFrozenOrDazed()
 
 void cFielder::EndConfusion()
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 30))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED))
     {
         RequestStateMachineDeactivation(GetConcurrentState(
             m_pAIContext->mScriptMachine, 30));
@@ -988,9 +989,9 @@ void cFielder::EndDaze()
 
 bool cFielder::EndSuperPower(int)
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
-        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
         return true;
     }
     return false;
@@ -1000,13 +1001,13 @@ bool cFielder::EndBowserSuperPower(bool value)
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == BOWSER
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        fn_800C9D74((DesireSuperPower*)GetFielderDesire(this, 23), value);
+        fn_800C9D74((DesireSuperPower*)GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER), value);
         return true;
     }
     return false;
@@ -1016,13 +1017,13 @@ bool cFielder::EndMarioSuperPower()
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == MARIO
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 23);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
         return true;
     }
     return false;
@@ -1032,13 +1033,13 @@ bool cFielder::EndLuigiSuperPower()
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == LUIGI
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 23);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
         return true;
     }
     return false;
@@ -1048,13 +1049,13 @@ bool cFielder::EndWaluigiSuperPower()
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == WALUIGI
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        DeactivateConcurrentState(m_pAIContext->mScriptMachine, 23);
+        DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
         return true;
     }
     return false;
@@ -1064,13 +1065,13 @@ bool cFielder::EndWarioSuperPower(bool)
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == WARIO
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
         return true;
     }
     return false;
@@ -1080,13 +1081,13 @@ bool cFielder::EndPeteySuperPower(bool)
 {
     bool active = false;
     if (m_DetChar.m_eCharacterClass == PETEY
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         active = true;
     }
     if (active)
     {
-        RequestStateMachineDeactivation(GetFielderDesire(this, 23));
+        RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
         return true;
     }
     return false;
@@ -1290,7 +1291,7 @@ bool cFielder::CanGetElectrocuted() const
         return false;
     if (IsInFallAction())
         return false;
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
         return false;
     if (IsYoshiSuperPowerActive())
         return false;
@@ -1360,7 +1361,7 @@ bool cFielder::CanGetElectrocuted(
             bool bWaluigiSuperPowerActive = false;
             if (m_DetChar.m_eCharacterClass == WALUIGI
                 && IsConcurrentStateActive(
-                    m_pAIContext->mScriptMachine, 0x17))
+                    m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
             {
                 bWaluigiSuperPowerActive = true;
             }
@@ -1526,7 +1527,7 @@ bool cFielder::CanReceivePass()
 
 void cFielder::SetDesiredFacingDirection(unsigned short aParam, bool bParam)
 {
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED))
     {
         DesireConfused* pAction = (DesireConfused*)
             GetScriptMachineState(m_pAIContext->mScriptMachine, 0x1E);
@@ -1920,7 +1921,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
 {
     bool bHasEgg = false;
     if (pFielder->m_DetChar.m_eCharacterClass == YOSHI
-        && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         bHasEgg = true;
     }
@@ -1987,8 +1988,8 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
     GetCharacterSpecialActive(this, YOSHI, yoshiActive);
     if (yoshiActive)
     {
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
-            RequestStateMachineDeactivation(GetFielderDesire(this, 23));
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
+            RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
         return false;
     }
     if (IsMarioSuperPowerActive() || IsLuigiSuperPowerActive() || IsDKSuperPowerActive() || IsDaisySuperPowerActive())
@@ -2249,8 +2250,8 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
         {
             FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gGasConfusionDuration));
-            ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1E, &params,
-                IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E));
+            ActivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED, &params,
+                IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED));
         }
     }
     else if (type == PATCH_HEAVENLY_LIGHT)
@@ -2300,8 +2301,8 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 AddRandomDirt();
                 fn_8001F1C0(DAMAGE_TEXTURE_DIRT);
             }
-            ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1B, &params,
-                IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1B));
+            ActivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY, &params,
+                IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY));
         }
     }
     else if (type == PATCH_MUCK_BALL)
@@ -2339,13 +2340,13 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 return;
             }
             fn_800470B4(this, eventData->pPatch->m_pOwner);
-            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1C))
+            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK))
             {
                 return;
             }
             FuzzyVariantCollection params;
             params.Set(14, FuzzyVariant(pOwner));
-            ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C, &params, false);
+            ActivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK, &params, false);
         }
     }
     else if (type == PATCH_YOSHI_TONGUE)
@@ -2378,7 +2379,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
     }
     else if (type == PATCH_SPEEDER)
     {
-        ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x19, 0, true);
+        ActivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM, 0, true);
     }
     else if (type == PATCH_LAVA_BALL || type == PATCH_LAVA_HOLE)
     {
@@ -2597,9 +2598,9 @@ bool cFielder::IsReceivingVolleyPass() const
     }
     else
     {
-        state = -1;
+        state = FIELDER_DESIRE_NONE;
     }
-    if (state == 0x16)
+    if (state == FIELDER_DESIRE_RECEIVE_PASS)
     {
         result = ((DesireReceivePass*)
             m_pAIContext->mScriptMachine->mActiveState)->IsVolleyReceive();
@@ -2684,9 +2685,9 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_tMoveToTurboTimer.Clear();
         if (IsYoshiSuperPowerActive())
         {
-            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
             {
-                RequestStateMachineDeactivation(GetFielderDesire(this, 0x17));
+                RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
             }
         }
         break;
@@ -2708,9 +2709,9 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_DetPlayer.m_eLastPadAction = 50;
         if (IsYoshiSuperPowerActive())
         {
-            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
             {
-                RequestStateMachineDeactivation(GetFielderDesire(this, 0x17));
+                RequestStateMachineDeactivation(GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER));
             }
         }
         break;
@@ -3560,9 +3561,9 @@ void cFielder::DoRegularShooting(bool bParam)
     if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
         nBallState = BALL_STATE_SKILLSHOT;
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1C))
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK))
         {
-            DeactivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C);
+            DeactivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK);
         }
         if (m_DetChar.m_eCharacterClass == KOOPA || m_DetChar.m_eCharacterClass == BIRDO)
         {
@@ -3748,7 +3749,7 @@ void cFielder::SetAction(eFielderActionState actionState)
 
 void cFielder::ClearInvincibility(bool force)
 {
-    if (!IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24) || force == true)
+    if (!IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR) || force == true)
     {
         muInvincibleStatus = 0;
     }
@@ -4120,7 +4121,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
 
     bool bYoshiSuperPowerActive = false;
     if (m_DetChar.m_eCharacterClass == YOSHI
-        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER))
     {
         bYoshiSuperPowerActive = true;
     }
@@ -4286,7 +4287,7 @@ void cFielder::BeginDekeIntangibility()
                 {
                     destination.x = AIsgn(destination.x) * cField::GetGoalLineX(1U);
                     if (gDisableElectrocution || GameInfoManager::Instance()->IsRule0x4Equal2()
-                        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+                        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
                     {
                         if (destination.y < 0.0f)
                             destination.y = -(1.0f + (0.5f * cNet::GetNetWidth() + fn_8002BFA8(m_pTweaks, GetPlayerScale())));
@@ -4421,7 +4422,7 @@ void cFielder::CleanActionDeke()
 
 void cFielder::CleanActionShootToScore()
 {
-    if (!IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+    if (!IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
         muInvincibleStatus = 0;
     m_nMegaStrikeResultState = MEGA_RESULT_NONE;
     if (m_pTeam->GetOtherTeam()->GetGoalie()->mGoalieActionState != GOALIEACTION_MEGA_STRIKE)
@@ -4714,7 +4715,7 @@ void cFielder::RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender*
         {
             weight = 1.0f - weight;
         }
-        if (IsConcurrentStateActive(fielder->m_pAIContext->mScriptMachine, 30))
+        if (IsConcurrentStateActive(fielder->m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED))
         {
             weight = 1.0f - weight;
         }
@@ -4787,20 +4788,20 @@ float cFielder::GetSpeedPowerupAdjusted(float speed)
     float multiplier = 1.0f;
     if (speed >= 0.0f)
     {
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 25))
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM))
         {
             multiplier *= GetMushroomSpeedBoost(m_pTweaks);
         }
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
         {
             multiplier *= GetStarSpeedBoost(m_pTweaks);
         }
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 27))
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY))
         {
             multiplier *= ((DesireGooey*)GetConcurrentState(
                 m_pAIContext->mScriptMachine, 27))->GetSpeedScale();
         }
-        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 28))
+        if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK))
         {
             multiplier *= ((DesireShrink*)GetConcurrentState(
                 m_pAIContext->mScriptMachine, 28))->GetSpeedScale();
@@ -4812,8 +4813,8 @@ float cFielder::GetSpeedPowerupAdjusted(float speed)
 float cFielder::GetSlideAttackSpeed(int direction)
 {
     float speed = GetSpeedPowerupAdjusted(GetSlideSpeed(m_pTweaks));
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 25)
-        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 24))
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM)
+        || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
     {
         speed *= GetSuperSlideSpeedBonus(m_pTweaks);
     }
@@ -5057,7 +5058,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                     parameters.Set(0, FuzzyVariant((cPlayer*)target));
                     parameters.Set(1, FuzzyVariant(false));
                     parameters.Set(10, FuzzyVariant((void*)TransDesireLooseBallContact));
-                    m_pAIContext->mScriptMachine->ActivateState(13, &parameters, true);
+                    m_pAIContext->mScriptMachine->ActivateState(FIELDER_DESIRE_RUN_TO_TARGET, &parameters, true);
                     m_DetPlayer.m_bCanTestController = false;
                 }
             }
@@ -5077,7 +5078,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                     parameters.Set(16, FuzzyVariant(modified));
                     parameters.Set(1, FuzzyVariant(true));
                     parameters.Set(10, FuzzyVariant((void*)TransDesireLooseBallContact));
-                    m_pAIContext->mScriptMachine->ActivateState(13, &parameters, true);
+                    m_pAIContext->mScriptMachine->ActivateState(FIELDER_DESIRE_RUN_TO_TARGET, &parameters, true);
                 }
             }
         }
@@ -5224,32 +5225,32 @@ PlayerTweaks* cFielder::GetTweaks() const
 
 bool cFielder::IsSuperPowerActive() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SUPER_POWER);
 }
 
 bool cFielder::IsStarActive() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x18);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR);
 }
 
 bool cFielder::IsConfused() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED);
 }
 
 bool cFielder::IsMushroomActive() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x19);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_MUSHROOM);
 }
 
 bool cFielder::IsSlippery() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1A);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SLIPPERY);
 }
 
 bool cFielder::IsShrunk() const
 {
-    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1C);
+    return IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK);
 }
 
 bool cFielder::IsSuperGrowActive() const
@@ -5644,7 +5645,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         return;
     }
 
-    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E)
+    if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_CONFUSED)
         && !IsFallenDown()
         && (m_DetChar.m_eCharacterClass != BIRDO || m_pBall == 0))
     {
@@ -6558,7 +6559,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     cache->ChecksumData(sActWarioSuperType, &m_fNextGasTime, context);
     cache->WriteData(sActWarioSuperType, &m_fNextGasTime, sizeof(m_fNextGasTime));
 
-    DesireSteering* steering = (DesireSteering*)GetFielderDesire(this, 34);
+    DesireSteering* steering = (DesireSteering*)GetFielderDesire(this, FIELDER_DESIRE_STEERING);
     fn_8000F324(steering->m_pAvoidance, context, cache);
 
     for (int i = 0; i < 36; i++)

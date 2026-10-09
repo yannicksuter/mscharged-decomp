@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireUserControlled.h"
 #include "Game/Player.h"
@@ -28,7 +29,7 @@ bool DesireUserControlled::Initialize(void* context)
     bool result = Desire::Initialize(context);
 
     DesireSteering* desire = (DesireSteering*)GetFielderDesire(
-        m_pFielder, 34);
+        m_pFielder, FIELDER_DESIRE_STEERING);
     ResetSteeringTargets(desire);
     ResetSteeringHistory(desire);
     ResetSteeringAvoidance(desire);

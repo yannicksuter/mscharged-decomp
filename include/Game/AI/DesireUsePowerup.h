@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_USE_POWERUP_H
 #define GAME_AI_DESIRE_USE_POWERUP_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/Powerups.h"
 
@@ -17,7 +18,7 @@ class DesireUsePowerup : public Desire
     friend void ThrowPowerup(DesireUsePowerup*);
 public:
     DesireUsePowerup()
-        : Desire(17, UnsetTransitionFunc(g_UnsetTransitionFunc))
+        : Desire(FIELDER_DESIRE_USE_POWERUP, UnsetTransitionFunc(g_UnsetTransitionFunc))
         , mePowerup(POWER_UP_NONE)
     {
     }

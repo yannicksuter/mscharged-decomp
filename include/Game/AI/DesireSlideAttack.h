@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_SLIDE_ATTACK_H
 #define GAME_AI_DESIRE_SLIDE_ATTACK_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 
 
@@ -15,7 +16,7 @@ class DesireSlideAttack : public Desire
 {
 public:
     DesireSlideAttack()
-        : Desire(16, UnsetTransitionFunc(g_UnsetTransitionFunc))
+        : Desire(FIELDER_DESIRE_SLIDE_ATTACK, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

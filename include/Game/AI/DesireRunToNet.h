@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_RUN_TO_NET_H
 #define GAME_AI_DESIRE_RUN_TO_NET_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/TransitionFunc.h"
 
@@ -8,7 +9,7 @@ class DesireRunToNet : public Desire
 {
 public:
     DesireRunToNet()
-        : Desire(9, ScriptTransitionFunc("TransDesireRunToNet"))
+        : Desire(FIELDER_DESIRE_RUN_TO_NET, ScriptTransitionFunc("TransDesireRunToNet"))
     {
     }
 

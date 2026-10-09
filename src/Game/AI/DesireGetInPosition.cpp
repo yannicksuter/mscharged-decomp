@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -259,7 +260,7 @@ bool DesireRunToTarget::Initialize(void* context)
         case FT_BALL:
             m_pTargetBall = (cBall*)target->mData.pointer;
             m_fUrgency = 4.0f;
-            ResetSteeringHistory((DesireSteering*)GetFielderDesire(m_pFielder, 34));
+            ResetSteeringHistory((DesireSteering*)GetFielderDesire(m_pFielder, FIELDER_DESIRE_STEERING));
             if (m_pFielder->m_pBall != 0)
             {
                 initialized = false;

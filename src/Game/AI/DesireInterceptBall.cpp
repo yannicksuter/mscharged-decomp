@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/DesireUpdate.inl"
@@ -34,11 +35,11 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     {
         switch (update->ExtraData.Get(8)->mData.i)
         {
-        case 15:
+        case FIELDER_DESIRE_SHOOT:
             m_pFielder->InitActionLooseBallShot(update->ExtraData.Get(16)->mData.b);
             *update = DESIRE_FINISHED;
             return;
-        case 14:
+        case FIELDER_DESIRE_PASS:
         {
             cFielder* target = static_cast<cFielder*>(update->ExtraData.Get(14)->mData.pPlayer);
             m_pFielder->InitActionLooseBallPass(target, OpenTo(m_pFielder, target) < 0.5f);

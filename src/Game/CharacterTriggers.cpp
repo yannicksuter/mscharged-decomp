@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
 #include "Game/CharacterTriggers.h"
@@ -275,7 +276,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x5D68C1D2:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, FIELDER_DESIRE_SUPER_POWER);
                 if (IsDesireActive(pDesire))
                 {
                     ((DesireSuperPower*)pDesire)->EmitHeavenlyLight();
@@ -286,7 +287,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xCFEAC332:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, FIELDER_DESIRE_SUPER_POWER);
                 if (IsDesireActive(pDesire))
                 {
                     EmitBowserJrShriek((DesireSuperPower*)pDesire);

@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_USER_CONTROLLED_H
 #define GAME_AI_DESIRE_USER_CONTROLLED_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/Desire.h"
 
 
@@ -8,7 +9,7 @@ class DesireUserControlled : public Desire
 {
 public:
     DesireUserControlled()
-        : Desire(20, UnsetTransitionFunc(g_UnsetTransitionFunc))
+        : Desire(FIELDER_DESIRE_USER_CONTROLLED, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

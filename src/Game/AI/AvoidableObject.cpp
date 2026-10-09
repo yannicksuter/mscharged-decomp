@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/CharacterTweaks.h"
@@ -306,7 +307,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         {
             cFielder* pTarget = 0;
             DesireRunInDirection* pDesire
-                = (DesireRunInDirection*)GetFielderDesire(m_pFielder, 12);
+                = (DesireRunInDirection*)GetFielderDesire(m_pFielder, FIELDER_DESIRE_RUN_IN_DIRECTION);
             if (pDesire != 0 && pDesire->IsActive())
             {
                 pTarget = pDesire->GetTarget();

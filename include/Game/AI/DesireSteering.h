@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_STEERING_H
 #define GAME_AI_DESIRE_STEERING_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/AvoidController.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/Fielder.h"
@@ -93,7 +94,7 @@ class DesireWaluigiWall : public Desire
 {
 public:
     DesireWaluigiWall()
-        : Desire(35, UnsetTransitionFunc(g_UnsetTransitionFunc))
+        : Desire(FIELDER_DESIRE_WALUIGI_WALL, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

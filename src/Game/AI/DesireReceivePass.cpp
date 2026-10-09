@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/DetInput.h"
@@ -161,7 +162,7 @@ static inline float DoCalculatePassSpeed(const nlVector2& distance,
 }
 
 DesireReceivePass::DesireReceivePass()
-    : Desire(22, ScriptTransitionFunc("TransDesireReceivePass"))
+    : Desire(FIELDER_DESIRE_RECEIVE_PASS, ScriptTransitionFunc("TransDesireReceivePass"))
 {
     mEstimated.Reset();
 }
@@ -171,7 +172,7 @@ bool DesireReceivePass::Initialize(void* context)
     Desire::Initialize(context);
 
     DesireSteering* desire = (DesireSteering*)GetFielderDesire(
-        m_pFielder, 34);
+        m_pFielder, FIELDER_DESIRE_STEERING);
     ResetSteeringTargets(desire);
 
     mEstimated.Reset();
@@ -242,12 +243,12 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         bool bUnhandled = false;
         switch (update->GetParameter(8)->fn_800C2BD4())
         {
-        case 15:
+        case FIELDER_DESIRE_SHOOT:
             *update = 0;
             RequestOneTouchShot(update->GetParameters()->Get(16)->fn_800C2BF8());
             SetPassTransitionTimer();
             break;
-        case 14:
+        case FIELDER_DESIRE_PASS:
         {
             *update = 0;
             cPlayer* pPassTarget = update->GetParameters()->Get(14)->GetPlayer();
@@ -326,7 +327,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         {
             fArrivalRadius = g_fReceiveArrivalRadiusLarge;
         }
-        DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, 34);
+        DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, FIELDER_DESIRE_STEERING);
         SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
             mEstimated.aFacingDirection, mEstimated.fAnimStartTime, fArrivalRadius);
         pSteering->SetAvoidanceMultiplier(InterpolateClamped(g_fMaxSteeringAvoidance, 0.0f, g_pBall->GetPassProgress()));
@@ -364,7 +365,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         }
         else
         {
-            DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, 34);
+            DesireSteering* pSteering = (DesireSteering*)GetFielderDesire(m_pFielder, FIELDER_DESIRE_STEERING);
             SetTimedSteeringTarget(pSteering, mEstimated.v3AnimStartPos,
                 mEstimated.aFacingDirection, mEstimated.fAnimStartTime, g_fReceiveArrivalRadius);
         }
@@ -704,7 +705,7 @@ void DesireReceivePass::Cleanup()
     }
 
     DesireSteering* desire = (DesireSteering*)GetFielderDesire(
-        m_pFielder, 34);
+        m_pFielder, FIELDER_DESIRE_STEERING);
     ResetSteeringHistory(desire);
     ResetSteeringAvoidance(desire);
 }
@@ -1480,7 +1481,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         FuzzyVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));
         params.Set(11, FuzzyVariant(FT_INT, eReceiveAnimType));
-        pPassTarget->ActivateDesire(22, &params);
+        pPassTarget->ActivateDesire(FIELDER_DESIRE_RECEIVE_PASS, &params);
 
         cAIPad* pAIPad = pPasser->m_pController;
         if (pAIPad != 0 && pPassTarget->m_pController == 0)

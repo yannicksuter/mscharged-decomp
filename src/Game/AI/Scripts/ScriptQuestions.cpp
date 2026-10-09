@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Game.h"
@@ -1629,7 +1630,7 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireGooey* pDesire = (DesireGooey*)GetFielderDesire(pFielder, 27);
+    DesireGooey* pDesire = (DesireGooey*)GetFielderDesire(pFielder, FIELDER_DESIRE_GOOEY);
     if (pDesire != NULL && pDesire->IsActive())
     {
         fScore = pDesire->GetSpeedScale();
@@ -1645,7 +1646,7 @@ extern "C" float fn_800DA130(cFielder* pFielder)
     }
 
     float fResult = 0.0f;
-    Desire* pDesire = GetFielderDesire(pFielder, 0x1E);
+    Desire* pDesire = GetFielderDesire(pFielder, FIELDER_DESIRE_CONFUSED);
     if ((pDesire != NULL) && pDesire->mActive)
     {
         fResult = 1.0f;
@@ -3272,7 +3273,7 @@ extern "C" float fn_800DED80(cPlayer* pPlayer)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
         DesireRunToTarget* pDesire = pFielder->GetDesireState() == 13
-            ? (DesireRunToTarget*)GetFielderDesire(pFielder, 13) : NULL;
+            ? (DesireRunToTarget*)GetFielderDesire(pFielder, FIELDER_DESIRE_RUN_TO_TARGET) : NULL;
         if ((pDesire != NULL && pDesire->GetTargetBall() != NULL)
             || pFielder->GetDesireState() == 7 || pFielder->GetDesireState() == 16
             || pFielder->m_eActionState == ACTION_SLIDE_ATTACK)
@@ -3322,7 +3323,7 @@ extern "C" float fn_800DF028(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
     if (pFielder->m_eActionState == ACTION_ONETIMER
         || pFielder->m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (pDesire != NULL && pDesire->IsActive() && pDesire->IsOneTouchShot()))
