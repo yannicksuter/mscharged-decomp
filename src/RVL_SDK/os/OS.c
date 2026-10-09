@@ -23,7 +23,7 @@ static u32 BI2DebugFlagHolder;
 static char GameNameBuffer[sizeof('ABCD') + 1];
 
 static f64 ZeroF;     // for lfd
-static f32 ZeroPS[2]; // for psl_l
+static f32 ZeroPS[2]; // for psq_l
 
 static OSExceptionHandler* OSExceptionTable;
 
@@ -47,8 +47,8 @@ void __DBVECTOR(void);
 void __OSEVSetNumber(void);
 void __OSEVEnd(void);
 
+// clang-format off
 asm void __OSFPRInit(void) {
-    // clang-format off
     nofralloc
 
     // Set FP available bit
@@ -132,8 +132,8 @@ paired_singles_disabled:
     mtfsf 0xff, f0
 
     blr
-    // clang-format on
 }
+// clang-format on
 
 static void DisableWriteGatherPipe(void) {
     PPCMthid2(PPCMfhid2() & ~HID2_WPE);
@@ -342,10 +342,8 @@ static void CheckTargets(void) {
     case 0x81:
         OSReport("OS ERROR: boot program is not for RVL target. Please use "
                  "correct boot program.\n");
-        // clang-format off
 #line 1112
         OS_ERROR("Failed to run app");
-        // clang-format on
         break;
     case 0x80:
     default:
@@ -356,10 +354,8 @@ static void CheckTargets(void) {
     case 0x81:
         OSReport("OS ERROR: apploader[D].img is not for RVL target. Please use "
                  "correct apploader[D].img.\n");
-        // clang-format off
 #line 1130
         OS_ERROR("Failed to run app");
-        // clang-format on
         break;
     case 0x80:
     default:
@@ -694,8 +690,8 @@ static void OSExceptionInit(void) {
     DBPrintf("Exceptions initialized...\n");
 }
 
+// clang-format off
 static asm void __OSDBIntegrator(void) {
-    // clang-format off
     nofralloc
 
     entry __OSDBINTSTART
@@ -721,11 +717,11 @@ static asm void __OSDBIntegrator(void) {
     blr
 
     entry __OSDBINTEND
-    // clang-format on
 }
+// clang-format on
 
+// clang-format off
 static asm void __OSDBJump(void){
-    // clang-format off
     nofralloc
 
     entry __OSDBJUMPSTART
@@ -733,8 +729,8 @@ static asm void __OSDBJump(void){
     bl __OSDBJUMPDEST
 
     entry __OSDBJUMPEND
-    // clang-format on
 }
+// clang-format on
 
 OSExceptionHandler
     __OSSetExceptionHandler(u8 type, OSExceptionHandler handler) {
@@ -747,8 +743,8 @@ OSExceptionHandler __OSGetExceptionHandler(u8 type) {
     return OSExceptionTable[type];
 }
 
+// clang-format off
 static asm void OSExceptionVector(void) {
-    // clang-format off
     nofralloc
 
     entry __OSEVStart
@@ -791,7 +787,7 @@ static asm void OSExceptionVector(void) {
     entry __OSEVSetNumber
 
     li r3, 0
-    // Currrent OS context (cached address)
+    // Current OS context (cached address)
     lwz r4, 0x000000D4(r0)
     rlwinm. r5, r5, 0, 30, 30
     bne lbl_800ECF70
@@ -809,11 +805,11 @@ lbl_800ECF70:
     entry __OSEVEnd
 
     nop
-    // clang-format on
 }
+// clang-format on
 
+// clang-format off
 asm void OSDefaultExceptionHandler(u8 type, register OSContext* ctx) {
-    // clang-format off
     nofralloc
 
     stw r0, ctx->gprs[0]
@@ -841,8 +837,8 @@ asm void OSDefaultExceptionHandler(u8 type, register OSContext* ctx) {
 
     stwu r1, -8(r1)
     b __OSUnhandledException
-    // clang-format on
 }
+// clang-format on
 
 void __OSPSInit(void) {
     PPCMthid2(PPCMfhid2() | (1 << 31) | HID2_PSE);
