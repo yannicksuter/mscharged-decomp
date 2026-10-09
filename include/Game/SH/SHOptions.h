@@ -7,6 +7,13 @@
 
 class TLComponentInstance;
 
+enum eOptionsMenuAction
+{
+    OPTIONS_VISUAL = 0,
+    OPTIONS_AUDIO = 1,
+    OPTIONS_CREDITS = 2,
+};
+
 class OptionsScene : public BaseSceneHandler
 {
 public:

@@ -111,7 +111,7 @@ void SHStrikerTimesChallenge::SceneCreated()
     StrikerChallenge* challenge = g_pStrikerChallenge;
     int captain = challenge->GetCurrentCaptain();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
-    int mood = -1;
+    int mood = NEWS_MOOD_NONE;
     if (mDisplayMode == ModeChallengeBriefing)
     {
         if (challenge->mCurrentChallenge < 10)
@@ -124,7 +124,7 @@ void SHStrikerTimesChallenge::SceneCreated()
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_CHALLENGE_START", challenge->GetName());
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_CHALLENGE_START", challenge->GetName());
         }
-        mood = 1;
+        mood = NEWS_MOOD_NEUTRAL;
     }
     else if (mDisplayMode == ModeChallengeResults)
     {
@@ -141,7 +141,7 @@ void SHStrikerTimesChallenge::SceneCreated()
                 nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_SUCCEED_%s", challenge->GetName());
                 nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_SUCCEED_%s", challenge->GetName());
             }
-            mood = 0;
+            mood = NEWS_MOOD_POSITIVE;
         }
         else
         {
@@ -155,7 +155,7 @@ void SHStrikerTimesChallenge::SceneCreated()
                 nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_FAILED_%s", challenge->GetName());
                 nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_FAILED_%s", challenge->GetName());
             }
-            mood = 2;
+            mood = NEWS_MOOD_NEGATIVE;
         }
     }
     if (challenge->mCurrentChallenge == 2)
@@ -163,7 +163,7 @@ void SHStrikerTimesChallenge::SceneCreated()
     else if (challenge->mCurrentChallenge == 4)
         SetArticleImageName(captain, mood, 2);
     else if (challenge->mCurrentChallenge == 5)
-        SetArticleImageName(captain, 1, 4);
+        SetArticleImageName(captain, NEWS_MOOD_NEUTRAL, 4);
     else
         SetArticleImageName(captain, mood, -1);
     if (mDisplayMode == ModeChallengeBriefing)

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Camera/rumblefilter.h"
 
 #include "NL/nlTask.h"
@@ -47,7 +48,7 @@ void cRumbleFilter::Update(float dt)
     float fDTerm;
     float fHTerm;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 1 ||
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED ||
         nlTaskManager::m_pInstance->mCurrentState == 0x20)
     {
         return;

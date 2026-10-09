@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include <stddef.h>
 #include "Game/CharacterTriggers.h"
@@ -660,7 +661,7 @@ void cPlayer::fn_80096CDC(cBall* pBall)
     if (m_pBall == NULL && pBall != NULL && m_eClassType == FIELDER)
     {
         DesireSteering* pDesire
-            = (DesireSteering*)GetFielderDesire((cFielder*)this, 34);
+            = (DesireSteering*)GetFielderDesire((cFielder*)this, FIELDER_DESIRE_STEERING);
         ResetSteeringHistory(pDesire);
     }
     m_pBall = pBall;
@@ -943,7 +944,7 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     bool bFindPosition, bool bPerfectPass, bool bParam4,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
-    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire((cFielder*)pTeammate, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire((cFielder*)pTeammate, FIELDER_DESIRE_RECEIVE_PASS);
     pDesire->ExecutePass(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 

@@ -10,6 +10,14 @@ class TLComponentInstance;
 class TLTextInstance;
 class FEPageControls;
 
+enum eCupHubPhase
+{
+    CUP_HUB_ENTERING = 0,
+    CUP_HUB_ACTIVE = 1,
+    CUP_HUB_TRANSITIONING = 2,
+    CUP_HUB_EXITING_BACK = 3,
+};
+
 class CupHubScene : public BaseSceneHandler
 {
 public:

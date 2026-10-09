@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/ReplayChoreo.h"
 
@@ -381,7 +382,7 @@ void ReplayChoreo::Update(float deltaT)
     replayExcitement = ReplayManager::Instance()->GetReplayExcitement(-8.0f);
     UpdateCrowdImpostorAnimation(replayExcitement);
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 8)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY)
     {
         if (mRunningFor)
         {
@@ -399,7 +400,7 @@ bool ReplayChoreo::Done(float param) const
 {
     if (IsFinished())
     {
-        if (nlTaskManager::m_pInstance->mCurrentState == 8)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY)
         {
             return true;
         }

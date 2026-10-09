@@ -1,6 +1,7 @@
 #ifndef GAME_AI_DESIRE_H
 #define GAME_AI_DESIRE_H
 
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TransitionFunc.h"
 #include "Game/AI/shdStateMachine.h"

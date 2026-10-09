@@ -10,6 +10,14 @@ class TLInstance;
 class FEPageControls;
 struct BasicGameInfo;
 
+enum eCupFinalRoundsPhase
+{
+    CUP_FINAL_ROUNDS_ENTERING = 0,
+    CUP_FINAL_ROUNDS_ACTIVE = 1,
+    CUP_FINAL_ROUNDS_TRANSITIONING = 2,
+    CUP_FINAL_ROUNDS_EXITING_BACK = 3,
+};
+
 class CupFinalRoundsScene : public BaseSceneHandler
 {
 public:

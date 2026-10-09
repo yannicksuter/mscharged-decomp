@@ -109,6 +109,16 @@ enum eCupType
     CUP_STRIKER = 2,
 };
 
+enum eCupState
+{
+    CUP_STATE_NONE = -1,
+    CUP_STATE_WON = 4,
+    CUP_STATE_ACTIVE = 15,
+    CUP_STATE_NOT_QUALIFIED = 16,
+    CUP_STATE_ELIMINATED = 17,
+    CUP_STATE_FINAL_LOST = 18,
+};
+
 class CupManager : public CupInterface, public nlSingleton<CupManager>
 {
 public:

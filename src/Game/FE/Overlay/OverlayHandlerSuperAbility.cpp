@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
 #include "Game/SharedStaticStorage.h"
@@ -27,8 +28,8 @@ SuperAbilityOverlay::~SuperAbilityOverlay()
 void SuperAbilityOverlay::SetVisible(bool visible)
 {
     bool frameLocked = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
-    if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState != 2
-        && nlTaskManager::m_pInstance->mPendingState != 2)
+    if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState != TASK_GAMEPLAY
+        && nlTaskManager::m_pInstance->mPendingState != TASK_GAMEPLAY)
     {
         mVisible = visible;
     }

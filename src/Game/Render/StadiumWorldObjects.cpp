@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/StadiumWorldObjects.h"
 
@@ -341,7 +342,7 @@ void StadiumWorldDrawable::UpdateBlend()
 {
     unsigned long flags = m_uFlags;
     if ((flags & 0x10) != 0
-        && nlTaskManager::m_pInstance->mCurrentState == 0x10)
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_NIS)
     {
         SetObjectBlend(this, 0.0f);
         return;

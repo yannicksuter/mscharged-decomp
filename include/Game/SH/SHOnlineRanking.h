@@ -8,6 +8,13 @@
 class TLComponentInstance;
 struct FEPageControls;
 
+enum eOnlineRankingPhase
+{
+    ONLINE_RANKING_ENTERING = 0,
+    ONLINE_RANKING_ACTIVE = 1,
+    ONLINE_RANKING_EXITING_BACK = 3,
+};
+
 class SHOnlineRanking : public BaseSceneHandler
 {
 public:

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Camera/CameraDamping.h"
 #include "Game/Camera/GameplayCameraEffects.h"
@@ -156,7 +157,7 @@ GameplayCamera::GameplayCamera()
 
 void GameplayCamera::Update(float deltaTime)
 {
-    bool gamePaused = (nlTaskManager::m_pInstance->mCurrentState == 1)
+    bool gamePaused = (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
                     | (nlTaskManager::m_pInstance->mCurrentState == 32);
 
     m_bDynamicZoom = GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera;

@@ -626,7 +626,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         ((PhysicsBulletBill*)pObject)->mBulletBill->Hide(false);
         break;
     case PHYSOBJ_PATCH:
-        if (((PhysicsPatch*)pObject)->m_Type == 0
+        if (((PhysicsPatch*)pObject)->m_Type == PATCH_GAS_BALL
             && !((PhysicsPatch*)pObject)->m_bKillMe)
         {
             CreateExplosionShockwave(&pObject->GetPosition());

@@ -213,7 +213,7 @@ void CupCheaterScene::ProcessPostGame()
         GameSceneManager::Instance()->Pop();
 
         CupManager* cup = CupManager::Instance();
-        if (cup->GetCurrentRoundNumber() == -5 && cup->mState == 4)
+        if (cup->GetCurrentRoundNumber() == -5 && cup->mState == CUP_STATE_WON)
         {
             if (cup->GetCurrentMode() == 0)
             {

@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/FielderDesireMachine.h"
 #include "Game/AI/FielderDesireTransitions.h"
@@ -34,7 +35,7 @@ class DesireDoNothing : public Desire
 {
 public:
     DesireDoNothing()
-        : Desire(33, UnsetTransitionFunc(g_UnsetTransitionFunc))
+        : Desire(FIELDER_DESIRE_DO_NOTHING, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -69,124 +70,124 @@ void FielderDesireMachine::Initialize()
     ScriptMachine::Initialize();
 
     DesireCutAndBreak* cutAndBreak
-        = new (8, false) DesireCutAndBreak(1, (void*)TransDesireBallOwner);
-    AddState(1, cutAndBreak, false);
+        = new (8, false) DesireCutAndBreak(FIELDER_DESIRE_CUT_AND_BREAK, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_CUT_AND_BREAK, cutAndBreak, false);
 
     DesireDefendPos* defendPos
-        = new (8, false) DesireDefendPos(2, (void*)TransDesireDefendPos);
-    AddState(2, defendPos, false);
+        = new (8, false) DesireDefendPos(FIELDER_DESIRE_DEFEND_POS, (void*)TransDesireDefendPos);
+    AddState(FIELDER_DESIRE_DEFEND_POS, defendPos, false);
 
     DesireDeke* deke
-        = new (8, false) DesireDeke(3, (void*)TransDesireActionDone);
-    AddState(3, deke, false);
+        = new (8, false) DesireDeke(FIELDER_DESIRE_DEKE, (void*)TransDesireActionDone);
+    AddState(FIELDER_DESIRE_DEKE, deke, false);
 
     DesireDoNothing* doNothing = new (8, false) DesireDoNothing();
-    AddState(33, doNothing, false);
+    AddState(FIELDER_DESIRE_DO_NOTHING, doNothing, false);
 
     DesireFinishAction* finishAction
-        = new (8, false) DesireFinishAction(21, (void*)TransDesireActionDone);
-    AddState(21, finishAction, false);
+        = new (8, false) DesireFinishAction(FIELDER_DESIRE_FINISH_ACTION, (void*)TransDesireActionDone);
+    AddState(FIELDER_DESIRE_FINISH_ACTION, finishAction, false);
 
     DesireGetInPosition* getInPosition
-        = new (8, false) DesireGetInPosition(4, (void*)TransDesireBallOwner);
-    AddState(4, getInPosition, false);
+        = new (8, false) DesireGetInPosition(FIELDER_DESIRE_GET_IN_POSITION, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_GET_IN_POSITION, getInPosition, false);
 
     DesireGetOpen* getOpen
-        = new (8, false) DesireGetOpen(5, (void*)TransDesireGetOpen);
-    AddState(5, getOpen, false);
+        = new (8, false) DesireGetOpen(FIELDER_DESIRE_GET_OPEN, (void*)TransDesireGetOpen);
+    AddState(FIELDER_DESIRE_GET_OPEN, getOpen, false);
 
-    DesireHit* hit = new (8, false) DesireHit(6, (void*)TransDesireActionDone);
-    AddState(6, hit, false);
+    DesireHit* hit = new (8, false) DesireHit(FIELDER_DESIRE_HIT, (void*)TransDesireActionDone);
+    AddState(FIELDER_DESIRE_HIT, hit, false);
 
-    DesireInterceptBall* interceptBall = new (8, false) DesireInterceptBall(7);
-    AddState(7, interceptBall, false);
+    DesireInterceptBall* interceptBall = new (8, false) DesireInterceptBall(FIELDER_DESIRE_INTERCEPT_BALL);
+    AddState(FIELDER_DESIRE_INTERCEPT_BALL, interceptBall, false);
 
     DesireMark* mark
-        = new (8, false) DesireMark(8, (void*)TransDesireBallOwner);
-    AddState(8, mark, false);
+        = new (8, false) DesireMark(FIELDER_DESIRE_MARK, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_MARK, mark, false);
 
-    DesireMegaStrike* megaStrike = new (8, false) DesireMegaStrike(32);
-    AddState(32, megaStrike, false);
+    DesireMegaStrike* megaStrike = new (8, false) DesireMegaStrike(FIELDER_DESIRE_MEGA_STRIKE);
+    AddState(FIELDER_DESIRE_MEGA_STRIKE, megaStrike, false);
 
     DesirePass* pass
-        = new (8, false) DesirePass(14, (void*)TransDesireActionDone);
-    AddState(14, pass, false);
+        = new (8, false) DesirePass(FIELDER_DESIRE_PASS, (void*)TransDesireActionDone);
+    AddState(FIELDER_DESIRE_PASS, pass, false);
 
     DesirePreparePass* preparePass
-        = new (8, false) DesirePreparePass(18, (void*)TransDesireNotBallOwner);
-    AddState(18, preparePass, false);
+        = new (8, false) DesirePreparePass(FIELDER_DESIRE_PREPARE_PASS, (void*)TransDesireNotBallOwner);
+    AddState(FIELDER_DESIRE_PREPARE_PASS, preparePass, false);
 
     DesireReceivePass* receivePass = new (8, false) DesireReceivePass();
-    AddState(22, receivePass, false);
+    AddState(FIELDER_DESIRE_RECEIVE_PASS, receivePass, false);
 
     DesireRunToNet* runToNet = new (8, false) DesireRunToNet();
-    AddState(9, runToNet, false);
+    AddState(FIELDER_DESIRE_RUN_TO_NET, runToNet, false);
 
     DesireRunUpfield* runUpfield
-        = new (8, false) DesireRunUpfield(10, (void*)TransDesireBallOwner);
-    AddState(10, runUpfield, false);
+        = new (8, false) DesireRunUpfield(FIELDER_DESIRE_RUN_UPFIELD, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_RUN_UPFIELD, runUpfield, false);
 
     DesireRunDownfield* runDownfield
-        = new (8, false) DesireRunDownfield(11, (void*)TransDesireBallOwner);
-    AddState(11, runDownfield, false);
+        = new (8, false) DesireRunDownfield(FIELDER_DESIRE_RUN_DOWNFIELD, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_RUN_DOWNFIELD, runDownfield, false);
 
     DesireRunInDirection* runInDirection
-        = new (8, false) DesireRunInDirection(12, (void*)TransDesireBallOwner);
-    AddState(12, runInDirection, false);
+        = new (8, false) DesireRunInDirection(FIELDER_DESIRE_RUN_IN_DIRECTION, (void*)TransDesireBallOwner);
+    AddState(FIELDER_DESIRE_RUN_IN_DIRECTION, runInDirection, false);
 
     DesireRunToTarget* runToTarget
-        = new (8, false) DesireRunToTarget(13, (void*)TransDesireRunToTarget);
-    AddState(13, runToTarget, false);
+        = new (8, false) DesireRunToTarget(FIELDER_DESIRE_RUN_TO_TARGET, (void*)TransDesireRunToTarget);
+    AddState(FIELDER_DESIRE_RUN_TO_TARGET, runToTarget, false);
 
     DesireShoot* shoot
-        = new (8, false) DesireShoot(15, (void*)TransDesireNotBallOwner);
-    AddState(15, shoot, false);
+        = new (8, false) DesireShoot(FIELDER_DESIRE_SHOOT, (void*)TransDesireNotBallOwner);
+    AddState(FIELDER_DESIRE_SHOOT, shoot, false);
 
     DesireSlideAttack* slideAttack = new (8, false) DesireSlideAttack();
-    AddState(16, slideAttack, false);
+    AddState(FIELDER_DESIRE_SLIDE_ATTACK, slideAttack, false);
 
     DesireUserControlled* userControlled
         = new (8, false) DesireUserControlled();
-    AddState(20, userControlled, false);
+    AddState(FIELDER_DESIRE_USER_CONTROLLED, userControlled, false);
 
-    DesireWait* wait = new (8, false) DesireWait(31);
-    AddState(31, wait, false);
+    DesireWait* wait = new (8, false) DesireWait(FIELDER_DESIRE_WAIT);
+    AddState(FIELDER_DESIRE_WAIT, wait, false);
 
-    DesireWindupShot* windupShot = new (8, false) DesireWindupShot(19);
-    AddState(19, windupShot, false);
+    DesireWindupShot* windupShot = new (8, false) DesireWindupShot(FIELDER_DESIRE_WINDUP_SHOT);
+    AddState(FIELDER_DESIRE_WINDUP_SHOT, windupShot, false);
 
-    DesireStar* star = new (8, false) DesireStar(24);
-    AddState(24, star, true);
+    DesireStar* star = new (8, false) DesireStar(FIELDER_DESIRE_STAR);
+    AddState(FIELDER_DESIRE_STAR, star, true);
 
-    DesireMushroom* mushroom = new (8, false) DesireMushroom(25);
-    AddState(25, mushroom, true);
+    DesireMushroom* mushroom = new (8, false) DesireMushroom(FIELDER_DESIRE_MUSHROOM);
+    AddState(FIELDER_DESIRE_MUSHROOM, mushroom, true);
 
-    DesireSlippery* slippery = new (8, false) DesireSlippery(26);
-    AddState(26, slippery, true);
+    DesireSlippery* slippery = new (8, false) DesireSlippery(FIELDER_DESIRE_SLIPPERY);
+    AddState(FIELDER_DESIRE_SLIPPERY, slippery, true);
 
     DesireGooey* gooey = new (8, false) DesireGooey();
-    AddState(27, gooey, true);
+    AddState(FIELDER_DESIRE_GOOEY, gooey, true);
 
-    DesireShrink* shrink = new (8, false) DesireShrink(28);
-    AddState(28, shrink, true);
+    DesireShrink* shrink = new (8, false) DesireShrink(FIELDER_DESIRE_SHRINK);
+    AddState(FIELDER_DESIRE_SHRINK, shrink, true);
 
-    DesireFrozen* frozen = new (8, false) DesireFrozen(29);
-    AddState(29, frozen, true);
+    DesireFrozen* frozen = new (8, false) DesireFrozen(FIELDER_DESIRE_FROZEN);
+    AddState(FIELDER_DESIRE_FROZEN, frozen, true);
 
-    DesireConfused* confused = new (8, false) DesireConfused(30);
-    AddState(30, confused, true);
+    DesireConfused* confused = new (8, false) DesireConfused(FIELDER_DESIRE_CONFUSED);
+    AddState(FIELDER_DESIRE_CONFUSED, confused, true);
 
     DesireSuperPower* superPower = new (8, false) DesireSuperPower();
-    AddState(23, superPower, true);
+    AddState(FIELDER_DESIRE_SUPER_POWER, superPower, true);
 
     DesireUsePowerup* usePowerup = new (8, false) DesireUsePowerup();
-    AddState(17, usePowerup, true);
+    AddState(FIELDER_DESIRE_USE_POWERUP, usePowerup, true);
 
     DesireSteering* steering = new (8, false) DesireSteering();
-    AddState(34, steering, true);
+    AddState(FIELDER_DESIRE_STEERING, steering, true);
 
     DesireWaluigiWall* desire35 = new (8, false) DesireWaluigiWall();
-    AddState(35, desire35, true);
+    AddState(FIELDER_DESIRE_WALUIGI_WALL, desire35, true);
 }
 
 /**
@@ -197,7 +198,7 @@ void FielderDesireMachine::Reset(bool deleting)
     ScriptMachine::Reset(deleting);
     if (!deleting)
     {
-        ActivateConcurrentState(this, 34, 0, false);
+        ActivateConcurrentState(this, FIELDER_DESIRE_STEERING, 0, false);
     }
 }
 
@@ -206,7 +207,7 @@ void FielderDesireMachine::Reset(bool deleting)
  */
 void FielderDesireMachine::Update(float deltaTime)
 {
-    Desire* frozen = GetFielderDesire(GetFielder(), 29);
+    Desire* frozen = GetFielderDesire(GetFielder(), FIELDER_DESIRE_FROZEN);
     if (frozen->IsActive())
     {
         DesireUpdate result;
@@ -231,18 +232,18 @@ void FielderDesireMachine::Update(float deltaTime)
         }
     }
 
-    if (!IsConcurrentStateActive(this, 34))
+    if (!IsConcurrentStateActive(this, FIELDER_DESIRE_STEERING))
     {
-        ActivateConcurrentState(this, 34, 0, false);
+        ActivateConcurrentState(this, FIELDER_DESIRE_STEERING, 0, false);
     }
 
     if (!waitForController && g_pGame->IsGameplayOrOvertime()
         && !UserControlledT(GetFielder()->m_pTeam)
-        && !IsConcurrentStateActive(this, 17) && fn_800D85F8(GetFielder()))
+        && !IsConcurrentStateActive(this, FIELDER_DESIRE_USE_POWERUP) && fn_800D85F8(GetFielder()))
     {
         FuzzyVariantCollection params;
         params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));
-        ActivateConcurrentState(this, 17, &params, false);
+        ActivateConcurrentState(this, FIELDER_DESIRE_USE_POWERUP, &params, false);
     }
 
     ScriptMachine::Update(deltaTime);
@@ -269,23 +270,23 @@ void FielderDesireMachine::SelectState()
         if (!hasController)
         {
             DeactivateConcurrentStates(this);
-            state = 31;
+            state = FIELDER_DESIRE_WAIT;
         }
         else
         {
-            state = 20;
+            state = FIELDER_DESIRE_USER_CONTROLLED;
         }
     }
     else if (g_pGame->m_eGameState == GS_KICKOFF)
     {
-        state = 31;
+        state = FIELDER_DESIRE_WAIT;
     }
     else if (g_pGame->IsGameplayOrOvertime())
     {
         bool hasController = fielder->GetGlobalPad();
         if (hasController)
         {
-            state = 20;
+            state = FIELDER_DESIRE_USER_CONTROLLED;
         }
         else
         {
@@ -305,7 +306,7 @@ void FielderDesireMachine::SelectState()
             }
             if (shouldRunToTarget)
             {
-                state = 13;
+                state = FIELDER_DESIRE_RUN_TO_TARGET;
                 params.Set(7, FuzzyVariant(gBehindGoalLineRunTimeLimit));
                 params.Set(13, FuzzyVariant(gBehindGoalLineRunSpeed));
                 params.Set(2, FuzzyVariant(gBehindGoalLineRunAvoidanceCoeff[0]));
@@ -336,7 +337,7 @@ void FielderDesireMachine::SelectState()
         formation->m_Positions[GetFielder()->m_DetPlayer.m_ID].GetLocationForTeam(
             *(nlVector2*)&position, team->m_nSide);
         position.z = 0.0f;
-        state = 13;
+        state = FIELDER_DESIRE_RUN_TO_TARGET;
         params.Set(14, FuzzyVariant(FT_VECTOR, position));
     }
 
@@ -356,7 +357,7 @@ void FielderDesireMachine::SelectState()
 shdStateMachine* FielderDesireMachine::ActivateState(
     int state, FuzzyVariantCollection* params, bool force)
 {
-    if (state == 17)
+    if (state == FIELDER_DESIRE_USE_POWERUP)
     {
         return 0;
     }
@@ -372,7 +373,7 @@ void FielderDesireMachine::DeactivateState()
     if (mActiveState != 0)
     {
         DeactivateStateMachine(mActiveState, true);
-        if (mActiveState->GetState() != 21)
+        if (mActiveState->GetState() != FIELDER_DESIRE_FINISH_ACTION)
         {
             mPreviousState = mActiveState;
         }

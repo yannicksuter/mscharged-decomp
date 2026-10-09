@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Game.h"
 /**
  * Address/Size: 0x80288FF8 | size: 0x1444
@@ -309,10 +310,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         else if (!mByPassing)
         {
-            if (nlTaskManager::m_pInstance->mCurrentState != 8
+            if (nlTaskManager::m_pInstance->mCurrentState != TASK_REPLAY
                 && !IsDuringGamePauseState())
             {
-                nlTaskManager::SetNextState(8);
+                nlTaskManager::SetNextState(TASK_REPLAY);
             }
             ReplayChoreo::Instance().StartAutoReplay(false);
             static_cast<OverlayManager*>(g_pOverlayManager)
@@ -337,10 +338,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         else if (!mByPassing)
         {
-            if (nlTaskManager::m_pInstance->mCurrentState != 8
+            if (nlTaskManager::m_pInstance->mCurrentState != TASK_REPLAY
                 && !IsDuringGamePauseState())
             {
-                nlTaskManager::SetNextState(8);
+                nlTaskManager::SetNextState(TASK_REPLAY);
             }
             ReplayChoreo::Instance().StartAutoReplay(true);
             static_cast<OverlayManager*>(g_pOverlayManager)

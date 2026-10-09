@@ -45,7 +45,7 @@ RoadToStrikersCupHubScene::RoadToStrikersCupHubScene()
     , mCupStatsButton()
     , mRulesButton()
     , mPlayButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(ROAD_TO_STRIKERS_CUP_ENTERING)
 {
     mPlayButton.mContext = (void*)ButtonPlay;
     mScheduleButton.mContext = (void*)ButtonSchedule;
@@ -124,7 +124,7 @@ void RoadToStrikersCupHubScene::SceneCreated()
 
     if (CupManager::Instance()->ShouldShowCupPhasePopup() == true)
     {
-        if (CupManager::Instance()->GetCurrentRoundType() != 0)
+        if (CupManager::Instance()->GetCurrentRoundType() != CUP_ROUND_LEAGUE)
             ShowCupRulesPopup();
         CupManager::Instance()->SetShowCupPhasePopup(false);
     }
@@ -166,7 +166,7 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         mIntroAudioPlayed = true;
     }
 
-    if (mTransitionState == 0 || mTransitionState == 2
+    if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING || mTransitionState == ROAD_TO_STRIKERS_CUP_TRANSITIONING
         || mTransitionState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -178,14 +178,14 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
             return;
         }
 
-        if (mTransitionState == 0)
+        if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
             navigation->SetButtons(0x14, true);
             UpdatePlayButtonText();
-            mTransitionState = 1;
+            mTransitionState = ROAD_TO_STRIKERS_CUP_ACTIVE;
         }
-        else if (mTransitionState == 2)
+        else if (mTransitionState == ROAD_TO_STRIKERS_CUP_TRANSITIONING)
         {
             if (mSelectedButton == ButtonPlay)
                 AdvanceCupFlow(false);
@@ -357,7 +357,7 @@ void RoadToStrikersCupHubScene::UpdateRoundMessage()
     FEPresentation* presentation = GetPresentation();
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
-    if (CupManager::s_pInstance->mState == 4)
+    if (CupManager::s_pInstance->mState == CUP_STATE_WON)
         currentRound->SetStringId("HUB_CONGRATS");
     else
         currentRound->SetStringId("HUB_ELIMINATED");
@@ -373,7 +373,7 @@ void RoadToStrikersCupHubScene::UpdateCupHeading()
     CupManager* cupManager = CupManager::s_pInstance;
     int captain;
     if (cupManager->GetCurrentRoundNumber() == -5
-        && cupManager->mState == 4)
+        && cupManager->mState == CUP_STATE_WON)
     {
         captain = cupManager->GetUserSelectedCupTeam();
     }
@@ -554,7 +554,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerPress(
     if (button != ButtonRules)
     {
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = ROAD_TO_STRIKERS_CUP_TRANSITIONING;
 
         SHNavigation* navigation = GetNavigationScene();
         if (navigation != 0)

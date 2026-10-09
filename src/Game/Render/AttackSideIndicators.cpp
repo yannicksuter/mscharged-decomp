@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Render/AttackSideIndicators.h"
 
 #include "Game/Render/StadiumWorldObjects.h"
@@ -101,7 +102,7 @@ void DestroyAttackSideIndicators()
 
 void UpdateAttackSideIndicators()
 {
-    bool active = nlTaskManager::m_pInstance->mCurrentState == 2;
+    bool active = nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY;
     for (int i = 0; i < 2; ++i)
     {
         gAttackSideIndicatorSets[i]->Update(

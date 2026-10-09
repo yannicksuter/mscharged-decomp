@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/Presentation.h"
 #include "Game/DetInput.h"
@@ -101,7 +102,7 @@ static inline bool IsDuringGamePauseState()
         }
     }
     if (bGameFrameUnlocked
-        && nlTaskManager::m_pInstance->mCurrentState == 1)
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
     {
         bDuringGamePauseState = true;
     }
@@ -292,8 +293,8 @@ bool Presentation::DetectSkipPress()
         return false;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState != 0x10
-        && nlTaskManager::m_pInstance->mCurrentState != 0x8)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_NIS
+        && nlTaskManager::m_pInstance->mCurrentState != TASK_REPLAY)
     {
         return false;
     }
@@ -398,7 +399,7 @@ void Presentation::Finish()
                 NisPlayer::Instance()->StopNisCue();
                 g_pGame->mEventQueue.mGameOverEvent.Queue(
                     Function<FnVoidVoid>());
-                nlTaskManager::SetNextState(1);
+                nlTaskManager::SetNextState(TASK_PAUSED);
             }
             else
             {
@@ -408,7 +409,7 @@ void Presentation::Finish()
                     FixedUpdateTask* task = GetFixedUpdateTask();
                     task->mSimulationStarted = true;
                 }
-                nlTaskManager::SetNextState(2);
+                nlTaskManager::SetNextState(TASK_GAMEPLAY);
             }
         }
     }
@@ -494,7 +495,7 @@ void Presentation::Update(float deltaT)
         }
     }
     if (bGameFrameUnlocked
-        && nlTaskManager::m_pInstance->mCurrentState == 1)
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
     {
         bDuringGamePauseState = true;
     }
@@ -502,7 +503,7 @@ void Presentation::Update(float deltaT)
     {
         if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
         {
-            if (nlTaskManager::m_pInstance->mCurrentState != 0x10)
+            if (nlTaskManager::m_pInstance->mCurrentState != TASK_NIS)
             {
                 glDiscardFrame(1);
             }
@@ -598,7 +599,7 @@ void Presentation::Update(float deltaT)
         }
     }
     if (bGameFrameUnlocked
-        && nlTaskManager::m_pInstance->mCurrentState == 1)
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
     {
         bDuringGamePauseState = true;
     }
@@ -1338,7 +1339,7 @@ bool DuringMegaStrikeEndPresentation(Presentation* presentation)
 
 static inline bool IsSynchronizedNisFunction(Presentation* state)
 {
-    if (nlTaskManager::m_pInstance->mCurrentState != 2)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_GAMEPLAY)
     {
         return false;
     }
@@ -1480,7 +1481,7 @@ void Presentation::PlayNis()
             "Starting NIS DoPlay at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
         NisPlayer::Instance()->Play();
-        nlTaskManager::SetNextState(0x10);
+        nlTaskManager::SetNextState(TASK_NIS);
         mNisLoadedBits = 0;
         mNisLoadedSent = false;
         tDebugPrintManager::Print(

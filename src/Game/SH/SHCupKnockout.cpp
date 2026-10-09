@@ -50,7 +50,7 @@ CupKnockoutScene::CupKnockoutScene()
     , mMatchupButtons()
     , mBracketButton()
     , mBracketButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(CUP_KNOCKOUT_ENTERING)
 {
     if (g_pNetworkSessionBase->GetSessionMode())
         mNetworkTournament = true;
@@ -157,7 +157,7 @@ void CupKnockoutScene::SceneCreated()
 void CupKnockoutScene::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
-    if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
+    if (mTransitionState == CUP_KNOCKOUT_ENTERING || mTransitionState == CUP_KNOCKOUT_TRANSITIONING || mTransitionState == CUP_KNOCKOUT_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -166,7 +166,7 @@ void CupKnockoutScene::Update(float fDeltaT)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mTransitionState == 0)
+        if (mTransitionState == CUP_KNOCKOUT_ENTERING)
         {
             if (!mPointerButtonsInitialized)
             {
@@ -176,9 +176,9 @@ void CupKnockoutScene::Update(float fDeltaT)
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
-            mTransitionState = 1;
+            mTransitionState = CUP_KNOCKOUT_ACTIVE;
         }
-        else if (mTransitionState == 2)
+        else if (mTransitionState == CUP_KNOCKOUT_TRANSITIONING)
         {
             if (mPreviousPagePressed)
             {
@@ -193,7 +193,7 @@ void CupKnockoutScene::Update(float fDeltaT)
             AdvanceCupFlow(false);
             return;
         }
-        else if (mTransitionState == 3)
+        else if (mTransitionState == CUP_KNOCKOUT_EXITING_BACK)
         {
             HandleCupBack(2);
             return;
@@ -228,7 +228,7 @@ void CupKnockoutScene::Update(float fDeltaT)
         mBracketButton.HandlePointerEvent(&event);
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mTransitionState = 3;
+            mTransitionState = CUP_KNOCKOUT_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();
@@ -242,7 +242,7 @@ void CupKnockoutScene::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
-                mTransitionState = 2;
+                mTransitionState = CUP_KNOCKOUT_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
                 if (mPageControls->IsButtonPressed(1))
                     mPreviousPagePressed = true;
@@ -471,12 +471,12 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
     case NET_TOURN_GAME_IN_PROGRESS:
         switch (tournamentGame->mGameStatus)
         {
-        case 1:
+        case TOURN_GAME_STATUS_INACTIVE:
             timer->SetActiveSlide("loading", true, false);
             timer->m_bVisible = true;
             break;
-        case 2:
-        case 3:
+        case TOURN_GAME_STATUS_PLAYING:
+        case TOURN_GAME_STATUS_SUDDEN_DEATH:
         {
             int seconds = tournamentGame->mGameTimeDelta;
             int minutes = seconds / 60;
@@ -486,7 +486,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
                 nlSNPrintf(time, sizeof(time), "%d:0%d", minutes, remainder);
             else
                 nlSNPrintf(time, sizeof(time), "%d:%d", minutes, remainder);
-            if (tournamentGame->mGameStatus == 3)
+            if (tournamentGame->mGameStatus == TOURN_GAME_STATUS_SUDDEN_DEATH)
                 timer->SetActiveSlide("Slide1", true, false);
             else
                 timer->SetActiveSlide("time_remaining", true, false);
@@ -496,7 +496,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
             timer->m_bVisible = true;
             break;
         }
-        case 0:
+        case TOURN_GAME_STATUS_NONE:
         default:
             timer->m_bVisible = false;
             break;
@@ -595,7 +595,7 @@ void CupKnockoutScene::UpdateRoundHighlight()
             FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
                 presentation, "OUT", "Layer", "tournament_screens", lightningName);
 
-        if (mTournament->GetCurrentRoundType() == 1
+        if (mTournament->GetCurrentRoundType() == CUP_ROUND_KNOCKOUT
             && ((currentRound == numRounds - 3 && i < 4)
                 || (currentRound == numRounds - 2 && i < 6 && i >= 4)
                 || (currentRound == numRounds - 1 && i >= 6)))
@@ -686,7 +686,7 @@ void CupKnockoutScene::OnBracketPointerPress(unsigned int, void* context)
     case 0:
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = CUP_KNOCKOUT_TRANSITIONING;
         SHNavigation* navigation = GetNavigationScene();
         if (navigation != 0)
             navigation->HideButtons();

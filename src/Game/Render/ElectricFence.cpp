@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/ElectricFence.h"
 #include <cstring>
@@ -572,7 +573,7 @@ void UpdateElectricFence(float fDeltaT)
     static unsigned long counter = 1;
     static float timeSinceLastEffect;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 1
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED
         || nlTaskManager::m_pInstance->mCurrentState == 0x20)
     {
         return;

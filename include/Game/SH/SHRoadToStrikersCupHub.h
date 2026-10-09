@@ -9,6 +9,13 @@ class TLComponentInstance;
 class TLImageInstance;
 class TLTextInstance;
 
+enum eRoadToStrikersCupPhase
+{
+    ROAD_TO_STRIKERS_CUP_ENTERING = 0,
+    ROAD_TO_STRIKERS_CUP_ACTIVE = 1,
+    ROAD_TO_STRIKERS_CUP_TRANSITIONING = 2,
+};
+
 class RoadToStrikersCupHubScene : public BaseSceneHandler
 {
 public:

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
@@ -287,7 +288,7 @@ void cDebugCamera::UpdateRadiusAndHeightControls(float dt, float controlSpeed)
         }
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState != 0x20000)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_DEBUG_REPLAY)
     {
         float down = m_pPad->GetPressure(5, true);
         float up = m_pPad->GetPressure(6, true);

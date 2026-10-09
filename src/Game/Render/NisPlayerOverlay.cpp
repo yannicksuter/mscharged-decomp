@@ -219,7 +219,7 @@ void NisPlayerCameraSwapOverlay::Render()
 int NisPlayerCameraSwapOverlay::Update(float dt)
 {
     mPlayer->SwapCameras();
-    return 1;
+    return NIS_OVERLAY_PIP;
 }
 
 /**
@@ -274,11 +274,11 @@ int NisPlayerPIPExpandOverlay::Update(float dt)
     mTime += dt;
     if (mTime <= mDuration)
     {
-        return 3;
+        return NIS_OVERLAY_PIP_EXPAND;
     }
 
     mPlayer->SwapCameras();
-    return 0;
+    return NIS_OVERLAY_NONE;
 }
 
 /**
@@ -286,7 +286,7 @@ int NisPlayerPIPExpandOverlay::Update(float dt)
  */
 int NisPlayerPIPExpandOverlay::GetOverlayType()
 {
-    return 1;
+    return NIS_OVERLAY_PIP;
 }
 
 /**
@@ -294,7 +294,7 @@ int NisPlayerPIPExpandOverlay::GetOverlayType()
  */
 int NisPlayerCameraSwapOverlay::GetOverlayType()
 {
-    return 1;
+    return NIS_OVERLAY_PIP;
 }
 
 /**
@@ -302,7 +302,7 @@ int NisPlayerCameraSwapOverlay::GetOverlayType()
  */
 int NisPlayerHolotronOverlay::GetOverlayType()
 {
-    return 4;
+    return NIS_OVERLAY_HOLOTRON;
 }
 
 /**
@@ -310,7 +310,7 @@ int NisPlayerHolotronOverlay::GetOverlayType()
  */
 int NisPlayerHolotronOverlay::Update(float dt)
 {
-    return 4;
+    return NIS_OVERLAY_HOLOTRON;
 }
 
 /**
@@ -318,7 +318,7 @@ int NisPlayerHolotronOverlay::Update(float dt)
  */
 int NisPlayerPIPOverlay::GetOverlayType()
 {
-    return 1;
+    return NIS_OVERLAY_PIP;
 }
 
 /**
@@ -326,7 +326,7 @@ int NisPlayerPIPOverlay::GetOverlayType()
  */
 int NisPlayerPIPOverlay::Update(float dt)
 {
-    return 1;
+    return NIS_OVERLAY_PIP;
 }
 
 /**
@@ -334,7 +334,7 @@ int NisPlayerPIPOverlay::Update(float dt)
  */
 int NisPlayerNoOverlay::GetOverlayType()
 {
-    return 0;
+    return NIS_OVERLAY_NONE;
 }
 
 /**
@@ -342,7 +342,7 @@ int NisPlayerNoOverlay::GetOverlayType()
  */
 int NisPlayerNoOverlay::Update(float dt)
 {
-    return 0;
+    return NIS_OVERLAY_NONE;
 }
 
 NisPlayerNoOverlay::~NisPlayerNoOverlay()

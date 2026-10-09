@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireSteering.h"
 #include "NL/nlMath.inl"
@@ -50,7 +51,7 @@ static inline bool IsNotNearlyZero(float value, float zero)
 }
 
 DesireSteering::DesireSteering()
-    : Desire(34, UnsetTransitionFunc(g_UnsetTransitionFunc)),
+    : Desire(FIELDER_DESIRE_STEERING, UnsetTransitionFunc(g_UnsetTransitionFunc)),
       m_AvoidanceHistory(gSteeringHistoryDuration)
 {
     m_pAvoidance = NULL;
@@ -327,7 +328,7 @@ void SetTimedSteeringTarget(DesireSteering* desire,
 const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
 {
     DesireReceivePass* receivePass = (DesireReceivePass*)GetFielderDesire(
-        desire->m_pFielder, 22);
+        desire->m_pFielder, FIELDER_DESIRE_RECEIVE_PASS);
 
     if (g_pBall->HasPassTarget()
         && g_pBall->m_pPassTarget == desire->m_pFielder

@@ -61,8 +61,8 @@ SHOnlineHub::SHOnlineHub()
     , mRefreshTimer(0.0f)
     , mPopupActive(false)
     , mHasStrikerOfTheDay(false)
-    , mState(0)
-    , mPressedItem(0)
+    , mState(ONLINE_HUB_ENTERING)
+    , mPressedItem(ONLINE_HUB_FRIEND_MATCH)
 {
     for (int i = 0; i < 4; ++i)
         mButtons[i].mContext = (void*)i;
@@ -120,7 +120,7 @@ void SHOnlineHub::Update(float dt)
     BaseSceneHandler::Update(dt);
     if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == ONLINE_HUB_ENTERING || mState == ONLINE_HUB_EXITING_FORWARD || mState == ONLINE_HUB_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -129,7 +129,7 @@ void SHOnlineHub::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mState == 0)
+        if (mState == ONLINE_HUB_ENTERING)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
@@ -143,23 +143,23 @@ void SHOnlineHub::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             UpdateOnlineHubMiiIcon(this);
             UpdateStrikerOfTheDay();
-            mState = 1;
+            mState = ONLINE_HUB_READY;
         }
-        else if (mState == 2)
+        else if (mState == ONLINE_HUB_EXITING_FORWARD)
         {
             switch (mPressedItem)
             {
-            case 0:
+            case ONLINE_HUB_FRIEND_MATCH:
                 if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
                     GameSceneManager::Instance()->Push((SceneList)42, SCREEN_FORWARD, true);
                 break;
-            case 1: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
-            case 2: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKING, SCREEN_FORWARD, true); break;
-            case 3: GameSceneManager::Instance()->Push((SceneList)47, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_RANKED_MATCH: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_RANKINGS: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKING, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_FRIENDS: GameSceneManager::Instance()->Push((SceneList)47, SCREEN_FORWARD, true); break;
             }
             return;
         }
-        else if (mState == 3)
+        else if (mState == ONLINE_HUB_EXITING_BACK)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
             GameSceneManager::Instance()->Pop();
@@ -197,12 +197,12 @@ void SHOnlineHub::Update(float dt)
         }
         for (int j = 0; j < 4; ++j)
             mButtons[j].HandlePointerEvent(&event);
-        if (mState != 1)
+        if (mState != ONLINE_HUB_READY)
             return;
         mHelpButton.HandlePointerEvent(&event);
         if (mBackButton.UpdateBackButton(event, dt))
         {
-            mState = 3;
+            mState = ONLINE_HUB_EXITING_BACK;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -383,7 +383,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
     bool change = false;
     switch (item)
     {
-    case 0:
+    case ONLINE_HUB_FRIEND_MATCH:
         if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
         {
             if (g_pFriendManager->CountBuddies() > 0)
@@ -392,17 +392,17 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
                 ShowOnlineHubDialog(this, (ePopupMenu)113);
         }
         break;
-    case 1:
+    case ONLINE_HUB_RANKED_MATCH:
         change = true;
         break;
-    case 2:
+    case ONLINE_HUB_RANKINGS:
         change = true;
         break;
-    case 3:
+    case ONLINE_HUB_FRIENDS:
         if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
             change = true;
         break;
-    case 4:
+    case ONLINE_HUB_HELP:
         g_pFriendManager->SetOwnStatusInitial(0);
         ShowOnlineHubDialog(this, (ePopupMenu)58);
         break;
@@ -412,7 +412,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         mPressedItem = item;
         for (int i = 0; i < 4; ++i)
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-        mState = 2;
+        mState = ONLINE_HUB_EXITING_FORWARD;
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
             scene->HideButtons();

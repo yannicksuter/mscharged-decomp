@@ -18,6 +18,13 @@ enum TweakStringKind
     kTweakStringCurrent = 5
 };
 
+enum eTweakNodeState
+{
+    TWEAK_NODE_PRE_REGISTRY = 0,
+    TWEAK_NODE_PERSISTENT = 1,
+    TWEAK_NODE_PUSHED = 2,
+};
+
 class TweakEntry;
 class TweakNode;
 struct TweakPendingValue;
@@ -95,7 +102,7 @@ public:
     /* 0x0C */ TweakValueBase* m_Value;
     /* 0x10 */ int m_Depth;
     /* 0x14 */ u32 m_PathHash;
-    /* 0x18 */ int m_State;
+    /* 0x18 */ eTweakNodeState m_State;
     /* 0x1C */ int m_Unk1C;
 }; // size: 0x20
 

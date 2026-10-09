@@ -1063,7 +1063,7 @@ float BubblingLava::GetStartChance()
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
             if (patch)
             {
-                if (patch->m_Type != 8 && patch->m_Type != 9)
+                if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
                     continue;
                 count++;
             }
@@ -1080,7 +1080,7 @@ float BubblingLava::GetStartChance()
 void OnLavaCollisionPatchGround(CollisionPatchData* event)
 {
     PhysicsPatch* patch = event->pPatch;
-    if (patch->m_Type == 8 && patch->m_Velocity.z < 0.0f)
+    if (patch->m_Type == PATCH_LAVA_BALL && patch->m_Velocity.z < 0.0f)
     {
         Weather* state = g_pGame->mpWeatherManager->GetWeather(WEATHER_BUBBLING_LAVA);
         if (state == 0 || state->meState != WEATHER_ACTIVE)
@@ -1258,7 +1258,7 @@ void BubblingLava::Stop(bool initialize)
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
             if (patch)
             {
-                if (patch->m_Type != 8 && patch->m_Type != 9)
+                if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
                     continue;
                 patch->Unknown0();
             }
@@ -1497,7 +1497,7 @@ void StormShipWeather::ResetLightning(bool initialize)
         for (int i = 0; i < 60; i++)
         {
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
-            if (patch && patch->m_Type == 10)
+            if (patch && patch->m_Type == PATCH_CHAIN_LIGHTNING)
             {
                 patch->Unknown0();
             }
@@ -1634,7 +1634,7 @@ void SandTombWeather::CreateSandPatches()
         for (int i = 0; i < 60; i++)
         {
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
-            if (patch && patch->m_Type == 11)
+            if (patch && patch->m_Type == PATCH_SAND)
                 patch->Unknown0();
         }
     }

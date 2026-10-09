@@ -197,7 +197,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     else
     {
         index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
-        if (DuringGoalCelebration(GetPresentation()) && renderMode == 0)
+        if (DuringGoalCelebration(GetPresentation()) && renderMode == NIS_RENDER_PRIMARY)
         {
             if (numAvailableNis > 1 && mLastCelebrationIndex == index && nlStrCmp(mLastCelebrationFilter, mExtraNameFilter) == 0)
             {
@@ -303,7 +303,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
         LoadRelatedNis(nisHeader.name, "other", otherTarget, useStadiumOffset, winnerType, nisHeader.mirrored, renderMode);
     }
 
-    if (renderMode != 1 && mPreparedNisCue == 0)
+    if (renderMode != NIS_RENDER_SECONDARY && mPreparedNisCue == 0)
     {
         PlayNisCue(this, nisHeader.name);
     }

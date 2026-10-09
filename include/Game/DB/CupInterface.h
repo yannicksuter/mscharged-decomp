@@ -6,6 +6,20 @@
 struct BasicGameInfo;
 struct NetworkTournamentGame;
 
+enum eCupPersona
+{
+    CUP_PERSONA_MUSHROOM = 0,
+    CUP_PERSONA_FLOWER = 1,
+    CUP_PERSONA_STAR = 2,
+    CUP_PERSONA_SUNSHINE = 3,
+    CUP_PERSONA_BANANA = 4,
+    CUP_PERSONA_NEXT_LEVEL = 5,
+    CUP_PERSONA_KONGA = 6,
+    CUP_PERSONA_SAND = 7,
+    CUP_PERSONA_LAVA = 8,
+    CUP_PERSONA_NINTENDO = 9,
+};
+
 class CupInterface
 {
 public:

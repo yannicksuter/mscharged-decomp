@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/Wiper.h"
 
@@ -103,7 +104,7 @@ void Wiper::Run(float dt)
     if (!FrontEnd::m_bGameOver)
     {
         bool frameLocked = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
-        if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState == 1)
+        if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
         {
             dt = 0.0f;
         }

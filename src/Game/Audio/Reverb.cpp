@@ -57,11 +57,11 @@ Reverb::Reverb()
     void* context = 0;
     AudioBackend* platform = g_pAudioBackend;
     AXFX_REVERBHI* reverb = platform->GetReverb();
-    switch (g_pAuxEffectMap->GetAuxiliary(1))
+    switch (g_pAuxEffectMap->GetAuxiliary(AUDIO_AUX_REVERB))
     {
-    case 0:
+    case AUDIO_AUX_A:
         AXGetAuxACallback(&callback, &context);
-        if (platform->m_OutputMode == 3)
+        if (platform->m_OutputMode == AUDIO_OUTPUT_DPL2)
         {
             if (callback != ProcessReverbDpl2)
                 AXRegisterAuxACallback(ProcessReverbDpl2, reverb);
@@ -71,9 +71,9 @@ Reverb::Reverb()
             AXRegisterAuxACallback(ProcessReverb, reverb);
         }
         break;
-    case 1:
+    case AUDIO_AUX_B:
         AXGetAuxBCallback(&callback, &context);
-        if (platform->m_OutputMode == 3)
+        if (platform->m_OutputMode == AUDIO_OUTPUT_DPL2)
         {
             if (callback != ProcessReverbDpl2)
                 AXRegisterAuxBCallback(ProcessReverbDpl2, reverb);
@@ -165,7 +165,7 @@ void Reverb::ApplyToSound(void* handle)
     unsigned int count;
     GetSoundSources(handle, voices, &count);
     int volume = (int)(-960.0f * (1.0f - m_Final.auxvol));
-    int auxIndex = g_pAuxEffectMap->GetAuxiliary(1);
+    int auxIndex = g_pAuxEffectMap->GetAuxiliary(AUDIO_AUX_REVERB);
     for (unsigned int i = 0; i < count; ++i)
         voices[i]->SetAuxiliaryVolume(auxIndex, volume);
 }
@@ -173,7 +173,7 @@ void Reverb::ApplyToSound(void* handle)
 void Reverb::OnSoundStarted(void*)
 {
     AXFX_REVERBHI* reverb = g_pAudioBackend->GetReverb();
-    if (g_pAudioBackend->m_OutputMode == 3)
+    if (g_pAudioBackend->m_OutputMode == AUDIO_OUTPUT_DPL2)
     {
         m_Final.ApplySettings(reverb);
         AXFXReverbHiSettingsDpl2((AXFX_REVERBHI_DPL2*)reverb);

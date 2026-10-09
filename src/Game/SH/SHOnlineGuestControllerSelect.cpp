@@ -34,7 +34,7 @@
 
 SHOnlineGuestControllerSelect::SHOnlineGuestControllerSelect()
     : mRespondingToInvitation(false)
-    , mState(0)
+    , mState(GUEST_CONTROLLER_SELECT_ENTERING)
     , mNavigation()
     , mDoneButton()
     , mControllerButton()
@@ -135,7 +135,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
     }
 
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == GUEST_CONTROLLER_SELECT_ENTERING || (unsigned int)(state - GUEST_CONTROLLER_SELECT_TRANSITIONING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -147,7 +147,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == GUEST_CONTROLLER_SELECT_ENTERING)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
@@ -157,7 +157,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             InitializeButtons();
             UpdateDoneButtonVisibility();
             mButtonsInitialized = true;
-            mState = 1;
+            mState = GUEST_CONTROLLER_SELECT_ACTIVE;
 
             if (mGuestController != -1)
             {
@@ -167,7 +167,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
                 mDoneButtonEntering = true;
             }
         }
-        else if (state == 2)
+        else if (state == GUEST_CONTROLLER_SELECT_TRANSITIONING)
         {
             gOnlineLocalControllerIndices[0] = mPrimaryController;
             gOnlineLocalControllerIndices[1] = mGuestController;
@@ -189,7 +189,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             FrontEnd::SetControllerState();
             return;
         }
-        else if (state == 3)
+        else if (state == GUEST_CONTROLLER_SELECT_EXITING_BACK)
         {
             if (mRespondingToInvitation)
             {
@@ -231,7 +231,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
 
         if (mNavigation.UpdateBackButton(event, fDeltaT))
         {
-            mState = 3;
+            mState = GUEST_CONTROLLER_SELECT_EXITING_BACK;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
@@ -465,7 +465,7 @@ void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
     }
 
     mSelectionConfirmed = true;
-    mState = 2;
+    mState = GUEST_CONTROLLER_SELECT_TRANSITIONING;
 
     SHNavigation* object = GetNavigationScene();
     if (object != 0)

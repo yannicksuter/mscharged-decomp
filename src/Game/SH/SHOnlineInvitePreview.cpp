@@ -36,7 +36,7 @@ SHOnlineInvitePreview::SHOnlineInvitePreview()
           Function<FETimer*>(Bind<void>(
               MemFun(&SHOnlineInvitePreview::OnPreviewDelayElapsed), this, Placeholder<0>())))
 {
-    mState = 0;
+    mState = INVITE_PREVIEW_ENTERING;
 
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
@@ -80,7 +80,7 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
     mPreviewDelayTimer.Update(fDeltaT);
 
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == INVITE_PREVIEW_ENTERING || (unsigned int)(state - INVITE_PREVIEW_TRANSITIONING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -92,13 +92,13 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == INVITE_PREVIEW_ENTERING)
         {
             InitializeContinueButton();
             mButtonInitialized = true;
-            mState = 1;
+            mState = INVITE_PREVIEW_ACTIVE;
         }
-        else if (state == 2)
+        else if (state == INVITE_PREVIEW_TRANSITIONING)
         {
             GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
             return;
@@ -232,7 +232,7 @@ void SHOnlineInvitePreview::OnContinuePointerPress(unsigned int index, void*)
     mContinueButtonInstance->SetActiveSlide("down", true, false);
     mContinueButton.SetPointerState(2, index);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    mState = 2;
+    mState = INVITE_PREVIEW_TRANSITIONING;
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
 }

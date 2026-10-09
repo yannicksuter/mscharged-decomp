@@ -8,6 +8,15 @@
 struct FEPageControls;
 class TLComponentInstance;
 
+enum eGameplayOptionsPhase
+{
+    GAMEPLAY_OPTIONS_ENTERING = 0,
+    GAMEPLAY_OPTIONS_ACTIVE = 1,
+    GAMEPLAY_OPTIONS_APPLYING = 2,
+    GAMEPLAY_OPTIONS_EXITING_BACK = 3,
+    GAMEPLAY_OPTIONS_REENTERING = 4,
+};
+
 class SHGameplayOptions : public BaseSceneHandler
 {
 public:

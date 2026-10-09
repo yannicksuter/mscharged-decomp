@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/OverlayManager.h"
 
@@ -93,7 +94,7 @@ inline void OverlayManager::SlideHUDOut()
 
 void OverlayManager::Update(float deltaTime)
 {
-    if (mHUDDelay > 0.0f && nlTaskManager::m_pInstance->mCurrentState == 2)
+    if (mHUDDelay > 0.0f && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
     {
         mHUDDelay -= deltaTime;
         if (mHUDDelay <= 0.0f)
@@ -225,7 +226,7 @@ void OverlayManager::OnGameOver()
     if (GetTweakBool("/user/dosoak", false)
         || (g_e3_Build && GameInfoManager::Instance()->IsInMode2()))
     {
-        nlTaskManager::SetNextState(0x400000);
+        nlTaskManager::SetNextState(TASK_GAME_TO_FE);
         return;
     }
 

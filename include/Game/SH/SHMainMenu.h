@@ -10,6 +10,17 @@ class TLInstance;
 class TLImageInstance;
 class TLTextInstance;
 
+enum eMainMenuItem
+{
+    MAIN_MENU_FRIENDLY = 0,
+    MAIN_MENU_ONLINE = 1,
+    MAIN_MENU_CUP = 2,
+    MAIN_MENU_CHALLENGE = 3,
+    MAIN_MENU_STRIKERS_101 = 4,
+    MAIN_MENU_HALL_OF_FAME = 5,
+    MAIN_MENU_OPTIONS = 6,
+};
+
 class SHMainMenu : public BaseSceneHandler
 {
 public:

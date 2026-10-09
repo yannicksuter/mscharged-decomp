@@ -46,7 +46,7 @@ AudioBackend::~AudioBackend()
         delete g_pAuxEffectMap;
         g_pAuxEffectMap = 0;
     }
-    if (m_OutputMode == 3)
+    if (m_OutputMode == AUDIO_OUTPUT_DPL2)
     {
         AXFXReverbHiShutdownDpl2(&m_ReverbEffect.m_ReverbDpl2);
         AXFXDelayExpShutdownDpl2(&m_DelayEffect.m_DelayDpl2);
@@ -82,7 +82,7 @@ bool AudioBackend::Initialize()
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
     m_AudioAllocator.Initialize(memory, gAudioMemorySize);
     InitializeAudioStreamBlockPool();
-    SetOutputMode(1);
+    SetOutputMode(AUDIO_OUTPUT_STEREO);
 
     OSCreateAlarm(&m_ControllerSpeakerAlarm);
     u32 ticks = OSNanosecondsToTicks(6666667);
@@ -150,7 +150,7 @@ void AudioBackend::Shutdown()
     gAudioMonoStreamSourcePool.FreeBlocks();
     gAudioStereoStreamSourcePool.FreeBlocks();
     gAudioReadQueueEntryPool.FreeBlocks();
-    if (m_OutputMode == 3)
+    if (m_OutputMode == AUDIO_OUTPUT_DPL2)
     {
         AXFXReverbHiShutdownDpl2(&m_ReverbEffect.m_ReverbDpl2);
         AXFXDelayExpShutdownDpl2(&m_DelayEffect.m_DelayDpl2);
@@ -280,16 +280,16 @@ void AudioBackend::SetOutputMode(unsigned int mode)
     u32 mixMode;
     switch (mode)
     {
-    case 0:
+    case AUDIO_OUTPUT_MONO:
         axMode = 0;
         mixMode = 0;
         break;
-    case 1:
+    case AUDIO_OUTPUT_STEREO:
     case 2:
         axMode = 0;
         mixMode = 1;
         break;
-    case 3:
+    case AUDIO_OUTPUT_DPL2:
         axMode = 2;
         mixMode = 3;
         break;
@@ -307,21 +307,21 @@ void AudioBackend::InitializeAuxEffects()
         new (storage) AuxEffectMap;
         g_pAuxEffectMap = static_cast<AuxEffectMap*>(storage);
     }
-    if (m_OutputMode == 3)
+    if (m_OutputMode == AUDIO_OUTPUT_DPL2)
     {
-        g_pAuxEffectMap->AssignAuxiliary(1);
+        g_pAuxEffectMap->AssignAuxiliary(AUDIO_AUX_REVERB);
         SetDefaultReverbSettings(&m_ReverbEffect.m_Reverb);
         AXFXReverbHiInitDpl2(&m_ReverbEffect.m_ReverbDpl2);
-        g_pAuxEffectMap->AssignAuxiliary(0);
+        g_pAuxEffectMap->AssignAuxiliary(AUDIO_AUX_DELAY);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayExpInitDpl2(&m_DelayEffect.m_DelayDpl2);
     }
     else
     {
-        g_pAuxEffectMap->AssignAuxiliary(1);
+        g_pAuxEffectMap->AssignAuxiliary(AUDIO_AUX_REVERB);
         SetDefaultReverbSettings(&m_ReverbEffect.m_Reverb);
         AXFXReverbHiInit(&m_ReverbEffect.m_Reverb);
-        g_pAuxEffectMap->AssignAuxiliary(0);
+        g_pAuxEffectMap->AssignAuxiliary(AUDIO_AUX_DELAY);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayInit(&m_DelayEffect.m_Delay);
     }

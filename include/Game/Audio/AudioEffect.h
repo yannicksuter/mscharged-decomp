@@ -6,6 +6,18 @@
 #include "types.h"
 struct AXFX_REVERBHI;
 
+enum eAudioAuxiliary
+{
+    AUDIO_AUX_A = 0,
+    AUDIO_AUX_B = 1,
+};
+
+enum eAudioAuxEffect
+{
+    AUDIO_AUX_DELAY = 0,
+    AUDIO_AUX_REVERB = 1,
+};
+
 class AudioEffectParameter
 {
 public:

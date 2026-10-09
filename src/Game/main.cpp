@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/main.h"
 #include "Game/TweakRegistry.h"
@@ -292,7 +293,7 @@ void MemCheckTask::Run(float)
     sAudioM14MiB = audioAllocator->m_14 / bytesPerMiB;
     sAudioM10MiB = audioAllocator->m_10 / bytesPerMiB;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 2 &&
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY &&
         sPreviousTaskState == 2 && !g_bTweaking)
     {
         mAccumulatedDelta += sLastVirtualFreeDelta;
@@ -325,7 +326,7 @@ static void PreInitFS()
 void OnSwappablePadChanged(int)
 {
     const u32 state = nlTaskManager::m_pInstance->mCurrentState;
-    if (state == 4 || state == 1)
+    if (state == TASK_FRONTEND || state == TASK_PAUSED)
     {
         EnableAutoPressed();
     }
@@ -786,7 +787,7 @@ int main()
         nlServiceFileSystem();
     }
 
-    nlTaskManager::SetNextState(0x00100000);
+    nlTaskManager::SetNextState(TASK_BOOT_TO_FE);
     FEMusic::SetEnabled(true);
 
     for (;;)

@@ -269,6 +269,43 @@ private:
     void AcquireLocalAddress();
 }; // size: 0xFFC
 
+enum eLANHostState
+{
+    LAN_HOST_IDLE = 0,
+    LAN_HOST_STARTED = 2,
+};
+
+enum eLANPeerState
+{
+    LAN_PEER_INITIAL = 0,
+    LAN_PEER_WAIT_JOIN_CONFIRM = 2,
+    LAN_PEER_JOIN_CONFIRMED = 3,
+};
+
+enum eLANJoinState
+{
+    LAN_JOIN_IDLE = 0,
+    LAN_JOIN_CONNECTING = 1,
+    LAN_JOIN_WAIT_RESPONSE = 2,
+    LAN_JOIN_JOINED = 3,
+};
+
+enum eLANLaunchState
+{
+    LAN_LAUNCH_IDLE = 0,
+    LAN_LAUNCH_WAIT_PEERS = 1,
+    LAN_LAUNCH_WAIT_CONNECTIONS = 2,
+    LAN_LAUNCH_READY = 3,
+    LAN_LAUNCH_COMPLETE = 4,
+};
+
+enum eLANConnectionState
+{
+    LAN_CONNECTION_FREE = 0,
+    LAN_CONNECTION_CONNECTING = 1,
+    LAN_CONNECTION_CONNECTED = 2,
+};
+
 struct LANGameInfo
 {
     LANGameInfo() { }
@@ -378,7 +415,7 @@ private:
             return false;
         for (int peer = 1; peer < mPeerCount; ++peer)
         {
-            if (mPeerInfoList[peer].mHostState != 3)
+            if (mPeerInfoList[peer].mHostState != LAN_PEER_JOIN_CONFIRMED)
                 return false;
         }
         return true;
@@ -400,7 +437,7 @@ private:
     {
         for (int index = 0; index < 8; ++index)
         {
-            if (m_ConnectionPool[index].mStatus == 0)
+            if (m_ConnectionPool[index].mStatus == LAN_CONNECTION_FREE)
                 return index;
         }
         return -1;

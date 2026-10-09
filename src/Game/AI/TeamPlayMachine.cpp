@@ -8,6 +8,13 @@
 #include "Game/GameInfo.h"
 #include "NL/nlMemory.h"
 
+enum eTeamPlayState
+{
+    TEAM_PLAY_NONE = -1,
+    TEAM_PLAY_KICKOFF = 1,
+    TEAM_PLAY_TUTORIAL_MEGA_STRIKE = 5,
+};
+
 float gKickoffStateTimeLimit = 1.1f;
 char gTeamPlayMachineName[] = "TeamPlayMachine";
 
@@ -21,8 +28,8 @@ void TeamPlayMachine::Initialize()
 
     TutorialMegastrikeDesire* desire =
         new (nlMalloc(sizeof(TutorialMegastrikeDesire), 8, false))
-            TutorialMegastrikeDesire(5, TransitionFunc(g_UnsetTransitionFunc));
-    AddState(5, desire, false);
+            TutorialMegastrikeDesire(TEAM_PLAY_TUTORIAL_MEGA_STRIKE, TransitionFunc(g_UnsetTransitionFunc));
+    AddState(TEAM_PLAY_TUTORIAL_MEGA_STRIKE, desire, false);
 }
 
 void TeamPlayMachine::Update(float deltaTime)
@@ -33,20 +40,20 @@ void TeamPlayMachine::Update(float deltaTime)
 void TeamPlayMachine::SelectState()
 {
     FuzzyVariantCollection values;
-    int state = -1;
+    int state = TEAM_PLAY_NONE;
 
     if (g_pGame->m_eGameState == GS_KICKOFF)
     {
         values.Set(7, FuzzyVariant(gKickoffStateTimeLimit));
-        state = 1;
+        state = TEAM_PLAY_KICKOFF;
     }
     else if (GameInfoManager::Instance()->IsInMode4()
         && g_pStrikerChallenge->mCurrentChallenge == 2)
     {
-        state = 5;
+        state = TEAM_PLAY_TUTORIAL_MEGA_STRIKE;
     }
 
-    if (state != -1)
+    if (state != TEAM_PLAY_NONE)
     {
         ActivateState(state, &values, true);
     }

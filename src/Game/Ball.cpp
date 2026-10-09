@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include <stddef.h>
@@ -421,7 +422,7 @@ void cBall::CollideWithCharacterCallback(
                         pFielder = NULL;
                     }
                     DesireReceivePass* pReceivePass
-                        = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                        = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
@@ -494,7 +495,7 @@ void cBall::CollideWithCharacterCallback(
                     }
                     DesireReceivePass* pReceivePass
                         = (DesireReceivePass*)GetFielderDesire(
-                            pPassTarget, 22);
+                            pPassTarget, FIELDER_DESIRE_RECEIVE_PASS);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
@@ -541,7 +542,7 @@ void cBall::CollideWithCharacterCallback(
                     pFielder = NULL;
                 }
                 DesireReceivePass* pReceivePass
-                    = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                    = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
                 if (pReceivePass == NULL
                     || !pReceivePass->IsActive()
                     || pReceivePass->meDesireSubState != 0)
@@ -755,7 +756,7 @@ static inline void fn_80014494Impl(cBall* pBall)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -822,7 +823,7 @@ extern "C" void fn_800145A4(cBall* pBall)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -1042,7 +1043,7 @@ static inline bool fn_80014D38Impl(cBall* pBall)
             pFielder = NULL;
         }
         DesireReceivePass* pReceivePass
-            = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+            = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
         if (pReceivePass != NULL
             && pReceivePass->IsActive())
         {
@@ -1556,7 +1557,7 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
@@ -2780,7 +2781,7 @@ void OnBallGameOver()
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2830,7 +2831,7 @@ void OnBallResetEffects(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2954,7 +2955,7 @@ void OnBallTronWallCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2999,7 +3000,7 @@ void OnBallEggCollision(CollisionEggData*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -3157,7 +3158,7 @@ void OnBallDebrisCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -3202,7 +3203,7 @@ void OnBallThwompCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, FIELDER_DESIRE_RECEIVE_PASS);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)

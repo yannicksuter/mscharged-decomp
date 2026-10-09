@@ -209,6 +209,14 @@ enum eNetworkTournamentUpdate
     NET_TOURN_UPDATE_COULD_NOT_START = 3,
 };
 
+enum eTournamentGameStatus
+{
+    TOURN_GAME_STATUS_NONE = 0,
+    TOURN_GAME_STATUS_INACTIVE = 1,
+    TOURN_GAME_STATUS_PLAYING = 2,
+    TOURN_GAME_STATUS_SUDDEN_DEATH = 3,
+};
+
 class NetMessageTournamentGameUpdate : public NetworkMessage
 {
 public:

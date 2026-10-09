@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
@@ -319,7 +320,7 @@ void ReplayManager::GrabSnapshot()
 
     mCurrent->Grab();
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 2)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
     {
         mTime = mReplay->EndTime() + g_fSimulationTick;
         unsigned int excitement = ExcitementSystem::Instance().mExcitement;
@@ -352,7 +353,7 @@ void ReplayManager::Flush()
 
 void ReplayManager::DoPotentialAutoReplay(float deltaTime)
 {
-    if (nlTaskManager::m_pInstance->mCurrentState == 8 && !gbLoadingReplay)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY && !gbLoadingReplay)
     {
         mSpeed = mSpeedUp * deltaTime + mSpeed;
         if (mSpeed < 0.1f)
@@ -406,9 +407,9 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
         && !IsNetworkOrRecordedGame()
         && unidentifiedPad->PlatJustPressed(4, true))
     {
-        if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_DEBUG_REPLAY)
         {
-            nlTaskManager::SetNextState(2);
+            nlTaskManager::SetNextState(TASK_GAMEPLAY);
             if (mReplayDebugCamera != 0)
             {
                 cCameraManager::PopCamera();
@@ -417,15 +418,15 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
             }
             return;
         }
-        else if (nlTaskManager::m_pInstance->mCurrentState == 2)
+        else if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
         {
             mTime = mReplay->EndTime();
-            nlTaskManager::SetNextState(0x20000);
+            nlTaskManager::SetNextState(TASK_DEBUG_REPLAY);
         }
         return;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_DEBUG_REPLAY)
     {
         if (cCameraManager::PeekCamera()->GetType() != eCameraType_Debug)
         {
@@ -520,7 +521,7 @@ void ReplayManager::SetCurrentTime(float time)
 
 static bool NisOverridesReplayBuffer()
 {
-    return nlTaskManager::m_pInstance->mCurrentState == 0x10 || (nlTaskManager::m_pInstance->mPreviousState == 0x10 && nlTaskManager::m_pInstance->mCurrentState == 1);
+    return nlTaskManager::m_pInstance->mCurrentState == TASK_NIS || (nlTaskManager::m_pInstance->mPreviousState == TASK_NIS && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED);
 }
 
 void ReplayManager::RenderSnapshotAt(float deltaTime)
@@ -547,7 +548,7 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
     mRender->Render(deltaTime);
     lbl_806E14CC = mRender->mSimulationTime;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_DEBUG_REPLAY)
     {
         mSnapshots[2].RenderDebugInfo(*mPrevious, *mCurrent, mBlend[0]);
     }

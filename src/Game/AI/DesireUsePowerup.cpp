@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireUsePowerup.h"
 #include "Game/AI/ScriptMachine.h"
@@ -147,7 +148,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 
     if (!pDesire->mActive)
     {
-        ActivateConcurrentState(pDesire->mScriptMachine, 17, NULL, false);
+        ActivateConcurrentState(pDesire->mScriptMachine, FIELDER_DESIRE_USE_POWERUP, NULL, false);
     }
 
     cTeam* pTeam = pDesire->m_pFielder->m_pTeam;
@@ -168,7 +169,7 @@ void DesireUsePowerup::fn_800D3968(
 
     if (!mActive && bActivate)
     {
-        ActivateConcurrentState(mScriptMachine, 17, NULL, false);
+        ActivateConcurrentState(mScriptMachine, FIELDER_DESIRE_USE_POWERUP, NULL, false);
     }
 
     cTeam* pTeam = m_pFielder->m_pTeam;
@@ -352,7 +353,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
                 : &pDesire->mDefaultTransition.mValue;
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
-            ActivateConcurrentState(pDesire->mScriptMachine, 23, &params, false);
+            ActivateConcurrentState(pDesire->mScriptMachine, FIELDER_DESIRE_SUPER_POWER, &params, false);
             NativeTransitionFunc transition((void*)TransDesireUsePowerup);
             pDesire->mOverrideTransition.mValue.mFuncHash
                 = transition.mValue.mFuncHash;
@@ -364,13 +365,13 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     }
     case POWER_UP_STAR:
     {
-        ActivateConcurrentState(pDesire->mScriptMachine, 24, NULL, true);
+        ActivateConcurrentState(pDesire->mScriptMachine, FIELDER_DESIRE_STAR, NULL, true);
         pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_MUSHROOM:
     {
-        ActivateConcurrentState(pDesire->mScriptMachine, 25, NULL, true);
+        ActivateConcurrentState(pDesire->mScriptMachine, FIELDER_DESIRE_MUSHROOM, NULL, true);
         pDesire->ResetPowerupState();
         break;
     }

@@ -1,3 +1,4 @@
+#include "Game/AI/FielderDesireTypes.h"
 #include "Game/Ball.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
@@ -316,9 +317,9 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
                     }
                 }
                 SetNormalTweaks();
-                if (IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
+                if (IsConcurrentStateActive(GetFielderScriptMachine(this), FIELDER_DESIRE_WALUIGI_WALL))
                 {
-                    DeactivateConcurrentState(GetFielderScriptMachine(this), 0x23);
+                    DeactivateConcurrentState(GetFielderScriptMachine(this), FIELDER_DESIRE_WALUIGI_WALL);
                 }
                 StopSound(0x8A9FCF66, this);
             }
@@ -425,9 +426,9 @@ bool cFielder::TurnOnSuperPowerTank()
         }
         InitMovementCoast();
         m_DetChar.m_fLeanAmount = 0.0f;
-        if (!IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
+        if (!IsConcurrentStateActive(GetFielderScriptMachine(this), FIELDER_DESIRE_WALUIGI_WALL))
         {
-            ActivateConcurrentState(GetFielderScriptMachine(this), 0x23, 0, 0);
+            ActivateConcurrentState(GetFielderScriptMachine(this), FIELDER_DESIRE_WALUIGI_WALL, 0, 0);
         }
     }
     else if (m_DetChar.m_eCharacterClass == WARIO)

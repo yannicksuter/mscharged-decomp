@@ -7,6 +7,14 @@
 
 class TLComponentInstance;
 
+enum eFriendCodeEntryPhase
+{
+    FRIEND_CODE_ENTRY_ENTERING = 0,
+    FRIEND_CODE_ENTRY_ACTIVE = 1,
+    FRIEND_CODE_ENTRY_TRANSITIONING = 2,
+    FRIEND_CODE_ENTRY_EXITING_BACK = 3,
+};
+
 class SHOnlineFriendCodeEntry : public BaseSceneHandler
 {
 public:

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Debug/TimeRegions.h"
 #include "Game/Debug/FrameCounter.h"
 
@@ -17,7 +18,7 @@ TimeRegion* pShotTimeRegion;
 
 static bool IsDuringGameplay()
 {
-    return nlTaskManager::m_pInstance->mCurrentState == 0x2;
+    return nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY;
 }
 
 static bool CentreOfField()
@@ -26,7 +27,7 @@ static bool CentreOfField()
         = (*nlDLRingGetStart<cBaseCamera>(cCameraManager::m_cameraStack))
               .GetTargetPosition();
     bool isCenter = false;
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x2
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY
         && (float)fabs(targetPosition.x) < 5.7f)
     {
         isCenter = true;
@@ -68,12 +69,12 @@ static bool RightSideOfField()
 
 static bool IsDuringNIS()
 {
-    return nlTaskManager::m_pInstance->mCurrentState == 0x10;
+    return nlTaskManager::m_pInstance->mCurrentState == TASK_NIS;
 }
 
 static bool IsDuringAutoreplay()
 {
-    return nlTaskManager::m_pInstance->mCurrentState == 0x8;
+    return nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY;
 }
 
 static bool IsShotInProgress()

@@ -8,6 +8,23 @@
 
 class TLComponentInstance;
 
+enum eOnlineHubState
+{
+    ONLINE_HUB_ENTERING = 0,
+    ONLINE_HUB_READY = 1,
+    ONLINE_HUB_EXITING_FORWARD = 2,
+    ONLINE_HUB_EXITING_BACK = 3,
+};
+
+enum eOnlineHubAction
+{
+    ONLINE_HUB_FRIEND_MATCH = 0,
+    ONLINE_HUB_RANKED_MATCH = 1,
+    ONLINE_HUB_RANKINGS = 2,
+    ONLINE_HUB_FRIENDS = 3,
+    ONLINE_HUB_HELP = 4,
+};
+
 class SHOnlineHub : public BaseSceneHandler
 {
 public:

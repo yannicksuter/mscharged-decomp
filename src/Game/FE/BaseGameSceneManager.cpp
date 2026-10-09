@@ -339,10 +339,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(OptionsScene), 8, false)) OptionsScene();
         break;
     case SCENE_AUDIO_OPTIONS:
-        newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(0);
+        newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(OPTIONS_CONTEXT_FRONTEND);
         break;
     case SCENE_VISUAL_OPTIONS:
-        newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(0);
+        newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(OPTIONS_CONTEXT_FRONTEND);
         break;
     case (SceneList)16:
         newHandler = new (nlMalloc(sizeof(CrossFaderScene), 8, false)) CrossFaderScene();
@@ -543,10 +543,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(SHChooseSides2), 8, false)) SHChooseSides2(SHChooseSides2::PAUSE, movement);
         break;
     case (SceneList)82:
-        newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(1);
+        newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(OPTIONS_CONTEXT_PAUSE);
         break;
     case (SceneList)83:
-        newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(1);
+        newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(OPTIONS_CONTEXT_PAUSE);
         break;
     case (SceneList)84:
         newHandler = new (nlMalloc(sizeof(PauseMenuScene), 8, false)) PauseMenuScene();

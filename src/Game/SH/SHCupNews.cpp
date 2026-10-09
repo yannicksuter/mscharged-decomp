@@ -91,7 +91,7 @@ void CupNewsScene::SceneCreated()
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int rank = cupManager->GetUserTeamRank();
     int cup = cupManager->GetCurrentMode();
-    int mood = -1;
+    int mood = NEWS_MOOD_NONE;
     char cupName[0x10];
 
     switch (cup)
@@ -113,7 +113,7 @@ void CupNewsScene::SceneCreated()
     case 1:
         nlSNPrintf(mStoryStringID, 0x40, "ST_%s_INTRO_%s_%d", cupName, character.GetName(), 0);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_INTRO_%s_%d", cupName, character.GetName(), 0);
-        mood = 1;
+        mood = NEWS_MOOD_NEUTRAL;
         break;
     case 2:
         for (int i = 0; i < 3; ++i)
@@ -128,17 +128,17 @@ void CupNewsScene::SceneCreated()
             case 0:
                 nlSNPrintf(mStoryStringID, 0x40, "ST_%s_EXCELLENT_%s_%d", cupName, character.GetName(), 0);
                 nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_EXCELLENT_%s_%d", cupName, character.GetName(), 0);
-                mood = 0;
+                mood = NEWS_MOOD_POSITIVE;
                 break;
             case 1:
                 nlSNPrintf(mStoryStringID, 0x40, "ST_%s_MODERATE_%s_%d", cupName, character.GetName(), 0);
                 nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_MODERATE_%s_%d", cupName, character.GetName(), 0);
-                mood = 1;
+                mood = NEWS_MOOD_NEUTRAL;
                 break;
             case 2:
                 nlSNPrintf(mStoryStringID, 0x40, "ST_%s_POOR_%s_%d", cupName, character.GetName(), 0);
                 nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_POOR_%s_%d", cupName, character.GetName(), 0);
-                mood = 2;
+                mood = NEWS_MOOD_NEGATIVE;
                 break;
             }
             break;
@@ -146,26 +146,26 @@ void CupNewsScene::SceneCreated()
         break;
     case 3:
         mShowAwardsOnClose = true;
-        if (GetCupState(cupManager) == 0x10)
+        if (GetCupState(cupManager) == CUP_STATE_NOT_QUALIFIED)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_NOT_QUALIFY_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_NOT_QUALIFY_%s_%d", cupName, character.GetName(), 0);
-            mood = 2;
+            mood = NEWS_MOOD_NEGATIVE;
         }
         else
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_QUALIFY_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_QUALIFY_%s_%d", cupName, character.GetName(), 0);
             cupManager->SetShowCupPhasePopup(true);
-            mood = 0;
+            mood = NEWS_MOOD_POSITIVE;
         }
         break;
     case 4:
-        if (GetCupState(cupManager) == 0x11)
+        if (GetCupState(cupManager) == CUP_STATE_ELIMINATED)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
-            mood = 2;
+            mood = NEWS_MOOD_NEGATIVE;
         }
         else
         {
@@ -173,23 +173,23 @@ void CupNewsScene::SceneCreated()
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_NOT_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
             cupManager->SetShowCupPhasePopup(true);
             formatOpponent = true;
-            mood = 0;
+            mood = NEWS_MOOD_POSITIVE;
         }
         break;
     case 5:
-        if (GetCupState(cupManager) == 0x12)
+        if (GetCupState(cupManager) == CUP_STATE_FINAL_LOST)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_LOSE_CUP_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_LOSE_CUP_%s_%d", cupName, character.GetName(), 0);
             formatOpponent = true;
-            mood = 2;
+            mood = NEWS_MOOD_NEGATIVE;
         }
         else
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_WIN_CUP_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_WIN_CUP_%s_%d", cupName, character.GetName(), 0);
             formatOpponent = true;
-            mood = 3;
+            mood = NEWS_MOOD_CUP_WIN;
             mShowWinnerRewardsOnClose = true;
         }
         break;
@@ -204,7 +204,7 @@ void CupNewsScene::SceneCreated()
         mHeadlineText = Format(String(g_pLocalization->GetString(mHeadlineStringID)), name);
         mStoryText = Format(String(story), name);
         mUseCustomText = true;
-        mood = 0;
+        mood = NEWS_MOOD_POSITIVE;
         break;
     }
     case 7:
@@ -218,7 +218,7 @@ void CupNewsScene::SceneCreated()
         mHeadlineText = Format(String(g_pLocalization->GetString(mHeadlineStringID)), name);
         mStoryText = Format(String(story), name);
         mUseCustomText = true;
-        mood = 0;
+        mood = NEWS_MOOD_POSITIVE;
         break;
     }
     }
@@ -239,19 +239,19 @@ void CupNewsScene::SceneCreated()
 
     switch (mood)
     {
-    case 0:
+    case NEWS_MOOD_POSITIVE:
         if (!FEMusic::IsPlayingCupResultStream())
             FEMusic::StartStreamIfDifferent(4);
         break;
-    case 1:
+    case NEWS_MOOD_NEUTRAL:
         if (!FEMusic::IsPlayingCupResultStream())
             FEMusic::StartStreamIfDifferent(6);
         break;
-    case 2:
+    case NEWS_MOOD_NEGATIVE:
         if (!FEMusic::IsPlayingCupResultStream())
             FEMusic::StartStreamIfDifferent(5);
         break;
-    case 3:
+    case NEWS_MOOD_CUP_WIN:
         if (!FEMusic::IsPlayingCupResultStream())
             FEMusic::StartStreamIfDifferent(7);
         break;

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
@@ -102,7 +103,7 @@ void NumberDisplay::Update(float deltaTime)
         return;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 2)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
     {
         mShowAccumulatedScore = false;
     }
@@ -120,7 +121,7 @@ void NumberDisplay::Update(float deltaTime)
         return;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x10
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_NIS
         && !mShowAccumulatedScore)
     {
         return;
@@ -207,7 +208,7 @@ void NumberDisplay::Render()
         return;
     }
     if ((g_pGame->m_eGameState == GS_END_GAME
-         && nlTaskManager::m_pInstance->mCurrentState == 8)
+         && nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY)
         || !mVisible)
     {
         return;

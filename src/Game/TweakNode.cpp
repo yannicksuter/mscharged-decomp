@@ -25,16 +25,16 @@ TweakNode::TweakNode()
     {
         if (gTweakStatePushed)
         {
-            m_State = 2;
+            m_State = TWEAK_NODE_PUSHED;
         }
         else
         {
-            m_State = 1;
+            m_State = TWEAK_NODE_PERSISTENT;
         }
     }
     else
     {
-        m_State = 0;
+        m_State = TWEAK_NODE_PRE_REGISTRY;
     }
 }
 
@@ -53,7 +53,7 @@ TweakNode::~TweakNode()
     {
         TweakEntry* parent = m_Parent;
         TweakNodeListRemove(&parent->m_ChildHead, this, &parent->m_ChildTail);
-        if (m_Unk1C == 0 && m_Value->mCreatedAfterRegistryInit && (m_State == 2 || (m_State == 1 && gDeletePersistentTweakValues)))
+        if (m_Unk1C == 0 && m_Value->mCreatedAfterRegistryInit && (m_State == TWEAK_NODE_PUSHED || (m_State == TWEAK_NODE_PERSISTENT && gDeletePersistentTweakValues)))
         {
             char buffer[0x100];
             BuildTweakNodePath(this, buffer, sizeof(buffer));

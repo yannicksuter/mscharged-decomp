@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
@@ -135,7 +136,7 @@ void FrontEnd::ExitWinnerScreen()
     gSkipPresentationResetOnReturnToGame
         = 1;
     sControllerRemovalChecksSuppressed = 0;
-    nlTaskManager::SetNextState(2);
+    nlTaskManager::SetNextState(TASK_GAMEPLAY);
 }
 
 void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
@@ -165,7 +166,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
             StopRumbleAction(globalPad);
         }
     }
-    nlTaskManager::SetNextState(1);
+    nlTaskManager::SetNextState(TASK_PAUSED);
     if (g_pOverlayManager->IsOnStack(SCENE_SUPER_LOADING))
     {
         g_pOverlayManager->Pop();
@@ -302,7 +303,7 @@ void FrontEnd::Update(float fTimeDelta)
             if (bPauseDelayElapsed)
             {
                 EnterMenuState(MET_PAUSE);
-                m_lastTaskState = 2;
+                m_lastTaskState = TASK_GAMEPLAY;
                 m_feStatePrevious = eFE_INGAME;
                 sInitialModePauseMenuShown = 1;
             }
@@ -315,7 +316,7 @@ void FrontEnd::Update(float fTimeDelta)
         break;
 
     case eFE_END_GAME:
-        nlTaskManager::SetNextState(1);
+        nlTaskManager::SetNextState(TASK_PAUSED);
         g_pBall->m_bVisible = false;
         m_pPauseMenuCamera
             = new (nlMalloc(sizeof(cAnimCamera), 8, false)) cAnimCamera();
@@ -326,7 +327,7 @@ void FrontEnd::Update(float fTimeDelta)
         break;
 
     case eFE_PROCESS_MENU_INPUT:
-        if (nlTaskManager::m_pInstance->mCurrentState == 1)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
         {
             nlTaskManager::m_pInstance->mLocked = true;
         }
@@ -391,7 +392,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
         {
             bool bPauseDelayElapsed = m_pauseDelay <= 0.0f;
             if (bPauseDelayElapsed
-                && nlTaskManager::m_pInstance->mCurrentState != 1
+                && nlTaskManager::m_pInstance->mCurrentState != TASK_PAUSED
                 && nlTaskManager::m_pInstance->mPendingState
                        == nlTaskManager::m_pInstance->mCurrentState)
             {
@@ -425,7 +426,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
     {
         bool bPauseDelayElapsed = m_pauseDelay <= 0.0f;
         if (bPauseDelayElapsed && !g_pGame->mbCaptainShotToScoreOn
-            && nlTaskManager::m_pInstance->mCurrentState != 1
+            && nlTaskManager::m_pInstance->mCurrentState != TASK_PAUSED
             && (nlTaskManager::m_pInstance->mCurrentState & 0x18) == 0
             && nlTaskManager::m_pInstance->mPendingState
                    == nlTaskManager::m_pInstance->mCurrentState
@@ -503,7 +504,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
         return;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 1)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
     {
         return;
     }
@@ -556,7 +557,7 @@ void FrontEnd::ReturnToFE()
 {
     gpHBMManager->mBlocked = true;
     glxSwapSetBlack(true);
-    if (nlTaskManager::m_pInstance->mCurrentState == 1)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
     {
         nlTaskManager::m_pInstance->mLocked = false;
         m_feStatePending = eFE_INVALID;
@@ -565,7 +566,7 @@ void FrontEnd::ReturnToFE()
     {
         g_pPadManager->GetPad(i)->StopRumble();
     }
-    nlTaskManager::SetNextState(0x400000);
+    nlTaskManager::SetNextState(TASK_GAME_TO_FE);
 }
 
 void FrontEnd::OnGameOver()

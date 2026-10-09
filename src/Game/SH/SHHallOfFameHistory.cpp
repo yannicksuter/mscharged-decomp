@@ -55,7 +55,7 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     mSelectedHistoryIndex = 0;
     mHistoryCount = 0;
     mPadding324 = false;
-    mState = 0;
+    mState = HOF_HISTORY_ENTERING;
     mImages[0] = 0;
     mImages[1] = 0;
     mImages[2] = 0;
@@ -163,7 +163,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
     BaseSceneHandler::Update(fDeltaT);
 
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == HOF_HISTORY_ENTERING || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -175,10 +175,10 @@ void SHHallOfFameHistory::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == HOF_HISTORY_ENTERING)
         {
             GetNavigationScene()->SetButtons(4, true);
-            mState = 1;
+            mState = HOF_HISTORY_ACTIVE;
             if (!mScrollWidget.mInitialized)
             {
                 TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
@@ -192,7 +192,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
         {
             return;
         }
-        else if (state == 3)
+        else if (state == HOF_HISTORY_EXITING_BACK)
         {
             LeaveHallOfFamePage(mMode);
             return;
@@ -263,7 +263,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
             if (mNavigation.UpdateBackButton(event, fDeltaT))
             {
                 FEAudio::PlayAnimAudioEvent(0x80BA0C86, 0, 0, 1);
-                mState = 3;
+                mState = HOF_HISTORY_EXITING_BACK;
                 SHNavigation* object = GetNavigationScene();
                 if (object != 0)
                 {

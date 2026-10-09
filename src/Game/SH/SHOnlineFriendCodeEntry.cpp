@@ -34,7 +34,7 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     , mDigitButtons()
     , mBackButton()
     , mPopupActive(false)
-    , mState(0)
+    , mState(FRIEND_CODE_ENTRY_ENTERING)
 {
     for (int i = 0; i < 12; ++i)
     {
@@ -199,7 +199,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
     }
 
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == FRIEND_CODE_ENTRY_ENTERING || (unsigned int)(state - FRIEND_CODE_ENTRY_TRANSITIONING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -211,23 +211,23 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == FRIEND_CODE_ENTRY_ENTERING)
         {
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
                 object->SetButtons(4, true);
             }
-            mState = 1;
+            mState = FRIEND_CODE_ENTRY_ACTIVE;
             InitializeButtons();
             mButtonsInitialized = true;
         }
-        else if (state == 2)
+        else if (state == FRIEND_CODE_ENTRY_TRANSITIONING)
         {
             GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
             return;
         }
-        else if (state == 3)
+        else if (state == FRIEND_CODE_ENTRY_EXITING_BACK)
         {
             GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_BACK, true);
             return;
@@ -291,7 +291,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mState = 3;
+            mState = FRIEND_CODE_ENTRY_EXITING_BACK;
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
@@ -493,7 +493,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         if (g_pFriendManager->AddFriendKey(friendKey, &error))
         {
             SaveLoad::StartSave(true);
-            mState = 2;
+            mState = FRIEND_CODE_ENTRY_TRANSITIONING;
 
             SHNavigation* object = GetNavigationScene();
             if (object != 0)

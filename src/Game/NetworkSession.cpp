@@ -556,7 +556,7 @@ void NetworkSession::Update()
         NetworkDraft::Instance()->Update(dt);
         mStatsReporter->Update();
 
-        if (mTransport->mLaunchState == 3)
+        if (mTransport->mLaunchState == LAN_LAUNCH_READY)
         {
             mTransport->CompleteLaunch();
             if (mTransport->GetPlayerCount() >= 2)
