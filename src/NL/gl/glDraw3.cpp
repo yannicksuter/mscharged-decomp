@@ -5,7 +5,6 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "NL/gl/glTexture.h"
 #include "Game/SharedStaticStorage.h"
 
 
