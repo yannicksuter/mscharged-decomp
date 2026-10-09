@@ -4,6 +4,7 @@
 #include <MetroTRK/dserror.h>
 #include <MetroTRK/flush_cache.h>
 #include <MetroTRK/trkenum.h>
+#include <MetroTRK/notify.h>
 #include <revolution/types.h>
 #include <stddef.h>
 
@@ -234,7 +235,6 @@ extern "C"
 
     void TRKConstructEvent(NubEvent* event, int eventType);
     DSError TRKPostEvent(NubEvent* event);
-    DSError TRKDoNotifyStopped(MessageCommandID cmd);
 
     DSError HandleOpenFileSupportRequest(const char* path, u8 replyError, u32* param_3, DSIOResult* ioResult);
     DSError HandleCloseFileSupportRequest(int replyError, DSIOResult* ioResult);
