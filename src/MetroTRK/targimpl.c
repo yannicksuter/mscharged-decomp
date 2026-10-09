@@ -127,7 +127,7 @@ DSError TRKValidMemory32(const void* addr, size_t length, ValidMemoryOptions rea
 }
 
 // clang-format off
-ASM static void TRK_ppc_memcpy(void* dest, const void* src, int n, u32 param_4, u32 param_5){
+ASM static void TRK_ppc_memcpy(void* dest, const void* src, int n, u32 destinationMSR, u32 sourceMSR){
     nofralloc
 
     mfmsr    r8
@@ -155,9 +155,9 @@ end:
 DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length, MemoryAccessOptions accessOptions, BOOL read)
 {
     DSError error;
-    u32 uVar5;
+    u32 currentMSR;
     void* addr;
-    u32 param4;
+    u32 targetMSR;
     TRKExceptionStatus tempExceptionStatus = gTRKExceptionStatus;
     gTRKExceptionStatus.exceptionDetected = false;
 
@@ -170,16 +170,16 @@ DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length, MemoryAcces
     }
     else
     {
-        uVar5 = __TRK_get_MSR();
-        param4 = uVar5 | (gTRKCPUState.Extended1.MSR & MSR_DR);
+        currentMSR = __TRK_get_MSR();
+        targetMSR = currentMSR | (gTRKCPUState.Extended1.MSR & MSR_DR);
 
         if (read)
         {
-            TRK_ppc_memcpy(data, addr, *length, uVar5, param4);
+            TRK_ppc_memcpy(data, addr, *length, currentMSR, targetMSR);
         }
         else
         {
-            TRK_ppc_memcpy(addr, data, *length, param4, uVar5);
+            TRK_ppc_memcpy(addr, data, *length, targetMSR, currentMSR);
             TRK_flush_cache((u32)addr, *length);
             if ((void*)start != addr)
             {
@@ -784,15 +784,15 @@ DSError TRKTargetAddStopInfo(MessageBuffer* b)
 
 void TRKTargetAddExceptionInfo(MessageBuffer* b)
 {
-    u32 local_54;
+    u32 instruction;
     msgbuf_t reply;
 
     TRK_memset(&reply, 0, sizeof(msgbuf_t));
     reply.msgLength = sizeof(msgbuf_t);
     reply.commandId = kDSNotifyException;
     reply.replyErrorInt = gTRKExceptionStatus.exceptionInfo.PC;
-    TRKTargetReadInstruction((void*)&local_54, gTRKExceptionStatus.exceptionInfo.PC);
-    *(u32*)&reply.unk0C = local_54;
+    TRKTargetReadInstruction((void*)&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    *(u32*)&reply.unk0C = instruction;
     *(u32*)reply.unk10 = gTRKExceptionStatus.exceptionInfo.exceptionID;
     TRKAppendBuffer_ui8(b, (u8*)&reply, sizeof(msgbuf_t));
 }
@@ -1158,13 +1158,13 @@ u32 ConvertAddress(u32 addr)
 
 #define INVALID_THREAD(thread) ((u32)thread == 0xFFFFFFFF || thread == NULL || (u32)thread == 0x80000000)
 
-static void GetThreadInfo(int* r3, int* r4)
+static void GetThreadInfo(int* threadCount, int* currentThreadIndex)
 {
     int i;
     OSThread* thread;
 
-    *r3 = 1;
-    *r4 = 0;
+    *threadCount = 1;
+    *currentThreadIndex = 0;
 
     if (INVALID_THREAD(OS_THREAD_QUEUE.head))
     {
@@ -1178,7 +1178,7 @@ static void GetThreadInfo(int* r3, int* r4)
     {
         if (thread == OS_CURRENT_THREAD)
         {
-            *r4 = i;
+            *currentThreadIndex = i;
         }
 
         i++;
@@ -1189,5 +1189,5 @@ static void GetThreadInfo(int* r3, int* r4)
         }
     }
 
-    *r3 = i;
+    *threadCount = i;
 }
