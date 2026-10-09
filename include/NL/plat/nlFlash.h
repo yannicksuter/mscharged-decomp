@@ -5,7 +5,7 @@
 
 struct NANDCommandBlock;
 
-typedef void (*NANDResultCallback)(s32 result);
+typedef void (*NANDResultCallback)(long result);
 
 class FlashMemoryTask : public nlTask
 {
@@ -19,24 +19,24 @@ public:
 
 extern "C"
 {
-void nlFlashAsyncCallback(s32 result, NANDCommandBlock* block);
+void nlFlashAsyncCallback(long result, NANDCommandBlock* block);
 void nlFlashInitialize();
-s32 nlFlashChangeDirectory(s32 directory, NANDResultCallback callback);
-s32 nlFlashCreateDirectory(
-    const char* name, u8 permissions, NANDResultCallback callback);
-s32 nlFlashCreate(
-    const char* name, u8 permissions, NANDResultCallback callback);
-s32 nlFlashCheck(
-    u32 blocks, u32 files, u32* answer, NANDResultCallback callback);
-s32 nlFlashDelete(const char* name, NANDResultCallback callback);
-s32 nlFlashWrite(
-    const void* data, u32 size, NANDResultCallback callback);
-s32 nlFlashGetLength(u32* size, NANDResultCallback callback);
-s32 nlFlashRead(
-    void** data, u32* size, NANDResultCallback callback, bool bufferProvided);
-s32 nlFlashOpen(
-    const char* name, u8 mode, NANDResultCallback callback);
-s32 nlFlashClose(NANDResultCallback callback);
+long nlFlashChangeDirectory(long directory, NANDResultCallback callback);
+long nlFlashCreateDirectory(
+    const char* name, unsigned char permissions, NANDResultCallback callback);
+long nlFlashCreate(
+    const char* name, unsigned char permissions, NANDResultCallback callback);
+long nlFlashCheck(
+    unsigned long blocks, unsigned long files, unsigned long* answer, NANDResultCallback callback);
+long nlFlashDelete(const char* name, NANDResultCallback callback);
+long nlFlashWrite(
+    const void* data, unsigned long size, NANDResultCallback callback);
+long nlFlashGetLength(unsigned long* size, NANDResultCallback callback);
+long nlFlashRead(
+    void** data, unsigned long* size, NANDResultCallback callback, bool bufferProvided);
+long nlFlashOpen(
+    const char* name, unsigned char mode, NANDResultCallback callback);
+long nlFlashClose(NANDResultCallback callback);
 bool nlFlashCallbackPending();
 }
 

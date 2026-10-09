@@ -53,7 +53,7 @@ struct CacheRequest
     void* mBuffer;
     FileCacheCallback mWriteCallback;
     FileCacheCallback mReadCallback;
-    u32 mBufferSize;
+    unsigned long mBufferSize;
     void* mUserData;
     CachedFile* mFile;
 };
