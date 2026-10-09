@@ -441,7 +441,7 @@ bool FinishLoadStadiumEffects()
             return false;
         }
         glBeginResource("Effects");
-        EmissionManager::LoadBundle(gStadiumEffectsData, gStadiumNonResidentEffectsData, glGetCurrentResourcePool(), 1);
+        EmissionManager::LoadBundle(gStadiumEffectsData, gStadiumNonResidentEffectsData, glGetCurrentResourcePool(), EFFECTS_BUNDLE_ADDITIONAL);
         glEndResource();
         gStadiumEffectsData = 0;
         gStadiumEffectsRequest = 0;

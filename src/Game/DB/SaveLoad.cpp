@@ -47,6 +47,12 @@ static bool IconDataLoaded;
 static u32 CheckAnswer;
 static u32 BannerFileLength;
 static bool BannerFileExists;
+enum eSaveLoadMode
+{
+    SAVELOAD_LOAD = 0,
+    SAVELOAD_SAVE = 1,
+};
+
 static u32 BannerOpenMode;
 static BaseGameSceneManager* SaveSceneManager;
 bool SaveError;
@@ -436,7 +442,7 @@ void SaveLoad::StartSaveDirectoryCallback(s32 result)
 {
     if (result == 0)
     {
-        BannerOpenMode = 1;
+        BannerOpenMode = SAVELOAD_SAVE;
         InOperation = true;
         HandleNANDResult(nlFlashOpen(BannerFileName, 1, BannerLengthCallback));
     }
@@ -450,7 +456,7 @@ void SaveLoad::StartLoadDirectoryCallback(s32 result)
 {
     if (result == 0)
     {
-        BannerOpenMode = 0;
+        BannerOpenMode = SAVELOAD_LOAD;
         InOperation = true;
         HandleNANDResult(nlFlashOpen(BannerFileName, 1, BannerLengthCallback));
     }
@@ -490,7 +496,7 @@ void SaveLoad::ChangeDirectoryCallback(s32 result)
     }
     else if (result == 0)
     {
-        if (BannerOpenMode == 0)
+        if (BannerOpenMode == SAVELOAD_LOAD)
         {
             nlFlashOpen(OnlineSaveFileName, 1, OpenSaveForReadCallback);
         }
@@ -670,7 +676,7 @@ void SaveLoad::BannerLengthCallback(s32 result)
         {
             result = nlFlashChangeDirectory(1, ChangeDirectoryCallback);
         }
-        else if (BannerOpenMode == 0)
+        else if (BannerOpenMode == SAVELOAD_LOAD)
         {
             result = nlFlashOpen(SaveFileName, 1, OpenSaveForReadCallback);
         }
@@ -873,7 +879,7 @@ void SaveLoad::BannerCloseCallback(s32 result)
         {
             result = nlFlashChangeDirectory(1, ChangeDirectoryCallback);
         }
-        else if (BannerOpenMode == 0)
+        else if (BannerOpenMode == SAVELOAD_LOAD)
         {
             result = nlFlashOpen(SaveFileName, 1, OpenSaveForReadCallback);
         }
