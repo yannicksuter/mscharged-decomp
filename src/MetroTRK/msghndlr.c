@@ -1,4 +1,5 @@
 #include <MetroTRK/msghndlr.h>
+#include <MetroTRK/msg.h>
 #include <MetroTRK/usr_put.h>
 #include <MetroTRK/msgbuf.h>
 #include <MetroTRK/nubevent.h>

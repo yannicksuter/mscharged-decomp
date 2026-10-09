@@ -1,8 +1,8 @@
 #include <MetroTRK/msg.h>
-#include <MetroTRK/trk.h>
+#include <MetroTRK/dolphin_trk_glue.h>
 
-DSError TRKMessageSend(TRK_Msg* msg)
+DSError TRKMessageSend(TRKBuffer* msg)
 {
-    DSError write_err = TRKWriteUARTN(&msg->m_msg, msg->m_msgLength);
+    DSError write_err = TRKWriteUARTN(msg->data, msg->length);
     return kNoError;
 }
