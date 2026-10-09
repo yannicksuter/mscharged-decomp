@@ -1,6 +1,7 @@
 #include "Game/Physics/PhysicsCylinder.h"
 
 #include "Game/Physics/CollisionSpace.h"
+#include "ode/mass.h"
 
 PhysicsCylinder::PhysicsCylinder(
     CollisionSpace* collisionSpace, PhysicsWorld* world, float radius, float length)
