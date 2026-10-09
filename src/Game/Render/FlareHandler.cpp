@@ -1,6 +1,7 @@
 #include "Game/Render/FlareHandler.h"
 
 #include "Game/SharedStaticStorage.h"
+#include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 
@@ -135,7 +136,7 @@ void FlareHandler::Render()
                 halo = halo->next;
             }
 
-            if (writer.Begin(count * 4, 3, 0))
+            if (writer.Begin(count * 4, GLP_QuadList, 0))
             {
                 u32 texture = glGetTexture("global/flare_halo");
                 glTextureBinding* state =
@@ -172,7 +173,7 @@ void FlareHandler::Render()
                 glow = glow->next;
             }
 
-            if (writer.Begin(count * 4, 3, 0))
+            if (writer.Begin(count * 4, GLP_QuadList, 0))
             {
                 u32 texture = glGetTexture("global/flare_glow");
                 glTextureBinding* state =
@@ -199,4 +200,3 @@ void FlareHandler::Render()
         }
     }
 }
-
