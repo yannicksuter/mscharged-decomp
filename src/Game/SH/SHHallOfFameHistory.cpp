@@ -12,8 +12,6 @@
 #include <string.h>
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/CharacterInfo.h"
-#include "Game/DB/GameProgress.h"
-#include "Game/FE/feCupFlow.h"
 #include "Game/FE/feAsyncImage.h"
 #include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinder_impl.h"
@@ -36,11 +34,7 @@
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feBackButton.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/Render/RLViewLayers.h"
-#include "Game/SH/SHNavigation.h"
 
-#include <string.h>
 
 char sHallOfFameResourcePath[] = "art/fe/HallOfFameUI.res";
 const char* sHallOfFameResource = sHallOfFameResourcePath;
