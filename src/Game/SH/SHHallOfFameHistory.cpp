@@ -39,8 +39,6 @@
 char sHallOfFameResourcePath[] = "art/fe/HallOfFameUI.res";
 const char* sHallOfFameResource = sHallOfFameResourcePath;
 
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
 SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     : mMode(mode)
 {
@@ -745,9 +743,7 @@ void SHHallOfFamePlayerCard::Update(float fDeltaT)
 
 void SHHallOfFamePlayerCard::UpdateText()
 {
-    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
-    WideBasicString title;
+        WideBasicString title;
     WideBasicString description;
     WideBasicString name;
 
