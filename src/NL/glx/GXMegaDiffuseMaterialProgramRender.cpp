@@ -16,7 +16,7 @@ static nlMatrix4 sMegaDiffuseViewMatrix;
 static int sMegaDiffuseLightCount;
 static bool sMegaDiffuseLightingEnabled;
 
-extern "C" void glxConfigureMegaDiffuseLighting(bool enabled)
+void glxConfigureMegaDiffuseLighting(bool enabled)
 {
     unsigned int numChans;
     unsigned int numTexGens;
