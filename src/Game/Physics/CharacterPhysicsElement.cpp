@@ -4,7 +4,7 @@
 #include "NL/nlMemory.h"
 
 bool LoadCharacterPhysicsElements(void* pFileData, unsigned long nFileSize,
-    CharacterPhysicsData* pPhysicsData, bool arg3)
+    CharacterPhysicsData* pPhysicsData, bool freeFileData)
 {
     nlChunk* outerChunk;
     nlChunk* endChunk;
@@ -43,7 +43,7 @@ bool LoadCharacterPhysicsElements(void* pFileData, unsigned long nFileSize,
         outerChunk = outerChunk->GetNextChunk();
     }
 
-    if (arg3)
+    if (freeFileData)
     {
         delete (u8*)pFileData;
     }
