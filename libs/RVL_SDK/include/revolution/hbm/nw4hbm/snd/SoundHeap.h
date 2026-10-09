@@ -47,7 +47,7 @@ public:
 private:
     static void DisposeCallbackFunc(void* buffer, u32 size, void* callbackArg);
 
-    /* 0x00 */ mutable OSMutex mMutex;
+    /* 0x04 */ mutable OSMutex mMutex;
     /* 0x1C */ detail::FrameHeap mFrameHeap;
 };
 
