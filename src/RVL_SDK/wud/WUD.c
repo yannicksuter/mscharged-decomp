@@ -6,7 +6,7 @@
 #include <private/bte/btm_int.h>
 #include <private/bte/l2c_api.h>
 #include <private/bte/misc.h>
-
+#include <private/bte/bta_sys.h>
 #include <revolution/os.h>
 
 #include <string.h>
