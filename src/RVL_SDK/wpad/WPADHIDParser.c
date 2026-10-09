@@ -488,10 +488,10 @@ s32 WPADiHIDParser(u8 chan, u8* data)
     int enable;
     s32 ret = 0;
 
-    if ((data[0] >= 0x20) && (data[0] <= 0x3F))
+    if ((data[RPT_REPORT_ID] >= RPTID_IN_LO) && (data[RPT_REPORT_ID] <= RPTID_IN_HI))
     {
         enable = OSDisableInterrupts();
-        (*(__a1_input_reports_array[data[0] - 0x20]))(chan, data);
+        (*(__a1_input_reports_array[data[RPT_REPORT_ID] - RPTID_IN_LO]))(chan, data);
         OSRestoreInterrupts(enable);
         WPADiExcludeButton(chan);
         WPADiCopyOut(chan);
@@ -1024,7 +1024,7 @@ void __a1_32_data_type(u8 chan, u8* data)
         {
             switch (p_cb->devMode)
             {
-            case 1:
+            case WPAD_DEV_MODE_CLASSIC_REDUCED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
 
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
@@ -1039,7 +1039,7 @@ void __a1_32_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)((u16)((u16)((u16)(data[HID_IDX_BYTE13]) << 8) & (u16)0xFF00 | (u16)(data[HID_IDX_BYTE14]) & (u16)0xFF) ^ 0xFFFF);
                 break;
 
-            case 2:
+            case WPAD_DEV_MODE_CLASSIC_EXTENDED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE13])) & (s16)0x0003)) - (s16)(1024 / 2));
                 p_clStat->clRStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE10]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE13]) >> 2) & (s16)0x0003)) - (s16)(1024 / 2));
@@ -1051,7 +1051,7 @@ void __a1_32_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)((u16)((u16)((u16)(data[HID_IDX_BYTE16]) << 8) & (u16)0xFF00 | (u16)(data[HID_IDX_BYTE17]) & (u16)0xFF) ^ 0xFFFF);
                 break;
 
-            case 3:
+            case WPAD_DEV_MODE_CLASSIC_STANDARD:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
 
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE9]) & (s16)0xFF) << 2) - (s16)(1024 / 2));
@@ -1305,7 +1305,7 @@ void __a1_35_data_type(u8 chan, u8* data)
         {
             switch (p_cb->devMode)
             {
-            case 1:
+            case WPAD_DEV_MODE_CLASSIC_REDUCED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE12]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
                 p_clStat->clLStickY = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE13]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
@@ -1319,7 +1319,7 @@ void __a1_35_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)((u16)((u16)((u16)(data[HID_IDX_BYTE16]) << 8) & (u16)0xFF00 | (u16)(data[HID_IDX_BYTE17]) & (u16)0xFF) ^ 0xFFFF);
                 break;
 
-            case 2:
+            case WPAD_DEV_MODE_CLASSIC_EXTENDED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE12]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE16])) & (s16)0x0003)) - (s16)(1024 / 2));
                 p_clStat->clRStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE13]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE16]) >> 2) & (s16)0x0003)) - (s16)(1024 / 2));
@@ -1331,7 +1331,7 @@ void __a1_35_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)((u16)((u16)((u16)(data[HID_IDX_BYTE19]) << 8) & (u16)0xFF00 | (u16)(data[HID_IDX_BYTE20]) & (u16)0xFF) ^ 0xFFFF);
                 break;
 
-            case 3:
+            case WPAD_DEV_MODE_CLASSIC_STANDARD:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
 
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE12]) & (s16)0xFF) << 2) - (s16)(1024 / 2));
@@ -1586,7 +1586,7 @@ void __a1_37_data_type(u8 chan, u8* data)
         {
             switch (p_cb->devMode)
             {
-            case 1:
+            case WPAD_DEV_MODE_CLASSIC_REDUCED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE22]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
                 p_clStat->clLStickY = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE23]) & (s16)0x003F) << 4) - (s16)(1024 / 2));
@@ -1600,7 +1600,7 @@ void __a1_37_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)((u16)((u16)((u16)(data[HID_IDX_BYTE26]) << 8) & (u16)0xFF00 | (u16)(data[HID_IDX_BYTE27]) & (u16)0xFF) ^ 0xFFFF);
                 break;
 
-            case 2:
+            case WPAD_DEV_MODE_CLASSIC_EXTENDED:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE22]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE26])) & (s16)0x0003)) - (s16)(1024 / 2));
                 p_clStat->clRStickX = (s16)((s16)((s16)((s16)((s16)(data[HID_IDX_BYTE23]) << 2) & (s16)0xFFFC) | (s16)((s16)((s16)(data[HID_IDX_BYTE26]) >> 2) & (s16)0x0003)) - (s16)(1024 / 2));
@@ -1612,7 +1612,7 @@ void __a1_37_data_type(u8 chan, u8* data)
                 p_clStat->clButton = (u16)0;
                 break;
 
-            case 3:
+            case WPAD_DEV_MODE_CLASSIC_STANDARD:
                 p_clStat = (WPADCLStatus*)&p_cb->rxBufs[p_cb->rxBufIndex];
 
                 p_clStat->clLStickX = (s16)((s16)((s16)((s16)(data[HID_IDX_BYTE22]) & (s16)0xFF) << 2) - (s16)(1024 / 2));
