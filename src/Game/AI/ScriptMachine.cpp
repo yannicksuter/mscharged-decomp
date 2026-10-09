@@ -217,7 +217,7 @@ void ScriptMachine::Update(float deltaTime)
     }
     if (active == mActiveState)
     {
-        if (update.mData.i != 0 && mPendingState > -1)
+        if (update.mData.i != DESIRE_CONTINUE && mPendingState > -1)
         {
             bool force = false;
             if (mPendingParameters.IsSet(12))
@@ -232,7 +232,7 @@ void ScriptMachine::Update(float deltaTime)
         {
             switch (update.mData.i)
             {
-            case 3:
+            case DESIRE_CHANGE:
             {
                 bool force = false;
                 if (update.ExtraData.IsSet(12))
@@ -245,7 +245,7 @@ void ScriptMachine::Update(float deltaTime)
                     force);
                 break;
             }
-            case 1:
+            case DESIRE_FINISHED:
             case 2:
                 DeactivateState();
                 selectState = true;
@@ -257,7 +257,7 @@ void ScriptMachine::Update(float deltaTime)
                     selectState = true;
                 }
                 break;
-            case 0:
+            case DESIRE_CONTINUE:
                 break;
             }
         }
@@ -277,13 +277,13 @@ void ScriptMachine::Update(float deltaTime)
         }
 
         UpdateStateMachine(machine, &update, true, deltaTime);
-        if (update.mData.i == 0)
+        if (update.mData.i == DESIRE_CONTINUE)
         {
             continue;
         }
 
         DeactivateConcurrentState(this, i);
-        if (update.mData.i == 3)
+        if (update.mData.i == DESIRE_CHANGE)
         {
             ActivateConcurrentState(this, update.ExtraData.Get(8)->mData.i, &update.ExtraData, false);
         }
