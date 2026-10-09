@@ -1,6 +1,7 @@
 #ifndef GAME_FE_INPUT_H
 #define GAME_FE_INPUT_H
 
+#include "Game/FE/feCupFlow.h"
 #include "NL/globalpad.h"
 #include "types.h"
 
@@ -68,8 +69,6 @@ private:
 }; // size 0x40
 
 extern FEInput* g_pFEInput;
-extern unsigned int gFEControllerIndex;
 
-extern unsigned int gFEControllerIndex;
 
 #endif // GAME_FE_INPUT_H
