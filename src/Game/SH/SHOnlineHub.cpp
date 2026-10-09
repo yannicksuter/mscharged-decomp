@@ -389,7 +389,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
             if (g_pFriendManager->CountBuddies() > 0)
                 change = true;
             else
-                ShowOnlineHubDialog(this, (ePopupMenu)113);
+                ShowOnlineHubDialog(this, POPUP_NETWORK_NO_FRIENDS);
         }
         break;
     case ONLINE_HUB_RANKED_MATCH:
@@ -404,7 +404,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         break;
     case ONLINE_HUB_HELP:
         g_pFriendManager->SetOwnStatusInitial(0);
-        ShowOnlineHubDialog(this, (ePopupMenu)58);
+        ShowOnlineHubDialog(this, POPUP_ONLINE_MENU_HELP);
         break;
     }
     if (change)

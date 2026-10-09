@@ -796,7 +796,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_eActionState = ACTION_NEED_ACTION;
     m_bInPosition = false;
     m_nPowerupAnimID = -1;
-    m_eRole = (eRole)0;
+    m_eRole = ROLE_STRIKER;
     mbWasHitByPowerupThisFrame = false;
     mbTangible = true;
     mbIgnorePadSwitchRelease = false;
@@ -2082,7 +2082,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
         else
             InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
-            StatsTracker::Instance()->TrackStat((ePlayerStats)0x1E, m_pTeam->m_nSide,
+            StatsTracker::Instance()->TrackStat(STATS_POWERUPS_HIT, m_pTeam->m_nSide,
                 m_DetPlayer.m_ID, chain->mnThrowerPadID, 0, 0, 0);
     }
 }
@@ -5203,12 +5203,12 @@ void cFielder::TestAnimBallContact()
                 {
                     DoRegularShooting(false);
                     DeliverShotPresentationEndEvent(g_pGame);
-                    EmitBallShot(this, (eBallShotEffectType)2, 0, false, true);
+                    EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, false, true);
                 }
                 else
                 {
                     DoClearBall();
-                    EmitBallShot(this, (eBallShotEffectType)1, 0, false, false);
+                    EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, false, false);
                 }
                 FixedUpdateTask::GetTargetTimeScale();
                 break;
@@ -6012,7 +6012,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_eActionState = ACTION_NEED_ACTION;
     m_bInPosition = false;
     m_nPowerupAnimID = -1;
-    m_eRole = (eRole)0;
+    m_eRole = ROLE_STRIKER;
     mbWasHitByPowerupThisFrame = false;
     mbTangible = true;
     mbIgnorePadSwitchRelease = false;

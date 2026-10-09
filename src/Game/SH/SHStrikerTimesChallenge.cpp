@@ -260,15 +260,15 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
             if (mNewUnlock && challenge >= 10)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
-                popup->Create((ePopupMenu)47, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_CHALLENGE_UNLOCK_CAPTAIN, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             }
             else
             {
                 FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
                 if (challenge >= 10)
-                    popup->Create((ePopupMenu)48, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                    popup->Create(POPUP_CHALLENGE_SUCCEEDED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
                 else
-                    popup->Create((ePopupMenu)51, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                    popup->Create(POPUP_TUTORIAL_SUCCEEDED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             }
         }
         else
@@ -276,9 +276,9 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
             int challenge = g_pStrikerChallenge->mCurrentChallenge;
             FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
             if (challenge >= 10)
-                popup->Create((ePopupMenu)49, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_CHALLENGE_FAILED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             else
-                popup->Create((ePopupMenu)52, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_TUTORIAL_FAILED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
         }
     }
 }

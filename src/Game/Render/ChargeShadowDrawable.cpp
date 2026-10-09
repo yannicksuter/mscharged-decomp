@@ -146,7 +146,7 @@ void ChargeShadowDrawable::Draw()
     if (nlTaskManager::m_pInstance->mCurrentState != TASK_NIS)
     {
         previous = m_pWorldContext->m_pOpaqueView;
-        m_pWorldContext->m_pOpaqueView = GetLayerView((eCLV)0xD);
+        m_pWorldContext->m_pOpaqueView = GetLayerView(eCLV_MoreCharacters);
         WorldDrawable::Draw();
         m_pWorldContext->m_pOpaqueView = previous;
     }
@@ -157,7 +157,7 @@ void ChargeShadowDrawable::Draw()
     if (charged != 0)
     {
         glModelSetMatrix(charged, m_worldMatrix);
-        GLView* view = (GLView*)GetLayerView((eCLV)0x1A);
+        GLView* view = (GLView*)GetLayerView(eCLV_BallChargeAlphaBlended);
         if (view == 0)
             view = m_pWorldContext->m_pOpaqueView;
         view->AttachModel(m_pChargeModels[level], 1);

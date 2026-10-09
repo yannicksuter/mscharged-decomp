@@ -1299,7 +1299,7 @@ inline void ChooseCaptainsSceneV2::ShowDisconnectedError()
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseCaptainsSceneV2::OnDisconnectDismissed), this)));
+        popup->Create(POPUP_NETWORK_CONNECTION_LOST, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseCaptainsSceneV2::OnDisconnectDismissed), this)));
         mPopupActive = true;
     }
 }

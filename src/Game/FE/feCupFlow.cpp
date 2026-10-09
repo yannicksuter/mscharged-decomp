@@ -233,7 +233,7 @@ void AdvanceCupFlow(bool pad)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     SCENE_POPUP_MENU, SCREEN_NOTHING, true);
-                popup->Create((ePopupMenu)56, Function<FnVoidVoid>(ResetCupFlow));
+                popup->Create(POPUP_STRIKER_CUP_COMPLETE, Function<FnVoidVoid>(ResetCupFlow));
             }
         }
         else
@@ -291,13 +291,13 @@ void HandleCupBack(int fromSubPage)
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             if (saveEnabled)
             {
-                popup->Create((ePopupMenu)0,
+                popup->Create(POPUP_LEAVE_CUP_SAVE,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
-                popup->Create((ePopupMenu)2,
+                popup->Create(POPUP_LEAVE_CUP_QUIT,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
@@ -308,14 +308,14 @@ void HandleCupBack(int fromSubPage)
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             if (saveEnabled)
             {
-                popup->Create((ePopupMenu)1,
+                popup->Create(POPUP_LEAVE_CUP_SAVE_OR_RESTART,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
-                popup->Create((ePopupMenu)3,
+                popup->Create(POPUP_LEAVE_CUP_QUIT_OR_RESTART,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
@@ -393,7 +393,7 @@ void ShowCupStartOptions()
     gMainMenuInputResetPending = false;
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)15,
+    popup->Create(POPUP_CONTINUE_OR_NEW_CUP,
                   Function<FnVoidVoid>(ContinueStrikerCup),
                   Function<FnVoidVoid>(ShowNewCupPrompt),
                   Function<FnVoidVoid>(RequestMainMenuInputReset));
@@ -403,7 +403,7 @@ void ShowNewCupPrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)16,
+    popup->Create(POPUP_CONFIRM_NEW_CUP,
                   Function<FnVoidVoid>(StartNewCup),
                   Function<FnVoidVoid>(ShowCupStartOptions));
 }
@@ -412,7 +412,7 @@ void ShowCupSavePrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)4,
+    popup->Create(POPUP_RESTART_CUP,
                   Function<FnVoidVoid>(SaveAndShowCupHub),
                   Function<FnVoidVoid>(ShowCupExitPopup));
 }

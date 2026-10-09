@@ -421,7 +421,7 @@ void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
         else
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
+            popup->Create(POPUP_NO_GAME_RESULTS, FEPopupMenu::Nothing);
         }
     }
 }

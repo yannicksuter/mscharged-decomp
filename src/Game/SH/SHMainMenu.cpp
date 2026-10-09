@@ -341,17 +341,17 @@ void SHMainMenu::SelectItem(unsigned int index, void* context)
         if (!SaveEnabled)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x46);
+            popup->Create(POPUP_ONLINE_SAVE_DATA_REQUIRED);
         }
         else if (!MiiManager::s_pInstance->mInitialized)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));
         }
         else if (RFLGetAvailableOfficialDataNum() == 0)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x86);
+            popup->Create(POPUP_PROFILE_NO_MIIS);
         }
         else
         {

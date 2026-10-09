@@ -461,6 +461,6 @@ void CupFinalRoundsScene::OnMatchupPointerPress(unsigned int, void* context)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
             SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
+        popup->Create(POPUP_NO_GAME_RESULTS, FEPopupMenu::Nothing);
     }
 }

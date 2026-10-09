@@ -158,7 +158,7 @@ void SHOnlineLogin::OnLoginResult(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x70, this);
+            CreateOnlineLoginErrorPopup(menu, POPUP_NETWORK_LOGINBADNAME, this);
             mPopupActive = true;
         }
         mState = ONLINE_LOGIN_LOGIN_ERROR;
@@ -171,7 +171,7 @@ void SHOnlineLogin::OnLoginResult(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x6F, this);
+            CreateOnlineLoginErrorPopup(menu, POPUP_NETWORK_LOGINGETSTATS_ERROR, this);
             mPopupActive = true;
         }
         mState = ONLINE_LOGIN_STATS_ERROR;

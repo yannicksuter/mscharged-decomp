@@ -3893,7 +3893,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
         {
             CleanupStun();
             ChooseSwatAnim(1);
-            SetGoalieAction((eGoalieActionState)0x1F, 0);
+            SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
             m_DetChar.m_fDesiredSpeed = 0.0f;
             m_DetChar.m_fActualSpeed = 0.0f;
             SetVelocity(v3Zero);
@@ -4066,7 +4066,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
     {
         CleanupStun();
         ChooseSwatAnim(1);
-        SetGoalieAction((eGoalieActionState)0x1F, 0);
+        SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
         m_DetChar.m_fDesiredSpeed = 0.0f;
         m_DetChar.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -4364,7 +4364,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
 
             PlayNewAnim(0xAD);
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
-            SetGoalieAction((eGoalieActionState)0x1F, 0);
+            SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
             mbGrabMonty = true;
             mpMonty = mpTarget;
             mpTarget->fn_8004F204();

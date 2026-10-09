@@ -440,7 +440,7 @@ inline void SHOnlineFriendsChooseSides::ShowDisconnectedError()
     {
         FEPopupMenu* popup = static_cast<FEPopupMenu*>(
             GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-        popup->Create((ePopupMenu)0x60,
+        popup->Create(POPUP_NETWORK_CONNECTION_LOST,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDisconnectPopupClosed), this)));
         mDisconnectPopupActive = true;
     }

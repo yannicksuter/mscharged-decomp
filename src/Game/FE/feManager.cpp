@@ -207,13 +207,13 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
         switch (m_menuType)
         {
         case MET_CONNECTIONLOST:
-            popupType = (ePopupMenu)0x60;
+            popupType = POPUP_NETWORK_CONNECTION_LOST;
             break;
         case MET_SYNCERROR:
-            popupType = (ePopupMenu)0x63;
+            popupType = POPUP_NETWORK_SYNC_ERROR;
             break;
         case MET_QUEUEOVERFLOW:
-            popupType = (ePopupMenu)0x64;
+            popupType = POPUP_NETWORK_OVERFLOW;
             break;
         default:
             break;

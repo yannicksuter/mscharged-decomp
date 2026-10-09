@@ -431,7 +431,7 @@ inline void SHOnlineFriends::ConfirmDeleteFriend(int index)
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)106,
+        popup->Create(POPUP_NETWORK_DELETE_FRIEND,
             Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, index),
             Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
         mPopupActive = true;

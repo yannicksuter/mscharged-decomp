@@ -210,7 +210,7 @@ inline void SHOnlineFriendsDraft::ShowDisconnectedError()
         return;
     FEPopupMenu* menu = static_cast<FEPopupMenu*>(
         GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-    menu->Create((ePopupMenu)0x60,
+    menu->Create(POPUP_NETWORK_CONNECTION_LOST,
         Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsDraft::OnErrorDismissed), this)));
     mErrorPopupOpen = true;
 }

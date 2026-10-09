@@ -1428,12 +1428,12 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         { GLM_Header, 0x400 },
         { GLM_VertexData, 0x800 },
     };
-    GLView* view = GetLayerView((eCLV)0);
+    GLView* view = GetLayerView(eCLV_ImpostorTexture);
     ImpostorManager::GetInstance()->Initialize(view, 30, requirements, 2, true);
     ImpostorManager::GetInstance()->SetEnabled(true);
     manager->SetLoadingComment("InitializeFEState2");
     ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
-    particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
+    particleTask->Initialize(GetLayerView(eCLV_Particles), 0x5F6, 0x2FB);
     GameInfoManager::Instance()->ResetUnknown0xA0();
     FEMusic::StopStream();
     BaseSceneHandler* scene = GameSceneManager::Instance()->Push(SCENE_NAVIGATION, SCREEN_NOTHING, false);
@@ -1751,7 +1751,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     InitializeWarbleRendering(&gWarbleEnabled);
     CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
     ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
-    particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
+    particleTask->Initialize(GetLayerView(eCLV_Particles), 0x5F6, 0x2FB);
     LoadCrowdCharacterList();
     FinishLoadingStep(manager);
 }

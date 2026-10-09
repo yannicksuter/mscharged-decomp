@@ -160,7 +160,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x5c, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_NO_LOCAL_IP, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -168,7 +168,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x58, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_CREATE_FAILED, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -203,7 +203,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x5c, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_NO_LOCAL_IP, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -211,7 +211,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x5d, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_FAILED_TO_CONNECT, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -219,7 +219,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x5e, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_NO_GAMES_TO_JOIN, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -227,7 +227,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)0x59, Function<FnVoidVoid>(ResetNetworkStart));
+                popup->Create(POPUP_NETWORK_JOIN_FAILED, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
@@ -406,7 +406,7 @@ void NetworkStartScene::OnGameCreated(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_CONNECTION_LOST, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -414,7 +414,7 @@ void NetworkStartScene::OnGameCreated(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x58, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_CREATE_FAILED, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -433,7 +433,7 @@ void NetworkStartScene::OnGameJoined(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x5d, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_FAILED_TO_CONNECT, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -441,7 +441,7 @@ void NetworkStartScene::OnGameJoined(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x5f, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_JOIN_REJECTED, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -449,7 +449,7 @@ void NetworkStartScene::OnGameJoined(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_CONNECTION_LOST, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -457,7 +457,7 @@ void NetworkStartScene::OnGameJoined(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x59, Function<FnVoidVoid>(ResetNetworkStart));
+            popup->Create(POPUP_NETWORK_JOIN_FAILED, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -475,7 +475,7 @@ void NetworkStartScene::OnGameLaunched(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x61, Function<FnVoidVoid>(ResumeNetworkStart));
+            popup->Create(POPUP_NETWORK_CLIENTS_FAILED_CONNECT, Function<FnVoidVoid>(ResumeNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
@@ -483,7 +483,7 @@ void NetworkStartScene::OnGameLaunched(int result)
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x62, Function<FnVoidVoid>(ResumeNetworkStart));
+            popup->Create(POPUP_NETWORK_START_FAILED, Function<FnVoidVoid>(ResumeNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;

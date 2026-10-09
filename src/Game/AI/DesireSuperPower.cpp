@@ -218,7 +218,7 @@ bool DesireSuperPower::Initialize(void* context)
         break;
     case DAISY:
         m_pFielder->InitDesire(
-            (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         m_pFielder->SetAction(ACTION_SUPER_POWER);
         m_pFielder->muInvincibleStatus |= 1;
         m_pFielder->SetAnimState(104, true, 0.2f, false, false);
@@ -654,7 +654,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
             target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
-        (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
@@ -773,7 +773,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
             target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
-        (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);

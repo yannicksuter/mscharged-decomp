@@ -1225,7 +1225,7 @@ void ChooseSidekicksSceneV2::SubmitSidekickChoice()
         mReadyPressed[0] = false;
         mCaptainComponents[0].SetReadyPromptVisible(false);
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
-        popup->Create((ePopupMenu)0x39, Function<FnVoidVoid>(StartCupNormalSkill), Function<FnVoidVoid>(StartCupHighestSkill));
+        popup->Create(POPUP_CUP_DIFFICULTY, Function<FnVoidVoid>(StartCupNormalSkill), Function<FnVoidVoid>(StartCupHighestSkill));
     }
     else
     {
@@ -1481,7 +1481,7 @@ inline void ChooseSidekicksSceneV2::ShowDisconnectedError()
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseSidekicksSceneV2::OnDisconnectDismissed), this)));
+        popup->Create(POPUP_NETWORK_CONNECTION_LOST, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseSidekicksSceneV2::OnDisconnectDismissed), this)));
         mPopupActive = true;
     }
 }

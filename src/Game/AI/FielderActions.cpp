@@ -1121,7 +1121,7 @@ void cFielder::fn_80044290(float fDeltaT)
             m_DetChar.m_v3Position.z += v3Velocity.z * fDeltaT;
 
             Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
-            if (pGoalie->mGoalieActionState == (eGoalieActionState)0x0D
+            if (pGoalie->mGoalieActionState == GOALIEACTION_PURSUE_DEKE
                 && pGoalie->mpTarget == this)
             {
                 pGoalie->fn_80080BFC(fDeltaT);
@@ -1288,7 +1288,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     if (bIsGameplay)
     {
         StatsTracker::Instance()->TrackStat(
-            (ePlayerStats)0x15, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
+            STATS_15, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
     }
 
     return true;
@@ -2349,7 +2349,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     if (g_pGame->IsGameplayOrOvertime())
     {
-        StatsTracker::Instance()->TrackStat((ePlayerStats)0x12,
+        StatsTracker::Instance()->TrackStat(STATS_HITS_MADE,
             pAttacker->m_pTeam->m_nSide,
             pAttacker->m_DetPlayer.m_ID,
             0,
@@ -4978,7 +4978,7 @@ void cFielder::fn_8004E438()
     if (bIsGameplay)
     {
         StatsTracker::Instance()->TrackStat(
-            (ePlayerStats)4, m_pTeam->m_nSide, m_DetPlayer.m_ID, 1, 0, 0, 0);
+            STATS_STS_ATTEMPTS, m_pTeam->m_nSide, m_DetPlayer.m_ID, 1, 0, 0, 0);
     }
 }
 

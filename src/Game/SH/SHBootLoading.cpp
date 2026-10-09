@@ -191,14 +191,14 @@ void BootLoadingScene::Update(float fDeltaT)
             mElapsedTime += fDeltaT;
             if (mElapsedTime >= 1.5f)
             {
-                if (g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x20, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x08, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x1E, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x1F, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x2A, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x2B, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x28, true, 0)
-                    || g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x29, true, 0))
+                if (g_pFEInput->JustPressed(FE_ALL_PADS, 0x20, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x08, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x1F, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x2A, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x2B, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x28, true, 0)
+                    || g_pFEInput->JustPressed(FE_ALL_PADS, 0x29, true, 0))
                     mStrapDismissed = true;
                 if (mElapsedTime >= 15.5f)
                     mStrapDismissed = true;

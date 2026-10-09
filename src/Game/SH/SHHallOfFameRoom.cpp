@@ -528,13 +528,13 @@ void SHHallOfFameCup::ShowLockedItemMessage(unsigned int item)
         switch (mMode)
         {
         case HOF_FIRE_CUP:
-            type = (ePopupMenu)0x7D;
+            type = POPUP_LOCKED_FIRE_CUP;
             break;
         case HOF_STRIKER_CUP:
-            type = (ePopupMenu)0x7E;
+            type = POPUP_LOCKED_STRIKER_CUP;
             break;
         case HOF_CRYSTAL_CUP:
-            type = (ePopupMenu)0x7F;
+            type = POPUP_LOCKED_CRYSTAL_CUP;
             break;
         }
     }
@@ -543,13 +543,13 @@ void SHHallOfFameCup::ShowLockedItemMessage(unsigned int item)
         switch (mMode)
         {
         case HOF_FIRE_CUP:
-            type = item == 1 ? (ePopupMenu)0x80 : (ePopupMenu)0x81;
+            type = item == 1 ? POPUP_LOCKED_FIRE_BRICK_WALL : POPUP_LOCKED_FIRE_GOLDEN_BOOT;
             break;
         case HOF_STRIKER_CUP:
-            type = item == 1 ? (ePopupMenu)0x82 : (ePopupMenu)0x83;
+            type = item == 1 ? POPUP_LOCKED_STRIKER_BRICK_WALL : POPUP_LOCKED_STRIKER_GOLDEN_BOOT;
             break;
         case HOF_CRYSTAL_CUP:
-            type = item == 1 ? (ePopupMenu)0x84 : (ePopupMenu)0x85;
+            type = item == 1 ? POPUP_LOCKED_CRYSTAL_BRICK_WALL : POPUP_LOCKED_CRYSTAL_GOLDEN_BOOT;
             break;
         }
     }

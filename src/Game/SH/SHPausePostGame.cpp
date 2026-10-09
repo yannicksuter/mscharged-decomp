@@ -96,7 +96,7 @@ void ContinuePostGame(bool online)
             tracker->mNumGamesWon[1] = 0;
             SetPointerEnabled(true);
             FEPopupMenu* popup = static_cast<FEPopupMenu*>(g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-            popup->Create((ePopupMenu)53, Function<FnVoidVoid>(PausePostGameScene::OnSelectRematch),
+            popup->Create(POPUP_SERIES_OVER, Function<FnVoidVoid>(PausePostGameScene::OnSelectRematch),
                 Function<FnVoidVoid>(PausePostGameScene::OnSelectChangeTeams), Function<FnVoidVoid>(PausePostGameScene::OnSelectQuit));
         }
         else
@@ -208,7 +208,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
             {
                 mMode = MODE_DEMO_EXIT_PROMPT;
                 FEPopupMenu* popup = static_cast<FEPopupMenu*>(g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-                popup->Create((ePopupMenu)142, Function<FnVoidVoid>(OnSelectQuit));
+                popup->Create(POPUP_E3_THANKS_FOR_PLAYING, Function<FnVoidVoid>(OnSelectQuit));
             }
             else if (mIsNetworkGame && IsOnlineRankedMatch())
             {

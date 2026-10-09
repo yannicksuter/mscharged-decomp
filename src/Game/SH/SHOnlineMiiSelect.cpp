@@ -148,7 +148,7 @@ void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
 
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x8C,
+            popup->Create(POPUP_DELETED_MII,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::UpdatePage), this)));
         }
@@ -168,7 +168,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -191,7 +191,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -214,7 +214,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -237,7 +237,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;

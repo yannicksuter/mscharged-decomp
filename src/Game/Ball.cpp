@@ -1678,7 +1678,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         break;
     case BALL_STATE_GOALIE_DEFLECTION:
         ClearBallStateTargets(pBall);
-        pBall->InitiateBallBlur((eBallShotEffectType)0, NULL);
+        pBall->InitiateBallBlur(BALL_EFFECT_S2S_SUPER_SHOT, NULL);
         break;
     case BALL_STATE_CLEARING:
         UpdateBallShotClock(pBall);

@@ -98,14 +98,14 @@ void PauseMenuScene::OnSelectQUIT()
         WorldDarkening::Instance().Fade(100.0f, 1.0f);
         if (GameInfoManager::Instance()->mIsInStrikers101Mode)
         {
-            popup->Create((ePopupMenu)11,
+            popup->Create(POPUP_STRIKERS_101_QUITTING,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY
             || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
         {
-            popup->Create((ePopupMenu)10,
+            popup->Create(POPUP_QUIT,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
@@ -113,13 +113,13 @@ void PauseMenuScene::OnSelectQUIT()
             || (GameInfoManager::Instance()->IsInMode1()
                 && GameInfoManager::Instance()->GetPlayingSide((unsigned short)mQuittingController) != -1))
         {
-            popup->Create((ePopupMenu)9,
+            popup->Create(POPUP_FORFEIT,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else
         {
-            popup->Create((ePopupMenu)22,
+            popup->Create(POPUP_FORFEIT_NO_TEAM,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
     }
