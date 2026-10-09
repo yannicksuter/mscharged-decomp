@@ -5,7 +5,7 @@
 
 #include "string.h"
 
-extern "C" int stricmp(const char*, const char*);
+#include "extras.h"
 
 namespace {
 
