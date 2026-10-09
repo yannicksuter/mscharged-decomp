@@ -925,7 +925,7 @@ void cFielder::fn_80043ADC()
     SetPosition(v3Position);
 
     InitDesire(
-        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_CROWD_RIOT);
     SetAnimState(0x7C, true, 0.2f, false, false);
     InitMovementCoast();
@@ -1029,7 +1029,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     }
 
     InitDesire(
-        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_LAUNCHED);
     SetAnimState(0x7C, false, 0.0333333f, false, false);
     SetVelocity(v3Velocity);
@@ -1160,7 +1160,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         return false;
     }
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_DEKE);
     m_aDekeDirection = 0;
     m_bDekeReset = false;
@@ -1373,7 +1373,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         m_pCurrentAnimController->m_fTime, fElectrocutionTime);
     fElectrocutionTime += lbl_806DB920;
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_ELECTROCUTION);
 
     if (m_pBall != 0)
@@ -1471,7 +1471,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         SetFacingDirection(nlVector3ToAngle(v3Direction), true);
     }
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_ELECTROCUTION);
     SetAnimState(0x79, true, 0.2f, false, false);
     InitMovementNone(0.0f, 0.0f);
@@ -1681,7 +1681,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         EndMushroom();
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_SUCKED_AWAY);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
@@ -1878,7 +1878,7 @@ void cFielder::fn_80046244()
         EndMushroom();
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_FALL);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
@@ -2123,7 +2123,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_HIT);
         SetAnimState(0x67, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -2334,7 +2334,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_HIT_REACT);
 
     s16 angleDiff
@@ -2803,7 +2803,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
         if (DoCommonInitActionLooseBall(
                 m_pTeam->GetOtherNet()->m_v3NetLocation, false))
         {
-            InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             SetAction(ACTION_LOOSE_BALL_SHOT);
             bIsModified = false;
             SetNoPickUpTime(3.0f);
@@ -2820,7 +2820,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
     else if (DoCommonInitActionLooseBall(finalPassTarget->m_DetChar.m_v3Position, true))
     {
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_PASS);
         bIsModified = bVolleyPass;
         m_DetPlayer.m_bCanTestController = false;
@@ -2855,7 +2855,7 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
             m_pTeam->GetOtherNet()->m_v3NetLocation, false))
     {
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_LOOSE_BALL_SHOT);
         bIsModified = bIsChipShot;
         SetNoPickUpTime(3.0f);
@@ -3558,7 +3558,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
     }
     bIsModified = bIsChipShot;
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_ONETOUCH_PASS_FROM_VOLLEY);
 
     int LateOneTimerFromVolleyAnims[4] = {
@@ -3646,7 +3646,7 @@ bool cFielder::InitActionPass(
         return false;
     }
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_PASS);
 
     static int PassingAnims[4] = {
@@ -3760,7 +3760,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_BOMB_REACT);
 
         s16 facingDelta = GetFacingDeltaToPosition(v3BombPosition);
@@ -3798,7 +3798,7 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
         PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BOMB_HIT_REACT);
 
     u32 index = (((u16)((u16)GetFacingDeltaToPosition(v3BombPosition)) >> 14) & 3);
@@ -3836,7 +3836,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
 
     PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BANANA_REACT);
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -3868,7 +3868,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
 
     PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SHELL_REACT);
 
     s16 facingDelta = GetFacingDeltaToPosition(v3CollisionLocation);
@@ -3966,7 +3966,7 @@ void cFielder::ActionRunningWB(float dt)
 
 void cFielder::fn_8004B148()
 {
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_RUNNING_PASS);
 
     u16 aDirection = m_DetChar.m_aActualFacingDirection;
@@ -4050,7 +4050,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
             fn_8002C180(this->GetTweaks()),
             0.0f);
         InitDesire(
-            (eFielderDesireState)0x14, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_USER_CONTROLLED, 0.5f, -1.0f, fvNotSet, fvNotSet);
         EmitBallShot(this, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);
     }
 
@@ -4166,7 +4166,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_REGULAR_SHOT);
         bIsModified = bIsChipShot;
 
@@ -4705,7 +4705,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_KNOCKDOWN_REACT);
         SetAnimState(0x56, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -4740,7 +4740,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_SLIDE_ATTACK_REACT);
 
         s16 facingDelta;
@@ -4881,7 +4881,7 @@ void cFielder::fn_8004E11C(float fParam)
 {
     SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
     fn_80097358(this, fParam);
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BURNING);
     SetAnimState(0x80, false, 0.3f, false, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -4944,7 +4944,7 @@ void cFielder::fn_8004E228()
 void cFielder::fn_8004E438()
 {
     EndShrink();
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SKILLSHOT);
 
     nlVector3 v3Delta;
@@ -5149,7 +5149,7 @@ void cFielder::fn_8004EC40()
 void cFielder::fn_8004ED64()
 {
     EndShrink();
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BOO_SKILLSHOT);
     InitMovementCoast();
 
@@ -5245,7 +5245,7 @@ void cFielder::fn_8004F180()
 
 void cFielder::fn_8004F204()
 {
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_MONTY_BURROWED);
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);

@@ -4299,7 +4299,7 @@ void Goalie::StealBall(cPlayer* pPlayer)
     pPlayer->ReleaseBall(false);
 
     cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-    if (pFielder->GetDesireState() == FIELDERDESIRE_FINISH_ACTION)
+    if (pFielder->GetDesireState() == FIELDER_DESIRE_FINISH_ACTION)
     {
         return;
     }

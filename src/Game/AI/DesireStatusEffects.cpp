@@ -370,7 +370,7 @@ bool DesireShrink::Initialize(void* context)
     if (m_pFielder->m_pBall != 0)
     {
         if (m_pFielder->GetDesireState()
-            == (eFielderDesireState)32)
+            == FIELDER_DESIRE_MEGA_STRIKE)
         {
             m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->EndDesire();
@@ -517,7 +517,7 @@ bool DesireFrozen::Initialize(void* context)
     {
         m_pFielder->TurnOffSuperPowerTank(true);
     }
-    if (m_pFielder->GetDesireState() != FIELDERDESIRE_FINISH_ACTION)
+    if (m_pFielder->GetDesireState() != FIELDER_DESIRE_FINISH_ACTION)
     {
         m_pFielder->EndDesire();
     }
@@ -745,7 +745,7 @@ bool DesireConfused::Initialize(void* context)
     if (m_pFielder->m_pBall != 0)
     {
         if (m_pFielder->GetDesireState()
-            == (eFielderDesireState)32)
+            == FIELDER_DESIRE_MEGA_STRIKE)
         {
             m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->EndDesire();

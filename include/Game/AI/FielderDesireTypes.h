@@ -1,7 +1,7 @@
 #ifndef GAME_AI_FIELDER_DESIRE_TYPES_H
 #define GAME_AI_FIELDER_DESIRE_TYPES_H
 
-enum eFielderDesireType
+enum eFielderDesireState
 {
     FIELDER_DESIRE_NONE = -1,
     FIELDER_DESIRE_CUT_AND_BREAK = 1,

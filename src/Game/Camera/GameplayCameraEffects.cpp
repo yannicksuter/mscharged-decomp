@@ -156,7 +156,7 @@ void GameplayCameraEffects::Update(float deltaTime)
     }
 
     if (mPrimaryPlayer != 0
-        && mPrimaryPlayer->GetDesireState() != (eFielderDesireState)0x16
+        && mPrimaryPlayer->GetDesireState() != FIELDER_DESIRE_RECEIVE_PASS
         && mPrimaryPlayer->m_eActionState != ACTION_ONETIMER
         && mPrimaryPlayer->m_eActionState != ACTION_PASS
         && mPrimaryPlayer->m_eActionState != ACTION_ONETOUCH_PASS_FROM_VOLLEY)

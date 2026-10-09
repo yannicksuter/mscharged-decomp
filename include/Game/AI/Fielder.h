@@ -4,6 +4,7 @@
 #include "Game/Player.h"
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FielderAbility.h"
+#include "Game/AI/FielderDesireTypes.h"
 
 enum ePenaltyType
 {
@@ -89,12 +90,6 @@ enum eFielderActionState
     ACTION_MONTY_BURROWED = 34,
     ACTION_LAUNCHED = 35,
     ACTION_WAIT = 36,
-};
-
-enum eFielderDesireState
-{
-    FIELDERDESIRE_PASS = 14,
-    FIELDERDESIRE_FINISH_ACTION = 0x15,
 };
 
 enum eStrafeDirection

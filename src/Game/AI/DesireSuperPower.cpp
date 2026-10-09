@@ -138,17 +138,17 @@ float gInterceptBallSpeed = 3.0f;
 int gFollowPathContinueResult = 0;
 #pragma explicit_zero_data off
 int gFollowPathFinishedResult = 1;
-eFielderDesireState gFollowPathWindupShotState = (eFielderDesireState)19;
-eFielderDesireState gFollowPathRunState = (eFielderDesireState)12;
+eFielderDesireState gFollowPathWindupShotState = FIELDER_DESIRE_WINDUP_SHOT;
+eFielderDesireState gFollowPathRunState = FIELDER_DESIRE_RUN_IN_DIRECTION;
 bool gFollowPathReinitialize = true;
 float gFollowPathNextSpeed = 2.0f;
 #pragma explicit_zero_data on
 int gChooseDirectionContinueResult = 0;
 #pragma explicit_zero_data off
 int gChooseDirectionFinishedResult = 1;
-eFielderDesireState gChooseDirectionWindupShotState = (eFielderDesireState)19;
-eFielderDesireState gChooseDirectionBlockedWindupShotState = (eFielderDesireState)19;
-eFielderDesireState gChooseDirectionRunState = (eFielderDesireState)12;
+eFielderDesireState gChooseDirectionWindupShotState = FIELDER_DESIRE_WINDUP_SHOT;
+eFielderDesireState gChooseDirectionBlockedWindupShotState = FIELDER_DESIRE_WINDUP_SHOT;
+eFielderDesireState gChooseDirectionRunState = FIELDER_DESIRE_RUN_IN_DIRECTION;
 bool gChooseDirectionReinitialize = true;
 float gChooseDirectionNextMaxDistance = 5.5f;
 float gChooseDirectionNextSpeed = 3.0f;
@@ -218,7 +218,7 @@ bool DesireSuperPower::Initialize(void* context)
         break;
     case DAISY:
         m_pFielder->InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         m_pFielder->SetAction(ACTION_SUPER_POWER);
         m_pFielder->muInvincibleStatus |= 1;
         m_pFielder->SetAnimState(104, true, 0.2f, false, false);
@@ -654,7 +654,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
             target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
-        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
@@ -773,7 +773,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
             target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
-        FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);

@@ -674,7 +674,7 @@ inline bool cFielder::ShouldSkipHardStopAnim()
             || (IsCharacterSuperPowerActive(this, PETEY) && m_bSuperPowerTankOn))
         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY);
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
-    if (!skip && GetDesireState() == (eFielderDesireState)20)
+    if (!skip && GetDesireState() == FIELDER_DESIRE_USER_CONTROLLED)
     {
         Desire* desire = GetFielderDesire(this, FIELDER_DESIRE_USER_CONTROLLED);
         if (desire->mAgeTimer.GetSeconds() < 0.05f)
@@ -868,7 +868,7 @@ eFielderDesireState cFielder::GetDesireState()
     {
         return (eFielderDesireState)machine->mActiveState->mState;
     }
-    return (eFielderDesireState)-1;
+    return FIELDER_DESIRE_NONE;
 }
 
 Desire* GetFielderDesire(cFielder* pFielder, int nAction)
@@ -1165,7 +1165,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->GetDesireState() == (eFielderDesireState)0x20)
+    if (pFielder->GetDesireState() == FIELDER_DESIRE_MEGA_STRIKE)
     {
         if (pFielder->m_eActionState == ACTION_MEGA_STRIKE)
         {
@@ -6087,7 +6087,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_fMegaStrikeSegment4Position = 0.0f;
     m_fMegaStrikeLastSegmentPosition = 0.0f;
     InitDesire(
-        (eFielderDesireState)0x1F, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_WAIT, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitActionWait();
 }
 

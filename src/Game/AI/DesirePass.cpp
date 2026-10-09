@@ -27,7 +27,7 @@ static float sPassAbortThresholdVariation = 0.3f;
 static float sPassArrivalDistance = 1.0f;
 static unsigned short sDesirePreparePassType = 0xFFFF;
 static unsigned short sDesirePassType = 0xFFFF;
-static int sPassDesireState = FIELDERDESIRE_PASS;
+static int sPassDesireState = FIELDER_DESIRE_PASS;
 // The default transition result resides in initialized small data.
 #pragma explicit_zero_data on
 static int sContinueDesire = DESIRE_CONTINUE;
