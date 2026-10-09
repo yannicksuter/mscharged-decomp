@@ -14,6 +14,15 @@ struct glModelPacket;
 struct GoalScoredData;
 struct GoalieSaveData;
 
+enum eNisOverlayMode
+{
+    NIS_OVERLAY_NONE = 0,
+    NIS_OVERLAY_PIP = 1,
+    NIS_OVERLAY_CAMERA_SWAP = 2,
+    NIS_OVERLAY_PIP_EXPAND = 3,
+    NIS_OVERLAY_HOLOTRON = 4,
+};
+
 enum NisUseFilter
 {
     NIS_NO_FILTER = 0,
@@ -91,7 +100,7 @@ public:
     bool HasSecondaryNis() const;
     unsigned int IsPIPOverlayMode() const
     {
-        return mOverlayMode == 0;
+        return mOverlayMode == NIS_OVERLAY_NONE;
     }
     float TimeLeft() const;
     float GetCameraTimeLeft(int cameraIndex) const;

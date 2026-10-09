@@ -434,7 +434,7 @@ void Nis::Render(int param1)
         mImpostors[i]->mWorldMatrix = matrix;
 
         GLView* view = GetLayerView(eCLV_MoreCharacters);
-        if (param1 == 1 && (mRenderMode == 1 || mRenderMode == 2))
+        if (param1 == 1 && (mRenderMode == NIS_RENDER_SECONDARY || mRenderMode == NIS_RENDER_BOTH))
         {
             view = GetLayerView(eCLV_PictureInPicture);
         }
@@ -663,7 +663,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         break;
     }
     case NIS_TRIGGER_TYPE_PLAY_SOUND:
-        if (nis.mRenderMode == 0)
+        if (nis.mRenderMode == NIS_RENDER_PRIMARY)
         {
             PlaySound(params.param1, params.param2, 0, 0);
         }

@@ -95,7 +95,7 @@ NisPlayer::NisPlayer()
     , mUsedFromBack(0x70800)
     , mGoalScorerCharIndex(-1)
     , mAnimProxyByteCode(0)
-    , mOverlayMode(1)
+    , mOverlayMode(NIS_OVERLAY_PIP)
     , mPlayingNisCue(0)
     , mPreparedNisCue(0)
     , mStopNisCueOnReset(true)
@@ -128,11 +128,11 @@ NisPlayer::NisPlayer()
         mCamera[i].m_LetManagerDoUpdate = false;
         mCamera[i].m_bCyclic = false;
     }
-    mOverlays[0] = new (8, false) NisPlayerNoOverlay(this);
-    mOverlays[1] = new (8, false) NisPlayerPIPOverlay(this);
-    mOverlays[4] = new (8, false) NisPlayerHolotronOverlay(this);
-    mOverlays[2] = new (8, false) NisPlayerCameraSwapOverlay(this);
-    mOverlays[3] = new (8, false) NisPlayerPIPExpandOverlay(this, 1.0f);
+    mOverlays[NIS_OVERLAY_NONE] = new (8, false) NisPlayerNoOverlay(this);
+    mOverlays[NIS_OVERLAY_PIP] = new (8, false) NisPlayerPIPOverlay(this);
+    mOverlays[NIS_OVERLAY_HOLOTRON] = new (8, false) NisPlayerHolotronOverlay(this);
+    mOverlays[NIS_OVERLAY_CAMERA_SWAP] = new (8, false) NisPlayerCameraSwapOverlay(this);
+    mOverlays[NIS_OVERLAY_PIP_EXPAND] = new (8, false) NisPlayerPIPExpandOverlay(this, 1.0f);
     mDisplayNisInfo = GetTweakBool("/user/DisplayNISInfo", false);
     mSuppressBlinking = false;
     mRequestedFogStart = -1.0f;
@@ -301,7 +301,7 @@ void NisPlayer::SelectCameras()
         for (int i = 0; i < 8; i++)
         {
             if (mPlaying[i] != 0
-                && (j == mPlaying[i]->mRenderMode || (j == 1 && mPlaying[i]->mRenderMode == 2))
+                && (j == mPlaying[i]->mRenderMode || (j == 1 && mPlaying[i]->mRenderMode == NIS_RENDER_BOTH))
                 && mPlaying[i]->mNumCameras != 0)
             {
                 mPlaying[i]->SelectRandomCamera(mCamera[j]);
@@ -470,9 +470,9 @@ void NisPlayer::Update(float deltaT)
                 continue;
             }
             int cameraIndex = mPlaying[i]->mRenderMode;
-            if (cameraIndex == 2)
+            if (cameraIndex == NIS_RENDER_BOTH)
             {
-                cameraIndex = 1;
+                cameraIndex = NIS_RENDER_SECONDARY;
             }
             mPlaying[i]->Update(deltaT);
             float duration = mCamera[cameraIndex].GetDuration();
@@ -498,7 +498,7 @@ void NisPlayer::Reset()
     }
 
     ResetPlayerEffects();
-    mOverlayMode = 0;
+    mOverlayMode = NIS_OVERLAY_NONE;
     if (mPlayingNisCue != 0 && mStopNisCueOnReset)
     {
         StopSound(mPlayingNisCue, (void*)-1);
@@ -652,9 +652,9 @@ void NisPlayer::Play()
     mSuppressBlinking = false;
     mRequestedFogStart = -1.0f;
     mRequestedFogEnd = -1.0f;
-    if (mOverlayMode != 4)
+    if (mOverlayMode != NIS_OVERLAY_HOLOTRON)
     {
-        mOverlayMode = 0;
+        mOverlayMode = NIS_OVERLAY_NONE;
     }
 
     if (mLoadingFromBack)
@@ -714,7 +714,7 @@ void NisPlayer::SetupNisPlayback()
     ResetEffects();
     ResetPlayerEffects();
     g_pGame->mpWeatherManager->Stop(true);
-    if (mOverlayMode != 4)
+    if (mOverlayMode != NIS_OVERLAY_HOLOTRON)
     {
         WorldDarkening::Instance().fn_801AF550();
     }
@@ -780,7 +780,7 @@ void NisPlayer::Render(int pass) const
     {
         if (mPlaying[i] != NULL)
         {
-            if (mPlaying[i]->mRenderMode == renderPass || mPlaying[i]->mRenderMode == 2)
+            if (mPlaying[i]->mRenderMode == renderPass || mPlaying[i]->mRenderMode == NIS_RENDER_BOTH)
             {
                 mPlaying[i]->Render(renderPass);
             }
@@ -1066,7 +1066,7 @@ bool NisPlayer::HasSecondaryNis() const
 {
     for (int i = 0; i < 8; i++)
     {
-        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != 0)
+        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != NIS_RENDER_PRIMARY)
         {
             return true;
         }
@@ -1085,13 +1085,13 @@ void NisPlayer::SwapCameras()
     {
         if (mPlaying[i] != NULL)
         {
-            if (mPlaying[i]->mRenderMode == 0)
+            if (mPlaying[i]->mRenderMode == NIS_RENDER_PRIMARY)
             {
-                mPlaying[i]->mRenderMode = 1;
+                mPlaying[i]->mRenderMode = NIS_RENDER_SECONDARY;
             }
-            else if (mPlaying[i]->mRenderMode == 1)
+            else if (mPlaying[i]->mRenderMode == NIS_RENDER_SECONDARY)
             {
-                mPlaying[i]->mRenderMode = 0;
+                mPlaying[i]->mRenderMode = NIS_RENDER_PRIMARY;
             }
         }
     }
@@ -1149,7 +1149,7 @@ void NisPlayer::StartNisCue()
 
 void NisPlayer::EnableWorldDarkening(bool fade)
 {
-    mOverlayMode = 4;
+    mOverlayMode = NIS_OVERLAY_HOLOTRON;
     if (fade)
     {
         WorldDarkening::Instance().Fade(g_NisWorldDarkeningAmount, g_NisWorldDarkeningFadeTime);
@@ -1158,7 +1158,7 @@ void NisPlayer::EnableWorldDarkening(bool fade)
 
 void NisPlayer::FadeWorldDarkening(float duration)
 {
-    if (mOverlayMode == 4)
+    if (mOverlayMode == NIS_OVERLAY_HOLOTRON)
     {
         WorldDarkening::Instance().Fade(g_NisWorldDarkeningAmount, duration);
     }
@@ -1167,7 +1167,7 @@ void NisPlayer::FadeWorldDarkening(float duration)
 void NisPlayer::ResetToPIPOverlay()
 {
     WorldDarkening::Instance().fn_801AF550();
-    mOverlayMode = 0;
+    mOverlayMode = NIS_OVERLAY_NONE;
     ClearSecondaryNis();
 }
 
@@ -1175,7 +1175,7 @@ void NisPlayer::ClearSecondaryNis()
 {
     for (int i = 0; i < 8; i++)
     {
-        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != 0)
+        if (mPlaying[i] != 0 && mPlaying[i]->mRenderMode != NIS_RENDER_PRIMARY)
         {
             delete mPlaying[i];
             mPlaying[i] = 0;

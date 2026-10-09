@@ -14,6 +14,13 @@ class cCameraData;
 class DrawableCharacter;
 class ImpostorModel;
 
+enum NisRenderMode
+{
+    NIS_RENDER_PRIMARY = 0,
+    NIS_RENDER_SECONDARY = 1,
+    NIS_RENDER_BOTH = 2,
+};
+
 enum NisTriggerType
 {
     NIS_TRIGGER_TYPE_EFFECT = 0,
