@@ -372,16 +372,16 @@ void SHStrikerTimesBase::SetArticleImageName(int captain, int mood, int special)
     }
     switch (mood)
     {
-    case 0:
+    case NEWS_MOOD_POSITIVE:
         nlSNPrintf(mArticleImageName, 0x40, "fe/striker_times_textures/%s_positive_0%d", name, variant);
         break;
-    case 1:
+    case NEWS_MOOD_NEUTRAL:
         nlSNPrintf(mArticleImageName, 0x40, "fe/striker_times_textures/%s_neutral_0%d", name, variant);
         break;
-    case 2:
+    case NEWS_MOOD_NEGATIVE:
         nlSNPrintf(mArticleImageName, 0x40, "fe/striker_times_textures/%s_negative_0%d", name, variant);
         break;
-    case 3:
+    case NEWS_MOOD_CUP_WIN:
         nlSNPrintf(mArticleImageName, 0x40, "fe/striker_times_textures/%s_positive_0%d", name, variant);
         break;
     }

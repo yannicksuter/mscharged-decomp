@@ -298,7 +298,7 @@ void PausePostGameScene::BuildStoryArticle()
         headline = String(g_pLocalization->GetString(mHeadlineStringID));
         mHeadlineText = Format(headline, g_pLocalization->GetString(seriesWinner.mDisplayNameKey), wMaxWins, wMinWins);
     }
-    SetArticleImageName(winner, 0, -1);
+    SetArticleImageName(winner, NEWS_MOOD_POSITIVE, -1);
 }
 
 void PausePostGameScene::OnSelectRematch()

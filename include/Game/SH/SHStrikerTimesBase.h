@@ -13,6 +13,15 @@ class TLComponentInstance;
 class TLInstance;
 class TLTextInstance;
 
+enum eNewsMood
+{
+    NEWS_MOOD_NONE = -1,
+    NEWS_MOOD_POSITIVE = 0,
+    NEWS_MOOD_NEUTRAL = 1,
+    NEWS_MOOD_NEGATIVE = 2,
+    NEWS_MOOD_CUP_WIN = 3,
+};
+
 class SHStrikerTimesBase : public BaseOverlayHandler
 {
 public:
