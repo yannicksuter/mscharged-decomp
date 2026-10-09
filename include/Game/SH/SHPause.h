@@ -6,6 +6,17 @@
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePointerButton.h"
 
+enum ePauseMenuAction
+{
+    PAUSE_RESUME = 0,
+    PAUSE_CHOOSE_SIDES = 1,
+    PAUSE_AUDIO_OPTIONS = 2,
+    PAUSE_VISUAL_OPTIONS = 3,
+    PAUSE_MATCH_INFO = 4,
+    PAUSE_QUIT = 5,
+    PAUSE_CONTROLLER_MAP = 6,
+};
+
 class PauseMenuScene : public BaseSceneHandler
 {
 public:

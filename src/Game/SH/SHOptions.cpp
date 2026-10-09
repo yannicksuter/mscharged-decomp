@@ -163,15 +163,15 @@ void OptionsScene::OnButtonPointerPress(int, void* context)
 
     switch ((int)context)
     {
-    case 1:
+    case OPTIONS_AUDIO:
         FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
         mNextScene = SCENE_AUDIO_OPTIONS;
         break;
-    case 0:
+    case OPTIONS_VISUAL:
         FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
         mNextScene = SCENE_VISUAL_OPTIONS;
         break;
-    case 2:
+    case OPTIONS_CREDITS:
         mNextScene = SCENE_CREDITS;
         break;
     }

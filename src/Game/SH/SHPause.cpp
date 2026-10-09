@@ -407,29 +407,29 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     switch ((unsigned int)context)
     {
-    case 0:
+    case PAUSE_RESUME:
         OnSelectRESUME(0);
         break;
-    case 1:
+    case PAUSE_CHOOSE_SIDES:
         TransitionOut(TT_CHOOSE_SIDES);
         break;
-    case 2:
+    case PAUSE_AUDIO_OPTIONS:
         TransitionOut(TT_AUDIO_OPTIONS);
         break;
-    case 3:
+    case PAUSE_VISUAL_OPTIONS:
         TransitionOut(TT_VISUAL_OPTIONS);
         break;
-    case 4:
+    case PAUSE_MATCH_INFO:
         if (GameInfoManager::Instance()->IsInMode4())
             TransitionOut(TT_CHALLENGE_PREVIEW);
         else
             TransitionOut(TT_STATISTICS);
         break;
-    case 5:
+    case PAUSE_QUIT:
         mQuittingController = (eFEINPUT_PAD)index;
         OnSelectQUIT();
         break;
-    case 6:
+    case PAUSE_CONTROLLER_MAP:
         TransitionOut(TT_CONTROLLER_MAP);
         break;
     }
