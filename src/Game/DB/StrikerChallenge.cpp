@@ -52,7 +52,7 @@ StrikerChallenge::StrikerChallenge()
     mCaptain = 0;
     mWinParameter = 0;
     mCustomPowerups = POWERUP_CHEAT_NONE;
-    mCurrentChallenge = -1;
+    mCurrentChallenge = STRIKER_CHALLENGE_NONE;
     mUnlocks.mUnlockedChallenges = 0;
     memset(mUnlocks.mCompletionDates, 0, sizeof(mUnlocks.mCompletionDates));
     mChallengeOffset = 0;
@@ -127,49 +127,49 @@ bool StrikerChallenge::IsUnlocked(int challenge) const
 {
     switch (challenge)
     {
-    case 10:
+    case STRIKER_CHALLENGE_MARIO:
         return IsUnlockFlagSet(0x200);
-    case 18:
+    case STRIKER_CHALLENGE_BOWSER:
         return IsUnlockFlagSet(0x400);
-    case 14:
+    case STRIKER_CHALLENGE_DAISY:
         return IsUnlockFlagSet(0x800);
-    case 12:
+    case STRIKER_CHALLENGE_DONKEY_KONG:
         return IsUnlockFlagSet(0x1000);
-    case 11:
+    case STRIKER_CHALLENGE_LUIGI:
         return IsUnlockFlagSet(0x2000);
-    case 13:
+    case STRIKER_CHALLENGE_PEACH:
         return IsUnlockFlagSet(0x4000);
-    case 16:
+    case STRIKER_CHALLENGE_WALUIGI:
         return IsUnlockFlagSet(0x8000);
-    case 15:
+    case STRIKER_CHALLENGE_WARIO:
         return IsUnlockFlagSet(0x10000);
-    case 17:
+    case STRIKER_CHALLENGE_YOSHI:
         return IsUnlockFlagSet(0x20000);
-    case 20:
+    case STRIKER_CHALLENGE_BOWSER_JR:
         return IsUnlockFlagSet(0x40000);
-    case 21:
+    case STRIKER_CHALLENGE_DIDDY_KONG:
         return IsUnlockFlagSet(0x80000);
-    case 19:
+    case STRIKER_CHALLENGE_PETEY:
         return IsUnlockFlagSet(0x100000);
-    case 0:
+    case TUTORIAL_CHARACTER_DIFFERENCES:
         return IsUnlockFlagSet(0x200000);
-    case 1:
+    case TUTORIAL_BALL_CHARGE:
         return IsUnlockFlagSet(0x400000);
-    case 2:
+    case TUTORIAL_MEGA_SAVES:
         return IsUnlockFlagSet(0x800000);
-    case 3:
+    case TUTORIAL_MEGA_STRIKE:
         return IsUnlockFlagSet(0x1000000);
-    case 4:
+    case TUTORIAL_SIDEKICK_SKILLSHOT:
         return IsUnlockFlagSet(0x2000000);
-    case 5:
+    case TUTORIAL_SKILLSHOT_PART_TWO:
         return IsUnlockFlagSet(0x4000000);
-    case 6:
+    case TUTORIAL_SUPER_MARIO:
         return IsUnlockFlagSet(0x8000000);
-    case 7:
+    case TUTORIAL_BRING_THUNDER:
         return IsUnlockFlagSet(0x10000000);
-    case 8:
+    case TUTORIAL_POWER_UPS:
         return IsUnlockFlagSet(0x20000000);
-    case 9:
+    case TUTORIAL_WIN_GAME:
         return IsUnlockFlagSet(0x40000000);
     default:
         return false;
@@ -182,70 +182,70 @@ bool StrikerChallenge::UnlockCurrentChallenge()
     u32 unlockFlag;
     switch (mCurrentChallenge)
     {
-    case 10:
+    case STRIKER_CHALLENGE_MARIO:
         unlockFlag = 0x200;
         break;
-    case 18:
+    case STRIKER_CHALLENGE_BOWSER:
         unlockFlag = 0x400;
         break;
-    case 14:
+    case STRIKER_CHALLENGE_DAISY:
         unlockFlag = 0x800;
         break;
-    case 12:
+    case STRIKER_CHALLENGE_DONKEY_KONG:
         unlockFlag = 0x1000;
         break;
-    case 11:
+    case STRIKER_CHALLENGE_LUIGI:
         unlockFlag = 0x2000;
         break;
-    case 13:
+    case STRIKER_CHALLENGE_PEACH:
         unlockFlag = 0x4000;
         break;
-    case 16:
+    case STRIKER_CHALLENGE_WALUIGI:
         unlockFlag = 0x8000;
         break;
-    case 15:
+    case STRIKER_CHALLENGE_WARIO:
         unlockFlag = 0x10000;
         break;
-    case 17:
+    case STRIKER_CHALLENGE_YOSHI:
         unlockFlag = 0x20000;
         break;
-    case 20:
+    case STRIKER_CHALLENGE_BOWSER_JR:
         unlockFlag = 0x40000;
         break;
-    case 21:
+    case STRIKER_CHALLENGE_DIDDY_KONG:
         unlockFlag = 0x80000;
         break;
-    case 19:
+    case STRIKER_CHALLENGE_PETEY:
         unlockFlag = 0x100000;
         break;
-    case 0:
+    case TUTORIAL_CHARACTER_DIFFERENCES:
         unlockFlag = 0x200000;
         break;
-    case 1:
+    case TUTORIAL_BALL_CHARGE:
         unlockFlag = 0x400000;
         break;
-    case 2:
+    case TUTORIAL_MEGA_SAVES:
         unlockFlag = 0x800000;
         break;
-    case 3:
+    case TUTORIAL_MEGA_STRIKE:
         unlockFlag = 0x1000000;
         break;
-    case 4:
+    case TUTORIAL_SIDEKICK_SKILLSHOT:
         unlockFlag = 0x2000000;
         break;
-    case 5:
+    case TUTORIAL_SKILLSHOT_PART_TWO:
         unlockFlag = 0x4000000;
         break;
-    case 6:
+    case TUTORIAL_SUPER_MARIO:
         unlockFlag = 0x8000000;
         break;
-    case 7:
+    case TUTORIAL_BRING_THUNDER:
         unlockFlag = 0x10000000;
         break;
-    case 8:
+    case TUTORIAL_POWER_UPS:
         unlockFlag = 0x20000000;
         break;
-    case 9:
+    case TUTORIAL_WIN_GAME:
         unlockFlag = 0x40000000;
         break;
     default:

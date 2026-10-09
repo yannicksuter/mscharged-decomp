@@ -430,7 +430,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
             homeAway = 1;
             unformatted = g_pLocalization->GetString("POPUP_CHALLENGE_FAILED");
         }
-        else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCurrentChallenge == 2
+        else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
             && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
         {
             homeAway = 1;

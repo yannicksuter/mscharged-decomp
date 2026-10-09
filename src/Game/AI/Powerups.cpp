@@ -1539,7 +1539,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             && GameInfoManager::Instance()->IsInMode4())
         {
             int mode = g_pStrikerChallenge->mCurrentChallenge;
-            if (!(mode != 6 && mode != 7))
+            if (!(mode != TUTORIAL_SUPER_MARIO && mode != TUTORIAL_BRING_THUNDER))
             {
                 return powerUpType;
             }

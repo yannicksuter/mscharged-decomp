@@ -1436,7 +1436,7 @@ void cGame::Update(float fDeltaT)
             if (m_eGameState == GS_GAMEPLAY)
             {
                 if (GameInfoManager::Instance()->IsInMode4()
-                    && g_pStrikerChallenge->mCurrentChallenge == 2
+                    && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
                 {
                     ChangeGameState(GS_END_GAME);
@@ -1659,7 +1659,7 @@ void cGame::Update(float fDeltaT)
         if ((GameInfoManager::Instance()->IsInMode4()
                 && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                 && g_pTeams[1]->m_nScore > 0)
-            || (g_pStrikerChallenge->mCurrentChallenge == 2
+            || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                 && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
         {
             NisPlayer* pNisPlayer = NisPlayer::Instance();
@@ -1948,7 +1948,7 @@ void cGame::ChangeGameState(eGameState state)
             if ((GameInfoManager::Instance()->IsInMode4()
                     && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                     && g_pTeams[1]->m_nScore > 0)
-                || (g_pStrikerChallenge->mCurrentChallenge == 2
+                || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
                 PlayCrowdReaction(0xEF3369E0);

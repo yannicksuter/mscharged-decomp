@@ -158,11 +158,11 @@ void SHStrikerTimesChallenge::SceneCreated()
             mood = NEWS_MOOD_NEGATIVE;
         }
     }
-    if (challenge->mCurrentChallenge == 2)
+    if (challenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES)
         SetArticleImageName(captain, mood, 8);
-    else if (challenge->mCurrentChallenge == 4)
+    else if (challenge->mCurrentChallenge == TUTORIAL_SIDEKICK_SKILLSHOT)
         SetArticleImageName(captain, mood, 2);
-    else if (challenge->mCurrentChallenge == 5)
+    else if (challenge->mCurrentChallenge == TUTORIAL_SKILLSHOT_PART_TWO)
         SetArticleImageName(captain, NEWS_MOOD_NEUTRAL, 4);
     else
         SetArticleImageName(captain, mood, -1);

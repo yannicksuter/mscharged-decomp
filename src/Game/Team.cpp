@@ -998,8 +998,8 @@ void cTeam::ResetCharacters()
     {
         int nMissingSidekicks
             = g_pStrikerChallenge->mMissingSidekicks[m_nSide];
-        if (!(g_pStrikerChallenge->mCurrentChallenge != 4
-                && g_pStrikerChallenge->mCurrentChallenge != 5))
+        if (!(g_pStrikerChallenge->mCurrentChallenge != TUTORIAL_SIDEKICK_SKILLSHOT
+                && g_pStrikerChallenge->mCurrentChallenge != TUTORIAL_SKILLSHOT_PART_TWO))
         {
             for (int i = 0; i < nMissingSidekicks; i++)
             {

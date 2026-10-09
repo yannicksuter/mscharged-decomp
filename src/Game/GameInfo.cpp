@@ -495,8 +495,8 @@ bool GameInfoManager::IsRule0x0Equal10() const
         int value = g_pStrikerChallenge->mCurrentChallenge;
 
         switch (value) {
-        case 6:
-        case 7:
+        case TUTORIAL_SUPER_MARIO:
+        case TUTORIAL_BRING_THUNDER:
             return true;
         default:
             return false;

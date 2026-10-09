@@ -1587,10 +1587,10 @@ unsigned int Goalie::FindDumpDirection(unsigned short aDesired, bool bConstrain)
     {
         switch (g_pStrikerChallenge->mCurrentChallenge)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
+        case TUTORIAL_CHARACTER_DIFFERENCES:
+        case TUTORIAL_BALL_CHARGE:
+        case TUTORIAL_MEGA_SAVES:
+        case TUTORIAL_MEGA_STRIKE:
         {
             nlVector3 v3Local;
             nlVec3Set(v3Local, (float)fabs(m_DetChar.m_v3Position.x), 0.0f, 0.0f);
@@ -2580,10 +2580,10 @@ bool Goalie::IsAttackDisabled()
     {
         switch (g_pStrikerChallenge->mCurrentChallenge)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
+        case TUTORIAL_CHARACTER_DIFFERENCES:
+        case TUTORIAL_BALL_CHARGE:
+        case TUTORIAL_MEGA_SAVES:
+        case TUTORIAL_MEGA_STRIKE:
             return true;
         default:
             return false;
