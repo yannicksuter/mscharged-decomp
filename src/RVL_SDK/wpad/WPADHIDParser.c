@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include <revolution/wpad/WPADHIDParser.h>
+#include <revolution/wpad/WPADEncrypt.h>
 
-extern void DEBUGPrint(const char*, ...);
 static u8 _devType[WPAD_MAX_CONTROLLERS];
 static u8 _devMode[WPAD_MAX_CONTROLLERS];
 static u8 _retryCnt[WPAD_MAX_CONTROLLERS];
