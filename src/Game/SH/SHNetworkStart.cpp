@@ -154,9 +154,9 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
         int result = lobby->CreateGame(g_pNetworkSession->mCupMode);
         switch (result)
         {
-        case 0:
+        case LAN_RESULT_OK:
             break;
-        case 1:
+        case LAN_RESULT_NO_LOCAL_ADDRESS:
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -197,9 +197,9 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
         int result = lobby->JoinGame(0, g_pNetworkSession->mCupMode);
         switch (result)
         {
-        case 0:
+        case LAN_RESULT_OK:
             break;
-        case 1:
+        case LAN_RESULT_NO_LOCAL_ADDRESS:
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -207,7 +207,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
                 gNetworkStartWaitingForDialog = true;
             }
             break;
-        case 4:
+        case LAN_RESULT_CONNECTION_FAILED:
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -215,7 +215,7 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
                 gNetworkStartWaitingForDialog = true;
             }
             break;
-        case 5:
+        case LAN_RESULT_NO_GAME_FOUND:
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -398,11 +398,11 @@ void NetworkStartScene::OnGameCreated(int result)
     tDebugPrintManager::Print(DC_NETWORK, "SHNetworkStart screen received game created callback status %d!\n", result);
     switch (result)
     {
-    case 0:
+    case LAN_RESULT_OK:
         break;
-    case 8:
+    case LAN_RESULT_CANCELED:
         break;
-    case 7:
+    case LAN_RESULT_CONNECTION_LOST:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -426,10 +426,10 @@ void NetworkStartScene::OnGameJoined(int result)
     tDebugPrintManager::Print(DC_NETWORK, "SHNetworkStart screen received game joined callback status %d!\n", result);
     switch (result)
     {
-    case 0:
+    case LAN_RESULT_OK:
         EnterState(STATE_WAIT_FOR_START);
         break;
-    case 4:
+    case LAN_RESULT_CONNECTION_FAILED:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -437,7 +437,7 @@ void NetworkStartScene::OnGameJoined(int result)
             gNetworkStartWaitingForDialog = true;
         }
         break;
-    case 6:
+    case LAN_RESULT_JOIN_REFUSED:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -445,7 +445,7 @@ void NetworkStartScene::OnGameJoined(int result)
             gNetworkStartWaitingForDialog = true;
         }
         break;
-    case 7:
+    case LAN_RESULT_CONNECTION_LOST:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
@@ -469,9 +469,9 @@ void NetworkStartScene::OnGameLaunched(int result)
     tDebugPrintManager::Print(DC_NETWORK, "SHNetworkStart screen received game launched callback status %d!\n", result);
     switch (result)
     {
-    case 0:
+    case LAN_RESULT_OK:
         break;
-    case 9:
+    case LAN_RESULT_CONFIRM_TIMEOUT:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
