@@ -12,6 +12,13 @@
 #include "NL/nlFile.h"
 #include "NL/nlList.h"
 
+enum eAudioOutputMode
+{
+    AUDIO_OUTPUT_MONO = 0,
+    AUDIO_OUTPUT_STEREO = 1,
+    AUDIO_OUTPUT_DPL2 = 3,
+};
+
 class AudioSource;
 struct XSoundOwner;
 class AudioReadState;

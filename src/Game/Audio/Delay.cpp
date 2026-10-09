@@ -63,11 +63,11 @@ Delay::Delay()
     void* context = 0;
     AudioBackend* platform = g_pAudioBackend;
     AXFX_DELAY* delayEffect = platform->GetDelay();
-    switch (g_pAuxEffectMap->GetAuxiliary(0))
+    switch (g_pAuxEffectMap->GetAuxiliary(AUDIO_AUX_DELAY))
     {
-    case 0:
+    case AUDIO_AUX_A:
         AXGetAuxACallback(&callback, &context);
-        if (platform->m_OutputMode == 3)
+        if (platform->m_OutputMode == AUDIO_OUTPUT_DPL2)
         {
             if (callback != ProcessDelayDpl2)
                 AXRegisterAuxACallback(ProcessDelayDpl2, delayEffect);
@@ -77,9 +77,9 @@ Delay::Delay()
             AXRegisterAuxACallback(ProcessDelay, delayEffect);
         }
         break;
-    case 1:
+    case AUDIO_AUX_B:
         AXGetAuxBCallback(&callback, &context);
-        if (platform->m_OutputMode == 3)
+        if (platform->m_OutputMode == AUDIO_OUTPUT_DPL2)
         {
             if (callback != ProcessDelayDpl2)
                 AXRegisterAuxBCallback(ProcessDelayDpl2, delayEffect);
@@ -172,7 +172,7 @@ void Delay::ApplyToSound(void* handle)
     GetSoundSources(handle, voices, &count);
 
     int volume = (int)(-960.0f * (1.0f - m_Final.m_AuxVolume));
-    int auxIndex = g_pAuxEffectMap->GetAuxiliary(0);
+    int auxIndex = g_pAuxEffectMap->GetAuxiliary(AUDIO_AUX_DELAY);
     for (u32 i = 0; i < count; ++i)
         voices[i]->SetAuxiliaryVolume(auxIndex, volume);
 }
@@ -194,7 +194,7 @@ inline void DelayParameter::ApplySettings(AXFX_DELAY* delay)
 void Delay::OnSoundStarted(void*)
 {
     AXFX_DELAY* delay = g_pAudioBackend->GetDelay();
-    if (g_pAudioBackend->m_OutputMode == 3)
+    if (g_pAudioBackend->m_OutputMode == AUDIO_OUTPUT_DPL2)
     {
         m_Final.ApplySettings(delay);
         AXFXDelayExpSettingsDpl2((AXFX_DELAY_EXP_DPL2*)delay);

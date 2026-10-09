@@ -1,4 +1,5 @@
 #include "revolution/types.h"
+#include "Game/Audio/AudioEffect.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioResourcePlatform.h"
@@ -69,7 +70,7 @@ void SetVoicePan(AXVPB* voice, float value)
 
 void SetVoiceSurroundPan(AXVPB* voice, float value)
 {
-    MIXSetSPan(voice, g_pAudioBackend->m_OutputMode == 3
+    MIXSetSPan(voice, g_pAudioBackend->m_OutputMode == AUDIO_OUTPUT_DPL2
             ? ((int)(127.0f * value) - 1) / 2 + 64
             : 127);
 }
@@ -101,10 +102,10 @@ void SetVoiceAuxiliaryVolume(AXVPB* voice, int auxiliary, int value)
 {
     switch (auxiliary)
     {
-    case 0:
+    case AUDIO_AUX_A:
         MIXSetAuxA(voice, value);
         break;
-    case 1:
+    case AUDIO_AUX_B:
         MIXSetAuxB(voice, value);
         break;
     }

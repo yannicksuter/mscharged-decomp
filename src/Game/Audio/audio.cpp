@@ -83,7 +83,7 @@ bool GameAudio::Initialize()
 
     if (SCGetSoundMode() == 0)
     {
-        g_pAudioBackend->SetOutputMode(0);
+        g_pAudioBackend->SetOutputMode(AUDIO_OUTPUT_MONO);
     }
 
     gAudioEnabled = !GetTweakBool(sNoAudio, !gAudioEnabled);
