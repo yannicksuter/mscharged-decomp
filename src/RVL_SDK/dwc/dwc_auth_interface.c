@@ -134,13 +134,13 @@ static void DWCi_Auth_HandleNandResult(
     s32 ok_state, s32 retry_state, s32 noexists_state, s32 eaccess_state);
 static char* DWCi_Auth_GetHost(void);
 
-void DWCi_Auth_InitInterface(DWC_AuthServer arg0)
+void DWCi_Auth_InitInterface(DWC_AuthServer authServer)
 {
     memset(&s_auth_result, 0, sizeof(s_auth_result));
     memset(&s_svl_result, 0, sizeof(s_svl_result));
     s_auth_work = NULL;
-    s_auth_state = 0;
-    s_authserver = arg0;
+    s_auth_state = DWCi_AUTH_STATE_NOT_STARTED;
+    s_authserver = authServer;
     s_auth_result.ingamesn_check_result = DWC_INGAMESN_NOT_CHECKED;
 }
 
@@ -511,13 +511,13 @@ void DWCi_Auth_ProcessAuthentication(void)
 
 BOOL DWCi_Auth_IsFinished(void)
 {
-    if (s_auth_state == 0x19)
+    if (s_auth_state == DWCi_AUTH_STATE_FINISHED)
     {
-        s_auth_state = 0x1A;
+        s_auth_state = DWCi_AUTH_STATE_IDLE;
         return TRUE;
     }
 
-    if (s_auth_state == 0 || s_auth_state == 0x1A)
+    if (s_auth_state == DWCi_AUTH_STATE_NOT_STARTED || s_auth_state == DWCi_AUTH_STATE_IDLE)
     {
         return TRUE;
     }
@@ -979,7 +979,7 @@ static void DWCi_Auth_EndProcess(void)
     DWC_Printf(DWC_REPORTFLAG_AUTH, "DWCi_Auth_EndProcess()\n");
     s_auth_work->auth_free(DWC_ALLOCTYPE_AUTH, s_auth_work, 0);
     s_auth_work = NULL;
-    s_auth_state = 0x19;
+    s_auth_state = DWCi_AUTH_STATE_FINISHED;
 }
 
 static void DWCi_Auth_HandleNandResult(s32 ok_state, s32 retry_state,
@@ -987,7 +987,7 @@ static void DWCi_Auth_HandleNandResult(s32 ok_state, s32 retry_state,
 {
     s_auth_work->is_nand_end = FALSE;
 
-    if (retry_state != 0x1B && s_auth_work->nand_result == NAND_RESULT_BUSY && s_auth_work->retry_num < 5)
+    if (retry_state != DWCi_AUTH_STATE_NONE && s_auth_work->nand_result == NAND_RESULT_BUSY && s_auth_work->retry_num < 5)
     {
         s_auth_work->retry_num++;
         s_auth_state = retry_state;
@@ -1002,13 +1002,13 @@ static void DWCi_Auth_HandleNandResult(s32 ok_state, s32 retry_state,
         return;
     }
 
-    if (noexists_state != 0x1B && s_auth_work->nand_result == NAND_RESULT_NOEXISTS)
+    if (noexists_state != DWCi_AUTH_STATE_NONE && s_auth_work->nand_result == NAND_RESULT_NOEXISTS)
     {
         s_auth_state = noexists_state;
         return;
     }
 
-    if (eaccess_state != 0x1B && s_auth_work->nand_result == NAND_RESULT_ACCESS)
+    if (eaccess_state != DWCi_AUTH_STATE_NONE && s_auth_work->nand_result == NAND_RESULT_ACCESS)
     {
         s_auth_state = eaccess_state;
         return;
