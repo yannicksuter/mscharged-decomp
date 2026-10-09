@@ -40,7 +40,7 @@ const glModel* glQuad3::GetModel() const
 
     if (glHasQuads())
     {
-        if (!writer.Begin(4, 3, 0))
+        if (!writer.Begin(4, GLP_QuadList, 0))
         {
             return 0;
         }
@@ -54,7 +54,7 @@ const glModel* glQuad3::GetModel() const
     }
     else
     {
-        if (!writer.Begin(4, 1, 0))
+        if (!writer.Begin(4, GLP_TriStrip, 0))
         {
             return 0;
         }
