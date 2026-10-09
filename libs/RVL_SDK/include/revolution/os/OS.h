@@ -69,6 +69,7 @@ typedef void (*OSExceptionHandler)(u8 type, OSContext* context);
 extern BOOL __OSInIPL;
 extern BOOL __OSInNandBoot;
 extern BOOL __OSIsGcam;
+extern u16 __OSWirelessPadFixMode;
 extern s64 __OSStartTime;
 extern const char* __OSVersion;
 
