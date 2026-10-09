@@ -51,14 +51,14 @@ static char sOutOfMemoryName[] = "OutOfMem";
 static char sMEM2Name[] = "MEM2";
 static char sMEM1Name[] = "MEM1";
 
-static unsigned char glx_MemoryDump;
-static unsigned long FrameMemSizes[2];
-static int i_frame;
+static unsigned char sDumpFrameMemory;
+static unsigned long sFrameMemorySizes[2];
+static int sCurrentFrame;
 static bool sFrameMemoryInitialized;
 static GLInventory::ModelReleaseCallback sModelReleaseCallback;
 
-static unsigned long p_frame[2][2];
-static unsigned long n_frame[2][2];
+static unsigned long sFrameMemory[2][2];
+static unsigned long sFrameMemoryUsed[2][2];
 
 static inline int RealOrVirtual(eGLMemory memType)
 {
@@ -90,8 +90,8 @@ bool glxInitMemory(
         return false;
     }
 
-    p_frame[0][0] = pMem;
-    p_frame[1][0] = pMem + frameMemSize1;
+    sFrameMemory[0][0] = pMem;
+    sFrameMemory[1][0] = pMem + frameMemSize1;
 
     CurrentAllocator = &VirtualAllocator;
     pMem = (unsigned long)nlMalloc(frameMemSize2 * 2, 32, false);
@@ -100,37 +100,37 @@ bool glxInitMemory(
         return false;
     }
 
-    p_frame[0][1] = pMem;
-    p_frame[1][1] = pMem + frameMemSize2;
+    sFrameMemory[0][1] = pMem;
+    sFrameMemory[1][1] = pMem + frameMemSize2;
     CurrentAllocator = allocator;
 
-    i_frame = 0;
-    n_frame[1][0] = 0;
-    n_frame[0][0] = 0;
-    n_frame[1][1] = 0;
-    n_frame[0][1] = 0;
-    FrameMemSizes[0] = frameMemSize1;
-    FrameMemSizes[1] = frameMemSize2;
+    sCurrentFrame = 0;
+    sFrameMemoryUsed[1][0] = 0;
+    sFrameMemoryUsed[0][0] = 0;
+    sFrameMemoryUsed[1][1] = 0;
+    sFrameMemoryUsed[0][1] = 0;
+    sFrameMemorySizes[0] = frameMemSize1;
+    sFrameMemorySizes[1] = frameMemSize2;
     sFrameMemoryInitialized = true;
     return true;
 }
 
 void glplatFrameAllocNextFrame()
 {
-    if (glx_MemoryDump)
+    if (sDumpFrameMemory)
     {
         tDebugPrintManager::Print(DC_GLPLAT, sFrameMemoryUsedFormat,
-            n_frame[i_frame][0] >> 10, n_frame[i_frame][1] >> 10);
+            sFrameMemoryUsed[sCurrentFrame][0] >> 10, sFrameMemoryUsed[sCurrentFrame][1] >> 10);
         tDebugPrintManager::Print(DC_GLPLAT, sFrameMemoryFreeFormat,
-            (FrameMemSizes[0] - n_frame[i_frame][0]) >> 10,
-            (FrameMemSizes[1] - n_frame[i_frame][1]) >> 10);
-        glx_MemoryDump = false;
+            (sFrameMemorySizes[0] - sFrameMemoryUsed[sCurrentFrame][0]) >> 10,
+            (sFrameMemorySizes[1] - sFrameMemoryUsed[sCurrentFrame][1]) >> 10);
+        sDumpFrameMemory = false;
     }
 
-    int newFrame = i_frame ^ 1;
-    i_frame = newFrame;
-    n_frame[newFrame][0] = 0;
-    n_frame[newFrame][1] = 0;
+    int newFrame = sCurrentFrame ^ 1;
+    sCurrentFrame = newFrame;
+    sFrameMemoryUsed[newFrame][0] = 0;
+    sFrameMemoryUsed[newFrame][1] = 0;
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 }
@@ -279,16 +279,16 @@ void* glplatFrameAlloc(unsigned long size, eGLMemory memType)
 {
     unsigned long isLow = RealOrVirtual(memType);
     unsigned long newTop
-        = (p_frame[i_frame][isLow] + n_frame[i_frame][isLow] + 31)
+        = (sFrameMemory[sCurrentFrame][isLow] + sFrameMemoryUsed[sCurrentFrame][isLow] + 31)
         & ~31u;
-    unsigned long newSize = size + (newTop - p_frame[i_frame][isLow]);
-    if (newSize > FrameMemSizes[isLow])
+    unsigned long newSize = size + (newTop - sFrameMemory[sCurrentFrame][isLow]);
+    if (newSize > sFrameMemorySizes[isLow])
     {
         OSReport(sOutOfFrameMemoryFormat, szMemoryNames[memType]);
         nlBreak();
         return 0;
     }
-    n_frame[i_frame][isLow] = newSize;
+    sFrameMemoryUsed[sCurrentFrame][isLow] = newSize;
     return (void*)newTop;
 }
 
