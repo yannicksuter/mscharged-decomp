@@ -5,6 +5,7 @@
 #include "NL/nlMath.h"
 #include "ode/NLGAdditions.h"
 #include "ode/ext/dColumn.h"
+#include "ode/mass.h"
 
 PhysicsColumn::PhysicsColumn(CollisionSpace* collisionSpace, PhysicsWorld* world, float radius)
     : PhysicsObject(world)
