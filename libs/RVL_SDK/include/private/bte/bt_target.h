@@ -26,6 +26,7 @@
 
 /* Includes changes by muff1n1634 and for this repository (KoopTheKoopa) */
 
+#include "bte.h"
 #include "bt_types.h"
 #include "data_types.h"
 
@@ -98,10 +99,7 @@
 /* HCI services */
 
 #ifndef HCI_ACL_DATA_TO_LOWER
-#if !defined(BTE_HCI_H)
-void bte_hcisu_send(BT_HDR *p_msg, UINT16 event);
-#endif
-# define HCI_ACL_DATA_TO_LOWER(p)			bte_hcisu_send((BT_HDR *)(p), BT_EVT_TO_LM_HCI_ACL);
+# define HCI_ACL_DATA_TO_LOWER(p)			bte_hcisu_send((HC_BT_HDR *)(p), BT_EVT_TO_LM_HCI_ACL);
 #endif
 
 #ifndef BTU_CMD_CMPL_TIMEOUT
