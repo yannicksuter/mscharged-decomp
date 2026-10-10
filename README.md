@@ -24,13 +24,13 @@ Replace with your Discord server's ID and invite URL.
 > [!IMPORTANT]
 > This repository does **not** provide a new way to play *Mario Strikers Charged*. It is not a modern recompilation ("recomp") or a port. Its 100% code and linking status refers to a high-fidelity reconstruction of what the original source code may have looked like—one that compiles into an executable byte-for-byte identical to the original retail Nintendo Wii release.
 >
-> Recompilations and ports may emerge elsewhere from this work—and we look forward to seeing them—but they are outside the scope of this repository. Please do not ask for recompilations or ports in the decompilation Discord, as producing and supporting them is not the focus of this community.
+> Recompilations and ports based on this work are maintained separately and are outside the scope of this repository. Please do not ask for recompilations or ports in the decompilation Discord, as producing and supporting them is not the focus of this community.
 
 A work-in-progress matching decompilation of *Mario Strikers Charged* for
 Nintendo Wii, developed by Next Level Games and published by Nintendo.
 
 > [!NOTE]
-> A [native PC port](https://github.com/yannicksuter/mscharged-port) is currently in development based on this work-in-progress decompilation. The port uses the decompiled source directly and does not rely on recompilation ("recomp"). This approach will enable bug fixes and make the game moddable.
+> Version **1.0.0** of the [native PC port](https://github.com/yannicksuter/mscharged-port) has been released and is available now. Based on this decompilation, the port uses the decompiled source directly and does not rely on recompilation ("recomp"). This approach enables bug fixes and modding.
 
 This repository does **not** contain game assets or assembly. You must provide
 your own legally obtained copy of the game.
