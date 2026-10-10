@@ -32,7 +32,7 @@ int sScrollingDiffuseLightCount;
 int sScrollingDiffuseLightingMode;
 float sScrollingDiffuseActivationValues[2];
 
-extern "C" void glxConfigureScrollingDiffuseLighting(int mode)
+void glxConfigureScrollingDiffuseLighting(int mode)
 {
     sScrollingDiffuseLightingMode = mode;
     gxSetNumChans(1);

@@ -24,7 +24,7 @@ typedef struct WPADMemBlock {
     int at_0x04;          // at 0x04
     s16 at_0x08;          // at 0x08
     int at_0x0c;          // at 0x0C
-    WPADCallback at_0x10; // at 0x10
+    WPADCallback callback; // at 0x10
 } WPADMemBlock;
 
 typedef struct WPADGameInfo {

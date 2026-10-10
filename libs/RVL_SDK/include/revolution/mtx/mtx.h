@@ -3,6 +3,7 @@
 #include <revolution/types.h>
 
 #include <revolution/mtx/mtxtypes.h>
+#include <revolution/mtx_fwd.h>
 
 #define MTXRowCol(m, r, c) ((m)[(r)][(c)])
 #define MTXDegToRad(d) ((d) * 0.01745329252f)
@@ -13,7 +14,6 @@ extern "C" {
 #endif
 
 // TODO(kiwi) Create macros for PS/C_ functions
-void PSMTXIdentity(Mtx);
 void PSMTXCopy(const Mtx, Mtx);
 void PSMTXConcat(const Mtx, const Mtx, Mtx);
 void PSMTXConcatArray(const Mtx, const Mtx, Mtx, u32);

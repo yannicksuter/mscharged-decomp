@@ -58,7 +58,7 @@ extern "C" void InitializeShockwaves();
 extern "C" void ShutdownShockwaves();
 extern "C" void UpdateShockwaves(float dt);
 
-extern "C" PhysicsShockwave* CreatePowerupShockwave(
+PhysicsShockwave* CreatePowerupShockwave(
     const nlVector3* position, cFielder* owner, bool frozen,
     int sourceIndex, float maximumRadius);
 extern "C" PhysicsShockwave* CreateHitShockwave(

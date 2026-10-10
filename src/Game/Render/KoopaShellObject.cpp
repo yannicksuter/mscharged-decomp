@@ -142,7 +142,7 @@ void KoopaShellObject::Update(float deltaTime)
         mPhysics->SetRadius(mRadius);
     }
 
-    // Retail reads the new position's uninitialized height before clamping it.
+    // The height comes from the temporary's stack slot before clamping.
     nlVector3 position = {
         mPosition.x + deltaTime * mVelocity.x,
         mPosition.y + deltaTime * mVelocity.y,

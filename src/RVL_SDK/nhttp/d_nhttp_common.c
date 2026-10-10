@@ -165,13 +165,13 @@ s32 NHTTPi_GetConnectionListLength(void)
 }
 
 s32 NHTTPi_PostSendCallback(void* mutexInfo,
-    NHTTPConnectionInfo* connection, void* value, u32 arg)
+    NHTTPConnectionInfo* connection, const char* label, u32 arg)
 {
     u32 postSendBuf;
     u32 postSendSize;
     s32 result;
     NHTTPResponseInfo* response;
-    NHTTPConnectionCallbackParam param;
+    NHTTPPostSendArg param;
 
     result = -1;
     if (NHTTPi_GetConnection(mutexInfo, connection) != NULL)
@@ -179,13 +179,13 @@ s32 NHTTPi_PostSendCallback(void* mutexInfo,
         response = NHTTPi_Connection2Response(mutexInfo, connection);
         if (response != NULL && connection->callback != NULL)
         {
-            param.value = value;
-            param._unk4 = connection->postSendBuf;
-            param._unk8 = connection->postSendSize;
-            param._unkC = arg;
+            param.label = label;
+            param.buf = (char*)connection->postSendBuf;
+            param.size = connection->postSendSize;
+            param.offset = arg;
             result = connection->callback(connection, 1, &param);
-            postSendSize = param._unk8;
-            postSendBuf = param._unk4;
+            postSendSize = param.size;
+            postSendBuf = (u32)param.buf;
 
             connection = NHTTPi_GetConnection(mutexInfo, connection);
             if (connection != NULL)

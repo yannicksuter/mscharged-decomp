@@ -26,9 +26,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-class SHNavigation;
-
-
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)
 {

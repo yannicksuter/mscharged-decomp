@@ -1,6 +1,7 @@
 #include "Game/Physics/PhysicsCapsule.h"
 
 #include "Game/Physics/CollisionSpace.h"
+#include "ode/mass.h"
 
 static inline void SetCapsuleParams(float radius, float length, dGeomID geom)
 {

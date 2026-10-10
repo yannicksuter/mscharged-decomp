@@ -1,6 +1,7 @@
 // Adapted from https://github.com/SMGCommunity/Petari (CC0-1.0).
 #include <NMWException.h>
 #include <__ppc_eabi_linker.h>
+#include <global_destructor_chain.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -9,7 +10,6 @@ extern "C"
 
     extern void __init_cpp_exceptions(void);
     extern void __fini_cpp_exceptions(void);
-    extern void __destroy_global_chain(void);
 
 #ifdef __cplusplus
 }

@@ -70,4 +70,6 @@ public:
     static SlotPool<Reverb> s_Pool;
 };
 
+void SetDefaultReverbSettings(AXFX_REVERBHI* reverb);
+
 #endif // GAME_AUDIO_REVERB_H

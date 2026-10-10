@@ -2,6 +2,7 @@
 #define REVOLUTION_SC_H
 
 #include <revolution/types.h>
+#include <revolution/sc_fwd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -164,10 +165,8 @@ BOOL SCSetBtDpdSensibility(u32 dpdSensibility);
 
 u8 SCGetAspectRatio(void);
 s8 SCGetDisplayOffsetH(void);
-u8 SCGetEuRgb60Mode(void);
 void SCGetIdleMode(SCIdleModeInfo* mode);
 u8 SCGetLanguage(void);
-u8 SCGetProgressiveMode(void);
 u8 SCGetScreenSaverMode(void);
 u8 SCGetSoundMode(void);
 u32 SCGetCounterBias(void);
@@ -184,9 +183,7 @@ BOOL SCGetSimpleAddressData(SCSimpleAddress* address);
 
 typedef void (*SCFlushCallback)(SCStatus status);
 
-void SCInit(void);
 void SCFlushAsync(SCFlushCallback callback);
-u32 SCCheckStatus(void);
 
 BOOL SCFindByteArrayItem(void* dst, u32 len, SCItemID id);
 BOOL SCReplaceByteArrayItem(const void* src, u32 len, SCItemID id);

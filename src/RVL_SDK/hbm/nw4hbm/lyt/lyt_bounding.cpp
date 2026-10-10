@@ -19,7 +19,7 @@ Bounding::~Bounding() {}
 void Bounding::DrawSelf(const DrawInfo& drawInfo) {
     if (drawInfo.IsDebugDrawMode()) {
         LoadMtx(drawInfo);
-        detail::DrawLine(GetVtxPos(), mSize, ut::Color(0x00ff00ff));
+        detail::DrawLine(GetVtxPos(), mSize, ut::Color(ut::Color::GREEN));
     }
 }
 

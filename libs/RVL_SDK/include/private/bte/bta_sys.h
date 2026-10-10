@@ -107,6 +107,7 @@ void bta_sys_stop_timer(TIMER_LIST_ENT *p_tle);
 // ---
 
 void bta_sys_init(void);
+void bta_sys_set_trace_level(UINT8 level);
 void bta_sys_timer_update(void);
 void bta_sys_event(BT_HDR *p_msg);
 

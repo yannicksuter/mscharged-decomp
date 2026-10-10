@@ -38,6 +38,7 @@ void SetCupTrophiesVisible(bool visible);
 void SetLockedTrophyVisibility(bool visible);
 
 extern bool gMainMenuInputResetPending;
+extern unsigned int gFEControllerIndex;
 
 void ShowCupStartOptions();
 

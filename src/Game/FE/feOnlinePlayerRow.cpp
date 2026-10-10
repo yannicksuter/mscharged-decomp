@@ -11,8 +11,6 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
-
 static const char* sOnlinePlayerSearchSlides[5] = { "SEARCHING", "CONNECTING", "INVITE", "ADD", "OFF" };
 static const char* sOnlinePlayerStatusSlides[12] = {
     "WAITING FOR FRIEND", "WAITING_FOR_OPPONENT", "AVAILABLE", "BUSY", "CHOOSING_CAPTAIN", "CHOOSING_SIDEKICKS", "CAPTAINNAMES", "ESTABLISHING", "OFFLINE", "DECLINED", "INVITING", "OFFLINE"
@@ -103,7 +101,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
 
     FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
     FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
-    WideString string = Format(WideString(g_pLocalization->GetString("ONLINE_RANKING")), row->mStats.mDisplayRank);
+    WideBasicString string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_RANKING")), row->mStats.mDisplayRank);
     nlStrNCpy(name, string.c_str(), nameSize);
     TLTextInstance* rank = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK");
     rank->SetString(name);
@@ -111,7 +109,7 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
     rank = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK");
     rank->SetString(name);
     rank->SetVisible(show && !row->mGuest);
-    string = Format(WideString(g_pLocalization->GetString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
+    string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
     nlStrNCpy(description, string.c_str(), descriptionSize);
     TLTextInstance* record = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD");
     record->SetString(description);

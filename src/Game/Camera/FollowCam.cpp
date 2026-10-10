@@ -13,7 +13,7 @@
 
 
 static float g_fDistanceSeek = 0.4f;
-static float lbl_806DC4CC = 1.5f;
+static float g_fFarDistanceSeek = 1.5f;
 static float g_fMaxDistance = 60.0f;
 static float g_fMinDistance = 2.0f;
 static float g_fFollowCamOOISeek = 0.1f;
@@ -135,7 +135,7 @@ void cFollowCamera::Update(float fDeltaT)
         && !pController->IsPressed(0xF, true) && !pController->IsPressed(0x10, true))
     {
         const float fDistanceScalar = InterpolateRange(
-            g_fDistanceSeek, lbl_806DC4CC, g_fMinDistance, g_fMaxDistance, m_fOOIDistance);
+            g_fDistanceSeek, g_fFarDistanceSeek, g_fMinDistance, g_fMaxDistance, m_fOOIDistance);
         m_fOOIDistance -= fDistanceScalar * pController->AnalogLeftY();
     }
 

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern char* itoa(int value, char* buffer, int radix);
+#include <extras.h>
 
 const char* DWCi_ENC_URL_BASE = NULL;
 static int s_local_seed;

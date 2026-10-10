@@ -1,14 +1,17 @@
 #ifndef METROTRK_MSG_H
 #define METROTRK_MSG_H
 
-#include <revolution/types.h>
+#include <MetroTRK/msgbuf.h>
 
-typedef struct _TRK_Msg
+#ifdef __cplusplus
+extern "C"
 {
-    u8 _00[8];
-    u32 m_msgLength;
-    u32 _0C;
-    u32 m_msg;
-} TRK_Msg;
+#endif
+
+    DSError TRKMessageSend(TRKBuffer* msg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // METROTRK_MSG_H

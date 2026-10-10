@@ -12,8 +12,6 @@
 #include <string.h>
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/CharacterInfo.h"
-#include "Game/DB/GameProgress.h"
-#include "Game/FE/feCupFlow.h"
 #include "Game/FE/feAsyncImage.h"
 #include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinder_impl.h"
@@ -36,16 +34,10 @@
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feBackButton.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/Render/RLViewLayers.h"
-#include "Game/SH/SHNavigation.h"
 
-#include <string.h>
 
 char sHallOfFameResourcePath[] = "art/fe/HallOfFameUI.res";
 const char* sHallOfFameResource = sHallOfFameResourcePath;
-
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
 SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     : mMode(mode)
@@ -131,7 +123,7 @@ void SHHallOfFameHistory::SceneCreated()
     mNavigation.SetButtonInstance(screen);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(presentation->m_currentSlide,
             nlStringLowerHash("Layer"), nlStringLowerHash("scrollbar"), 0, 0, 0, 0);
     mScrollWidget.SetComponent(scrollbar);
     mScrollWidget.SetRange(mHistoryCount - 1);
@@ -181,7 +173,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
             mState = HOF_HISTORY_ACTIVE;
             if (!mScrollWidget.mInitialized)
             {
-                TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find(
+                TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(
                         mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
                         nlStringLowerHash("scrollbar"), 0, 0, 0, 0);
                 mScrollWidget.SetComponent(scrollbar);
@@ -329,7 +321,7 @@ void SHHallOfFameHistory::UpdateTitle()
     unsigned long titlesHash = nlStringLowerHash("TITLES");
     unsigned long titleHash = nlStringLowerHash("TITLE");
     unsigned long historyHash = nlStringLowerHash("HISTORY");
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+    TLTextInstance* titleText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation->m_currentSlide,
             nlStringLowerHash("Layer"), historyHash, titleHash, titlesHash, 0, 0);
     if (titleText == 0)
     {
@@ -376,7 +368,7 @@ void SHHallOfFameHistory::UpdateCupRecordText()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     unsigned long recordHash = nlStringLowerHash("RECORD");
     unsigned long historyHash = nlStringLowerHash("HISTORY");
-    TLTextInstance* recordText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+    TLTextInstance* recordText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation->m_currentSlide,
             nlStringLowerHash("Layer"), historyHash, recordHash, 0, 0, 0);
     if (recordText == 0)
     {
@@ -433,13 +425,13 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
     {
         unformatted = WideBasicString(LookupLocString("HOF_GOALS_AGAINST"));
 
-        goalsText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide,
+        goalsText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide,
                 "Layer", "HISTORY", "GOALS FOR");
         goalsText->m_bVisible = false;
 
         unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
         unsigned long historyHash = nlStringLowerHash("HISTORY");
-        goalsText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+        goalsText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         if (goalsText == 0)
         {
@@ -455,13 +447,13 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
 
         unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
         unsigned long historyHash = nlStringLowerHash("HISTORY");
-        goalsText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide,
+        goalsText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         goalsText->m_bVisible = false;
 
         unsigned long goalsForHash = nlStringLowerHash("GOALS FOR");
         historyHash = nlStringLowerHash("HISTORY");
-        goalsText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+        goalsText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0);
         if (goalsText == 0)
         {
@@ -488,7 +480,7 @@ void SHHallOfFameHistory::UpdateDateText()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     unsigned long dateHash = nlStringLowerHash("DATE");
     unsigned long historyHash = nlStringLowerHash("HISTORY");
-    TLTextInstance* dateText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+    TLTextInstance* dateText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation->m_currentSlide,
             nlStringLowerHash("Layer"), historyHash, dateHash, 0, 0, 0);
     if (dateText == 0)
     {
@@ -565,7 +557,7 @@ void SHHallOfFameHistory::UpdateTeamDisplay()
     }
 
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->GetActiveSlide(),
+    TLTextInstance* text = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(),
         "Layer", "HISTORY", "NAMES", "NAMES");
     memcpy(mTeamNameText, string.c_str(), sizeof(mTeamNameText));
     text->SetString(mTeamNameText);
@@ -574,20 +566,20 @@ void SHHallOfFameHistory::UpdateTeamDisplay()
     TLImageInstance* image;
     char path[0x80];
 
-    image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "CAPTAIN");
+    image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "CAPTAIN");
     mImages[0]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_%s", captain.GetName());
     mImages[0]->QueueLoad(path, false);
 
-    image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "KRITTER");
+    image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "KRITTER");
     mImages[4]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_kritter_%s", captain.GetName());
     mImages[4]->QueueLoad(path, false);
 
     const CharacterInfo* sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value1));
-    image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK1");
+    image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK1");
     mImages[1]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
@@ -595,7 +587,7 @@ void SHHallOfFameHistory::UpdateTeamDisplay()
     mImages[1]->QueueLoad(path, false);
 
     sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value2));
-    image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK2");
+    image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK2");
     mImages[2]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
@@ -603,7 +595,7 @@ void SHHallOfFameHistory::UpdateTeamDisplay()
     mImages[2]->QueueLoad(path, false);
 
     sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value3));
-    image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK3");
+    image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK3");
     mImages[3]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
@@ -653,7 +645,7 @@ void SHHallOfFamePlayerCard::SceneCreated()
     mNavigation.SetButtonInstance(screen);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLComponentInstance* playerCard = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
+    TLComponentInstance* playerCard = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(presentation->m_currentSlide,
             nlStringLowerHash("Layer"), nlStringLowerHash("player card"), 0, 0, 0, 0);
     if (playerCard == 0)
     {
@@ -751,18 +743,16 @@ void SHHallOfFamePlayerCard::Update(float fDeltaT)
 
 void SHHallOfFamePlayerCard::UpdateText()
 {
-    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
     WideBasicString title;
     WideBasicString description;
     WideBasicString name;
 
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+    TLTextInstance* titleText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "player card", "title");
-    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+    TLTextInstance* nameText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "player card", "name");
-    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "player card", "description");
 
     switch (mCardIndex)
@@ -891,7 +881,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
         unsigned long playerCardHash;
         imageHash = nlStringLowerHash("00_dummy_texture");
         playerCardHash = nlStringLowerHash("player card");
-        image0 = FEFinder<TLImageInstance, 2>::Find(presentation->m_currentSlide,
+        image0 = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), playerCardHash, imageHash, 0, 0, 0);
     }
     if (image0 == 0)
@@ -902,7 +892,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     {
         unsigned long imageHash = nlStringLowerHash("00_dummy_texture_positions");
         unsigned long playerCardHash = nlStringLowerHash("player card");
-        image1 = FEFinder<TLImageInstance, 2>::Find(presentation->m_currentSlide,
+        image1 = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), playerCardHash, imageHash, 0, 0, 0);
     }
     if (image1 == 0)

@@ -27,6 +27,8 @@
 // this source file is mostly concerned with the data structures, not the
 // numerics.
 
+#include <string.h>
+
 #include <ode/objects.h>
 #include "objects.h"
 #include "joint.h"
@@ -42,7 +44,6 @@
 #include <ode/error.h>
 
 extern "C" {
-void* memcpy(void* dst, const void* src, size_t size);
 dxGeom* dGeomGetBodyNext(dxGeom* geom);
 void dGeomSetBody(dxGeom* geom, dxBody* body);
 void dGeomMoved(dxGeom* geom);

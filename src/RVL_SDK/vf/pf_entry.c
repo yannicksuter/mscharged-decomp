@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern PF_VOLUME_SET VFipf_vol_set;
 static u8 FAT_DELETED = 0xE5;
 
 static u32 VFiPFENT_compareAttr(u8 attr, u8 attr_required, u8 attr_unwanted) {

@@ -6,6 +6,7 @@
 #include "Game/Render/RLView.h"
 #include "Game/Render/RLViewLayers.h"
 
+#include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glState.h"
@@ -301,7 +302,7 @@ void RenderHighRangePass(
     glSetCurrentRasterState(glHandleizeRasterState());
 
     gray = *GetHighRangeTweaks()->miHighRangeGray.m_pValue;
-    if (writer.Begin(4, 3, 0))
+    if (writer.Begin(4, GLP_QuadList, 0))
     {
         sampleOffset = sampleOffsets;
         vertex = sHighRangeVertices;

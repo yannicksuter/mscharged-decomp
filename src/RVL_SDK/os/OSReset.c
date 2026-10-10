@@ -1,7 +1,9 @@
 #include <decomp.h>
 #include <revolution/os.h>
+#include <revolution/pad.h>
 #include <revolution/vi/vi3in1.h>
 #include <revolution/os/OSNandbootInfo.h>
+#include <revolution/sc_fwd.h>
 #include <mem.h>
 
 typedef struct SCIdleModeInfo {
@@ -32,12 +34,9 @@ enum {
 OSThreadQueue __OSActiveThreadQueue AT_ADDRESS(OS_BASE_CACHED | 0x000000DC);
 
 void __OSGetIOSRev(OSIOSRev* rev);
-void SCInit(void);
-u32 SCCheckStatus(void);
 
 void __OSLaunchMenu(void);
 void __OSRelaunchTitle(void);
-BOOL __PADDisableRecalibration(BOOL disable);
 u32 __DVDGetCoverStatus(void);
 void __DVDPrepareReset(void);
 

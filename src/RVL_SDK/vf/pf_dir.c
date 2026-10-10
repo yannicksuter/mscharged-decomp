@@ -1,4 +1,7 @@
-#include <revolution/vf.h>
+#include <revolution/vf/vf_struct.h>
+
+#include <revolution/vf/pf_dir.h>
+#include <revolution/vf/pf_fat.h>
 
 static void VFiPFDIR_FinalizeSDD(struct PF_SDD* p_sdd) {
     p_sdd->stat = 0;

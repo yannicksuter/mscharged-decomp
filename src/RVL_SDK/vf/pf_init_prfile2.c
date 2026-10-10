@@ -1,4 +1,8 @@
-#include <revolution/vf.h>
+#include <revolution/vf/pf_init_prfile2.h>
+#include <revolution/vf/vf_struct.h>
+#include <revolution/vf/pf_api_util.h>
+#include <revolution/vf/pf_fatfs.h>
+#include <revolution/vf/pf_system.h>
 
 int VFipf2_init_prfile2(s32 config, void* param) {
     s32 err;

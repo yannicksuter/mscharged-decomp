@@ -23,7 +23,7 @@ public:
     }
 
     /* 0x90 */ FETextureResource* m_pTextureResource;
-    /* 0x94 */ unsigned long field_0x94;
+    /* 0x94 */ unsigned long m_uAlphaBlendMode;
 }; // size 0x98
 
 

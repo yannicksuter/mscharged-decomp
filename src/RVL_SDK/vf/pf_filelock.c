@@ -1,8 +1,8 @@
-#include <revolution/vf.h>
+#include <revolution/vf/pf_filelock.h>
 
 static int VFipf_sys_set = 0;
 
-void VFiPF_InitLockFile() {
+void VFiPF_InitLockFile(void) {
     VFipf_sys_set = 0;
 }
 

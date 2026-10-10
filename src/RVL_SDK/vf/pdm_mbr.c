@@ -1,7 +1,5 @@
 #include <revolution/vf.h>
 
-extern PDM_DISK_SET VFipdm_disk_set;
-
 s32 VFipdm_mbr_get_table(u8* buf, u32 sector, struct PDM_MBR* p_mbr_tbl) {
     u8* p_buf;
     u16 cs_val;

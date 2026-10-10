@@ -642,7 +642,6 @@ void btm_pm_proc_mode_change(UINT8 hci_status,
                              UINT16 hci_handle, UINT8 mode,
                              UINT16 interval);
 
-void btm_sco_init(void);
 /**/
 void btm_set_sco_ind_cback(tBTM_SCO_IND_CBACK *sco_ind_cb);
 void btm_accept_sco_link(UINT16 sco_inx, tBTM_ESCO_PARAMS *p_setup,
@@ -678,7 +677,6 @@ void btm_sec_mx_access_request(BD_ADDR bd_addr, UINT16 psm,
                                void *p_ref_data);
 void btm_sec_change_link_key(UINT16 handle);
 void btm_sec_conn_req(BD_ADDR bda, DEV_CLASS dc);
-void btm_sec_init(UINT8 sec_mode);
 void btm_sec_dev_reset(void);
 void btm_sec_abort_access_req(BD_ADDR bd_addr);
 void btm_sec_rmt_name_request_complete(BD_ADDR_PTR p_bd_addr,

@@ -1,9 +1,7 @@
 #include <private/nhttp.h>
 
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
 void NHTTPi_destroyRequestObject(void* mutexInfo, NHTTPRequestInfo* request);
-NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
 
 void NHTTPi_InitListInfo(NHTTPListInfo* info)
 {

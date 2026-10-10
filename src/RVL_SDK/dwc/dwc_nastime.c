@@ -13,7 +13,7 @@ BOOL DWC_GetDateTime(DWCDate* date, DWCTime* time)
 {
     s64 diff;
     s64 localsec = DWCi_Np_GetTimeInSeconds();
-    BOOL result = fn_8049F7D4(&diff);
+    BOOL result = DWCi_Auth_GetServerTimeOffsetInSeconds(&diff);
     struct tm* tm;
 
     if (result)
@@ -21,7 +21,7 @@ BOOL DWC_GetDateTime(DWCDate* date, DWCTime* time)
         localsec += diff;
     }
 
-    tm = fn_8049BB54(&localsec);
+    tm = DWCi_Np_SecondsToCalendarTime(&localsec);
     date->year = tm->tm_year + 1900;
     date->month = tm->tm_mon;
     date->mday = tm->tm_mday;

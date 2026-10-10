@@ -1,5 +1,6 @@
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetworkMessageRegistry.h"
+#include "Game/NetworkMessages.h"
 #include "Game/MathHelpers.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/RLViewLayers.h"
@@ -47,7 +48,7 @@ float gMegaBallTimerScale = 1.0f;
 int gRemoteMegaBallPointerTextureIndex = 1;
 
 cGlobalPad* gMegaBallController;
-bool lbl_806E15C4;
+bool gForceMegaBallPointerMagnetism;
 bool gMegaBallPointerMagnetism;
 bool gSuppressMegaBallPointerPackets;
 float gMegaBallTimerYOffset;
@@ -620,7 +621,7 @@ have_controller_data:
         float fY = -gMegaBallPointerYScale * v2Position.y + 240.0f;
         fY = nlMaxEquals(fY, 30.0f);
         fY = nlMinEquals(fY, 450.0f);
-        if (gMegaBallPointerMagnetism || lbl_806E15C4)
+        if (gMegaBallPointerMagnetism || gForceMegaBallPointerMagnetism)
         {
             float fRadiusSquared
                 = gMegaBallPointerMagnetRadius
@@ -1058,13 +1059,13 @@ void SendMegaBallPointerUpdate(u16 nAngle, u32 nTextureIndex,
 
 void ReceiveMegaBallPointerUpdate(void* pMessage)
 {
-    u8* pData = (u8*)pMessage;
+    NetMessageMegaBallPointer* pData = static_cast<NetMessageMegaBallPointer*>(pMessage);
     gRemoteMegaBallPointerReceived = true;
-    gRemoteMegaBallPointerX = (float)*(s16*)(pData + 8);
-    gRemoteMegaBallPointerY = (float)*(s16*)(pData + 10);
-    gRemoteMegaBallPointerAngle = (u16)(pData[12] << 8);
-    gRemoteMegaBallPointerTextureIndex = pData[13];
-    gRemoteMegaBallPointerStatus = pData[14];
+    gRemoteMegaBallPointerX = (float)pData->mPointerX;
+    gRemoteMegaBallPointerY = (float)pData->mPointerY;
+    gRemoteMegaBallPointerAngle = (u16)(pData->mAngleHighByte << 8);
+    gRemoteMegaBallPointerTextureIndex = pData->mTextureIndex;
+    gRemoteMegaBallPointerStatus = pData->mStatus;
 }
 
 inline MegaBallIndicator::MegaBallIndicator()

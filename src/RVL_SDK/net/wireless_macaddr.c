@@ -1,4 +1,5 @@
-extern int NCDiGetWirelessMacAddress(void* data);
+#include <revolution/ncd.h>
+#include <revolution/net_fwd.h>
 
 int NETGetWirelessMacAddress(void* data)
 {

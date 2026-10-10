@@ -43,6 +43,7 @@ struct AudioResourceLoadOwner
     MemoryAllocator* m_Allocator;
 };
 
+void OnAudioResourceBundleLoaded(void* data, unsigned long size, void* context);
 void UnloadAudioResource(AudioResourceLoadOwner* state);
 unsigned int FindAudioResourceCue(AudioResourceLoadOwner* state,
     unsigned int field0, unsigned int field4,

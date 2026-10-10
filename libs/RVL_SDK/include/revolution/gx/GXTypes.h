@@ -3,6 +3,9 @@
 #include <revolution/types.h>
 #include <revolution/gx/GXTextureTypes.h>
 #include <revolution/gx/GXPublicTypes.h>
+#include <revolution/gx/GXMiscTypes.h>
+#include <revolution/gx/GXBlendTypes.h>
+#include <revolution/gx/GXProjectionTypes.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,7 +62,6 @@ extern "C" {
  * Common structs
  */
 
-
 typedef struct _GXColorS10 {
     s16 r, g, b, a;
 } GXColorS10;
@@ -76,14 +78,6 @@ typedef enum _GXAlphaOp {
 
     GX_MAX_ALPHAOP
 } GXAlphaOp;
-
-typedef enum _GXAnisotropy {
-    GX_ANISO_1,
-    GX_ANISO_2,
-    GX_ANISO_4,
-
-    GX_MAX_ANISOTROPY
-} GXAnisotropy;
 
 typedef enum _GXAttnFn {
     GX_AF_SPEC,
@@ -135,36 +129,6 @@ typedef enum _GXAttrType {
     GX_INDEX16 // 16-bit index sent to FIFO
 } GXAttrType;
 
-typedef enum _GXBlendFactor {
-    GX_BL_ZERO,
-    GX_BL_ONE,
-    GX_BL_SRCCLR,
-    GX_BL_INVSRCCLR,
-    GX_BL_SRCALPHA,
-    GX_BL_INVSRCALPHA,
-    GX_BL_DSTALPHA,
-    GX_BL_INVDSTALPHA,
-
-    GX_BL_DSTCLR = GX_BL_SRCCLR,
-    GX_BL_INVDSTCLR = GX_BL_INVSRCCLR
-} GXBlendFactor;
-
-typedef enum _GXBlendMode {
-    GX_BM_NONE,
-    GX_BM_BLEND,
-    GX_BM_LOGIC,
-    GX_BM_SUBTRACT,
-
-    GX_MAX_BLENDMODE
-} GXBlendMode;
-
-
-typedef enum _GXCITexFmt {
-    GX_TF_C4 = 8,
-    GX_TF_C8,
-    GX_TF_C14X2,
-} GXCITexFmt;
-
 typedef enum _GXClearZ {
     GX_CLEAR_Z_MIN = 0,
     GX_CLEAR_Z_MAX = (1 << 24) - 1,
@@ -177,7 +141,6 @@ typedef enum _GXClipMode {
 } GXClipMode;
 
 typedef enum _GXColorSrc { GX_SRC_REG, GX_SRC_VTX } GXColorSrc;
-
 
 typedef enum _GXCompCnt {
     GX_POS_XY = 0,
@@ -394,25 +357,6 @@ typedef enum _GXLightID {
     GX_LIGHT_NULL = 0
 } GXLightID;
 
-typedef enum _GXLogicOp {
-    GX_LO_CLEAR,
-    GX_LO_AND,
-    GX_LO_REVAND,
-    GX_LO_COPY,
-    GX_LO_INVAND,
-    GX_LO_NOOP,
-    GX_LO_XOR,
-    GX_LO_OR,
-    GX_LO_NOR,
-    GX_LO_EQUIV,
-    GX_LO_INV,
-    GX_LO_REVOR,
-    GX_LO_INVCOPY,
-    GX_LO_INVOR,
-    GX_LO_NAND,
-    GX_LO_SET
-} GXLogicOp;
-
 typedef enum _GXMtxType {
     GX_MTX_3x4,
     GX_MTX_2x4,
@@ -457,11 +401,6 @@ typedef enum _GXPrimitive {
     GX_TRIANGLEFAN = 0xA0,
     GX_QUADS = 0x80,
 } GXPrimitive;
-
-typedef enum _GXProjectionType {
-    GX_PERSPECTIVE,
-    GX_ORTHOGRAPHIC
-} GXProjectionType;
 
 typedef enum _GXSpotFn {
     GX_SP_OFF,
@@ -697,41 +636,6 @@ typedef enum _GXTexCoordID {
     GX_TEXCOORD_NULL = 255
 } GXTexCoordID;
 
-
-
-typedef enum _GXTexFmt {
-    GX_TF_I4,
-    GX_TF_I8,
-    GX_TF_IA4,
-    GX_TF_IA8,
-    GX_TF_RGB565,
-    GX_TF_RGB5A3,
-    GX_TF_RGBA8,
-    GX_TF_CMPR = 14,
-
-    GX_CTF_R4 = 32,
-    GX_CTF_RA4 = 34,
-    GX_CTF_RA8 = 35,
-    GX_CTF_YUVA8 = 38,
-    GX_CTF_A8 = 39,
-    GX_CTF_R8 = 40,
-    GX_CTF_G8 = 41,
-    GX_CTF_B8 = 42,
-    GX_CTF_RG8 = 43,
-    GX_CTF_GB8 = 44,
-
-    GX_TF_Z8 = 17,
-    GX_TF_Z16 = 19,
-    GX_TF_Z24X8 = 22,
-
-    GX_CTF_Z4 = 48,
-    GX_CTF_Z8M = 57,
-    GX_CTF_Z8L = 58,
-    GX_CTF_Z16L = 60,
-
-    GX_TF_A8 = GX_CTF_A8
-} GXTexFmt;
-
 typedef enum _GXTexGenSrc {
     GX_TG_POS,
     GX_TG_NRM,
@@ -769,21 +673,6 @@ typedef enum _GXTexGenType {
     GX_TG_BUMP7,
     GX_TG_SRTG
 } GXTexGenType;
-
-typedef enum _GXTexMapID {
-    GX_TEXMAP0,
-    GX_TEXMAP1,
-    GX_TEXMAP2,
-    GX_TEXMAP3,
-    GX_TEXMAP4,
-    GX_TEXMAP5,
-    GX_TEXMAP6,
-    GX_TEXMAP7,
-    GX_MAX_TEXMAP,
-
-    GX_TEXMAP_NULL = 255,
-    GX_TEX_DISABLE
-} GXTexMapID;
 
 typedef enum _GXTexMtx {
     // Any dimension (in standard XF matrix memory)
@@ -863,13 +752,6 @@ typedef enum _GXAlphaReadMode {
     GX_READ_NONE,
 } GXAlphaReadMode;
 
-typedef enum _GXMiscToken {
-    GX_MT_NULL,
-    GX_MT_XF_FLUSH,
-    GX_MT_DL_SAVE_CONTEXT,
-    GX_MT_ABORT_WAIT_COPYOUT,
-} GXMiscToken;
-
 typedef enum _GXPerf0 {
     GX_PERF0_VERTICES,
     GX_PERF0_CLIP_VTX,
@@ -935,8 +817,6 @@ typedef enum _GXPerf1 {
     GX_PERF1_NONE
 } GXPerf1;
 
-
-
 typedef enum _GXTlut {
     GX_TLUT0,
     GX_TLUT1,
@@ -964,8 +844,6 @@ typedef enum _GXTlut {
     GX_MAX_BIGTLUT = 4,
     GX_MAX_TLUT_ALL = GX_MAX_TLUT + GX_MAX_BIGTLUT,
 } GXTlut;
-
-
 
 typedef enum _GXTlutSize {
     GX_TLUT_16 = 1,

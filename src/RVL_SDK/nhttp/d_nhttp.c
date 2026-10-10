@@ -16,9 +16,7 @@ BOOL NHTTPi_Startup(void* systemInfo, NHTTPAlloc alloc, NHTTPFree free,
     u32 priority);
 void NHTTPi_CleanupAsync(void* systemInfo, NHTTPCleanupCallback callback);
 s32 NHTTPi_GetSSLError(NHTTPBgnEndInfo* info);
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* buffer);
-s32 NHTTPi_strlen(const char* string);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 void* NHTTPi_memclr(void* destination, u32 size);
 s32 NHTTPi_Base64Encode(char* destination, const char* source);
@@ -30,10 +28,6 @@ s32 NHTTPGetBodyBuffer(NHTTPConnectionInfo* connection, void** buffer,
     u32* bufferSize);
 void* NHTTPGetUserParam(NHTTPConnectionInfo* connection);
 s32 NHTTPGetConnectionError(NHTTPConnectionInfo* connection);
-BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
-    const char* name, const char* value);
-BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
-    const char* name, const char* value);
 BOOL NHTTP_CancelRequestAsync(void* systemInfo, s32 requestId);
 void NHTTP_DestroyRequest(void* systemInfo, NHTTPRequestInfo* request);
 void NHTTP_DestroyResponse(void* mutexInfo, NHTTPResponseInfo* response);

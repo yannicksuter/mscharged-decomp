@@ -26,7 +26,7 @@ bool sMaskedDetailBlendShadowsActive;
 int sMaskedDetailBlendLightCount;
 int sMaskedDetailBlendLightingMode;
 
-extern "C" void glxConfigureMaskedDetailBlendLighting(
+void glxConfigureMaskedDetailBlendLighting(
     int mode, GXMaskedDetailBlendMaterialProgram*)
 {
     sMaskedDetailBlendLightingMode = mode;

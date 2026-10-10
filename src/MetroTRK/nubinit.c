@@ -1,4 +1,5 @@
 #include <MetroTRK/nubinit.h>
+#include <MetroTRK/usr_put.h>
 #include <MetroTRK/serpoll.h>
 
 BOOL gTRKBigEndian;

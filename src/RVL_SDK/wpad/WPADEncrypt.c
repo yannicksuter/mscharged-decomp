@@ -1,5 +1,6 @@
 #include <revolution/os.h>
 #include <revolution/wpad.h>
+#include <revolution/wpad/WPADEncrypt.h>
 
 static u8 SEED;
 static u8 NUM_A;

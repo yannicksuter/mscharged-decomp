@@ -45,11 +45,8 @@ typedef struct NHTTPThreadData
     /* 0x33C */ BOOL isChunked;
 } NHTTPThreadData;
 
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
-void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
 void* NHTTPi_memclr(void* destination, u32 size);
-s32 NHTTPi_strlen(const char* string);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 s32 NHTTPi_strcmp(const char* left, const char* right);
 s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size);
@@ -77,7 +74,6 @@ int NHTTPi_SocSend(const NHTTPRequestInfo* req_p, const int socket,
 int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
     char* buf_p, const int len, const int flags);
 
-NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
 int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos);
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags);
@@ -96,9 +92,9 @@ s32 NHTTPi_CheckHeaderEnd(char* buffer, s32 position);
 s32 NHTTPi_SaveBuf(NHTTPRequestInfo* request, char* buffer, s32 socket,
     s32* bufferedBytes, const char* data, s32 length);
 BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
-    void* value, s32* contentLength, s32 format);
+    const char* label, s32* contentLength, s32 format);
 s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
-    char* buffer, void* value, s32 socket, s32* bufferedBytes, s32 format);
+    char* buffer, const char* label, s32 socket, s32* bufferedBytes, s32 format);
 BOOL NHTTPi_BufFull(void* mutexInfo, NHTTPResponseInfo* response);
 s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p);
 BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p);
@@ -209,7 +205,7 @@ static inline s32 NHTTPi_SkipLineBuf(NHTTPRequestInfo* req_p, s32 socket)
 }
 
 BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
-    void* value, s32* contentLength, s32 format)
+    const char* label, s32* contentLength, s32 format)
 {
     u32 total = 0;
     NHTTPConnectionInfo* connection =
@@ -226,7 +222,7 @@ BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
             return FALSE;
         }
         connection->postSendSize = 0;
-        if (NHTTPi_PostSendCallback(mutexInfo, connection, value, total) < 0)
+        if (NHTTPi_PostSendCallback(mutexInfo, connection, label, total) < 0)
         {
             return FALSE;
         }
@@ -260,7 +256,7 @@ BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
 }
 
 s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
-    char* buffer, void* value, s32 socket, s32* bufferedBytes, s32 format)
+    char* buffer, const char* label, s32 socket, s32* bufferedBytes, s32 format)
 {
     char* data;
     u32 total = 0;
@@ -280,7 +276,7 @@ s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
             return 3;
         }
         connection->postSendSize = 0;
-        if (NHTTPi_PostSendCallback(mutexInfo, connection, value, total) < 0)
+        if (NHTTPi_PostSendCallback(mutexInfo, connection, label, total) < 0)
         {
             return 3;
         }

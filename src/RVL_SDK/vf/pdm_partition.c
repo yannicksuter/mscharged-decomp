@@ -1,7 +1,5 @@
 #include <revolution/vf.h>
 
-extern PDM_DISK_SET VFipdm_disk_set;
-
 static s32 VFipdm_part_search_handle(struct PDM_PARTITION* p_part, struct PDM_PARTITION* lp_part, u16* p_handle_no) {
     u16 handle_no;
 

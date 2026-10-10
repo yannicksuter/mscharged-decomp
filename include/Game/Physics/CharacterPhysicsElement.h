@@ -29,6 +29,6 @@ public:
 }; // size: 0xC
 
 bool LoadCharacterPhysicsElements(void* pFileData, unsigned long nFileSize,
-    CharacterPhysicsData* pPhysicsData, bool arg3);
+    CharacterPhysicsData* pPhysicsData, bool freeFileData);
 
 #endif

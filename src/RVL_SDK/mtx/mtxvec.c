@@ -1,4 +1,4 @@
-#include <revolution/mtx.h>
+#include <revolution/mtx/mtxvec.h>
 
 // clang-format off
 asm void PSMTXMultVec(const register Mtx m, const register Vec* src, register Vec* dst)

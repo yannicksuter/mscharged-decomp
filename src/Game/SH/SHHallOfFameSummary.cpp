@@ -145,23 +145,23 @@ inline void SHHallOfFameSummary::UpdateRows()
 void SHHallOfFameSummary::SceneCreated()
 {
     SHNavigation* scene = GetNavigationScene();
-    TLComponentInstance* screen = 0;
+    TLComponentInstance* backButton = 0;
     TLComponentInstance* breadcrumbs = 0;
     if (scene != 0)
     {
         scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS, false);
-        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
+        backButton = scene->GetButton(NAVIGATION_BUTTON_BACK);
         breadcrumbs = scene->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
         mPageControls = &scene->mPageControls;
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);
     }
 
-    mBackButton.SetButtonInstance(screen);
+    mBackButton.SetButtonInstance(backButton);
     SetHallOfFameBreadcrumbs(mMode, breadcrumbs);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(presentation->m_currentSlide, "Layer", "summary", "scrollbar");
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<>(presentation->m_currentSlide, "Layer", "summary", "scrollbar");
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(mItemCount - 7);
     mScrollBar.SetValue(mFirstVisibleItem);
@@ -314,7 +314,7 @@ void SHHallOfFameSummary::UpdateTitle()
     WideBasicString title;
 
     FEPresentation* presentation = this->mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", "subtitle", "SUBtitle");
+    TLTextInstance* titleText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", "subtitle", "SUBtitle");
 
     switch (this->mMode)
     {
@@ -351,9 +351,9 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(itemComponentName, sizeof(itemComponentName), "ITEM_%d", index);
 
     FEPresentation* presentation = this->mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* rowText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "stat_0");
+    TLTextInstance* rowText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "stat_0");
 
-    TLComponentInstance* lockState = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked");
+    TLComponentInstance* lockState = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked");
 
     if (unlocked)
     {
@@ -388,7 +388,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
 
     if (this->mMode == HOF_CHALLENGE_SUMMARY)
     {
-        TLTextInstance* statusText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked", "stat_1");
+        TLTextInstance* statusText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked", "stat_1");
 
         if (unlocked)
         {
@@ -408,6 +408,6 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(tournamentName, sizeof(tournamentName), "TOURNAMENT_%d",
         index + this->mFirstVisibleItem + 1);
 
-    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
+    TLTextInstance* tournamentText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
     tournamentText->SetStringId(tournamentName);
 }

@@ -3,6 +3,8 @@
 
 #include "revolution/types.h"
 
+#include "revolution/hbm/nw4hbm/snd/BasicSound.h"
+
 namespace nw4hbm {
 namespace snd {
 class SoundHandle;

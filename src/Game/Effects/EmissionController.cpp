@@ -11,7 +11,7 @@
 #include "NL/nlMemory.h"
 #include "Game/SharedStaticStorage.h"
 
-static int numLingeringSystems;
+static int sNumLingeringControllers;
 
 void EmissionController::ClearParticles()
 {
@@ -67,10 +67,10 @@ EmissionController::EmissionController(EffectsGroup* pGroup, EmissionManager* pM
 
     if (m_bLingering)
     {
-        numLingeringSystems++;
+        sNumLingeringControllers++;
     }
 
-    m_pManager->KillOldest(numLingeringSystems - 12, true);
+    m_pManager->KillOldest(sNumLingeringControllers - 12, true);
 }
 
 void EmissionController::InitializeSystemsFromGroup()
@@ -163,7 +163,7 @@ EmissionController::~EmissionController()
 
     if (m_bLingering)
     {
-        numLingeringSystems--;
+        sNumLingeringControllers--;
     }
 }
 

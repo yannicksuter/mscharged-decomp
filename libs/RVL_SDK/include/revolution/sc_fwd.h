@@ -5,6 +5,11 @@
 extern "C" {
 #endif
 
+void SCInit(void);
+unsigned long SCCheckStatus(void);
+unsigned char SCGetProgressiveMode(void);
+unsigned char SCGetEuRgb60Mode(void);
+
 unsigned char SCGetAspectRatio(void);
 unsigned char SCGetLanguage(void);
 unsigned char SCGetSoundMode(void);

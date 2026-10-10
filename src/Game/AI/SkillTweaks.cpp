@@ -524,10 +524,10 @@ static void InitializeSkillTweakModifiers()
 /**
  * Offset/Address/Size: 0x2ABC | 0x800A327C | size: 0xD4
  */
-float SkillTweaks::GetSkillValue(unsigned long param1, cPlayer* param2)
+float SkillTweaks::GetSkillValue(unsigned long key, cPlayer* pPlayer)
 {
     float result = -9999.9f;
-    GetSkillValue(param1, &result, param2);
+    GetSkillValue(key, &result, pPlayer);
     return result;
 }
 
@@ -535,24 +535,24 @@ float SkillTweaks::GetSkillValue(unsigned long param1, cPlayer* param2)
  * Offset/Address/Size: 0x2B90 | 0x800A3350 | size: 0xB4
  */
 bool SkillTweaks::GetSkillValue(
-    unsigned long param1, float* param2, cPlayer* param3)
+    unsigned long key, float* value, cPlayer* pPlayer)
 {
     cPlayer* pPreviousPlayer = mpCurrentPlayer;
-    if (param3 != NULL)
+    if (pPlayer != NULL)
     {
-        mpCurrentPlayer = param3;
+        mpCurrentPlayer = pPlayer;
     }
 
     bool found = false;
     SkillTweak* pSkillTweak;
-    bool tweakFound = mSkillTweaksList.FindGet(param1, pSkillTweak);
+    bool tweakFound = mSkillTweaksList.FindGet(key, pSkillTweak);
     if (tweakFound)
     {
-        *param2 = pSkillTweak->GetValue();
+        *value = pSkillTweak->GetValue();
         found = true;
     }
 
-    if (param3 != NULL)
+    if (pPlayer != NULL)
     {
         mpCurrentPlayer = pPreviousPlayer;
     }
@@ -577,20 +577,20 @@ float* SkillTweaks::GetDecisionWeights()
 /**
  * Offset/Address/Size: 0x2CB4 | 0x800A3474 | size: 0x60
  */
-float SkillTweaks::GetReaction(cPlayer* param1)
+float SkillTweaks::GetReaction(cPlayer* pPlayer)
 {
-    if (param1 == NULL)
+    if (pPlayer == NULL)
     {
-        param1 = mpCurrentPlayer;
+        pPlayer = mpCurrentPlayer;
     }
 
     float result = 0.0f;
-    if (param1 == NULL)
+    if (pPlayer == NULL)
     {
         return result;
     }
 
-    switch (param1->m_pTeam->mpCurrentSituation)
+    switch (pPlayer->m_pTeam->mpCurrentSituation)
     {
     case SITUATION_DEFENSE:
         return Def_Reaction->GetValue();

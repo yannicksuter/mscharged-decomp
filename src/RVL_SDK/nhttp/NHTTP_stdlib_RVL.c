@@ -1,4 +1,4 @@
-#include <revolution/types.h>
+#include <private/nhttp.h>
 
 #include <string.h>
 

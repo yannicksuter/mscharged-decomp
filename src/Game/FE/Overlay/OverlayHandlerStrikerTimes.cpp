@@ -67,7 +67,7 @@ void StrikerTimesOverlay::Update(float dt)
     if (!mButtonsHidden)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-        TLInstance* buttons = FEFinder<TLInstance, 1>::Find<>(presentation->m_currentSlide, "Layer", "buttons");
+        TLInstance* buttons = FEFinder<TLInstance, TLAT_LAYER>::Find<>(presentation->m_currentSlide, "Layer", "buttons");
         if (mIsNetworkGame)
         {
             buttons->m_bVisible = false;
@@ -86,7 +86,7 @@ void StrikerTimesOverlay::Update(float dt)
         mCountdownTimer.Update(dt);
         if (mCountdownTicked)
         {
-            TLTextInstance* timerText = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide, "Layer", "TimerText");
+            TLTextInstance* timerText = FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(mPresentation->m_currentSlide, "Layer", "TimerText");
             char buffer[8];
             nlSNPrintf(buffer, 8, "%d", mCountdownSeconds);
             nlStrToWcs(buffer, mTimerText, 8);
@@ -235,15 +235,15 @@ void StrikerTimesOverlay::SceneCreated()
 
     presentation = mFEScene->GetPackage()->GetPresentation();
 
-    bodyText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "BODY");
+    bodyText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "BODY");
     mStoryScroller.ApplyNewTextInstancePointer(bodyText, -1, -1, 0);
     mStoryScroller.SetDisplayMessage(story);
 
-    TLTextInstance* clipText = (TLTextInstance*)FEFinder<TLInstance, 3>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "Description_clip");
+    TLTextInstance* clipText = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "Description_clip");
     mStoryScroller.SetClippingTextInstance(clipText);
     clipText->SetVisible(false);
 
-    headlineText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "HEADLINE");
+    headlineText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "HEADLINE");
     glGetScreenInfo();
     mHeadlineScroller = new (8, false) FEScrollText(SCROLL_HORIZONTAL);
     mHeadlineScroller->ApplyNewTextInstancePointer(headlineText, -17, 240, 0);
@@ -251,11 +251,11 @@ void StrikerTimesOverlay::SceneCreated()
 
     if (!mIsNetworkGame)
     {
-        FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "TimerText")->SetVisible(false);
-        FEFinder<TLImageInstance, 2>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "metre_yellow_centre")->SetVisible(false);
+        FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "TimerText")->SetVisible(false);
+        FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "metre_yellow_centre")->SetVisible(false);
     }
 
-    ((TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "OK"))->SetActiveSlide("ON", true, false);
+    ((TLComponentInstance*)FEFinder<TLInstance, TLAT_COMPONENT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "OK"))->SetActiveSlide("ON", true, false);
     mHeadlineScroller->SetScrollSpeed(150.0f);
     SetArticleImage(winnerCaptain, imageVariant);
 }
@@ -267,7 +267,7 @@ void StrikerTimesOverlay::SetArticleImage(int captain, int variant)
         captain = 0;
     }
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
-    TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "00_dummy_texture");
+    TLImageInstance* image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "00_dummy_texture");
     mArticleImage->mImageInstance = image;
     char path[128];
     nlSNPrintf(path, 128, "fe/striker_times_textures/%spositivevice%d", info.mName, variant);

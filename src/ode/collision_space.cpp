@@ -26,6 +26,8 @@ spaces
 
 */
 
+#include <string.h>
+
 #include <ode/common.h>
 #include <ode/matrix.h>
 #include <ode/collision_space.h>
@@ -41,8 +43,6 @@ extern "C"
     double ldexp(double, int);
     void* malloc(size_t);
     void free(void*);
-    void* memcpy(void*, const void*, size_t);
-    void* memset(void*, int, size_t);
 }
 
 extern const float __float_max;

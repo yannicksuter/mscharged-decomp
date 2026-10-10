@@ -301,7 +301,7 @@ void btu_hcif_send_cmd(BT_HDR *p_buf)
 
 		--btu_cb.controller_cmd_window;
 
-		bte_hcisu_send(p_buf, 0x2000);
+		bte_hcisu_send((HC_BT_HDR *)p_buf, 0x2000);
 
 		p_buf = NULL;
 	}

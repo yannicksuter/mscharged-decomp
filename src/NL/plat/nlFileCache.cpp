@@ -42,8 +42,8 @@ static void AfterReadFromCacheCallback(s32, const char*, void*, u32, void*);
 static void AfterReadFromDiscToCacheCallback(nlFile*, void*, unsigned int, unsigned long);
 static void AfterReadFromDiscCallback(nlFile*, void*, unsigned int, unsigned long);
 static void AfterWriteToCacheCallback(s32, const char*, void*, u32, void*);
-static void FlashWriteCallback(s32);
-static void FlashReadCallback(s32);
+static void FlashWriteCallback(long);
+static void FlashReadCallback(long);
 
 bool nlLoadEntireCachedFileAsync(const char* filename, LoadAsyncCallback callback,
     void* user_data, unsigned int alignment, eAllocType type, void* buffer,
@@ -236,7 +236,7 @@ bool nlFileCache::WriteEntireFileToCacheAsync(const char* filename,
     return true;
 }
 
-static void FlashWriteCallback(s32 result)
+static void FlashWriteCallback(long result)
 {
     nlFileCache* cache = sFileCache;
     CacheRequest request = cache->mRequests.Pop();
@@ -246,7 +246,7 @@ static void FlashWriteCallback(s32 result)
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after write callback\n", closeResult);
     if (result != value->mBufferSize)
     {
-        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashWriteCallback returned error %d\n", result);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashWriteCallback returned error %d\n", (int)result);
         request.mWriteCallback(result, value->mFilename, 0, 0, request.mUserData);
         cache->mFiles.Remove(nlStringLowerHash(value->mFilename));
     }
@@ -256,7 +256,7 @@ static void FlashWriteCallback(s32 result)
     }
 }
 
-static void FlashReadCallback(s32 result)
+static void FlashReadCallback(long result)
 {
     CacheRequest request = sFileCache->mRequests.Pop();
     CachedFile* value = request.mFile;
@@ -265,7 +265,7 @@ static void FlashReadCallback(s32 result)
         tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashMemClose returned error %d after read callback\n", closeResult);
     if (result != value->mBufferSize)
     {
-        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashReadCallback returned error %d\n", result);
+        tDebugPrintManager::Print(DC_LOADER, "nlFileCache: FlashReadCallback returned error %d\n", (int)result);
         request.mReadCallback(result, value->mFilename, 0, 0, request.mUserData);
     }
     else

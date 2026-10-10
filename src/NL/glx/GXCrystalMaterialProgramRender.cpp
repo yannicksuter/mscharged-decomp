@@ -50,26 +50,26 @@ static void ConfigureCrystalStages()
         detailColourInput = GX_CC_KONST;
     GXTevAlphaArg detailAlphaInput = sUseCrystalDetailTexture ? GX_CA_KONST : GX_CA_ZERO;
 
-    gxSetTevOrder(0, 1, 1, 4);
-    gxSetTevColourIn(0, 15, 8, diffuseColourInput, 15);
-    gxSetTevAlphaIn(0, 7, 4, diffuseAlphaInput, 7);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, diffuseColourInput, GX_CC_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, diffuseAlphaInput, GX_CA_ZERO);
 
-    gxSetTexCoordGen(1, 1, 5, 60);
-    gxSetTevOrder(1, 2, 2, 4);
-    gxSetTevColourIn(1, 15, 8, rampColourInput, 0);
-    gxSetTevAlphaIn(1, 7, 4, rampAlphaInput, 0);
+    gxSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
+    gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
+    gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, rampColourInput, GX_CC_CPREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, rampAlphaInput, GX_CA_APREV);
 
-    gxSetTexCoordGen(2, 1, 1, 30);
-    gxSetTevKColourSel(1, 12);
-    gxSetTevKAlphaSel(1, 28);
+    gxSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_NRM, GX_TEXMTX0);
+    gxSetTevKColourSel(GX_TEVSTAGE1, GX_TEV_KCSEL_K0);
+    gxSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_K0_A);
 
-    gxSetTevOrder(2, 0, 0, 4);
-    gxSetTevColourIn(2, 15, detailColourInput, 8, 0);
-    gxSetTevAlphaIn(2, 7, detailAlphaInput, 4, 0);
+    gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, detailColourInput, GX_CC_TEXC, GX_CC_CPREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, detailAlphaInput, GX_CA_TEXA, GX_CA_APREV);
 
-    gxSetTexCoordGen(0, 1, 4, 60);
-    gxSetTevKColourSel(2, 13);
-    gxSetTevKAlphaSel(2, 29);
+    gxSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    gxSetTevKColourSel(GX_TEVSTAGE2, GX_TEV_KCSEL_K1);
+    gxSetTevKAlphaSel(GX_TEVSTAGE2, GX_TEV_KASEL_K1_A);
 }
 
 template <>
@@ -85,9 +85,9 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Deactivate()
 {
     gxSetNumTevStages(1);
     gxSetNumTexGens(1);
-    gxSetTexCoordGen(0, 1, 4, 60);
-    gxSetTexCoordGen(1, 1, 5, 60);
-    gxSetTexCoordGen(2, 1, 6, 60);
+    gxSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    gxSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
+    gxSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY);
 }
 
 template <>
@@ -135,7 +135,7 @@ void GXMaterialProgramImpl<GXCrystalMaterialProgram>::Draw(
         rampMatrix[1][column] = 0.0f;
     }
     rampMatrix[0][3] += 1.0f;
-    GXLoadTexMtxImm(rampMatrix, 30, GX_MTX3x4);
+    GXLoadTexMtxImm(rampMatrix, GX_TEXMTX0, GX_MTX3x4);
 
     if (packet->displayList == 0 || !sUseCrystalDisplayLists)
     {

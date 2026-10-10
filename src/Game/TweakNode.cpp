@@ -5,7 +5,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlSmallBlockAllocator.h"
 #include "NL/nlString.h"
-#include "NL/nlstring_tmpl.h"
 
 nlSlotPoolFixed<0x20> gTweakNodePool(0x20);
 

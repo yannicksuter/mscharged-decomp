@@ -21,12 +21,8 @@
 #include "NL/nlLocalization.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/FEAudio.h"
-#include "NL/nlPrint.h"
 
 #include <string.h>
-
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
 SHOnlineInvitePreview::SHOnlineInvitePreview()
     : mContinueButton()
@@ -146,7 +142,7 @@ void SHOnlineInvitePreview::SceneCreated()
         GetFriendManager()->GetHostInvitationIndex());
     const CheatSettings& settings = payload->mPowerupSettings;
     TLSlide* slide = GetPresentation()->GetActiveSlide();
-    mContinueButtonInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW", "BTN_1");
+    mContinueButtonInstance = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW", "BTN_1");
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);

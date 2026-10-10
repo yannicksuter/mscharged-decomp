@@ -1,4 +1,4 @@
-#include <revolution/wpad.h>
+#include <revolution/wpad/debug_msg.h>
 
 void DEBUGPrint(const char* pFmt, ...)
 {

@@ -2,6 +2,7 @@
 #define GAME_AUDIO_AUDIO_RESOURCE_PLATFORM_H
 
 #include "Game/Audio/AudioBankLoader.h"
+#include "Game/Audio/AudioStreamHeader.h"
 #include "NL/nlArrayAllocator.h"
 
 class AudioBundleManager;
@@ -49,14 +50,9 @@ private:
     nlFile* m_File;
 };
 
-struct AudioStreamBlock
-{
-    unsigned char m_Unknown00[0x60];
-};
-
-extern nlArrayAllocator<AudioStreamBlock>* g_pAudioStreamBlockPool;
+extern nlArrayAllocator<AudioStreamHeader>* g_pAudioStreamHeaderPool;
 
 void DumpAudioBankMemory(const char* path);
-bool InitializeAudioStreamBlockPool();
+bool InitializeAudioStreamHeaderPool();
 
 #endif // GAME_AUDIO_AUDIO_RESOURCE_PLATFORM_H

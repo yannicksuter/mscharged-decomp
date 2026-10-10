@@ -1,16 +1,16 @@
 #include <MetroTRK/mutex_TRK.h>
 
-DSError TRKInitializeMutex(void* p1)
+DSError TRKInitializeMutex(void* mutex)
 {
     return kNoError;
 }
 
-DSError TRKAcquireMutex(void* p1)
+DSError TRKAcquireMutex(void* mutex)
 {
     return kNoError;
 }
 
-DSError TRKReleaseMutex(void* p1)
+DSError TRKReleaseMutex(void* mutex)
 {
     return kNoError;
 }

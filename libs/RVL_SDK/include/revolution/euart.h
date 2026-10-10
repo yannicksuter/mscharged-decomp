@@ -17,7 +17,7 @@ typedef enum EUARTError {
 } EUARTError;
 
 BOOL EUARTInit(void);
-EUARTError InitializeUART(void);
+EUARTError InitializeUART(int unused);
 EUARTError WriteUARTN(const char* msg, u32 n);
 
 #ifdef __cplusplus

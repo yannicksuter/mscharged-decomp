@@ -80,6 +80,8 @@ struct dxJointContact : public dxJoint
     dContact contact;
 };
 
+dxJoint* createJoint(dWorldID world, dJointGroupID group, dxJoint::Vtable* vtable);
+
 extern dxJoint::Vtable __dcontact_vtable;
 
 #endif

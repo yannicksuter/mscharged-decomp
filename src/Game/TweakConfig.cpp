@@ -109,7 +109,6 @@ static char sLineEndCharacters[] = "\n\r";
 static char sTagValueSeparator[] = "=";
 static char sConfigWhitespace[] = " \t\"\r";
 
-#pragma dont_inline on
 void ParseTweakConfigData(
     char* data, int size, Config::Parser* parser)
 {
@@ -181,7 +180,6 @@ void ParseTweakConfigData(
         line = lines.GetLine();
     }
 }
-#pragma dont_inline reset
 
 char* ReadTweakConfigFile(
     const char* filename, unsigned long* outSize)

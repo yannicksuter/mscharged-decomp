@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 #include <wchar_t.h>
 #include <wctype.h>
@@ -22,8 +23,6 @@ typedef long long intmax_t;
 typedef PTRDIFF ptrdiff_t;
 
 wchar_t* wcscpy(wchar_t* pDest, const wchar_t* pSrc);
-size_t strlen(const char* pStr);
-void* memchr(const void*, int, size_t);
 int mbtowc(wchar_t* pDest, const char* s, size_t num);
 int vswprintf(wchar_t* s, size_t n, const wchar_t* format, va_list arg);
 

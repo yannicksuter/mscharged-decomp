@@ -25,8 +25,8 @@ public:
     virtual void DrawPlanarShadow();
 }; // size: 0x78
 
-// The charge shadow keeps its own transform and one duplicated model per
-// charge level.
+// The charge shadow keeps its own transform and references inventory models
+// for the charge levels.
 class ChargeShadowDrawable : public PlanarShadowDrawable
 {
 public:

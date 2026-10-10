@@ -5,6 +5,7 @@
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioEffect.h"
+#include "Game/Audio/Reverb.h"
 #include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioSystem.h"
 #include "NL/nlMemory.h"
@@ -81,7 +82,7 @@ bool AudioBackend::Initialize()
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
     m_AudioAllocator.Initialize(memory, gAudioMemorySize);
-    InitializeAudioStreamBlockPool();
+    InitializeAudioStreamHeaderPool();
     SetOutputMode(AUDIO_OUTPUT_STEREO);
 
     OSCreateAlarm(&m_ControllerSpeakerAlarm);

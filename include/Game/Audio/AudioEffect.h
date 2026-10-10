@@ -4,7 +4,6 @@
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
 #include "types.h"
-struct AXFX_REVERBHI;
 
 enum eAudioAuxiliary
 {
@@ -149,7 +148,6 @@ inline void AudioEffectParameter::Update(float dt)
 }
 
 extern AuxEffectMap* g_pAuxEffectMap;
-void SetDefaultReverbSettings(AXFX_REVERBHI* reverb);
 
 inline void* AllocateAudioEffectMemory(unsigned long size)
 {

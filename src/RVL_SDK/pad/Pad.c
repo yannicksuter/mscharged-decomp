@@ -6,8 +6,6 @@
 #include <string.h>
 
 
-extern u16 __OSWirelessPadFixMode;
-
 #define SQ(x) ((x) * (x))
 
 static void SPEC0_MakeStatus(s32 chan, PADStatus* status, u32 data[2]);

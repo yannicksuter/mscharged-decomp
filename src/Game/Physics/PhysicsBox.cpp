@@ -1,6 +1,7 @@
 #include "Game/Physics/PhysicsBox.h"
 
 #include "Game/Physics/CollisionSpace.h"
+#include "ode/mass.h"
 
 PhysicsBox::PhysicsBox(CollisionSpace* collisionSpace, PhysicsWorld* world, float lx, float ly, float lz)
     : PhysicsObject(world)

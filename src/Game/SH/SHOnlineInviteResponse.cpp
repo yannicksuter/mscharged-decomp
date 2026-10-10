@@ -27,7 +27,6 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlinePlayerCount.h"
 #include "Game/SH/SHOnlineGuestControllerSelect.h"
-#include "NL/nlstring_tmpl.h"
 #include "Game/FE/tlDefault.h"
 
 SHOnlineInviteResponse::~SHOnlineInviteResponse()
@@ -55,15 +54,14 @@ void SHOnlineInviteResponse::SceneCreated()
     {
         char name[6];
         nlSNPrintf(name, sizeof(name), "BTN_%d", i + 1);
-        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+        mButtonInstances[i] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<TLSlide>(
             presentation->m_currentSlide, "Layer", "INVITATION", name);
     }
     int index = g_pFriendManager->mHostInvitationIndex;
     const unsigned short* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
-    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
     WideBasicString string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_INVITATION_INVITATION")), name);
     nlStrNCpy(mInvitationText, string.c_str(), 0x80);
-    FEFinder<TLTextInstance, 3>::Find<>(
+    FEFinder<TLTextInstance, TLAT_TEXT>::Find<>(
         presentation->m_currentSlide, "Layer", "INVITATION", "INVITE")->SetString(mInvitationText);
     g_pFriendManager->SetOwnStatusReceivedInvitation(index);
     SHNavigation* scene = GetNavigationScene();

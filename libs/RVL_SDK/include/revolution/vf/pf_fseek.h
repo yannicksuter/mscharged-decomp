@@ -1,6 +1,6 @@
 #ifndef RVL_SDK_VF_PF_FSEEK_H
 #define RVL_SDK_VF_PF_FSEEK_H
-#include <revolution/types.h>
+#include <revolution/vf/vf_struct.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

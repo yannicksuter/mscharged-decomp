@@ -4,37 +4,37 @@
 #include "NL/nlMain.h"
 #include "ode/NLGAdditions.h"
 
-static unsigned short s_dxBodyType = 0xFFFF;
+static unsigned short s_dxBodyType = DEBUG_TYPE_NONE;
 
 #define BODY_FIELD_OFFSET(body, field) \
     ((unsigned char*)&(body)->field - (unsigned char*)&(body)->flags)
 
 void dBodySyncLog(dBodyID body, void* context, DebugWriteCache* cache)
 {
-    if (s_dxBodyType == 0xFFFF)
+    if (s_dxBodyType == DEBUG_TYPE_NONE)
     {
         s_dxBodyType = cache->BeginType("dxBody");
-        cache->AddField("flags", 8, 0);
-        cache->AddField("geom", 15, BODY_FIELD_OFFSET(body, geom));
-        cache->AddField("mass.mass", 17, BODY_FIELD_OFFSET(body, mass.mass));
-        cache->AddField("mass.c", 28, BODY_FIELD_OFFSET(body, mass.c));
-        cache->AddField("mass.I", 30, BODY_FIELD_OFFSET(body, mass.I));
-        cache->AddField("invI", 30, BODY_FIELD_OFFSET(body, invI));
-        cache->AddField("invMass", 17, BODY_FIELD_OFFSET(body, invMass));
-        cache->AddField("pos", 27, BODY_FIELD_OFFSET(body, pos));
-        cache->AddField("q", 29, BODY_FIELD_OFFSET(body, q));
-        cache->AddField("R", 30, BODY_FIELD_OFFSET(body, R));
-        cache->AddField("lvel", 27, BODY_FIELD_OFFSET(body, lvel));
-        cache->AddField("avel", 27, BODY_FIELD_OFFSET(body, avel));
-        cache->AddField("facc", 27, BODY_FIELD_OFFSET(body, facc));
-        cache->AddField("tacc", 27, BODY_FIELD_OFFSET(body, tacc));
-        cache->AddField("finite_rot_axis", 27, BODY_FIELD_OFFSET(body, finite_rot_axis));
-        cache->AddField("adis.linear_threshold", 17, BODY_FIELD_OFFSET(body, adis.linear_threshold));
-        cache->AddField("adis.angular_threshold", 17, BODY_FIELD_OFFSET(body, adis.angular_threshold));
-        cache->AddField("adis.idle_time", 17, BODY_FIELD_OFFSET(body, adis.idle_time));
-        cache->AddField("adis.idle_steps", 8, BODY_FIELD_OFFSET(body, adis.idle_steps));
-        cache->AddField("adis_timeleft", 17, BODY_FIELD_OFFSET(body, adis_timeleft));
-        cache->AddField("adis_stepsleft", 8, BODY_FIELD_OFFSET(body, adis_stepsleft));
+        cache->AddField("flags", DEBUG_FIELD_INT, 0);
+        cache->AddField("geom", DEBUG_FIELD_POINTER, BODY_FIELD_OFFSET(body, geom));
+        cache->AddField("mass.mass", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, mass.mass));
+        cache->AddField("mass.c", DEBUG_FIELD_ODE_VECTOR4, BODY_FIELD_OFFSET(body, mass.c));
+        cache->AddField("mass.I", DEBUG_FIELD_ODE_MATRIX3, BODY_FIELD_OFFSET(body, mass.I));
+        cache->AddField("invI", DEBUG_FIELD_ODE_MATRIX3, BODY_FIELD_OFFSET(body, invI));
+        cache->AddField("invMass", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, invMass));
+        cache->AddField("pos", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, pos));
+        cache->AddField("q", DEBUG_FIELD_ODE_QUATERNION, BODY_FIELD_OFFSET(body, q));
+        cache->AddField("R", DEBUG_FIELD_ODE_MATRIX3, BODY_FIELD_OFFSET(body, R));
+        cache->AddField("lvel", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, lvel));
+        cache->AddField("avel", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, avel));
+        cache->AddField("facc", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, facc));
+        cache->AddField("tacc", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, tacc));
+        cache->AddField("finite_rot_axis", DEBUG_FIELD_ODE_VECTOR3, BODY_FIELD_OFFSET(body, finite_rot_axis));
+        cache->AddField("adis.linear_threshold", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, adis.linear_threshold));
+        cache->AddField("adis.angular_threshold", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, adis.angular_threshold));
+        cache->AddField("adis.idle_time", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, adis.idle_time));
+        cache->AddField("adis.idle_steps", DEBUG_FIELD_INT, BODY_FIELD_OFFSET(body, adis.idle_steps));
+        cache->AddField("adis_timeleft", DEBUG_FIELD_FLOAT, BODY_FIELD_OFFSET(body, adis_timeleft));
+        cache->AddField("adis_stepsleft", DEBUG_FIELD_INT, BODY_FIELD_OFFSET(body, adis_stepsleft));
         cache->EndType();
     }
 

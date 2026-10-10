@@ -1,7 +1,5 @@
 #include <revolution/vf.h>
 
-extern PDM_DISK_SET VFipdm_disk_set;
-
 s32 VFipdm_disk_convert_sector_into_block(struct PDM_DISK* p_disk, u32 sector, u32 num_sector, u16 bps, u32* p_block, u32* p_num_block) {
     u16 delta;
     s32 err;

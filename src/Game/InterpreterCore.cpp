@@ -58,7 +58,7 @@ struct InterpreterTweakStorage
 
 InterpreterCore::InterpreterCore(unsigned int size)
 {
-    m_StackSegment = (u32*)nlMalloc(size * 4, 8, false);
+    m_StackSegment = (u32*)nlMalloc(size * sizeof(*m_StackSegment), 8, false);
     m_Header = 0;
     m_Globals = 0;
     m_TweakStorage = 0;

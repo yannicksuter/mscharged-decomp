@@ -145,7 +145,7 @@ void RenderSnapshot::Replay(T& frame)
     Replayable<0>(frame, mBall);
     Replayable<1>(frame, mCameraUp);
     Replayable<1>(frame, mGoalLight);
-    Replayable<1>(frame, CrowdManager::fn_801919AC());
+    Replayable<1>(frame, CrowdManager::Instance());
     Replayable<0>(frame, WorldDarkening::Instance());
     if ((mFlags.raw >> 23) & 1)
     {
@@ -598,11 +598,11 @@ int ReplayManager::GetReplayExcitement(float time) const
     return (unsigned short)count * (unsigned short)value;
 }
 
-static void OnReplayFileClosed(s32 result)
+static void OnReplayFileClosed(long result)
 {
 }
 
-static void OnReplayWritten(s32 result)
+static void OnReplayWritten(long result)
 {
     gbSavingReplay = false;
     if (result < 0)
@@ -615,7 +615,7 @@ static void OnReplayWritten(s32 result)
     }
 }
 
-static void OnReplayRead(s32 result)
+static void OnReplayRead(long result)
 {
     gbLoadingReplay = false;
     if (result < 0)
@@ -694,7 +694,7 @@ bool ReplayManager::LoadReplay(int index)
     }
 
     gbLoadingReplay = true;
-    u32 size = 0x100000;
+    unsigned long size = 0x100000;
     if (nlFlashRead((void**)&mMemory, &size, OnReplayRead, true) != 0)
     {
         GetPresentation()->SendSkipNis();

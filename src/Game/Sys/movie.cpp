@@ -140,7 +140,7 @@ bool MovieStart(
         return false;
     }
 
-    fn_80372970(bMono);
+    THPSimpleSetMono(bMono);
     g_bFinished = false;
     start = true;
     g_bActive = true;

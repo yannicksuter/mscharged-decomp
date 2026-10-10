@@ -52,7 +52,7 @@ int sMaskedSpecularFresnelLightCount;
 int sMaskedSpecularFresnelLightingMode;
 unsigned long sMaskedSpecularFresnelBoundTexture;
 
-extern "C" void glxConfigureMaskedSpecularFresnelLighting(int mode)
+void glxConfigureMaskedSpecularFresnelLighting(int mode)
 {
     sMaskedSpecularFresnelLightingMode = mode;
     gxSetNumChans(1);

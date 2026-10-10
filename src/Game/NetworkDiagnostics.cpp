@@ -5,11 +5,11 @@
 
 #include "NL/nlPrint.h"
 
-void FormatNetworkTimestamp(char* text, unsigned long size, bool arg2)
+void FormatNetworkTimestamp(char* text, unsigned long size, bool timeOnly)
 {
     OSCalendarTime calendar;
     OSTicksToCalendarTime(OSGetTime(), &calendar);
-    if (arg2)
+    if (timeOnly)
     {
         nlSNPrintf(text, size, "%d_%d_%d.%d", calendar.hour, calendar.min, calendar.sec, calendar.msec);
     }

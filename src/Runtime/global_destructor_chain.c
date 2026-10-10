@@ -1,4 +1,6 @@
 // Adapted from https://github.com/SMGCommunity/Petari (CC0-1.0).
+#include <global_destructor_chain.h>
+
 typedef struct DestructorChain
 {
     struct DestructorChain* next;

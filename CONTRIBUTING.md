@@ -25,10 +25,10 @@ code.
 
 ## Where the project stands
 
-The project is at its initial reconstruction stage. The `R4QE01` revision has
-been analyzed, its generated symbols and splits are checked in, and the
-baseline build reproduces the original DOL. Most of the useful reverse-
-engineering work is still ahead:
+The USA `R4QE01` revision has reached 100% code matching and source linking.
+The EU `R4QP01` revision is in progress: its initial symbols and splits are
+checked in, and the baseline build reproduces the original DOL using extracted
+objects. Work on the EU version includes:
 
 - Identify translation-unit and library boundaries.
 - Replace generated split objects with matching C and C++ source.
@@ -40,7 +40,7 @@ valuable as completed function matches.
 
 ## Before you start
 
-- Read the [README](README.md) for the supported version and build workflow.
+- Read the [README](README.md) for the supported versions and build workflow.
 - Produce a clean local build before submitting a pull request.
 - Coordinate non-trivial or overlapping work on Discord when practical.
 - Never commit disc images, game assets, executable files, extracted DOL data,
@@ -53,7 +53,8 @@ At minimum, you need:
 
 - Python 3
 - Ninja
-- A legally obtained `R4QE01` revision 1 disc image in `orig/R4QE01/`
+- A legally obtained supported disc image in `orig/<version>/` (see the
+  [README](README.md#supported-versions) for regions and revisions)
 
 From the repository root, run:
 
@@ -61,6 +62,9 @@ From the repository root, run:
 python3 configure.py
 ninja
 ```
+
+This selects USA by default. For EU, configure with
+`python3 configure.py --version R4QP01` before running `ninja`.
 
 The build downloads its pinned tools when needed. After configuration,
 `objdiff.json` is generated at the repository root; see

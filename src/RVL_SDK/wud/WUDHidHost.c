@@ -1,4 +1,5 @@
 #include <private/wud.h>
+#include <private/wud/WUDHidHost.h>
 
 #include <private/bte/bta_sys.h>
 

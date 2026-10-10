@@ -5,7 +5,6 @@
 #define PF_STR_CODEMODE_UNICODE 2
 #define PF_STR_CODEMODE_LOCAL 3
 
-extern PF_VOLUME_SET VFipf_vol_set;
 
 void VFiPFSTR_SetCodeMode(struct PF_STR* p_str, u32 code_mode) {
     p_str->code_mode = code_mode;

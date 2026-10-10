@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int NETGetStartupErrorCode(int result);
+long NETGetStartupErrorCode(long result);
 
 #ifdef __cplusplus
 }

@@ -82,8 +82,7 @@
 
 #include <internal/fdlibm.h>
 
-extern int __float_nan[];
-#define NAN (*(float*)__float_nan)
+#include <internal/math_nan.h>
 #include <errno.h>
 
 #ifdef __STDC__

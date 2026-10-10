@@ -1,13 +1,12 @@
 #ifndef MISC_IO_H
 #define MISC_IO_H
 
-#include <file_struct.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void clearerr(FILE* file);
 void __stdio_atexit(void);
 
 #ifdef __cplusplus

@@ -122,7 +122,7 @@ void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
     bool changed = false;
     for (int i = 0; i < 10; ++i)
     {
-        void* saveId = GameInfoManager::Instance()->GetUnknown0xA80(i);
+        void* saveId = GameInfoManager::Instance()->GetSaveSlotIdAddress(i);
         if (*(u64*)saveId != 0)
         {
             u64 id;

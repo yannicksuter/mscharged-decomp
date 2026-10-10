@@ -250,7 +250,7 @@ bool SHOnlineMiiSelectOverlay::SelectMii()
 
     for (int i = 0; i < 10; ++i)
     {
-        saveId = GameInfoManager::Instance()->GetUnknown0xA80(i);
+        saveId = GameInfoManager::Instance()->GetSaveSlotIdAddress(i);
         unsigned long long id;
         memcpy(&id, saveId, sizeof(id));
 
@@ -277,7 +277,7 @@ bool SHOnlineMiiSelectOverlay::SelectMii()
         {
             gNetworkSaveSlotIndex = emptySlot;
             void* saveId
-                = GameInfoManager::Instance()->GetUnknown0xA80(emptySlot);
+                = GameInfoManager::Instance()->GetSaveSlotIdAddress(emptySlot);
             *(unsigned long long*)saveId = mCreateID;
         }
         else

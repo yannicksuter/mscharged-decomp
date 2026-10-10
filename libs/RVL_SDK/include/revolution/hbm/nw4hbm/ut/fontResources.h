@@ -12,7 +12,7 @@ typedef struct CharWidths {
     /* 0x00 */ s8 left;
     /* 0x01 */ u8 glyphWidth;
     /* 0x02 */ s8 charWidth;
-} CharWidths; // size = 0x04
+} CharWidths; // size = 0x03
 
 typedef struct FontWidth {
     /* 0x00 */ u16 indexBegin;

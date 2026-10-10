@@ -7,7 +7,6 @@ namespace nw4hbm {
 namespace snd {
 namespace detail {
 
-// No midi for you
 class MidiSeqTrack : public SeqTrack {
     MidiSeqTrack();
     virtual ~MidiSeqTrack() {}

@@ -56,7 +56,7 @@ void WiiClassicPad::UpdateState(float dt)
     mAnalogRight.y = status->clRStickY / 56.0f;
     if (m_isLeftAnalogToDPadMapEnabled)
     {
-        status->clButton |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y, 2, 0x8000, 0x4000, 1);
+        status->clButton |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y, WPAD_BUTTON_CL_LEFT, WPAD_BUTTON_CL_RIGHT, WPAD_BUTTON_CL_DOWN, WPAD_BUTTON_CL_UP);
     }
 
     int changed = mCurrentStatus->wpad.clButton ^ mPreviousStatus->wpad.clButton;
@@ -114,52 +114,52 @@ int WiiClassicPad::GetButtonIndex(int button, bool remap)
     int buttonIndex = 0;
     switch (button)
     {
-    case 0x1:
+    case WPAD_BUTTON_CL_UP:
         buttonIndex = 0;
         break;
-    case 0x2:
+    case WPAD_BUTTON_CL_LEFT:
         buttonIndex = 1;
         break;
-    case 0x4:
+    case WPAD_BUTTON_CL_ZR:
         buttonIndex = 2;
         break;
-    case 0x8:
+    case WPAD_BUTTON_CL_X:
         buttonIndex = 3;
         break;
-    case 0x10:
+    case WPAD_BUTTON_CL_A:
         buttonIndex = 4;
         break;
-    case 0x20:
+    case WPAD_BUTTON_CL_Y:
         buttonIndex = 5;
         break;
-    case 0x40:
+    case WPAD_BUTTON_CL_B:
         buttonIndex = 6;
         break;
-    case 0x80:
+    case WPAD_BUTTON_CL_ZL:
         buttonIndex = 7;
         break;
     case 0x100:
         buttonIndex = 8;
         break;
-    case 0x200:
+    case WPAD_BUTTON_CL_R:
         buttonIndex = 9;
         break;
-    case 0x400:
+    case WPAD_BUTTON_CL_PLUS:
         buttonIndex = 10;
         break;
-    case 0x800:
+    case WPAD_BUTTON_CL_HOME:
         buttonIndex = 11;
         break;
-    case 0x1000:
+    case WPAD_BUTTON_CL_MINUS:
         buttonIndex = 12;
         break;
-    case 0x2000:
+    case WPAD_BUTTON_CL_L:
         buttonIndex = 13;
         break;
-    case 0x4000:
+    case WPAD_BUTTON_CL_DOWN:
         buttonIndex = 14;
         break;
-    case 0x8000:
+    case WPAD_BUTTON_CL_RIGHT:
         buttonIndex = 15;
         break;
     }
@@ -172,52 +172,52 @@ int WiiClassicPad::GetButtonMask(int buttonIndex)
     switch (buttonIndex)
     {
     case 0:
-        button = 0x1;
+        button = WPAD_BUTTON_CL_UP;
         break;
     case 1:
-        button = 0x2;
+        button = WPAD_BUTTON_CL_LEFT;
         break;
     case 2:
-        button = 0x4;
+        button = WPAD_BUTTON_CL_ZR;
         break;
     case 3:
-        button = 0x8;
+        button = WPAD_BUTTON_CL_X;
         break;
     case 4:
-        button = 0x10;
+        button = WPAD_BUTTON_CL_A;
         break;
     case 5:
-        button = 0x20;
+        button = WPAD_BUTTON_CL_Y;
         break;
     case 6:
-        button = 0x40;
+        button = WPAD_BUTTON_CL_B;
         break;
     case 7:
-        button = 0x80;
+        button = WPAD_BUTTON_CL_ZL;
         break;
     case 8:
         button = 0x100;
         break;
     case 9:
-        button = 0x200;
+        button = WPAD_BUTTON_CL_R;
         break;
     case 10:
-        button = 0x400;
+        button = WPAD_BUTTON_CL_PLUS;
         break;
     case 11:
-        button = 0x800;
+        button = WPAD_BUTTON_CL_HOME;
         break;
     case 12:
-        button = 0x1000;
+        button = WPAD_BUTTON_CL_MINUS;
         break;
     case 13:
-        button = 0x2000;
+        button = WPAD_BUTTON_CL_L;
         break;
     case 14:
-        button = 0x4000;
+        button = WPAD_BUTTON_CL_DOWN;
         break;
     case 15:
-        button = 0x8000;
+        button = WPAD_BUTTON_CL_RIGHT;
         break;
     }
     return button;

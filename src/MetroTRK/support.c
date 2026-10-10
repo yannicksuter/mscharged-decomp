@@ -1,6 +1,7 @@
 #include <MetroTRK/support.h>
 #include <MetroTRK/cc_gdev.h>
 #include <MetroTRK/mem_TRK.h>
+#include <MetroTRK/msg.h>
 #include <MetroTRK/msgbuf.h>
 #include <MetroTRK/serpoll.h>
 #include <MetroTRK/string_TRK.h>

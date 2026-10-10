@@ -6,6 +6,7 @@
 #include <revolution/thp/THPBuffer.h>
 #include <revolution/thp/THPFile.h>
 #include <revolution/thp/THPInfo.h>
+#include <revolution/thp_fwd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,11 +93,6 @@ void __THPInverseDCTNoYPos(THPCoeff *, u32);
 void __THPHuffDecodeDCTCompY(THPFileInfo *, THPCoeff *);
 void __THPHuffDecodeDCTCompU(THPFileInfo *, THPCoeff *);
 void __THPHuffDecodeDCTCompV(THPFileInfo *, THPCoeff *);
-
-s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work);
-u32 THPAudioDecode(s16 *, u8 *, s32);
-
-BOOL THPInit(void);
 
 void THPGXYuv2RgbSetup(GXRenderModeObj *);
 void THPGXYuv2RgbDraw(u8 *, u8 *, u8 *, s16, s16, s16, s16, s16, s16);

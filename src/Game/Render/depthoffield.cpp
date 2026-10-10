@@ -1,5 +1,9 @@
 #include "Game/Render/depthoffield.h"
 
+#include <string.h>
+#include <revolution/gx/GXTransform_fwd.h>
+#include <revolution/mtx_fwd.h>
+
 #include "Game/SharedStaticStorage.h"
 #include "Game/Render/RLView.h"
 
@@ -9,23 +13,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
 
-typedef float Mtx[3][4];
-typedef float Mtx44[4][4];
-
-extern "C"
-{
-    void GXGetProjectionv(float* projection);
-    void GXSetProjection(const Mtx44 projection, int type);
-    void GXSetProjectionv(const float* projection);
-    void GXGetViewportv(float* viewport);
-    void GXProject(float x, float y, float z, const Mtx matrix,
-        const float* projection, const float* viewport, float* screenX,
-        float* screenY, float* screenZ);
-    void PSMTXIdentity(Mtx matrix);
-    void* memcpy(void* destination, const void* source, u32 size);
-}
-
-u8 lbl_806DCDE0 = true;
+u8 gDepthOfFieldEnabled = true;
 
 DepthOfFieldManager::DepthOfFieldManager()
     : m_bOn(false)
@@ -69,7 +57,7 @@ void DepthOfFieldManager::Update()
         return;
     }
 
-    if (!lbl_806DCDE0)
+    if (!gDepthOfFieldEnabled)
     {
         return;
     }
@@ -88,7 +76,7 @@ void DepthOfFieldManager::Update()
     float projection[7];
     float savedProjection[7];
     nlMatrix4 projectionMatrix;
-    Mtx identity;
+    float identity[3][4];
     glPoly2 poly;
 
     GXGetProjectionv(savedProjection);
@@ -96,7 +84,7 @@ void DepthOfFieldManager::Update()
     memcpy(&projectionMatrix,
         GetLayerView(eCLV_Shadowed)->m_Interface->GetProjectionMatrix(),
         sizeof(projectionMatrix));
-    GXSetProjection(projectionMatrix.e2, 0);
+    GXSetProjection(projectionMatrix.e2, GX_PERSPECTIVE);
 
     GXGetProjectionv(projection);
     GXGetViewportv(viewport);

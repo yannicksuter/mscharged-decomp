@@ -44,8 +44,8 @@ static void* SaveBuffer;
 static NANDBanner* BannerBuffer;
 static TPLPalette* RegionBannerTPL;
 static bool IconDataLoaded;
-static u32 CheckAnswer;
-static u32 BannerFileLength;
+static unsigned long CheckAnswer;
+static unsigned long BannerFileLength;
 static bool BannerFileExists;
 enum eSaveLoadMode
 {
@@ -68,39 +68,39 @@ void CancelSave();
 void ContinueWithoutSaving();
 void BeginReset();
 void DeleteSaveFile();
-void OpenSaveForWriteCallback(s32 result);
-void OpenSaveForReadCallback(s32 result);
-void CheckSaveFileCallback(s32 result);
-void CreateSaveFileCallback(s32 result);
-void WriteSaveFileCallback(s32 result);
-void ReadSaveFileCallback(s32 result);
-void DeleteSaveFileCallback(s32 result);
-void CloseCallback(s32 result);
-void ContinueAfterCloseCallback(s32 result);
-void StartSaveDirectoryCallback(s32 result);
-void StartLoadDirectoryCallback(s32 result);
+void OpenSaveForWriteCallback(long result);
+void OpenSaveForReadCallback(long result);
+void CheckSaveFileCallback(long result);
+void CreateSaveFileCallback(long result);
+void WriteSaveFileCallback(long result);
+void ReadSaveFileCallback(long result);
+void DeleteSaveFileCallback(long result);
+void CloseCallback(long result);
+void ContinueAfterCloseCallback(long result);
+void StartSaveDirectoryCallback(long result);
+void StartLoadDirectoryCallback(long result);
 void CheckSaveAndBannerSpace();
-void ChangeDirectoryCallback(s32 result);
+void ChangeDirectoryCallback(long result);
 void WriteSaveData();
 bool ReadSaveData(u32 size);
 void HandleNANDResult(s32 result);
-void OpenBannerCallback(s32 result);
-void BannerLengthCallback(s32 result);
-void BannerFileLengthCallback(s32 result);
-void DeleteInvalidBannerCallback(s32 result);
-void CheckBannerSpaceCallback(s32 result);
-void CreateBannerCallback(s32 result);
-void WriteBannerCallback(s32 result);
+void OpenBannerCallback(long result);
+void BannerLengthCallback(long result);
+void BannerFileLengthCallback(long result);
+void DeleteInvalidBannerCallback(long result);
+void CheckBannerSpaceCallback(long result);
+void CreateBannerCallback(long result);
+void WriteBannerCallback(long result);
 void IconLoadedCallback(void* data, unsigned long size, void* userData);
 void IconLoadsComplete();
 void RegionBannerLoadedCallback(void* data, unsigned long size, void* userData);
-void BannerWriteFinishedCallback(s32 result);
-void FinishOperation(s32 result);
-void BannerCloseCallback(s32 result);
+void BannerWriteFinishedCallback(long result);
+void FinishOperation(long result);
+void BannerCloseCallback(long result);
 void CheckSpaceAnswer(u32 answer, bool online);
-void CheckNoCopyDirectoryCallback(s32 result);
-void CreateNoCopyDirectoryCallback(s32 result);
-void OpenBannerDirectoryCallback(s32 result);
+void CheckNoCopyDirectoryCallback(long result);
+void CreateNoCopyDirectoryCallback(long result);
+void OpenBannerDirectoryCallback(long result);
 } // namespace SaveLoad
 
 static inline u32 Align32(u32 size)
@@ -217,7 +217,7 @@ void SaveLoad::DeleteSaveFile()
     }
 }
 
-void SaveLoad::OpenSaveForWriteCallback(s32 result)
+void SaveLoad::OpenSaveForWriteCallback(long result)
 {
     if (result == -12)
     {
@@ -245,12 +245,12 @@ void SaveLoad::OpenSaveForWriteCallback(s32 result)
     }
 }
 
-void SaveLoad::OpenSaveForReadCallback(s32 result)
+void SaveLoad::OpenSaveForReadCallback(long result)
 {
     if (result == 0)
     {
         SaveBuffer = 0;
-        u32 size;
+        unsigned long size;
         if (OnlineMode)
         {
             size = GameInfoManager::GetInstance()->GetMemoryCardDataSize() + sizeof(SaveFileHeader);
@@ -291,7 +291,7 @@ void SaveLoad::OpenSaveForReadCallback(s32 result)
     HandleNANDResult(result);
 }
 
-void SaveLoad::CheckSaveFileCallback(s32 result)
+void SaveLoad::CheckSaveFileCallback(long result)
 {
     if (result == 0)
     {
@@ -313,7 +313,7 @@ void SaveLoad::CheckSaveFileCallback(s32 result)
     CheckAnswer = 0;
 }
 
-void SaveLoad::CreateSaveFileCallback(s32 result)
+void SaveLoad::CreateSaveFileCallback(long result)
 {
     if (result == -6 || result == 0)
     {
@@ -327,7 +327,7 @@ void SaveLoad::CreateSaveFileCallback(s32 result)
     }
 }
 
-void SaveLoad::WriteSaveFileCallback(s32 result)
+void SaveLoad::WriteSaveFileCallback(long result)
 {
     nlFree(SaveBuffer);
     SaveBuffer = 0;
@@ -345,7 +345,7 @@ void SaveLoad::WriteSaveFileCallback(s32 result)
     ResetTask::s_resetPaused = false;
 }
 
-void SaveLoad::ReadSaveFileCallback(s32 result)
+void SaveLoad::ReadSaveFileCallback(long result)
 {
     u32 expectedSize = Align32(SaveFileSize());
     if ((u32)result == expectedSize)
@@ -399,7 +399,7 @@ void SaveLoad::ReadSaveFileCallback(s32 result)
     }
 }
 
-void SaveLoad::DeleteSaveFileCallback(s32 result)
+void SaveLoad::DeleteSaveFileCallback(long result)
 {
     if (result == 0)
     {
@@ -422,11 +422,11 @@ void SaveLoad::DeleteSaveFileCallback(s32 result)
     }
 }
 
-void SaveLoad::CloseCallback(s32)
+void SaveLoad::CloseCallback(long)
 {
 }
 
-void SaveLoad::ContinueAfterCloseCallback(s32)
+void SaveLoad::ContinueAfterCloseCallback(long)
 {
     if (OnlineMode)
     {
@@ -438,7 +438,7 @@ void SaveLoad::ContinueAfterCloseCallback(s32)
     }
 }
 
-void SaveLoad::StartSaveDirectoryCallback(s32 result)
+void SaveLoad::StartSaveDirectoryCallback(long result)
 {
     if (result == 0)
     {
@@ -452,7 +452,7 @@ void SaveLoad::StartSaveDirectoryCallback(s32 result)
     }
 }
 
-void SaveLoad::StartLoadDirectoryCallback(s32 result)
+void SaveLoad::StartLoadDirectoryCallback(long result)
 {
     if (result == 0)
     {
@@ -486,7 +486,7 @@ void SaveLoad::CheckSaveAndBannerSpace()
     HandleNANDResult(nlFlashCheck(saveBlocks + bannerBlocks, files, &CheckAnswer, CheckNoCopyDirectoryCallback));
 }
 
-void SaveLoad::ChangeDirectoryCallback(s32 result)
+void SaveLoad::ChangeDirectoryCallback(long result)
 {
     if (result == -12)
     {
@@ -648,7 +648,7 @@ void SaveLoad::HandleNANDResult(s32 result)
     }
 }
 
-void SaveLoad::OpenBannerCallback(s32 result)
+void SaveLoad::OpenBannerCallback(long result)
 {
     if (BannerFileExists && (result == 0 || result == -6))
     {
@@ -662,7 +662,7 @@ void SaveLoad::OpenBannerCallback(s32 result)
     }
 }
 
-void SaveLoad::BannerLengthCallback(s32 result)
+void SaveLoad::BannerLengthCallback(long result)
 {
     if (result == 0 || result == -6)
     {
@@ -688,7 +688,7 @@ void SaveLoad::BannerLengthCallback(s32 result)
     }
 }
 
-void SaveLoad::BannerFileLengthCallback(s32 result)
+void SaveLoad::BannerFileLengthCallback(long result)
 {
     if (result == 0)
     {
@@ -711,7 +711,7 @@ void SaveLoad::BannerFileLengthCallback(s32 result)
     }
 }
 
-void SaveLoad::DeleteInvalidBannerCallback(s32 result)
+void SaveLoad::DeleteInvalidBannerCallback(long result)
 {
     if (result == 0)
     {
@@ -720,7 +720,7 @@ void SaveLoad::DeleteInvalidBannerCallback(s32 result)
     HandleNANDResult(result);
 }
 
-void SaveLoad::CheckBannerSpaceCallback(s32 result)
+void SaveLoad::CheckBannerSpaceCallback(long result)
 {
     if (result == 0)
     {
@@ -741,7 +741,7 @@ void SaveLoad::CheckBannerSpaceCallback(s32 result)
     CheckAnswer = 0;
 }
 
-void SaveLoad::CreateBannerCallback(s32 result)
+void SaveLoad::CreateBannerCallback(long result)
 {
     if (result == -6 || result == 0)
     {
@@ -754,7 +754,7 @@ void SaveLoad::CreateBannerCallback(s32 result)
     }
 }
 
-void SaveLoad::WriteBannerCallback(s32 result)
+void SaveLoad::WriteBannerCallback(long result)
 {
     if (result != 0)
     {
@@ -860,18 +860,18 @@ void SaveLoad::RegionBannerLoadedCallback(void* data, unsigned long, void* userD
     RegionBannerTPL = 0;
 }
 
-void SaveLoad::BannerWriteFinishedCallback(s32)
+void SaveLoad::BannerWriteFinishedCallback(long)
 {
     ResetTask::s_resetPaused = false;
     HandleNANDResult(nlFlashClose(FinishOperation));
 }
 
-void SaveLoad::FinishOperation(s32)
+void SaveLoad::FinishOperation(long)
 {
     InOperation = false;
 }
 
-void SaveLoad::BannerCloseCallback(s32 result)
+void SaveLoad::BannerCloseCallback(long result)
 {
     if (result == 0)
     {
@@ -943,7 +943,7 @@ void SaveLoad::CheckSpaceAnswer(u32 answer, bool online)
     }
 }
 
-void SaveLoad::CheckNoCopyDirectoryCallback(s32 result)
+void SaveLoad::CheckNoCopyDirectoryCallback(long result)
 {
     if (result == 0)
     {
@@ -963,7 +963,7 @@ void SaveLoad::CheckNoCopyDirectoryCallback(s32 result)
     CheckAnswer = 0;
 }
 
-void SaveLoad::CreateNoCopyDirectoryCallback(s32 result)
+void SaveLoad::CreateNoCopyDirectoryCallback(long result)
 {
     if (result == 0)
     {
@@ -975,7 +975,7 @@ void SaveLoad::CreateNoCopyDirectoryCallback(s32 result)
     }
 }
 
-void SaveLoad::OpenBannerDirectoryCallback(s32 result)
+void SaveLoad::OpenBannerDirectoryCallback(long result)
 {
     if (result == 0)
     {

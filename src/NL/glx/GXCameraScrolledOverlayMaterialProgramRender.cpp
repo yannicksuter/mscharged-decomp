@@ -20,7 +20,7 @@ int sCameraOverlayLightCount;
 bool sCameraOverlayLightingActive;
 bool sCameraOverlayShadowsActive;
 
-extern "C" void glxConfigureCameraScrolledOverlay()
+void glxConfigureCameraScrolledOverlay()
 {
     gxSetNumChans(1);
     gxSetNumTevStages(gCameraOverlayStageCount);

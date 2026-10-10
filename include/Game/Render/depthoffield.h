@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+extern u8 gDepthOfFieldEnabled;
+
 class DepthOfFieldManager
 {
 public:

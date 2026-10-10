@@ -10,9 +10,9 @@ extern "C"
 
     typedef unsigned int DSMutex;
 
-    DSError TRKReleaseMutex(void* p1);
-    DSError TRKAcquireMutex(void* p1);
-    DSError TRKInitializeMutex(void* p1);
+    DSError TRKReleaseMutex(void* mutex);
+    DSError TRKAcquireMutex(void* mutex);
+    DSError TRKInitializeMutex(void* mutex);
 
 #ifdef __cplusplus
 }

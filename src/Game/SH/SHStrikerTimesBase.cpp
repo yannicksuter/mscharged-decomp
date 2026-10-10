@@ -16,7 +16,6 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
-#include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
@@ -27,8 +26,6 @@
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/SH/SHNavigation.h"
 
 static inline void ShowDoneButtons(TLSlide* first)
 {
@@ -107,7 +104,7 @@ void SHStrikerTimesBase::SceneCreated()
 
     if (mDisplayMode != NEWS_FRIENDLY_RESULTS)
     {
-        TLInstance* more = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation, "story", "Layer", "more");
+        TLInstance* more = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation, "story", "Layer", "more");
         more->m_bVisible = false;
     }
 
@@ -142,7 +139,7 @@ void SHStrikerTimesBase::SceneCreated()
 
     if (!mLogoReady)
     {
-        TLInstance* logo = FEFinder<TLImageInstance, 2>::Find<>(mPresentation, "logo", "Layer", "logo", "st_logo");
+        TLInstance* logo = FEFinder<TLImageInstance, TLAT_IMAGE>::Find<>(mPresentation, "logo", "Layer", "logo", "st_logo");
         mLogoImage.mImageInstance = (TLImageInstance*)logo;
         mLogoImage.QueueLoad(buffer, false);
     }
@@ -288,9 +285,9 @@ void SHStrikerTimesBase::InitializeContent()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
 
-    TLTextInstance* headlineText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "headline pic", "Layer", "HEADLINE");
+    TLTextInstance* headlineText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "headline pic", "Layer", "HEADLINE");
 
-    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "Description_clip");
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "story", "Layer", "Description_clip");
 
     mHeadlineScroller.ApplyNewTextInstancePointer(headlineText, -1, -1, -300);
     if (mUseCustomText)
@@ -300,7 +297,7 @@ void SHStrikerTimesBase::InitializeContent()
     mHeadlineScroller.SetClippingTextInstance(descriptionText);
     descriptionText->m_bVisible = false;
 
-    TLTextInstance* storyHeadline = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "HEADLINE");
+    TLTextInstance* storyHeadline = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "story", "Layer", "HEADLINE");
     mStoryHeadlineScroller.ApplyNewTextInstancePointer(storyHeadline, -1, -1, -300);
     if (mUseCustomText)
         mStoryHeadlineScroller.SetDisplayMessage(mHeadlineText);
@@ -308,7 +305,7 @@ void SHStrikerTimesBase::InitializeContent()
         mStoryHeadlineScroller.SetDisplayMessage(mHeadlineStringID);
     mStoryHeadlineScroller.SetClippingTextInstance(descriptionText);
 
-    TLTextInstance* bodyText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation, "story", "Layer", "BODY");
+    TLTextInstance* bodyText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "story", "Layer", "BODY");
     if (mUseCustomText)
         bodyText->SetString(mStoryText.c_str());
     else

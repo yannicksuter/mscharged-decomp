@@ -1,5 +1,6 @@
 #pragma once
 
+#include <revolution/net_fwd.h>
 #include <revolution/os/OSTime.h>
 #include <revolution/types.h>
 
@@ -11,9 +12,8 @@ extern "C" {
 #endif
 
 s64 DWCi_Np_GetTimeInSeconds(void);
-struct tm* fn_8049BB54(s64* theTime);
+struct tm* DWCi_Np_SecondsToCalendarTime(s64* theTime);
 u64 DWCi_Np_GetConsoleId(void);
-int NETGetWirelessMacAddress(void* data);
 
 #define DWCi_Np_TicksToMilliSeconds OSTicksToMilliseconds
 #define DWCi_Np_MilliSecondsToTicks(a) OSMillisecondsToTicks((u64)(a))

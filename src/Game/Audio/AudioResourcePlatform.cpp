@@ -64,7 +64,7 @@ static unsigned long sCurrentStreamBytes;
 static AudioBankTree sAudioBankTree;
 static AudioMemoryReportWriter sReport;
 static unsigned long sResidentTotal;
-nlArrayAllocator<AudioStreamBlock>* g_pAudioStreamBlockPool;
+nlArrayAllocator<AudioStreamHeader>* g_pAudioStreamHeaderPool;
 
 bool PrintAudioBankMemory(
     AudioMemoryLoader* const&, AudioBankValue* value)
@@ -168,10 +168,10 @@ void OnAudioBankReadComplete(
     loader->OnLoadComplete();
 }
 
-bool InitializeAudioStreamBlockPool()
+bool InitializeAudioStreamHeaderPool()
 {
-    AudioStreamBlock* storage = (AudioStreamBlock*)nlMalloc(16 * sizeof(AudioStreamBlock), 0x20, false);
-    g_pAudioStreamBlockPool = new nlArrayAllocator<AudioStreamBlock>(storage, 16);
+    AudioStreamHeader* storage = (AudioStreamHeader*)nlMalloc(16 * sizeof(AudioStreamHeader), 0x20, false);
+    g_pAudioStreamHeaderPool = new nlArrayAllocator<AudioStreamHeader>(storage, 16);
     return true;
 }
 

@@ -20,9 +20,6 @@
 #include "NL/nlFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/Render/RLViewLayers.h"
-#include "Game/SH/SHNavigation.h"
 
 
 
@@ -91,7 +88,7 @@ void CreditScene::Update(float fDeltaT)
 void CreditScene::DisplayFinalMessage()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(presentation, "CREDITS", "Layer", "Final Message");
+    TLTextInstance* pText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation, "CREDITS", "Layer", "Final Message");
     pText->m_bVisible = true;
 
     mFinalMessageDisplayed = true;
@@ -169,7 +166,7 @@ void CreditScene::SetupForPhase()
 
 void CreditScene::OnMoviePlaybackEnded()
 {
-    if ((unsigned int)(mPhase - 1) <= 1)
+    if ((unsigned int)(mPhase - CREDITS_NLG_INTRO) <= 1)
     {
         ++mPhase;
         SetupForPhase();
@@ -234,7 +231,7 @@ void CreditScene::SetupForCredits()
     mPresentation->Update(0.0f);
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* pFinalText = FEFinder<TLTextInstance, 3>::Find(presentation, "CREDITS", "Layer", "Final Message");
+    TLTextInstance* pFinalText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(presentation, "CREDITS", "Layer", "Final Message");
     pFinalText->m_bVisible = false;
 
     mCreditParser.Load();

@@ -43,8 +43,8 @@ struct UserInfo
 /**
  * One saved user profile. R4QE01 stores ten of them contiguously and always
  * addresses them as `base + slot * 0xB10`, which is what fixes both the record
- * size and the slot count. Field names are offset-derived: the stripped DOL
- * does not preserve them.
+ * size and the slot count. Unknown fields use offset-derived names; semantic
+ * names describe their reconstructed use, since the stripped DOL preserves neither.
  */
 struct GameInfoSaveSlot
 {
@@ -104,7 +104,7 @@ public:
     short GetPlayingSide(unsigned short pad) const;
     void SetPlayingSide(unsigned short pad, short side);
     void ResetPlayingSides();
-    void SetMode(int mode, bool flag);
+    void SetMode(int mode, bool online);
 
     unsigned long GetMemoryCardDataSize() const;
     void GetMemoryCardData(void* data) const;
@@ -161,7 +161,7 @@ public:
 
     GameInfoSaveSlot* GetSaveSlot(int slot);
     void* GetUnknown0x40(int slot, int index);
-    void* GetUnknown0xA80(int slot);
+    void* GetSaveSlotIdAddress(int slot);
     u16* GetSavedFriendName(int slot, int index);
     void* GetUnknown0xA88(int slot);
     void* GetUnknown0xA40(int slot, int index);

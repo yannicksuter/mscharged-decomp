@@ -3,7 +3,6 @@
 #include "NL/glx/GXCameraScrolledOverlayMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "NL/gl/glLoadModel.h"
 #include "Game/SharedStaticStorage.h"
 
 GXCameraScrolledOverlayMaterialProgram* GXCameraScrolledOverlayMaterialProgram::Instance;

@@ -44,7 +44,7 @@ struct PermanentBundleLoadState
 
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
 static unsigned char* s_pResourceLoadBuffer;
-static nlDLListSlotPool<PendingResourceLoad> pendingResourceQueue(0x100, 0);
+static nlDLListSlotPool<PendingResourceLoad> s_pendingResourceQueue(0x100, 0);
 static FEResourceHandle* s_pCurrentResourceBeingLoaded;
 static GLResourcePool* s_pResourcePool;
 FESceneResource* s_pCurrentFESceneResourceContext;
@@ -319,23 +319,23 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
     }
 
     PendingResourceLoad pendingResource(pHandle, pAllocator);
-    if (s_pOnDemandBundle != 0 && pHandle->m_type != FERT_SCENE && pendingResourceQueue.m_Head != 0)
+    if (s_pOnDemandBundle != 0 && pHandle->m_type != FERT_SCENE && s_pendingResourceQueue.m_Head != 0)
     {
         BundleFileDirectoryEntry fileDirectoryEntry;
         if (s_pOnDemandBundle->GetFileInfo(pHandle->m_hashID, &fileDirectoryEntry, false))
         {
             pHandle->m_uFileBlock = fileDirectoryEntry.m_blockNumber;
-            InsertSorted(pendingResourceQueue, pendingResource);
+            InsertSorted(s_pendingResourceQueue, pendingResource);
             return;
         }
         else
         {
             pHandle->m_uFileBlock = -1;
-            pendingResourceQueue.AddEnd(pendingResource);
+            s_pendingResourceQueue.AddEnd(pendingResource);
             return;
         }
     }
-    pendingResourceQueue.AddEnd(pendingResource);
+    s_pendingResourceQueue.AddEnd(pendingResource);
 }
 
 void FEResourceManager::UnloadResource(FEResourceHandle* pFeResourceHandle)
@@ -492,9 +492,9 @@ void FEResourceManager::Update(float dt)
 
         if (s_pCurrentResourceBeingLoaded != 0)
         {
-            pendingResourceQueue.RemoveStart(0);
+            s_pendingResourceQueue.RemoveStart(0);
             s_pCurrentResourceBeingLoaded = 0;
-            if (pendingResourceQueue.m_Head == 0 && s_pCurrentFESceneResourceContext != 0)
+            if (s_pendingResourceQueue.m_Head == 0 && s_pCurrentFESceneResourceContext != 0)
             {
                 s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = FE_SCENE_READY;
                 s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
@@ -502,12 +502,12 @@ void FEResourceManager::Update(float dt)
             }
         }
 
-        if (pendingResourceQueue.m_Head == 0)
+        if (s_pendingResourceQueue.m_Head == 0)
         {
             return;
         }
 
-        result = IssueResourceLoadRequest(pendingResourceQueue.Begin().m_Curr->entry);
+        result = IssueResourceLoadRequest(s_pendingResourceQueue.Begin().m_Curr->entry);
         bQueueNextResource = result == FERR_AlreadyLoaded;
     }
 }

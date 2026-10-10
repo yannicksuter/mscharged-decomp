@@ -3,8 +3,6 @@
 static void* SaveEnd;
 static void* SaveStart;
 
-extern void __OSBootDol(u32 bootDol, u32 resetCode, char** argv);
-
 void __OSReboot(u32 resetCode, u32 bootDol) {
     char* argvToPass;
 

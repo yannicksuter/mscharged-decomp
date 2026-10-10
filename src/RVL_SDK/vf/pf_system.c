@@ -1,4 +1,6 @@
-#include <revolution/vf.h>
+#include <revolution/vf/vf_struct.h>
+#include <revolution/vf/pf_system.h>
+#include <revolution/vf/d_time.h>
 
 void VFiPFSYS_initializeSYS() {
     return;

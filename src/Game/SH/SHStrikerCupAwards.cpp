@@ -26,7 +26,7 @@
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)
 {
-    return FEFinder<TLImageInstance, 2>::FindOrDefault(
+    return FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
         presentation, "art", "Layer", name);
 }
 
@@ -92,11 +92,11 @@ void StrikerCupAwardsScene::SceneCreated()
     {
         char rowName[8];
         nlSNPrintf(rowName, sizeof(rowName), "TEAM_%d", row);
-        mTeamRows[row] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+        mTeamRows[row] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<TLSlide>(
             presentation->m_currentSlide, "Layer", "award_screen", rowName);
     }
 
-    mUserTeamHighlight = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+    mUserTeamHighlight = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<TLSlide>(
         presentation->m_currentSlide, "Layer", "award_screen", "highlite_moving");
 
     for (int team = 0; team < teamCount; ++team)
@@ -116,7 +116,7 @@ void StrikerCupAwardsScene::SceneCreated()
 
     UpdateAwards();
 
-    TLTextInstance* description = FEFinder<TLTextInstance, 3>::FindOrDefault<TLSlide>(
+    TLTextInstance* description = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault<TLSlide>(
         presentation->m_currentSlide, "Layer", "award_screen", "Description_clip_right");
     description->m_bVisible = false;
 
@@ -134,7 +134,7 @@ void StrikerCupAwardsScene::SceneCreated()
     mBackButton.SetButtonInstance(backButton);
     UpdateCupBreadcrumbs(mCupPage);
 
-    TLComponentInstance* scrollBar = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+    TLComponentInstance* scrollBar = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(
         presentation->m_currentSlide, "Layer", "award_screen", "scrollbar");
     mScrollBar.SetComponent(scrollBar);
     mScrollBar.SetRange(teamCount - 4);
@@ -337,7 +337,7 @@ bool StrikerCupAwardsScene::PopulateTeamRow(int row, int teamPosition)
         statValue = playerStats.mNumGoalsAgainst;
     }
 
-    TLImageInstance* captainImage = FEFinder<TLImageInstance, 2>::FindOrDefault(
+    TLImageInstance* captainImage = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
         rowInstance, "Team_content", "left", "captain");
 
     char captainName[24];
@@ -354,7 +354,7 @@ bool StrikerCupAwardsScene::PopulateTeamRow(int row, int teamPosition)
     char statText[4];
     nlSNPrintf(statText, sizeof(statText), "%d", statValue);
     nlStrToWcs(statText, mStatText[row], 4);
-    TLTextInstance* statTextInstance = FEFinder<TLTextInstance, 3>::FindOrDefault(
+    TLTextInstance* statTextInstance = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         rowInstance, "Team_content", "stat_0");
     statTextInstance->SetString(mStatText[row]);
 

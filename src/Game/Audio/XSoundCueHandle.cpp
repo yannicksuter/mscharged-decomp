@@ -66,7 +66,7 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
     }
 
     AudioVoiceDefinition* selected = SelectSound();
-    tDebugPrintManager::Print(DC_SOUND, sCueSelectionMessage, nlLookupDebugString(g_pDebugStringTable, (unsigned long)*(const char**)selected), nlLookupDebugString(g_pDebugStringTable, (unsigned long)this->definition->name));
+    tDebugPrintManager::Print(DC_SOUND, sCueSelectionMessage, nlLookupDebugString(g_pDebugStringTable, (unsigned long)selected->name), nlLookupDebugString(g_pDebugStringTable, (unsigned long)this->definition->name));
 
     SoundInstance* instance = sSoundInstancePool.Allocate();
     instance = new (instance) SoundInstance(this, selected);

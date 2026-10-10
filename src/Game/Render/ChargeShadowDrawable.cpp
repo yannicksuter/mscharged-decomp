@@ -97,7 +97,7 @@ void ChargeShadowDrawable::Initialize(glModel* model, unsigned long hash)
         {
             glSetRasterState(
                 m_pChargeModels[level]->packets[packet].rasterState,
-                (eGLState)5, 3);
+                GLS_AlphaBlend, 3);
         }
     }
 }

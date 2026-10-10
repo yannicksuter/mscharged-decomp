@@ -216,7 +216,7 @@ static inline PhysicsShockwave* CreateShockwave(const nlVector3& position,
     return 0;
 }
 
-extern "C" PhysicsShockwave* CreatePowerupShockwave(
+PhysicsShockwave* CreatePowerupShockwave(
     const nlVector3* position, cFielder* owner, bool frozen,
     int sourceIndex, float maximumRadius)
 {

@@ -1,8 +1,6 @@
 #include <math.h>
 #include <revolution/mtx.h>
 
-extern f64 tan(f64);
-
 void C_MTXFrustum(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f)
 {
     f32 tmp;

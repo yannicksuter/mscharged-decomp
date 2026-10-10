@@ -20,7 +20,7 @@ s64 DWCi_Np_GetTimeInSeconds(void)
     return OS_TICKS_TO_SEC(OSGetTime()) + 0x386CC4F0;
 }
 
-struct tm* fn_8049BB54(s64* theTime)
+struct tm* DWCi_Np_SecondsToCalendarTime(s64* theTime)
 {
     OSCalendarTime aCalTimeStruct;
 

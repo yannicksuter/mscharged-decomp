@@ -179,11 +179,11 @@ void GameInfoManager::ResetPlayingSides()
     }
 }
 
-void GameInfoManager::SetMode(int mode, bool flag)
+void GameInfoManager::SetMode(int mode, bool online)
 {
     mCurrentMode = mode;
     mIsInStrikers101Mode = 0;
-    mIsOnlineMode = flag;
+    mIsOnlineMode = online;
 }
 
 unsigned long GameInfoManager::GetSettingsDataSize() const
@@ -385,17 +385,17 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameGameplayOptions.GameTime = 0xB4;
         mCurGameGameplayOptions.SkillLevel = GameplaySettings::ROOKIE;
     } else if (mCurrentMode == GM_CHALLENGE) {
-        StrikerChallenge* other = g_pStrikerChallenge;
+        StrikerChallenge* challenge = g_pStrikerChallenge;
 
-        mCurGameGameplayOptions.GameTime = other->mRemainingTime;
-        mCurGameGameplayOptions.mHomePowerupsEnabled = other->mHomePowerupsEnabled;
-        mCurGameGameplayOptions.mAwayPowerupsEnabled = other->mAwayPowerupsEnabled;
-        mCurGameGameplayOptions.mHomeMegastrikeEnabled = other->mHomeMegastrikeEnabled;
-        mCurGameGameplayOptions.mAwayMegastrikeEnabled = other->mAwayMegastrikeEnabled;
-        mCurGameGameplayOptions.m_unk18 = other->mHomeSkillshotDisabled;
-        mCurGameGameplayOptions.m_unk19 = other->mAwaySkillshotDisabled;
+        mCurGameGameplayOptions.GameTime = challenge->mRemainingTime;
+        mCurGameGameplayOptions.mHomePowerupsEnabled = challenge->mHomePowerupsEnabled;
+        mCurGameGameplayOptions.mAwayPowerupsEnabled = challenge->mAwayPowerupsEnabled;
+        mCurGameGameplayOptions.mHomeMegastrikeEnabled = challenge->mHomeMegastrikeEnabled;
+        mCurGameGameplayOptions.mAwayMegastrikeEnabled = challenge->mAwayMegastrikeEnabled;
+        mCurGameGameplayOptions.m_unk18 = challenge->mHomeSkillshotDisabled;
+        mCurGameGameplayOptions.m_unk19 = challenge->mAwaySkillshotDisabled;
         mCurGameGameplayOptions.GameLimitType = GAME_LIMIT_TIME;
-        mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)other->mAIDifficulty;
+        mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)challenge->mAIDifficulty;
         mCurGameGameplayOptions.NumGames = 1;
     }
 
@@ -637,7 +637,7 @@ void* GameInfoManager::GetUnknown0x40(int slot, int index)
     return mSaveSlots[slot].unknown_0x040[index];
 }
 
-void* GameInfoManager::GetUnknown0xA80(int slot)
+void* GameInfoManager::GetSaveSlotIdAddress(int slot)
 {
     return &mSaveSlots[slot].mSaveId;
 }

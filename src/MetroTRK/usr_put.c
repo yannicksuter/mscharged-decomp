@@ -1,4 +1,5 @@
 #include <MetroTRK/msghndlr.h>
+#include <MetroTRK/usr_put.h>
 
 extern void OSReport(char* fmt);
 

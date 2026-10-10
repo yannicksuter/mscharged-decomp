@@ -392,7 +392,7 @@ void ModeledScreenTransition::Cancel()
     m_Effects = NULL;
 }
 
-// The original parser does not define a return value; callers discard it.
+// The current caller discards the result.
 #pragma warning off(10184) // return value expected
 ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
     SimpleParser* parser)
@@ -497,7 +497,7 @@ void ModeledScreenTransition::Load(const char* szName)
         buf, &fileSize, 0x20, AllocateStart, NULL, 0, NULL);
     m_pSkeleton = cSHierarchy::Initialize((nlChunk*)m_pSkelFile);
 
-    m_pModelMap = (int*)nlMalloc(m_nModels * 4, 8, false);
+    m_pModelMap = (int*)nlMalloc(m_nModels * sizeof(*m_pModelMap), 8, false);
     for (unsigned long i = 0; i < m_nModels; i++)
     {
         m_pModelMap[i]

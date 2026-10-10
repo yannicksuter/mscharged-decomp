@@ -45,7 +45,7 @@ BOOL EUARTInit(void) {
     return TRUE;
 }
 
-EUARTError InitializeUART(void) {
+EUARTError InitializeUART(int unused) {
     if ((OSGetConsoleType() & OS_CONSOLE_MASK_EMU) == 0) {
         Enabled = 0;
         return EUART_ERROR_INVALID;

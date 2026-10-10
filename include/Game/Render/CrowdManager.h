@@ -11,7 +11,7 @@ class SaveFrame;
 class CrowdManager
 {
 public:
-    static CrowdManager& fn_801919AC()
+    static CrowdManager& Instance()
     {
         return instance;
     }

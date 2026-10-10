@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+extern const char* NETRexPPCVersionPrintableString;
 const char* NETGetRexPPCVersionPrintable(void);
 
 #ifdef __cplusplus

@@ -20,9 +20,9 @@ AudioCalculationTable* ParseAudioCalculationTable(nlChunk* outer)
         AudioCalculationDefinition* definition
             = (AudioCalculationDefinition*)((u8*)table->definitions
                 + relocationOffset);
-        if (definition->field_0C != 0)
-            definition->field_0C
-                = (s32*)((u8*)definition->field_0C - relocationDelta);
+        if (definition->modifierSliderIndex != 0)
+            definition->modifierSliderIndex
+                = (s32*)((u8*)definition->modifierSliderIndex - relocationDelta);
         if (definition->field_10 != 0)
             definition->field_10
                 = (s32*)((u8*)definition->field_10 - relocationDelta);
@@ -43,8 +43,8 @@ void AudioCalculationTable::Update(float dt)
     AudioCalculationDefinition* definition = definitions;
     for (u32 i = 0; i < count;)
     {
-        float modifier = definition->field_0C != 0
-                             ? sliders[*definition->field_0C].value
+        float modifier = definition->modifierSliderIndex != 0
+                             ? sliders[*definition->modifierSliderIndex].value
                              : 1.0f;
         slider->Update(dt, modifier);
         i++;

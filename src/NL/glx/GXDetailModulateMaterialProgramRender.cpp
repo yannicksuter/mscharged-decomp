@@ -27,7 +27,7 @@ bool sDetailModulateShadowsActive;
 int sDetailModulateLightCount;
 int sDetailModulateLightingMode;
 
-extern "C" void glxConfigureDetailModulateLighting(int mode, GXDetailModulateMaterialProgram*)
+void glxConfigureDetailModulateLighting(int mode, GXDetailModulateMaterialProgram*)
 {
     sDetailModulateLightingMode = mode;
     gxSetNumChans(1);

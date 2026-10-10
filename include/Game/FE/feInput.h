@@ -1,6 +1,7 @@
 #ifndef GAME_FE_INPUT_H
 #define GAME_FE_INPUT_H
 
+#include "Game/FE/feCupFlow.h"
 #include "NL/globalpad.h"
 #include "types.h"
 
@@ -28,7 +29,7 @@ struct InputLockEntry
 
 struct FEInput
 {
-    /* 0x00 */ InputLockEntry m_nExclusiveInputSceneHashIDStack[4];
+    /* 0x00 */ InputLockEntry m_ExclusiveInputLocks[4];
     /* 0x20 */ int m_InputLockDepth;
     /* 0x24 */ unsigned long m_DisabledButtonMask[4];
     /* 0x34 */ bool m_bEnableInput[4];
@@ -38,8 +39,8 @@ struct FEInput
     {
         for (int i = 0; i < 4; i++)
         {
-            m_nExclusiveInputSceneHashIDStack[i].m_pBaseSceneHandler = 0;
-            m_nExclusiveInputSceneHashIDStack[i].m_customID = -1;
+            m_ExclusiveInputLocks[i].m_pBaseSceneHandler = 0;
+            m_ExclusiveInputLocks[i].m_customID = -1;
         }
         Reset(true);
     }
@@ -47,7 +48,7 @@ struct FEInput
     virtual ~FEInput();
 
     static void Initialize();
-    void Reset(bool arg0 = true);
+    void Reset(bool resetInputLocks = true);
     cGlobalPad* GetGlobalPad(eFEINPUT_PAD pad) const;
     bool IsConnected(eFEINPUT_PAD pad);
     bool IsPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PAD* pOutPad);
@@ -68,8 +69,5 @@ private:
 }; // size 0x40
 
 extern FEInput* g_pFEInput;
-extern unsigned int gFEControllerIndex;
-
-extern unsigned int gFEControllerIndex;
 
 #endif // GAME_FE_INPUT_H

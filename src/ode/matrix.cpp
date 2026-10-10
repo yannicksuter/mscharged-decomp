@@ -20,12 +20,12 @@
  *                                                                       *
  *************************************************************************/
 
+#include <string.h>
+
 #include <ode/common.h>
 #include <ode/matrix.h>
 
 extern "C" {
-void* memcpy(void* destination, const void* source, size_t size);
-void* memmove(void* destination, const void* source, size_t size);
 void dSetValue(dReal* a, int n, dReal value);
 void dMultiply0(dReal* A, const dReal* B, const dReal* C, int p, int q, int r);
 void dMultiply1(dReal* A, const dReal* B, const dReal* C, int p, int q, int r);

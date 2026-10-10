@@ -1,6 +1,6 @@
 #include <revolution/kpad.h>
 
-double sqrt(double x);
+#include <internal/fdlibm.h>
 
 static const char* __KPADVersion = "<< RVL_SDK - KPAD \trelease build: May 17 2007 15:52:00 (0x4199_60831) >>";
 

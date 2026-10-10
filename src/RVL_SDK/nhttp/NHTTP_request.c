@@ -2,11 +2,8 @@
 
 const char NHTTPi_strMultipartBound[] = STR_POSTBOUND;
 
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
-void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
 void* NHTTPi_memclr(void* destination, u32 size);
-s32 NHTTPi_strlen(const char* string);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size);
 s32 NHTTPi_strToHex(const char* string, s32 length);
