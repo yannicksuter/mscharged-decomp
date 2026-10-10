@@ -5671,15 +5671,6 @@ void Goalie::InitActionLobSave(float fTargetTime,
     m_pPhysicsCharacter->m_CanCollideWithWall = false;
 }
 
-// The ball-path-change check retains an unused owner comparison.
-// clang-format off
-static inline asm void LobSaveOwnerDiagnostic()
-{
-    b done
- done:
-}
-// clang-format on
-
 void Goalie::ActionLobSave(float fDeltaT)
 {
     if (mnOffplayPending != GOALIE_OFFPLAY_NONE
@@ -5696,7 +5687,10 @@ void Goalie::ActionLobSave(float fDeltaT)
     {
         if (g_pBall->m_pOwner != 0)
         {
-            LobSaveOwnerDiagnostic();
+            // Matching workaround: CodeWarrior removes this unused float copy
+            // late enough to preserve retail's otherwise-unused owner comparison.
+            const float fUnusedDeltaT = fDeltaT;
+            (void)fUnusedDeltaT;
         }
         InitActionMove(false);
         return;
