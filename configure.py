@@ -572,7 +572,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/GoalieSave.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/HeadTrack.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01"), "Game/AI/Powerups.cpp", extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01"), "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/ShotMeter.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/SkillTweaks.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/SpaceSearch.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AI/StatsGatherer.cpp", cflags=cflags_game_deferred),
