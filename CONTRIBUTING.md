@@ -26,9 +26,9 @@ code.
 ## Where the project stands
 
 The USA `R4QE01` revision has reached 100% code matching and source linking.
-The EU `R4QP01` revision is in progress: its initial symbols and splits are
-checked in, and the baseline build reproduces the original DOL using extracted
-objects. Work on the EU version includes:
+The EU `R4QP01_rev1` and `R4QP01_rev2` revisions are in progress. Their symbols
+and splits are checked in, and their builds combine verified source units with
+extracted objects for unresolved differences. Work on the EU revisions includes:
 
 - Identify translation-unit and library boundaries.
 - Replace generated split objects with matching C and C++ source.
@@ -64,7 +64,10 @@ ninja
 ```
 
 This selects USA by default. For EU, configure with
-`python3 configure.py --version R4QP01` before running `ninja`.
+`python3 configure.py --version R4QP01_rev1` or
+`python3 configure.py --version R4QP01_rev2` before running `ninja`.
+Keep the original files for each revision in its separate `orig/<version>`
+directory and verify against that revision's DOL hash.
 
 The build downloads its pinned tools when needed. After configuration,
 `objdiff.json` is generated at the repository root; see

@@ -14,8 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Add game versions here
-        version: [R4QE01]
+        version: [R4QE01, R4QP01_rev1, R4QP01_rev2]
 
     steps:
     # Checkout the repository
@@ -37,10 +36,26 @@ jobs:
 
     # Copy the original files to the workspace
     - name: Prepare
-      run: cp -a /orig .
+      id: originals
+      env:
+        VERSION: ${{ matrix.version }}
+      run: |
+        if [ ! -f "/orig/$VERSION/sys/main.dol" ]; then
+          if [ "$VERSION" = R4QE01 ]; then
+            echo "::error::The private build container is missing the USA original."
+            exit 1
+          fi
+          echo "::notice::Add orig/$VERSION/sys/main.dol to the private build container to enable this revision."
+          echo "available=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        mkdir -p "orig/$VERSION/sys"
+        cp "/orig/$VERSION/sys/main.dol" "orig/$VERSION/sys/main.dol"
+        echo "available=true" >> "$GITHUB_OUTPUT"
 
     # Restore cached files
     - name: Cache build
+      if: steps.originals.outputs.available == 'true'
       uses: actions/cache@v4
       with:
         path: |
@@ -52,13 +67,15 @@ jobs:
 
     # Build the project
     - name: Build
+      if: steps.originals.outputs.available == 'true'
       run: |
         python configure.py --map --version ${{ matrix.version }} \
             --binutils /binutils --compilers /compilers
-        ninja all_source progress build/${{ matrix.version }}/report.json
+        ninja
 
     # Upload map files
     - name: Upload map
+      if: steps.originals.outputs.available == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.version }}_maps
@@ -66,6 +83,7 @@ jobs:
 
     # Upload progress report
     - name: Upload report
+      if: steps.originals.outputs.available == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.version }}_report
