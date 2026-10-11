@@ -511,7 +511,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Replay.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01"), "Game/ReplayChoreo.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01"), "Game/ReplayManager.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01"), "Game/RumbleActions.cpp", extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/RumbleActions.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SAnim.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SAnimDecode.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/ScriptTuning.cpp", extra_cflags=["-ipa file"]),
