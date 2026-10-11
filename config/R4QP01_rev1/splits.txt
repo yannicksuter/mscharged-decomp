@@ -227,6 +227,7 @@ Game/AI/GoalieActions.cpp:
 
 Game/GoalieFatigue.cpp:
 	.text       start:0x80090A14 end:0x80090A90
+	.sdata      start:0x806DA950 end:0x806DA958
 	.sdata2     start:0x806E26D8 end:0x806E26E0
 
 Game/AI/GoalieLooseBall.cpp:

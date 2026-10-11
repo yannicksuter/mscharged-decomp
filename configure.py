@@ -455,7 +455,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/GameTweaks.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/GameTweaksManager.cpp", extra_cflags=["-use_lmw_stmw off", "-sym on", "-ipa file"]),
             Object(MatchingFor("R4QE01"), "Game/Goalie.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01"), "Game/GoalieFatigue.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/GoalieFatigue.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/GoalieTweaks.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/HBMManager.cpp", extra_cflags=["-sym on", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/InputManager.cpp"),
