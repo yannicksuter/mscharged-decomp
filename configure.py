@@ -431,7 +431,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AIPad.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/AnimInventory.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01"), "Game/AsyncLoading.cpp", extra_cflags=["-sym on"]),
-            Object(MatchingFor("R4QE01"), "Game/Ball.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Ball.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/BasicStadium.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Blinker.cpp", cflags=cflags_game_deferred),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Character.cpp", extra_cflags=["-inline deferred", "-ipa file", "-sym on"]),
