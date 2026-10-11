@@ -641,7 +641,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/animcam.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/AnimViewerCam.cpp", cflags=cflags_game_deferred),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/BaseCam.cpp"),
-            Object(MatchingFor("R4QE01"), "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01"), "Game/Camera/DebugCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/FaceCam.cpp", cflags=cflags_game_deferred),
             Object(MatchingFor("R4QE01"), "Game/Camera/FollowCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
