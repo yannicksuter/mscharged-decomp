@@ -50,6 +50,7 @@ void NetworkUpdateTask::Initialize()
     }
 
     NetworkStatsManager::CreateInstance();
+#if defined(VERSION_R4QE01)
     if (GetRegion() == GAME_REGION_JAPAN)
     {
         g_nAddHoursTime = 9;
@@ -58,6 +59,7 @@ void NetworkUpdateTask::Initialize()
     {
         g_nAddHoursTime = -8;
     }
+#endif
 
     lbl_806E1008 = 0;
     gInputManager->mEnabled = 1;

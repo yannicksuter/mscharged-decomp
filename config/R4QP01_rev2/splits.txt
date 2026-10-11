@@ -283,6 +283,7 @@ Game/AI/ShotMeter.cpp:
 	.rodata     start:0x804DB870 end:0x804DB880
 	.sdata      start:0x806DAFD8 end:0x806DAFF8
 	.sbss       start:0x806DFF30 end:0x806DFF40
+	.sdata2     start:0x806E2DF8 end:0x806E2E28
 
 Game/AI/SkillTweaks.cpp:
 	.text       start:0x800A0428 end:0x800A3C44

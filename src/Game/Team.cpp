@@ -1344,7 +1344,10 @@ void UpdateTeamTimers(cTeam* pTeam, float fDeltaT)
 {
     if ((g_pGame->IsGameplayOrOvertime()
             || g_pGame->GetGameState() == GS_KICKOFF)
-        && !g_pGame->IsCaptainShotToScoreOn())
+#if defined(VERSION_R4QE01)
+        && !g_pGame->IsCaptainShotToScoreOn()
+#endif
+    )
     {
         pTeam->mfPowerupTimer -= fDeltaT;
         if (pTeam->mfPowerupTimer < 0.0f)
