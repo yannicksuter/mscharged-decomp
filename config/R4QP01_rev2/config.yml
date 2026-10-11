@@ -67,6 +67,8 @@ add_relocations:
   - { source: .text:0x802AB610, type: l, target: "lbl_8052A880" }
   - { source: .text:0x802AB620, type: l, target: "lbl_8052A8A0" }
 block_relocations:
+  # gHitReactFacingOffsets begins with the u16 angles 0x8000 and 0x4000.
+  - { source: 0x806DAB40 }
   # Constants and chunk IDs whose values overlap the address space.
   - { source: 0x802C9964 }
   - { source: 0x802C9A18 }

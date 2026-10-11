@@ -617,7 +617,9 @@ PhysicsPatch* PhysicsPatchManager::CreatePatch(
     {
         nlVector3 initialVelocity = velocity;
         patch->SetPosition(position, PhysicsObject::WORLD_COORDINATES);
+#if defined(VERSION_R4QE01)
         patch->m_SpawnPosition = position;
+#endif
         patch->InitType(&type);
         patch->m_Velocity = initialVelocity;
         patch->m_pOwner = owner;
@@ -739,7 +741,11 @@ static void UpdatePatchEffect(EmissionController& controller)
         PhysicsPatch* patch = (PhysicsPatch*)controller.m_uUserData;
         if (patch->m_bVisible == true)
         {
+#if defined(VERSION_R4QE01)
             controller.SetPosition(patch->m_SpawnPosition);
+#else
+            controller.SetPosition(patch->GetPosition());
+#endif
             controller.SetVelocity(patch->m_Velocity);
         }
     }

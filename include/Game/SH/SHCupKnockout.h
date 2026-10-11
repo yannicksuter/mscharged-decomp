@@ -58,7 +58,7 @@ public:
     /* 0x2F3 */ bool m_pad2F3;
     /* 0x2F4 */ bool m_pad2F4;
     /* 0x2F5 */ bool m_pad2F5;
-    /* 0x2F6 */ bool m_pad2F6;
+    /* 0x2F6 */ bool mAllowTournamentExit;
     /* 0x2F7 */ bool m_pad2F7;
     /* 0x2F8 */ bool mPointerButtonsInitialized;
     /* 0x2F9 */ bool mBracketPressed;

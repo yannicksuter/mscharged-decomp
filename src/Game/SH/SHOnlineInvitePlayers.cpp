@@ -373,6 +373,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
         mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
         mRows[index].mStatus = ONLINE_ROW_WAIT_OPPONENT;
+#if defined(VERSION_R4QE01)
         memset(&mRows[index].mStats, 0, sizeof(mRows[index].mStats));
         if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
         {
@@ -390,6 +391,12 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
                     mRows[index].mStats = category->mMetadata[player];
             }
         }
+#else
+        if (NetworkStatsManager::Instance()->GetLocalStats(2) != 0)
+            mRows[index].mStats = *NetworkStatsManager::Instance()->GetLocalStats(2);
+        else
+            memset(&mRows[index].mStats, 0, sizeof(mRows[index].mStats));
+#endif
         mRows[index].mVisible = true;
         UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);

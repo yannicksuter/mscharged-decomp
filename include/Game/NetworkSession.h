@@ -52,6 +52,7 @@ enum eNetworkLoginStage
     NET_LOGIN_PUT_FRIENDS_STATS = 4,
     NET_LOGIN_GET_SEASON_STATS = 5,
     NET_LOGIN_PUT_SEASON_STATS = 6,
+#if defined(VERSION_R4QE01)
     NET_LOGIN_REFRESH_SEASON_STATS = 7,
     NET_LOGIN_GET_DAILY_STATS = 8,
     NET_LOGIN_PUT_DAILY_STATS = 9,
@@ -61,6 +62,12 @@ enum eNetworkLoginStage
     NET_LOGIN_GET_TOP_SEASON_STATS = 13,
     NET_LOGIN_COMPLETE = 14,
     NET_LOGIN_FAILED = 15,
+#else
+    NET_LOGIN_GET_DAILY_STATS = 7,
+    NET_LOGIN_PUT_DAILY_STATS = 8,
+    NET_LOGIN_COMPLETE = 9,
+    NET_LOGIN_FAILED = 10,
+#endif
 };
 
 class NetMessageDraft;
@@ -507,12 +514,16 @@ public:
     void DWCLoginCallback(int error, int profileID, void* param);
     bool RequestLoginRankings();
     void UpdateLogin();
+#if defined(VERSION_R4QE01)
     void RequestLoginNearbySeasonRankingsAgain();
+#endif
     void RequestLoginNearbyDailyRankings();
+#if defined(VERSION_R4QE01)
     void RequestLoginNearbyDailyRankingsAgain();
     void RequestLoginFriendsSeasonRankings();
     void RequestLoginTopDailyRankings();
     void RequestLoginTopSeasonRankings();
+#endif
 
     void ShutdownOnline();
     NetworkLobby* GetOnlineLobby();

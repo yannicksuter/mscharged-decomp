@@ -40,11 +40,13 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
             time->min -= 60;
             ++time->hour;
         }
+#if defined(VERSION_R4QE01)
         else if (time->min < 0)
         {
             time->min += 60;
             --time->hour;
         }
+#endif
 
         time->hour += g_nAddHoursTime;
         if (time->hour > 23)
@@ -61,6 +63,7 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
                 }
             }
         }
+#if defined(VERSION_R4QE01)
         else if (time->hour < 0)
         {
             time->hour += 24;
@@ -74,6 +77,7 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
                 date->mday = DaysInMonth(date->month, date->year);
             }
         }
+#endif
     }
     return true;
 }

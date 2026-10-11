@@ -211,10 +211,12 @@ void SHHallOfFameHistory::Update(float fDeltaT)
         mImages[2]->mImageInstance->m_bVisible = true;
         mImages[3]->mImageInstance->m_bVisible = true;
     }
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
     else
     {
         return;
     }
+#endif
 
     for (unsigned int pad = 0; pad < 4; ++pad)
     {
@@ -493,13 +495,25 @@ void SHHallOfFameHistory::UpdateDateText()
     CupHistoryRecord& record = mHistory[mSelectedHistoryIndex];
     int month = record.mMonth + 1;
     int day = record.mDay + 1;
-    int year = record.mYearOffset + 2000;
+    int year = record.mYearOffset + CupHistoryRecord::BASE_YEAR;
 
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+    nlSNPrintf(yearString, 5, "%d", year);
+#else
     nlSNPrintf(yearString, 5, "%.4d", year);
+#endif
     nlStrToWcs(yearString, yearWideString, 5);
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+    nlSNPrintf(monthString, 5, "%d", month);
+#else
     nlSNPrintf(monthString, 5, "%.2d", month);
+#endif
     nlStrToWcs(monthString, monthWideString, 5);
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+    nlSNPrintf(dayString, 5, "%d", day);
+#else
     nlSNPrintf(dayString, 5, "%.2d", day);
+#endif
     nlStrToWcs(dayString, dayWideString, 5);
 
     unformatted = WideBasicString(LookupLocString("DATE_STAMP"));

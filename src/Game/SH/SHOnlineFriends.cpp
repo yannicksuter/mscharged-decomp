@@ -456,7 +456,9 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     }
     else if (!IsOnlineFriendSelectionMode())
     {
+#if !defined(VERSION_R4QP01_REV1)
         g_pFriendManager->SetOwnStatusInitial(0);
+#endif
         ConfirmDeleteFriend(item);
     }
     else
@@ -515,13 +517,17 @@ void SHOnlineFriends::DeleteFriend(int index)
     RefreshFriends(this);
     UpdateScrollRange();
     UpdateVisibleRows();
+#if !defined(VERSION_R4QP01_REV1)
     g_pFriendManager->SetOwnStatusInitial(1);
+#endif
 }
 
 void SHOnlineFriends::CancelDeleteFriend()
 {
     mPopupActive = false;
+#if !defined(VERSION_R4QP01_REV1)
     g_pFriendManager->SetOwnStatusInitial(1);
+#endif
 }
 
 void SHOnlineFriends::UpdateFriendCode()

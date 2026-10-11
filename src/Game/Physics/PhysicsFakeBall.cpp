@@ -61,11 +61,13 @@ static void ClearBallCache()
     }
 
     FakeBallWorld::mfLastCacheTime = -1.0f;
+#if defined(VERSION_R4QE01)
     if (FakeBallWorld::mpPredictWorld != 0)
     {
         FakeBallWorld::mpPredictWorld->mbCacheHitGoaliePlane = false;
         FakeBallWorld::mpPredictWorld->mbCacheReachedGoalLine = false;
     }
+#endif
 }
 
 void FakeBallWorld::InvalidateBallCache()

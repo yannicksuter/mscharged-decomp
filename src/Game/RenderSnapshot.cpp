@@ -210,6 +210,7 @@ void RenderSnapshot::Grab()
         mNegativeGoalieNetCheck = Goalie::mbNegGoalieNetCheck;
     }
     mCameraUp = g_CameraWorldUpVector;
+#if defined(VERSION_R4QE01)
     if (lbl_806E12C8 != 0)
     {
         for (int i = 0; i < 60; i++)
@@ -221,6 +222,7 @@ void RenderSnapshot::Grab()
                 mPatchPositions[i].z = -10000.0f;
         }
     }
+#endif
     mSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     mValid = true;
 }
@@ -489,6 +491,7 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
     mpNetMeshNegativeX->Blend(blendFactors[0], *lhs.mpNetMeshNegativeX, *rhs.mpNetMeshNegativeX);
     nlVecLerp(mCameraUp, lhs.mCameraUp, rhs.mCameraUp, blendFactors[0]);
     nlVec3Normalize(mCameraUp, mCameraUp);
+#if defined(VERSION_R4QE01)
     if (lbl_806E12C8 != 0 && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) == 0)
     {
         const RenderSnapshot& previous = lhs;
@@ -509,6 +512,7 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
             }
         }
     }
+#endif
     static float sPreviousStadiumTime = -1.0f;
     mSimulationTime = (1.0f - blendFactors[0]) * lhs.mSimulationTime + blendFactors[0] * rhs.mSimulationTime;
     if (sPreviousStadiumTime > 0.0f)

@@ -148,6 +148,17 @@ void NetTournManager::TransitionOnlineMenuToTournament(
         SCENE_CUP_KNOCKOUT, SCREEN_NOTHING, true);
 }
 
+void NetTournManager::Shutdown()
+{
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_GAME_UPDATE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_LOADING_STATE);
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    if (roster != 0)
+    {
+        roster->Shutdown(true);
+    }
+}
+
 int NetTournManager::ChooseFirstRoundMachine(int machineCount, bool* used)
 {
     int candidate = (int)nlRandomf((float)machineCount, &nlDefaultSeed);
@@ -785,14 +796,7 @@ void NetTournManager::Update(float dt)
                 gameIndex = mFirstGameInRound;
                 mWinningMachine = -1;
                 mGames[gameIndex].GetWinnerResult(0, &mWinningMachine);
-                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_GAME_UPDATE);
-                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_LOADING_STATE);
-                NetworkMachineRoster* roster
-                    = g_pNetworkSessionBase->GetMachineRoster();
-                if (roster != 0)
-                {
-                    roster->Shutdown(true);
-                }
+                Shutdown();
                 mState = NET_TOURN_FINISHED;
             }
             else

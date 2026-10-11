@@ -44,7 +44,11 @@ public:
 
     void Reset(bool setInstance);
     void GetOwnFriendKeyString(u16* output);
+#if defined(VERSION_R4QE01)
     bool AddFriendKey(unsigned long long friendKey, int* error);
+#else
+    bool AddFriendKey(unsigned long long friendKey);
+#endif
     void HandleFriendStatus(
         int index, u8 status, const char* statusString, void* param);
     FriendStatusPayload* GetFriendStatusPayload(int index);

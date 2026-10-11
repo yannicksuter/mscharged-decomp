@@ -110,8 +110,10 @@ public:
     /* 0x90 */ float m_PathSpeed;
     /* 0x94 */ int m_CurrentPathPoint;
     /* 0x98 */ int m_PathPointCount;
+#if defined(VERSION_R4QE01)
     /* 0x9C */ nlVector3 m_SpawnPosition;
-}; // total size: 0xA8
+#endif
+}; // total size: 0xA8 (USA), 0x9C (Europe)
 
 class PhysicsPatchManager
 {

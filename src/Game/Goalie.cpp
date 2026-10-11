@@ -16,6 +16,7 @@
 #include "Game/AI/FilteredRandom.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/SkillTweaks.h"
+#include "Game/AI/Powerups.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/AI/GoalieLooseBall.h"
@@ -318,6 +319,7 @@ void Goalie::Update(float dt)
     }
     if (mGoalieActionState != GOALIEACTION_MEGA_STRIKE && mbDefensivePlayOverlayPushed)
         CleanupMegaStrikeOverlay();
+#if defined(VERSION_R4QE01)
     if (m_DetChar.m_v3Position.x < 1.0f && m_pTeam->m_nSide == 1)
     {
         nlVector3 v3Position = m_DetChar.m_v3Position;
@@ -330,6 +332,7 @@ void Goalie::Update(float dt)
         v3Position.x = -1.0f;
         SetPosition(v3Position);
     }
+#endif
     if (!mbIsPosed)
     {
         PostPhysicsUpdate();
@@ -542,7 +545,9 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             if (mpSaveData->muSaveType & 0x80003)
             {
                 TacklePlayer(pBall->GetOwnerFielder());
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
                 StealBall(g_pBall->GetOwnerFielder());
+#endif
                 MakeSaveEvent(false);
                 PickupBall(pBall);
                 m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
@@ -609,7 +614,9 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                     || (float)fabsf(g_pBall->m_v3Position.x) < cField::GetGoalLineX(1U))
                 {
                     TacklePlayer(pBall->GetOwnerFielder());
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
                     StealBall(g_pBall->GetOwnerFielder());
+#endif
                     MakeSaveEvent(false);
                     PickupBall(pBall);
                     EmitGoalieCatch(this, "goalie_catch", false);
@@ -622,7 +629,9 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             {
                 MakeSaveEvent(false);
                 TacklePlayer(pBall->GetOwnerFielder());
+#if defined(VERSION_R4QE01)
                 StealBall(g_pBall->GetOwnerFielder());
+#endif
             }
             EmitGoalieCatch(this, "goalie_deflect", false);
             if (pBall->m_tNoPickupTimer.m_uPackedTime == 0)
@@ -639,6 +648,9 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                         || CalculateDistanceSquared(pBall->m_v3Position, GetJointPosition(m_nRightHandJointIndex)) < fDistSquared)
                     {
                         mbNoUserControl = true;
+#if defined(VERSION_R4QP01_REV2)
+                        StealBall(g_pBall->GetOwnerFielder());
+#endif
                         PickupBall(pBall);
                         m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
                         m_pPhysicsCharacter->m_CanCollideWithWall = true;
@@ -917,8 +929,10 @@ void Goalie::ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance)
     if (bDoHit)
     {
         TacklePlayer(pPlayer);
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         if (bGetBall && pPlayer->m_pBall != NULL)
             StealBall(pPlayer);
+#endif
     }
     else
         StealBall(pPlayer);
@@ -1838,7 +1852,9 @@ bool Goalie::InitiatePickup()
                     return false;
                 }
                 TacklePlayer(pFldr);
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
                 StealBall(pFldr);
+#endif
             }
             else if (g_pBall->m_tNoPickupTimer.m_uPackedTime != 0)
                 return false;
@@ -1900,7 +1916,9 @@ void Goalie::InitiatePanicGrab(cPlayer* pPlayer)
     }
     if (m_pBall == NULL)
     {
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         StealBall(g_pBall->m_pOwner);
+#endif
         PickupBall(g_pBall);
         mbPickedUp = true;
         EmitGoalieCatch(this, "goalie_catch", false);
@@ -3600,9 +3618,18 @@ int Goalie::ChooseRunAnim(
 
 void Goalie::EndFreeze()
 {
+#if !defined(VERSION_R4QE01)
+    mGoalieActionState = mPrevGoalieActionState;
+#endif
     m_DetPlayer.m_bSkipAnimUpdate = false;
     m_DetPlayer.m_fSkipTimer = 0.0f;
+#if defined(VERSION_R4QE01)
     g_pBall->mbBallFrozen = false;
+#else
+    EmitUnFreeze(this);
+    PowerupBase::PlayPowerupSound(POWER_UP_FREEZE_SHELL,
+        PowerupBase::PWRUP_SOUND_END, m_pPhysicsCharacter, 0.0f, NULL);
+#endif
 }
 
 void Goalie::ReleaseMonty()
@@ -4061,15 +4088,22 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
         {
             nlVector3 v3Velocity;
             nlVec3Set(v3Velocity, m_m4WorldMatrix.m11, m_m4WorldMatrix.m12, m_m4WorldMatrix.m13);
+#if defined(VERSION_R4QE01)
             float fScale = 1.0f;
+#else
+            // EU leaves the impact scale unset for the skipped deke types.
+            float fScale;
+#endif
             mbDoHeadTrack = false;
             if (pFielder->m_pBall != NULL)
             {
                 pFielder->ReleaseBall(BALL_STATE_LOOSE);
                 bReleased = true;
             }
+#if defined(VERSION_R4QE01)
             if (mGoalieActionState != GOALIEACTION_PURSUE_DEKE)
                 mPursueDekeType = 0;
+#endif
             switch (mPursueDekeType)
             {
             case 0:

@@ -235,7 +235,9 @@ void CupHubScene::Update(float fDeltaT)
         if (!mSuppressInput)
             mScrollWidget.Update(event, fDeltaT);
 
+#if !defined(VERSION_R4QP01_REV1)
         if (g_pFEInput->m_InputLockDepth == 0)
+#endif
         {
             if (mPageControls->IsButtonPressed(1) || mPageControls->IsButtonPressed(0))
             {

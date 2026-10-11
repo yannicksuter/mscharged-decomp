@@ -61,6 +61,7 @@
 
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioResourceRuntime.h"
+#include "Game/Audio/AudioBankID.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/SharedStaticStorage.h"
@@ -324,7 +325,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         if (gAudioEnabled)
         {
             lbl_806E106A = false;
-            LoadSoundBank((GameAudio*)g_pAudioSystem, 0x32, 0x14,
+            LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_TO_GAME_LOOP, 0x14,
                 fn_8011B40C, (void*)"FE2GameLoop");
         }
         else
@@ -352,9 +353,13 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         lbl_806E1058 += gAudioEnabled ? 2 : 0;
         lbl_806E1048 = nlGetTicker();
         lbl_806E104C = 0.0f;
-        LoadSoundBank((GameAudio*)g_pAudioSystem, 0x17, 0x15,
+        LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN, 0x15,
             fn_80116988, (void*)"FE_GEN");
-        LoadSoundBank((GameAudio*)g_pAudioSystem, 0x1A, 0x16,
+#if defined(VERSION_R4QP01_REV1)
+        LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_MUSIC_STREAMS, 0x16,
+#else
+        LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_MUSIC, 0x16,
+#endif
             fn_80116988, (void*)"FE_GEN_MUSIC");
         FEAudio::SetSoundCategory(0x15);
         FEMusic::SetInGame(false);
@@ -376,7 +381,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             if (gAudioEnabled)
             {
                 lbl_806E106A = false;
-                LoadSoundBank((GameAudio*)g_pAudioSystem, 0x19, 0x17,
+                LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x17,
                     fn_8011B40C, (void*)"FE_GEN_SPLASH");
             }
         }
@@ -384,7 +389,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             lbl_806E106A = false;
             g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
-            LoadSoundBank((GameAudio*)g_pAudioSystem, 0x18, 0x17,
+            LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_SOUND_LOOP, 0x17,
                 fn_8011B40C, (void*)"FESoundLoop");
         }
         else
@@ -422,6 +427,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 16:
     {
         SetLoadingComment("AsyncFEResourceLoadFinalize");
+#if defined(VERSION_R4QE01)
         BootLoadingScene* loadingScene;
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
@@ -433,8 +439,12 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             loadingScene = static_cast<BootLoadingScene*>(
                 GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING));
         }
+#endif
         if (lbl_806E1068 && lbl_806E1069
-            && (loadingScene == 0 || !loadingScene->IsBootScreenPending()))
+#if defined(VERSION_R4QE01)
+            && (loadingScene == 0 || !loadingScene->IsBootScreenPending())
+#endif
+        )
         {
             FinishLoadingStep(this);
         }
@@ -448,14 +458,14 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         lbl_806E1058 += gAudioEnabled ? 1 : 0;
         lbl_806E1048 = nlGetTicker();
         lbl_806E104C = 0.0f;
-        LoadSoundBank((GameAudio*)g_pAudioSystem, 0x19, 0x15,
+        LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x15,
             fn_80116988, (void*)"FE_GEN_SPLASH");
         FEAudio::SetSoundCategory(0x15);
         break;
     case 18:
         lbl_806E1058 += gAudioEnabled ? 1 : 0;
         g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x12);
-        LoadSoundBank((GameAudio*)g_pAudioSystem, 0x31, 0x12,
+        LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_MUSIC_STREAMS, 0x12,
             fn_80116988, (void*)"MUSICSTREAMS");
         break;
     case 19:
@@ -1411,7 +1421,11 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
     ClearTweakRegistryReset();
     GLMemoryRequirement requirements[] = {
         { GLM_Header, 0x100000 },
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+        { GLM_TextureData, 0xB00000 },
+#else
         { GLM_TextureData, 0xA00000 },
+#endif
     };
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "FE"));
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
@@ -1697,7 +1711,13 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
         { GLM_VertexData, 0 },
     };
     requirements[0].mSize = 0x140000;
+#if defined(VERSION_R4QP01_REV1)
+    requirements[1].mSize = 0x966666;
+#elif defined(VERSION_R4QP01_REV2)
+    requirements[1].mSize = 0x900000;
+#else
     requirements[1].mSize = 0x8B3333;
+#endif
     requirements[2].mSize = 0x580000;
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 3, "InGame"));
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
@@ -1771,12 +1791,12 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
     lbl_806E1058 += gAudioEnabled ? 7 : 0;
     GameAudio* audio = static_cast<GameAudio*>(g_pAudioSystem);
     LoadSoundBank(audio, GetStadiumUnknown0x14(stadium), 0xB, fn_80116988, (void*)"STAD_*");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1F, 0xA, fn_80116988, (void*)"STAD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x35, 0xC, fn_80116988, (void*)"WEATHER_LIGHTNING");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x16, 0xD, fn_80116988, (void*)"CROWD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x34, 0xE, fn_80116988, (void*)"CROWDStreams");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x31, 0x12, fn_80116988, (void*)"MUSICSTREAMS");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x33, 0x13, fn_80116988, (void*)"NisStreams");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_STAD_GEN, 0xA, fn_80116988, (void*)"STAD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_WEATHER_LIGHTNING, 0xC, fn_80116988, (void*)"WEATHER_LIGHTNING");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_GEN, 0xD, fn_80116988, (void*)"CROWD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_STREAMS, 0xE, fn_80116988, (void*)"CROWDStreams");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_MUSIC_STREAMS, 0x12, fn_80116988, (void*)"MUSICSTREAMS");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_NIS_STREAMS, 0x13, fn_80116988, (void*)"NisStreams");
     {
         int parameter[2];
         parameter[0] = 1;
@@ -1827,8 +1847,8 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
     g_pOverlayManager->Push(OVERLAY_IN_GAME_TEXT, SCREEN_NOTHING, false);
     g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
     lbl_806E1058 += gAudioEnabled ? 2 : 0;
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1C, 0xF, fn_80116988, (void*)"HUD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1E, 0x10, fn_80116988, (void*)"HUD_PU");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_GEN, 0xF, fn_80116988, (void*)"HUD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_PU, 0x10, fn_80116988, (void*)"HUD_PU");
     FEAudio::SetSoundCategory(0xF);
     FEMusic::SetInGame(true);
     if (GameInfoManager::Instance()->mIsInStrikers101Mode)

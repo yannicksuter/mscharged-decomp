@@ -22,6 +22,10 @@ class SlotPool;
 extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
 extern AvoidablePolygon* lbl_806E0C74;
 
+#if !defined(VERSION_R4QE01)
+extern int gFramesSinceElectrocutionSound;
+#endif
+
 void UnFreezeEveryoneButCaptain(cFielder* pCaptain);
 
 

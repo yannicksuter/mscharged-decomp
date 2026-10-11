@@ -73,6 +73,14 @@ void nlQuatNormalize(nlQuaternion& out, const nlQuaternion& in)
     nlQuatScale(out, in, fOneOverSqrt);
 }
 
+void nlQuatInverse(nlQuaternion& out, const nlQuaternion& in)
+{
+    out.x = -in.x;
+    out.y = -in.y;
+    out.z = -in.z;
+    out.w = in.w;
+}
+
 void nlQuatNLerp(
     nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t)
 {

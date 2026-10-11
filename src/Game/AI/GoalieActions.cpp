@@ -658,7 +658,9 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         && !bOffplayActive)
     {
         TacklePlayer(g_pBall->m_pOwner);
+#if defined(VERSION_R4QE01)
         StealBall(g_pBall->m_pOwner);
+#endif
 
         float fNoPickupTime = m_DetPlayer.m_tNoPickupTimer.GetSeconds();
         if (fNoPickupTime > 0.0f)
@@ -711,6 +713,9 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         }
         else
         {
+#if defined(VERSION_R4QP01_REV2)
+            StealBall(g_pBall->m_pOwner);
+#endif
             PickupBall(g_pBall);
             mbPickedUp = true;
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
@@ -4642,7 +4647,9 @@ void Goalie::ActionSnapBall(float fDeltaT)
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime == 0 && g_pBall->m_pOwner != this)
     {
         TacklePlayer(g_pBall->m_pOwner);
+#if defined(VERSION_R4QE01)
         StealBall(g_pBall->m_pOwner);
+#endif
 
         fTimeLeft = m_DetPlayer.m_tNoPickupTimer.GetSeconds();
 
@@ -4671,6 +4678,9 @@ void Goalie::ActionSnapBall(float fDeltaT)
             return;
         }
 
+#if defined(VERSION_R4QP01_REV2)
+        StealBall(g_pBall->m_pOwner);
+#endif
         PickupBall(g_pBall);
         m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
         m_pPhysicsCharacter->m_CanCollideWithWall = true;
@@ -6049,7 +6059,9 @@ void Goalie::ActionLobSaveContact(float fDeltaT)
                    < fDX)
         {
             TacklePlayer(g_pBall->m_pOwner);
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
             StealBall(g_pBall->m_pOwner);
+#endif
             MakeSaveEvent(false);
             PickupBall(g_pBall);
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
