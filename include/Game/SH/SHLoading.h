@@ -57,7 +57,12 @@ public:
     void SetTeamLogo(int side, CharacterInfo character);
 
     /* 0x024 */ TLTextInstance* mTextInstances[6];
-    /* 0x03C */ unsigned short mTextBuffers[5][128];
-}; // size 0x53C
+    /* 0x03C */ unsigned short mTitleBuffer[128];
+#if defined(VERSION_R4QE01)
+    /* 0x13C */ unsigned short mStatsBuffers[4][128];
+#else
+    /* 0x13C */ unsigned short mStatsBuffers[4][32];
+#endif
+}; // size 0x53C (USA), 0x23C (Europe)
 
 #endif // GAME_SH_SH_LOADING_H

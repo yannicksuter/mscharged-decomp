@@ -222,6 +222,7 @@ Game/AI/GoalieActions.cpp:
 	.rodata     start:0x804DB7B0 end:0x804DB808
 	.data       start:0x804FDB90 end:0x804FDCB0
 	.bss        start:0x8056C3E0 end:0x8056C488
+	.sdata      start:0x806DAD68 end:0x806DAED0
 	.sbss       start:0x806DFE78 end:0x806DFE90
 	.sdata2     start:0x806E2AF0 end:0x806E2C58
 
@@ -276,6 +277,7 @@ Game/AI/Powerups.cpp:
 	.bss        start:0x8056C858 end:0x8056CDD8
 	.sdata      start:0x806DAF20 end:0x806DAFD8
 	.sbss       start:0x806DFF08 end:0x806DFF30
+	.sdata2     start:0x806E2D80 end:0x806E2DF8
 
 Game/AI/ShotMeter.cpp:
 	.text       start:0x8009FB88 end:0x800A0428
@@ -1330,6 +1332,7 @@ Game/RenderSnapshot.cpp:
 	.bss        start:0x805700D8 end:0x805700E8
 	.sdata      start:0x806DBE70 end:0x806DBE78
 	.sbss       start:0x806E05F0 end:0x806E0600
+	.sdata2     start:0x806E3EE0 end:0x806E3EE8
 
 Game/Render/Wiper.cpp:
 	.text       start:0x80187B10 end:0x801880C4
@@ -2040,11 +2043,13 @@ Game/SH/SHStrikerCupStandings.cpp:
 	.text       start:0x8020FA60 end:0x80211B2C
 	.data       start:0x8051B5A0 end:0x8051B6F0
 	.sdata      start:0x806DCF38 end:0x806DCFB0
+	.sdata2     start:0x806E49B0 end:0x806E49C0
 
 Game/SH/SHStrikerCupAwards.cpp:
 	.text       start:0x80211B2C end:0x80213630
 	.data       start:0x8051B6F0 end:0x8051B7D0
 	.sdata      start:0x806DCFB0 end:0x806DD010
+	.sdata2     start:0x806E49C0 end:0x806E49D0
 
 Game/SH/SHCupNews.cpp:
 	.text       start:0x80213630 end:0x8021422C
@@ -2216,6 +2221,7 @@ Game/SH/SHHallOfFameHistory.cpp:
 	.sdata2     start:0x806E4BB8 end:0x806E4BC0
 
 Game/SH/SHOnlineFriendCodeEntry.cpp:
+	.text       start:0x8024E5A0 end:0x80250FBC
 	.data       start:0x8051ECE8 end:0x8051EDC4
 	.sdata      start:0x806DD908 end:0x806DD980
 	.sdata2     start:0x806E4BC0 end:0x806E4BE8
@@ -7051,6 +7057,7 @@ RVL_SDK/dwc/dwc_match.c:
 	.data       start:0x80562928 end:0x80564200
 	.bss        start:0x806C8BA0 end:0x806C92F8
 	.sdata      start:0x806DF518 end:0x806DF588
+	.sbss       start:0x806E2038 end:0x806E2048
 
 RVL_SDK/dwc/dwc_transport.c:
 	.text       start:0x8049A598 end:0x8049B298

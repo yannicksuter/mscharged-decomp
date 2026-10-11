@@ -167,10 +167,12 @@ void PhysicsBall::PreUpdate()
 void PhysicsBall::PostUpdate()
 {
     PhysicsObject::PostUpdate();
+#if defined(VERSION_R4QE01)
     if (m_parentObject != 0)
     {
         return;
     }
+#endif
 
     nlVector3 linVel;
     GetLinearVelocity(&linVel);
@@ -197,11 +199,15 @@ void PhysicsBall::PostUpdate()
         pos.z = GetRadius();
         SetPosition(pos, WORLD_COORDINATES);
 
+#if defined(VERSION_R4QE01)
         if (linVel.z < 0.0f)
+#endif
         {
             linVel.z *= -g_pGame->mpTerrain->GetRestitution(g_BallBounceGround);
             SetLinearVelocity(linVel);
+#if defined(VERSION_R4QE01)
             mfBallAirResistance = g_BallAirResistance;
+#endif
         }
     }
 }

@@ -246,11 +246,15 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             if (navigation != 0)
                 navigation->HideButtons();
             mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QE01)
             mPresentation->Update(0.0f);
+#endif
             return;
         }
 
+#if !defined(VERSION_R4QP01_REV1)
         if (g_pFEInput->m_InputLockDepth == 0)
+#endif
         {
             if (mPageControls->IsButtonPressed(1)
                 || mPageControls->IsButtonPressed(0))
@@ -259,7 +263,9 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
                 mTransitionState = CUP_STANDINGS_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QE01)
                 mPresentation->Update(0.0f);
+#endif
                 if (mPageControls->IsButtonPressed(1))
                     mPreviousPagePressed = true;
                 else if (mPageControls->IsButtonPressed(0))
@@ -521,7 +527,9 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
         }
 
         mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QE01)
         mPresentation->Update(0.0f);
+#endif
         break;
     }
     case CUP_STANDINGS_BUTTON_HELP:

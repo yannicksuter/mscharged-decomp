@@ -40,12 +40,16 @@ public:
     /* 0x325 */ unsigned char mPadding325[3];
     /* 0x328 */ int mState;
     /* 0x32C */ unsigned short mTitleText[0x40];
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+    /* 0x3AC */ unsigned short mRecordText[0x20];
+#else
     /* 0x3AC */ unsigned short mRecordText[0x80];
-    /* 0x4AC */ unsigned short mDateText[0x20];
-    /* 0x4EC */ unsigned short mTeamNameText[0x20];
-    /* 0x52C */ AsyncImage* mImages[5];
-    /* 0x540 */ bool mImageReady[5];
-    /* 0x545 */ unsigned char mPadding545[3];
-}; // size 0x548
+#endif
+    /* US 0x4AC, EU 0x3EC */ unsigned short mDateText[0x20];
+    /* US 0x4EC, EU 0x42C */ unsigned short mTeamNameText[0x20];
+    /* US 0x52C, EU 0x46C */ AsyncImage* mImages[5];
+    /* US 0x540, EU 0x480 */ bool mImageReady[5];
+    /* US 0x545, EU 0x485 */ unsigned char mPadding545[3];
+}; // size US 0x548, EU 0x488
 
 #endif // GAME_SH_HALL_OF_FAME_HISTORY_H

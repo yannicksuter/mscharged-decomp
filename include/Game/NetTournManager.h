@@ -91,6 +91,7 @@ public:
         }
     }
     void TransitionOnlineMenuToTournament(NetMessageTournamentStart* message);
+    void Shutdown();
     void BuildInitialBracket();
     void AdvanceBracket();
     void OnTournamentGameStart(NetMessageGameStart* message);

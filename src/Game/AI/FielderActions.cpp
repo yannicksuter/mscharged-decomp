@@ -148,6 +148,9 @@ float lbl_806DB9A8 = 0.8f;
 float lbl_806DB9AC = 0.2f;
 float lbl_806DB9B0 = 0.48f;
 float lbl_806DB9B4 = 0.54f;
+#if !defined(VERSION_R4QE01)
+int gFramesSinceElectrocutionSound = 100;
+#endif
 static unsigned short gHitReactFacingOffsets[4] = {
     0x8000,
     0x4000,
@@ -1079,10 +1082,12 @@ void cFielder::fn_80044290(float fDeltaT)
                 float fSpeed = nlSqrt(v3Velocity.GetLengthSq3D(), true);
                 if (fSpeed < 2.0f)
                 {
+#if defined(VERSION_R4QE01)
                     if (fSpeed < 0.01f)
                     {
                         v3Velocity = m_DetChar.m_v3Position;
                     }
+#endif
                     float fRecipLength
                         = nlRecipSqrt(v3Velocity.GetLengthSq3D(), true);
                     nlVec3Scale(v3Velocity, v3Velocity, fRecipLength);
@@ -1430,13 +1435,21 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         EmitElectrocution(this);
     }
 
-    bool bIsCaptain = IsCaptain();
-    unsigned long soundID = 0xBADF0EF9;
-    if (bIsCaptain)
+#if !defined(VERSION_R4QE01)
+    if (gFramesSinceElectrocutionSound > 5)
+#endif
     {
-        soundID = 0x1602CA52;
+        bool bIsCaptain = IsCaptain();
+        unsigned long soundID = 0xBADF0EF9;
+        if (bIsCaptain)
+        {
+            soundID = 0x1602CA52;
+        }
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
-    PlaySound(m_uSoundSlotId, soundID, 0, 0);
+#if !defined(VERSION_R4QE01)
+    gFramesSinceElectrocutionSound = 0;
+#endif
 }
 
 void cFielder::fn_800451B0(const nlVector3& v3Position)
@@ -2166,6 +2179,7 @@ void cFielder::ActionHit(float fDeltaT)
         }
     }
 
+#if defined(VERSION_R4QE01)
     if (m_DetChar.m_eCharacterClass == BIRDO)
     {
         if (m_pTeam->GetCaptain()->m_DetChar.m_eCharacterClass == WALUIGI
@@ -2216,6 +2230,7 @@ void cFielder::ActionHit(float fDeltaT)
             }
         }
     }
+#endif
 
     if (ShouldStartCrossBlend(4))
     {
@@ -3024,6 +3039,12 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
     if (!bDidWindup)
     {
+#if !defined(VERSION_R4QE01)
+        if (IsWaluigiSuperPowerActive(this))
+        {
+            EndWaluigiSuperPower();
+        }
+#endif
         KillWindup("ball_sts_windup");
         SetAction(ACTION_SHOOT_TO_SCORE);
 
@@ -3281,12 +3302,20 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
                 OVERLAY_MEGA_STRIKE_METER);
         pScene->mMegaStrikeStarted = true;
         SetAction(ACTION_MEGA_STRIKE);
+#if !defined(VERSION_R4QE01)
+        if (IsWaluigiSuperPowerActive(this))
+        {
+            EndWaluigiSuperPower();
+        }
+#endif
         FreezeEveryoneButCaptain(0);
 
+#if defined(VERSION_R4QE01)
         m_pTeam->GetGoalie()->InitActionFrozen();
         m_pTeam->GetOtherTeam()->GetGoalie()->InitActionFrozen();
 
         g_pBall->mbBallFrozen = true;
+#endif
         muInvincibleStatus |= 0x1F;
 
         m_pTeam->GetOtherTeam()->GetGoalie()->InitMegaStrikeUserControl();

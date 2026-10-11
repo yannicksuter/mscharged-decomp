@@ -59,7 +59,11 @@ DWCFriendsMatchControl gDWCFriendsMatchControl;
 void* gNetworkMemoryPool;
 int gNetworkBuildNumberOverride;
 
+#if defined(VERSION_R4QE01)
 float gNetworkLoginTimeout = 180.0f;
+#else
+float gNetworkLoginTimeout = 90.0f;
+#endif
 u32 gNetworkGameCodeR4QP = 0x52345150;
 u32 gNetworkGameCodeR4QJ = 0x5234514A;
 u32 gNetworkGameCodeR4QE = 0x52345145;
@@ -108,6 +112,7 @@ void NetworkSession::Initialize(bool first)
         mCupMode = 0;
 
         PushAllocator(&VirtualAllocator);
+#if defined(VERSION_R4QE01)
         if (GetRegion() == GAME_REGION_US)
         {
             u32 poolSize = 0xB0000 - 0x2A90;
@@ -122,6 +127,14 @@ void NetworkSession::Initialize(bool first)
             gNetworkMemoryPool = pool;
             s_NetworkAllocator.Initialize(pool, poolSize);
         }
+#else
+        {
+            u32 poolSize = 310000;
+            void* pool = nlMalloc(poolSize, 8, false);
+            gNetworkMemoryPool = pool;
+            s_NetworkAllocator.Initialize(pool, poolSize);
+        }
+#endif
         PopAllocator();
 
         mDWCInitialized = 0;
@@ -590,7 +603,10 @@ void NetworkSession::Update()
     else if (mSessionMode == NET_MODE_ONLINE)
     {
         if (mSessionState != NET_SESSION_NONE && mFriendsMatchProcessingSuspended == 0
-            && !mLobby->mMatchmakingThreadRunning)
+#if !defined(VERSION_R4QP01_REV1)
+            && !mLobby->mMatchmakingThreadRunning
+#endif
+        )
         {
             DWC_ProcessFriendsMatch();
         }
@@ -935,6 +951,7 @@ bool NetworkSession::RequestLoginRankings()
     return false;
 }
 
+#if defined(VERSION_R4QE01)
 void NetworkSession::RequestLoginNearbySeasonRankingsAgain()
 {
     mLoginStage = NET_LOGIN_REFRESH_SEASON_STATS;
@@ -945,6 +962,7 @@ void NetworkSession::RequestLoginNearbySeasonRankingsAgain()
         mLoginStage = NET_LOGIN_FAILED;
     }
 }
+#endif
 
 void NetworkSession::RequestLoginNearbyDailyRankings()
 {
@@ -962,6 +980,7 @@ void NetworkSession::RequestLoginNearbyDailyRankings()
     }
 }
 
+#if defined(VERSION_R4QE01)
 void NetworkSession::RequestLoginNearbyDailyRankingsAgain()
 {
     mLoginStage = NET_LOGIN_REFRESH_DAILY_STATS;
@@ -1014,6 +1033,24 @@ void NetworkSession::RequestLoginTopSeasonRankings()
         mLoginListener->OnStatsResult(false);
         mLoginStage = NET_LOGIN_FAILED;
     }
+}
+#endif
+
+static inline void CompleteLogin(NetworkSession* session)
+{
+    session->mLoginStage = NET_LOGIN_COMPLETE;
+    g_pNetworkSession->SetSessionState(NET_SESSION_MATCHMAKE);
+    session->mLoginListener->OnStatsResult(true);
+    NetworkStatsManager::Instance()->RefreshFriendCount();
+    gNetworkMiiChanged = 0;
+#if !defined(VERSION_R4QE01)
+    if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
+    {
+        NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_FRIENDS);
+    }
+    NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_DAILY_TOP);
+    NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_SEASON_TOP);
+#endif
 }
 
 void NetworkSession::UpdateLogin()
@@ -1190,7 +1227,12 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
+#if defined(VERSION_R4QE01)
             RequestLoginNearbySeasonRankingsAgain();
+#else
+            RequestLoginNearbyDailyRankings();
+            NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_SEASON_NEARBY);
+#endif
         }
         else
         {
@@ -1203,6 +1245,7 @@ void NetworkSession::UpdateLogin()
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
+#if defined(VERSION_R4QE01)
     case NET_LOGIN_REFRESH_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
@@ -1220,6 +1263,7 @@ void NetworkSession::UpdateLogin()
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
+#endif
 
     case NET_LOGIN_GET_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
@@ -1245,6 +1289,7 @@ void NetworkSession::UpdateLogin()
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(1, 1);
                     mLoginStage = NET_LOGIN_PUT_DAILY_STATS;
                 }
+#if defined(VERSION_R4QE01)
                 else if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
                 {
                     RequestLoginFriendsSeasonRankings();
@@ -1253,6 +1298,12 @@ void NetworkSession::UpdateLogin()
                 {
                     RequestLoginTopDailyRankings();
                 }
+#else
+                else
+                {
+                    CompleteLogin(this);
+                }
+#endif
             }
             else
             {
@@ -1279,7 +1330,12 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
+#if defined(VERSION_R4QE01)
             RequestLoginNearbyDailyRankingsAgain();
+#else
+            NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_DAILY_NEARBY);
+            CompleteLogin(this);
+#endif
         }
         else
         {
@@ -1292,6 +1348,7 @@ void NetworkSession::UpdateLogin()
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
+#if defined(VERSION_R4QE01)
     case NET_LOGIN_REFRESH_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
@@ -1360,11 +1417,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            mLoginStage = NET_LOGIN_COMPLETE;
-            g_pNetworkSession->SetSessionState(NET_SESSION_MATCHMAKE);
-            mLoginListener->OnStatsResult(true);
-            NetworkStatsManager::Instance()->RefreshFriendCount();
-            gNetworkMiiChanged = 0;
+            CompleteLogin(this);
         }
         else
         {
@@ -1374,6 +1427,7 @@ void NetworkSession::UpdateLogin()
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
+#endif
 
     case NET_LOGIN_COMPLETE:
     case NET_LOGIN_FAILED:

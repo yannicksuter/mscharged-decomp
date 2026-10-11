@@ -12,6 +12,7 @@
 #include "Game/Render/PeachPhoto.h"
 
 #include "Game/AI/AiUtil.h"
+#include "Game/AI/FielderActions.h"
 #include "Game/Ball.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/CharacterTemplate.h"
@@ -432,6 +433,9 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     DispatchDetermDataEvents();
 
     AIUpdateTask(g_fSimulationTick);
+#if !defined(VERSION_R4QE01)
+    ++gFramesSinceElectrocutionSound;
+#endif
     ClearPlayerPlayerCollisionCache();
     gNPCManager->UpdateAINPCs(g_fSimulationTick);
     PrePhysicsAITask(g_fSimulationTick);

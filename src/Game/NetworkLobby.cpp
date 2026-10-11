@@ -362,11 +362,13 @@ void NetworkLobby::CloseConnections()
 
     int result = DWC_CloseAllConnectionsHard();
     tDebugPrintManager::Print(DC_NETWORK, "DWC_CloseAllConnectionsHard returned %d\n", result);
+#if !defined(VERSION_R4QP01_REV1)
     bool failed = mMatchmakingThreadRunning || mState != NET_LOBBY_IDLE;
     if (failed)
     {
         mMatchFailed = true;
     }
+#endif
 }
 
 void NetworkLobby::CloseConnectionsAndReset()
@@ -861,6 +863,7 @@ void NetworkLobby::BuildLocalMachineInfo(
     {
         record = NetworkStatsManager::Instance()->GetLocalStats(0);
     }
+#if defined(VERSION_R4QE01)
     else if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
     {
         record = NetworkStatsManager::Instance()->GetLocalStats(2);
@@ -881,6 +884,12 @@ void NetworkLobby::BuildLocalMachineInfo(
             }
         }
     }
+#else
+    else
+    {
+        record = NetworkStatsManager::Instance()->GetLocalStats(2);
+    }
+#endif
 
     if (record != 0)
     {

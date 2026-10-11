@@ -28,7 +28,11 @@ static int sLeaderboardJobs[5] = { NET_STATS_GET_DAILY_NEARBY, NET_STATS_GET_DAI
 
 static NetworkStatsManager* sNetworkStatsManager;
 
-static float sSecondsPerMinute = 60.0f;
+#if defined(VERSION_R4QE01)
+static float sLeaderboardRefreshInterval = 60.0f;
+#else
+static float sLeaderboardRefreshInterval = 70.0f;
+#endif
 static float sRankingRequestTimeout = 30.0f;
 
 
@@ -196,6 +200,10 @@ bool NetworkStatsManager::RequestRankings(int category)
     mRequestedCategory = category;
     NetworkLeaderboardCategory& leaderboard = mCategories[category];
     leaderboard.mAvailable = false;
+#if !defined(VERSION_R4QE01)
+    leaderboard.mCount = 0;
+    leaderboard.mLocalPlayerIndex = -1;
+#endif
     if (g_pNetworkSession->GetStatsInterface()->GetLeaderboardStats(leaderboard.mPersistentCategory,
             leaderboard.mFilter,
             65,
@@ -207,8 +215,10 @@ bool NetworkStatsManager::RequestRankings(int category)
         return true;
     }
 
+#if defined(VERSION_R4QE01)
     leaderboard.mCount = 0;
     leaderboard.mLocalPlayerIndex = -1;
+#endif
     tDebugPrintManager::Print(DC_NETWORK,
         "Initial failure GetLeaderboardStats cat %d filter %d\n",
         leaderboard.mPersistentCategory,
@@ -584,6 +594,11 @@ void NetworkStatsManager::UpdateOnlineResultTotals(
         return;
     }
 
+#if defined(VERSION_R4QP01_REV1)
+    CalculateNetworkResultPoints(result, home, homeScore, awayScore,
+        &mLastGameWon, &mLastGameTied, &mLastResultPoints,
+        &mLastGoalPoints, &mLastBonusPoints);
+#else
     NetworkGameResultDetails details;
     details.mPoints = 0;
     details.mWon = false;
@@ -594,10 +609,15 @@ void NetworkStatsManager::UpdateOnlineResultTotals(
     details.mPoints = CalculateNetworkResultPoints(result, home, homeScore,
         awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
         &details.mGoalPoints, &details.mBonusPoints);
+#endif
 
     int* wins = GameInfoManager::GetInstance()->GetUnknown0xAA0(gNetworkSaveSlotIndex);
     int* losses = GameInfoManager::GetInstance()->GetUnknown0xAA4(gNetworkSaveSlotIndex);
+#if defined(VERSION_R4QP01_REV1)
+    if (mLastGameWon)
+#else
     if (details.mWon)
+#endif
     {
         ++*wins;
         if (*wins > 9999)
@@ -702,6 +722,14 @@ void NetworkStatsManager::ReportGameResult(int result,
 {
     if (g_pNetworkSession->GetRankingReporter() != 0)
     {
+#if defined(VERSION_R4QP01_REV1)
+        mLastTotalPoints = 0;
+        mLastGameWon = false;
+        mLastGameTied = false;
+        mLastResultPoints = 0;
+        mLastGoalPoints = 0;
+        mLastBonusPoints = 0;
+#else
         NetworkGameResultDetails details;
         details.mPoints = 0;
         details.mWon = false;
@@ -709,11 +737,17 @@ void NetworkStatsManager::ReportGameResult(int result,
         details.mResultPoints = 0;
         details.mGoalPoints = 0;
         details.mBonusPoints = 0;
+#endif
 
         if (fallback == 0)
         {
             if (!mGameResultReported)
             {
+#if defined(VERSION_R4QP01_REV1)
+                mLastTotalPoints = CalculateNetworkResultPoints(result, reportHome,
+                    homeScore, awayScore, &mLastGameWon, &mLastGameTied,
+                    &mLastResultPoints, &mLastGoalPoints, &mLastBonusPoints);
+#else
                 details.mPoints = CalculateNetworkResultPoints(result, reportHome,
                     homeScore, awayScore, &details.mWon, &details.mTied, &details.mResultPoints,
                     &details.mGoalPoints, &details.mBonusPoints);
@@ -723,6 +757,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLastResultPoints = details.mResultPoints;
                 mLastGoalPoints = details.mGoalPoints;
                 mLastBonusPoints = details.mBonusPoints;
+#endif
             }
             else if (result == 0)
             {
@@ -731,6 +766,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 return;
             }
         }
+#if !defined(VERSION_R4QP01_REV1)
         else
         {
             mLastTotalPoints = 0;
@@ -740,6 +776,7 @@ void NetworkStatsManager::ReportGameResult(int result,
             mLastGoalPoints = 0;
             mLastBonusPoints = 0;
         }
+#endif
 
         bool restoreDisconnectLoss = result == 0 ? IsCurrentSeriesComplete() : true;
         if (fallback != 0)
@@ -752,7 +789,11 @@ void NetworkStatsManager::ReportGameResult(int result,
         {
             int oldPoints = mLocalStats[category].mScore;
             NetworkRankingMeta* localStats = &mLocalStats[category];
+#if defined(VERSION_R4QP01_REV1)
+            int pointsScored = mLastTotalPoints;
+#else
             int pointsScored = details.mPoints;
+#endif
             bool startFresh = false;
 
             if (category == 1)
@@ -776,7 +817,11 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mLosses = 0;
                 if (result != 4 && result != 3 && result != 2)
                 {
+#if defined(VERSION_R4QP01_REV1)
+                    if (mLastGameWon)
+#else
                     if (details.mWon)
+#endif
                     {
                         ++mLocalStats[category].mWins;
                     }
@@ -804,7 +849,11 @@ void NetworkStatsManager::ReportGameResult(int result,
                 {
                     --mLocalStats[category].mLosses;
                 }
+#if defined(VERSION_R4QP01_REV1)
+                else if (mLastGameWon)
+#else
                 else if (details.mWon)
+#endif
                 {
                     ++mLocalStats[category].mWins;
                     --mLocalStats[category].mLosses;
@@ -815,7 +864,11 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mScore += pointsScored;
                 if (result != 4 && result != 3 && result != 2)
                 {
+#if defined(VERSION_R4QP01_REV1)
+                    if (mLastGameWon)
+#else
                     if (details.mWon)
+#endif
                     {
                         ++mLocalStats[category].mWins;
                     }
@@ -846,7 +899,11 @@ void NetworkStatsManager::ReportGameResult(int result,
                 oldPoints,
                 pointsScored,
                 mLocalStats[category].mScore,
+#if defined(VERSION_R4QP01_REV1)
+                mLastGameWon,
+#else
                 details.mWon,
+#endif
                 mLocalStats[category].mWins,
                 mLocalStats[category].mLosses,
                 mLocalStats[category].mOnlineRegion);
@@ -988,7 +1045,7 @@ bool NetworkStatsManager::RefreshRankings()
         }
         if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sRankingRequestTimeout)
             PreGameRestoreDefaultDisconnectLoss();
-        if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sSecondsPerMinute)
+        if (mJobs.GetCount() == 0 && mCurrentTime - mOperationStartTime >= sLeaderboardRefreshInterval)
         {
             SubmitJob(sLeaderboardJobs[mNextLeaderboardJobIndex]);
             ++mNextLeaderboardJobIndex;

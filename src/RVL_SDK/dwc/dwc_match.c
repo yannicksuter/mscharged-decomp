@@ -303,8 +303,11 @@ static int DWCi_ChangeToClient(void);
 
 static char* stpAddFilter = NULL;
 static DWCMatchOptMinCompleteIn* stpOptMinComp = NULL;
+#if defined(VERSION_R4QE01)
+// USA callbacks defer browser destruction until ServerBrowserThink returns.
 static int s_sbCallbackLevel = 0;
 static BOOL s_needSbFree = FALSE;
+#endif
 static DWCMatchControl* stpMatchCnt = NULL;
 static DWCMatchOptSCBlock stOptSCBlock;
 
@@ -811,8 +814,10 @@ qr2_error_t DWCi_QR2Startup(int profileID)
             break;
         }
 
+#if defined(VERSION_R4QE01)
         qr2_shutdown(DWCi_GetMatchCnt()->qr2Obj);
         DWCi_GetMatchCnt()->qr2Obj = NULL;
+#endif
 
         if ((qr2Error != e_qrdnserror)
             || (i == DWC_DNS_ERROR_RETRY_MAX - 1))
@@ -1430,23 +1435,21 @@ void DWCi_MatchProcess(BOOL fullSpec)
 
     if (DWCi_GetMatchCnt()->sbObj)
     {
-#if 1
+#if defined(VERSION_R4QE01)
         s_sbCallbackLevel = 0;
         s_needSbFree = FALSE;
+#endif
 
         (void)ServerBrowserThink(DWCi_GetMatchCnt()->sbObj);
 
+#if defined(VERSION_R4QE01)
         if (s_needSbFree)
         {
             ServerBrowserFree(DWCi_GetMatchCnt()->sbObj);
             DWCi_GetMatchCnt()->sbObj = NULL;
         }
-#else
-        sbError = ServerBrowserThink(DWCi_GetMatchCnt()->sbObj);
-        if (DWCi_HandleSBError(sbError))
-            return;
-#endif
         if (DWCi_GetMatchCnt()->sbObj)
+#endif
         {
             if (ServerBrowserState(DWCi_GetMatchCnt()->sbObj)
                     != sb_disconnected
@@ -1573,10 +1576,12 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket,
     GT2Connection* pGt2Con;
     DWCConnectionInfo* pConInfo;
 
+#if defined(VERSION_R4QE01)
     if (DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_CL_NN)
     {
         return;
     }
+#endif
 
     if (!DWCi_GetMatchCnt()
         || (DWCi_GetMatchCnt()->state != DWC_MATCH_STATE_CL_GT2)
@@ -2298,15 +2303,19 @@ static void DWCi_CloseMatching(void)
 
     if (stpMatchCnt->sbObj != NULL)
     {
+#if defined(VERSION_R4QE01)
         if (s_sbCallbackLevel == 0)
         {
+#endif
             ServerBrowserFree(stpMatchCnt->sbObj);
             stpMatchCnt->sbObj = NULL;
+#if defined(VERSION_R4QE01)
         }
         else
         {
             s_needSbFree = 1;
         }
+#endif
     }
 
     NNFreeNegotiateList();
@@ -5513,7 +5522,9 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
 
     DWC_Printf(0x40, "SBCallback : reason %d (state = %d)\n", reason,
         stpMatchCnt->state);
+#if defined(VERSION_R4QE01)
     s_sbCallbackLevel++;
+#endif
 
     switch (reason)
     {
@@ -5556,7 +5567,14 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
             {
                 stpMatchCnt->state = 3;
                 stpMatchCnt->reqProfileID = 0;
-                DWCi_HandleSBError(DWCi_SBUpdateAsync(stpMatchCnt->reqProfileID));
+                if (DWCi_HandleSBError(DWCi_SBUpdateAsync(stpMatchCnt->reqProfileID)))
+                {
+#if defined(VERSION_R4QE01)
+                    break;
+#else
+                    return;
+#endif
+                }
             }
             else
             {
@@ -5582,7 +5600,11 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                 }
                 if (result != 0)
                 {
+#if defined(VERSION_R4QE01)
                     break;
+#else
+                    return;
+#endif
                 }
                 stpMatchCnt->state = 4;
                 stpMatchCnt->sbUpdateFlag = 0;
@@ -5635,7 +5657,11 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                             }
                             if (result != 0)
                             {
+#if defined(VERSION_R4QE01)
                                 break;
+#else
+                                return;
+#endif
                             }
                         }
                     }
@@ -5655,25 +5681,44 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                         }
                         if (result != 0)
                         {
+#if defined(VERSION_R4QE01)
                             break;
+#else
+                            return;
+#endif
                         }
                         stpMatchCnt->state = 4;
                         result = DWCi_SendResvCommandToFriend(
                             0, 0, stpMatchCnt->sbPidList[0]);
                         if (stpMatchCnt->qr2MatchType == 0)
                         {
-                            DWCi_HandleSBError(result);
+                            result = DWCi_HandleSBError(result);
                         }
                         else
                         {
-                            DWCi_HandleGPError(result);
+                            result = DWCi_HandleGPError(result);
+                        }
+                        if (result != 0)
+                        {
+#if defined(VERSION_R4QE01)
+                            break;
+#else
+                            return;
+#endif
                         }
                         break;
                     }
                 }
                 stpMatchCnt->state = 6;
                 nnError = DWCi_NNStartupAsync(0, 0, ServerBrowserGetServer(sb, 0));
-                DWCi_HandleNNError(nnError);
+                if (DWCi_HandleNNError(nnError))
+                {
+#if defined(VERSION_R4QE01)
+                    break;
+#else
+                    return;
+#endif
+                }
             }
             else
             {
@@ -5697,7 +5742,9 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
         break;
     }
 
+#if defined(VERSION_R4QE01)
     s_sbCallbackLevel--;
+#endif
 }
 
 static void DWCi_SBPrintServerData(SBServer server)

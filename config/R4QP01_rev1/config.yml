@@ -22,6 +22,8 @@ add_relocations:
   - { source: .text:0x8009A228, type: l, target: "__vt__8RedShell" }
   - { source: .text:0x801EA7D8, type: ha, target: "POWER_UP_IMAGE_NAMES" }
   - { source: .text:0x801EA820, type: l, target: "POWER_UP_IMAGE_NAMES" }
+  - { source: .text:0x8026A1A4, type: ha, target: "@9358" }
+  - { source: .text:0x8026A1CC, type: l, target: "@9358" }
   - { source: .text:0x802CF18C, type: ha, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
   - { source: .text:0x802CF198, type: ha, target: "glReleaseTexture__FP11PlatTexture" }
   - { source: .text:0x802CF1B8, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
@@ -67,6 +69,8 @@ add_relocations:
   - { source: .text:0x802AB300, type: l, target: "lbl_8052A880" }
   - { source: .text:0x802AB310, type: l, target: "lbl_8052A8A0" }
 block_relocations:
+  # gHitReactFacingOffsets begins with the u16 angles 0x8000 and 0x4000.
+  - { source: 0x806DA5C0 }
   # Constants and chunk IDs whose values overlap the address space.
   - { source: 0x802C9654 }
   - { source: 0x802C9708 }

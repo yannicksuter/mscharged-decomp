@@ -11,6 +11,15 @@ struct OSCalendarTime;
 
 struct CupHistoryRecord
 {
+    enum
+    {
+#if defined(VERSION_R4QP01_REV1)
+        BASE_YEAR = 2006,
+#else
+        BASE_YEAR = 2000,
+#endif
+    };
+
     bool IsEmpty() const
     {
         bool emptyThrough04, emptyThrough07, emptyThrough0A, emptyThrough0D,

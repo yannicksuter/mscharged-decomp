@@ -23,6 +23,9 @@
 #include "Game/GameSceneManager.h"
 #include "Game/NetTournManager.h"
 #include "Game/NetworkSession.h"
+#if defined(VERSION_R4QP01_REV1)
+#include "Game/Render/FrontEndPresentation.h"
+#endif
 #include "Game/SH/SHGameResults.h"
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlBind.h"
@@ -42,7 +45,7 @@ CupKnockoutScene::CupKnockoutScene()
     , m_pad2F3(false)
     , m_pad2F4(false)
     , m_pad2F5(false)
-    , m_pad2F6(false)
+    , mAllowTournamentExit(false)
     , mPointerButtonsInitialized(false)
     , mPreviousPagePressed(false)
     , mNextPagePressed(false)
@@ -224,19 +227,40 @@ void CupKnockoutScene::Update(float fDeltaT)
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
         for (int j = 0; j < 7; ++j)
             mMatchupButtons[j].HandlePointerEvent(&event);
-        mPageControls->Update(event, fDeltaT);
-        mBracketButton.HandlePointerEvent(&event);
-        if (mBackButton.UpdateBackButton(event, fDeltaT))
+#if defined(VERSION_R4QP01_REV1)
+        if (!mNetworkTournament)
+#endif
         {
-            mTransitionState = CUP_KNOCKOUT_EXITING_BACK;
-            SHNavigation* navigation = GetNavigationScene();
-            if (navigation != 0)
-                navigation->HideButtons();
-            mPresentation->SetActiveSlide("out", true);
-            return;
+            mPageControls->Update(event, fDeltaT);
+            mBracketButton.HandlePointerEvent(&event);
+            if (mBackButton.UpdateBackButton(event, fDeltaT))
+            {
+                mTransitionState = CUP_KNOCKOUT_EXITING_BACK;
+                SHNavigation* navigation = GetNavigationScene();
+                if (navigation != 0)
+                    navigation->HideButtons();
+                mPresentation->SetActiveSlide("out", true);
+                return;
+            }
         }
+#if defined(VERSION_R4QP01_REV1)
+        else if (mAllowTournamentExit)
+        {
+            if (mBackButton.UpdateBackButton(event, fDeltaT))
+            {
+                NetTournManager::Instance()->Shutdown();
+                NetTournManager::Instance()->Reset(false);
+                GameSceneManager::Instance()->PopToScene(SCENE_CUP_KNOCKOUT);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, true);
+                FrontEndPresentation::GetInstance()->Call("TransitionOnlineTournamentToMenu");
+                return;
+            }
+        }
+#endif
 
+#if !defined(VERSION_R4QP01_REV1)
         if (g_pFEInput->m_InputLockDepth == 0)
+#endif
         {
             if (mPageControls->IsButtonPressed(1) || mPageControls->IsButtonPressed(0))
             {

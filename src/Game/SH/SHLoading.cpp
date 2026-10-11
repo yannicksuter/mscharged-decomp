@@ -331,11 +331,11 @@ void MatchLoadingScene::DisplayCupInfo()
         nlSNPrintf(awayRankString, 4, (const unsigned short*)L"%d", awayRank + 1);
         const unsigned short* unformatted = g_pLocalization->GetString("LOADING_SCREEN_RANK");
         WideString homeRankText = Format(WideString(unformatted), homeRankString);
-        memcpy(mTextBuffers[1], homeRankText.c_str(), sizeof(mTextBuffers[1]));
-        mTextInstances[2]->SetString(mTextBuffers[1]);
+        memcpy(mStatsBuffers[0], homeRankText.c_str(), sizeof(mStatsBuffers[0]));
+        mTextInstances[2]->SetString(mStatsBuffers[0]);
         WideString awayRankText = Format(WideString(unformatted), awayRankString);
-        memcpy(mTextBuffers[3], awayRankText.c_str(), sizeof(mTextBuffers[3]));
-        mTextInstances[4]->SetString(mTextBuffers[3]);
+        memcpy(mStatsBuffers[2], awayRankText.c_str(), sizeof(mStatsBuffers[2]));
+        mTextInstances[4]->SetString(mStatsBuffers[2]);
 
         unformatted = g_pLocalization->GetString("ROAD_HUB_TEAM_RECORD_STATS");
         WideString homeRecord, awayRecord;
@@ -350,10 +350,10 @@ void MatchLoadingScene::DisplayCupInfo()
         nlSNPrintf(suddenDeathLosses[1], 4, (const unsigned short*)L"%d", awayStats.mNumOTLosses);
         homeRecord = Format(WideString(unformatted), wins[0], losses[0], suddenDeathLosses[0]);
         awayRecord = Format(WideString(unformatted), wins[1], losses[1], suddenDeathLosses[1]);
-        memcpy(mTextBuffers[2], homeRecord.c_str(), sizeof(mTextBuffers[2]));
-        mTextInstances[3]->SetString(mTextBuffers[2]);
-        memcpy(mTextBuffers[4], awayRecord.c_str(), sizeof(mTextBuffers[4]));
-        mTextInstances[5]->SetString(mTextBuffers[4]);
+        memcpy(mStatsBuffers[1], homeRecord.c_str(), sizeof(mStatsBuffers[1]));
+        mTextInstances[3]->SetString(mStatsBuffers[1]);
+        memcpy(mStatsBuffers[3], awayRecord.c_str(), sizeof(mStatsBuffers[3]));
+        mTextInstances[5]->SetString(mStatsBuffers[3]);
     }
 
     const unsigned short* cupName;
@@ -398,8 +398,8 @@ void MatchLoadingScene::DisplayCupInfo()
         nlSNPrintf(game, 4, (const unsigned short*)L"%d", CupManager::Instance()->GetCurrentRoundNumber() + 1);
         formatted = Format(WideString(g_pLocalization->GetString("CUP_LOADING_CHAMPIONSHIP")), cupName, game);
     }
-    memcpy(mTextBuffers[0], formatted.c_str(), 128);
-    mTextInstances[0]->SetString(mTextBuffers[0]);
+    memcpy(mTitleBuffer, formatted.c_str(), 128);
+    mTextInstances[0]->SetString(mTitleBuffer);
 }
 
 static void DisplayBestOfText(MatchLoadingScene* scene, TLTextInstance* text, int numGames)
@@ -410,8 +410,8 @@ static void DisplayBestOfText(MatchLoadingScene* scene, TLTextInstance* text, in
     {
         typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
         WideString formatted = Format(WideString(unformatted), games);
-        memcpy(scene->mTextBuffers[0], formatted.c_str(), 128);
-        text->SetString(scene->mTextBuffers[0]);
+        memcpy(scene->mTitleBuffer, formatted.c_str(), 128);
+        text->SetString(scene->mTitleBuffer);
     }
     scene->DisplayStadiumName(scene->mTextInstances[1]);
     scene->mTextInstances[2]->m_bVisible = false;

@@ -33,7 +33,9 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     , mKeypadButtons()
     , mDigitButtons()
     , mBackButton()
+#if defined(VERSION_R4QE01)
     , mPopupActive(false)
+#endif
     , mState(FRIEND_CODE_ENTRY_ENTERING)
 {
     for (int i = 0; i < 12; ++i)
@@ -193,10 +195,12 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
         return;
     }
 
+#if defined(VERSION_R4QE01)
     if (mPopupActive && !g_pFEInput->HasInputLock(this))
     {
         return;
     }
+#endif
 
     int state = mState;
     if (state == FRIEND_CODE_ENTRY_ENTERING || (unsigned int)(state - FRIEND_CODE_ENTRY_TRANSITIONING) <= 1)
@@ -460,6 +464,7 @@ void SHOnlineFriendCodeEntry::UpdateConfirmButton()
     }
 }
 
+#if defined(VERSION_R4QE01)
 void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
 {
     g_pFriendManager->SetOwnStatusInitial(true);
@@ -478,6 +483,7 @@ inline void SHOnlineFriendCodeEntry::ShowAddFriendError(int error)
         mPopupActive = true;
     }
 }
+#endif
 
 void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 {
@@ -489,8 +495,12 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 
         unsigned long long friendKey = ParseFriendKey();
 
+#if defined(VERSION_R4QE01)
         int error = -1;
         if (g_pFriendManager->AddFriendKey(friendKey, &error))
+#else
+        if (g_pFriendManager->AddFriendKey(friendKey))
+#endif
         {
             SaveLoad::StartSave(true);
             mState = FRIEND_CODE_ENTRY_TRANSITIONING;
@@ -510,8 +520,10 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         }
         else
         {
+#if defined(VERSION_R4QE01)
             g_pFriendManager->SetOwnStatusInitial(false);
             ShowAddFriendError(error);
+#endif
 
             FEAudio::EnableSounds(true);
             FEAudio::PlayAnimAudioEvent(0xD641865E, 0, 0, 1);

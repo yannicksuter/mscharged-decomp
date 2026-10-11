@@ -14,6 +14,11 @@
 #include "Game/NetworkSession.h"
 #include "Game/NetworkLobby.h"
 
+#if !defined(VERSION_R4QE01)
+#include "NL/nlFunction.inl"
+#include "Game/FE/fePopupMenu.h"
+#endif
+
 #include <string.h>
 #include "Game/SharedStaticStorage.h"
 
@@ -91,9 +96,15 @@ void FriendManager::GetOwnFriendKeyString(u16* output)
     FormatFriendKey(friendKey, output);
 }
 
+#if defined(VERSION_R4QE01)
 bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
+#else
+bool FriendManager::AddFriendKey(unsigned long long friendKey)
+#endif
 {
+#if defined(VERSION_R4QE01)
     *error = -1;
+#endif
 
     DWCUserData* userData = reinterpret_cast<DWCUserData*>(
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
@@ -102,7 +113,13 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
 
     if (friendKey == ownFriendKey)
     {
+#if defined(VERSION_R4QE01)
         *error = 0x66;
+#else
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_NETWORK_OWN_FRIEND_CODE, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+#endif
         return false;
     }
 
@@ -110,7 +127,13 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
     if (!DWC_CheckFriendKey(userData, friendKey))
     {
+#if defined(VERSION_R4QE01)
         *error = 0x65;
+#else
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_NETWORK_INVALID_FRIEND_CODE, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+#endif
         return false;
     }
 
@@ -124,7 +147,13 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
         if (DWC_IsEqualFriendData(&token, friendData)
             || token.gs_profile_id.id == friendData->gs_profile_id.id)
         {
+#if defined(VERSION_R4QE01)
             *error = 0x67;
+#else
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+            popup->Create(POPUP_NETWORK_DUPLICATE_FRIEND, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+#endif
             return false;
         }
     }
@@ -147,6 +176,7 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
         }
     }
 
+#if defined(VERSION_R4QE01)
     if (!added)
     {
         *error = 0x68;
@@ -155,6 +185,19 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
 
     mFriendListChanged = true;
     return true;
+#else
+    if (!added)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_NETWORK_FRIEND_LIST_FULL, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+    }
+    else
+    {
+        mFriendListChanged = true;
+    }
+    return added;
+#endif
 }
 
 static void BuddyFriendCallback(int index, void*)

@@ -306,7 +306,11 @@ void SHOnlineHub::UpdateLocalStats()
 void SHOnlineHub::UpdateStrikerOfTheDay()
 {
     NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(1);
+#if defined(VERSION_R4QE01)
     if (category != 0)
+#else
+    if (category != 0 && category->mAvailable)
+#endif
     {
         if (category->mCount >= 1 && category->mMetadata[0].mScore > 0)
         {
@@ -314,6 +318,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
             mStrikerOfTheDayStats = category->mMetadata[0];
             mHasStrikerOfTheDay = true;
         }
+#if defined(VERSION_R4QE01)
         else
         {
             mStrikerOfTheDay.mName[0] = 0;
@@ -322,6 +327,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
             mStrikerOfTheDayStats.Reset();
             mHasStrikerOfTheDay = false;
         }
+#endif
     }
     TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation->m_currentSlide, "Layer", "summary");
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord2");
@@ -341,9 +347,17 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
         nlStrNCpy(mStrikerDescriptionText, string.c_str(), 128);
         text->SetString(mStrikerDescriptionText);
         text->m_bVisible = true;
+#if !defined(VERSION_R4QE01)
+        bool valid = MiiManager::s_pInstance->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
+        unsigned long texture = MiiManager::s_pInstance->mIconTextureIds[1];
+        image->SetAssetVisible(valid && mInitialized);
+        image->m_pTextureResource->SetTextureHandle(texture);
+#endif
     }
     else
         text->m_bVisible = false;
+#if defined(VERSION_R4QE01)
     bool valid = false;
     if (mHasStrikerOfTheDay)
         valid = MiiManager::s_pInstance->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
@@ -351,6 +365,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     unsigned long texture = MiiManager::s_pInstance->mIconTextureIds[1];
     image->SetAssetVisible(valid && mInitialized);
     image->m_pTextureResource->SetTextureHandle(texture);
+#endif
 }
 
 void SHOnlineHub::InitializeButtons()
@@ -403,7 +418,9 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
             change = true;
         break;
     case ONLINE_HUB_HELP:
+#if !defined(VERSION_R4QP01_REV1)
         g_pFriendManager->SetOwnStatusInitial(0);
+#endif
         ShowOnlineHubDialog(this, POPUP_ONLINE_MENU_HELP);
         break;
     }
@@ -423,7 +440,9 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
 
 void SHOnlineHub::OnDialogDismissed()
 {
+#if !defined(VERSION_R4QP01_REV1)
     g_pFriendManager->SetOwnStatusInitial(1);
+#endif
     mPopupActive = false;
 }
 

@@ -92,7 +92,9 @@ public:
     bool mPositiveGoalieNetCheck;
     bool mNegativeGoalieNetCheck;
     nlVector3 mCameraUp;
+#if defined(VERSION_R4QE01)
     nlVector3 mPatchPositions[60];
+#endif
     float mFrameBlendPercent;
     RenderSnapshotFlags mFlags;
     float mSimulationTime;

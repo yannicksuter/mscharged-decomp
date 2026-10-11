@@ -133,6 +133,12 @@ private:
 }; // size 0x28
 
 
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+static const eGameRegion sDefaultRegion = GAME_REGION_EU;
+#else
+static const eGameRegion sDefaultRegion = GAME_REGION_US;
+#endif
+
 volatile int g_Region = GAME_REGION_DEFAULT;
 
 static u32 sCountryCode;
@@ -215,7 +221,7 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter*, ParticleSystem*,
 
 int GetRegion()
 {
-    int region = GAME_REGION_US;
+    int region = sDefaultRegion;
     if (g_Region != GAME_REGION_DEFAULT)
     {
         region = g_Region;
@@ -225,7 +231,7 @@ int GetRegion()
 
 int GetOnlineRegion()
 {
-    int region = GAME_REGION_US;
+    int region = sDefaultRegion;
     if (g_Region != GAME_REGION_DEFAULT)
     {
         region = g_Region;

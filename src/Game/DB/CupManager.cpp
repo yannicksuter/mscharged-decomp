@@ -1328,9 +1328,9 @@ void CupManager::RecordCupUnlock(int index)
 void AppendCupHistoryRecord(CupHistory* history, int index, OSCalendarTime* date,
     int captain, CupSidekicks* sidekicks, TeamStats* stats, CupProgressRecord records)
 {
-    if (date->year < 2000)
+    if (date->year < CupHistoryRecord::BASE_YEAR)
     {
-        date->year = 2000;
+        date->year = CupHistoryRecord::BASE_YEAR;
     }
     int goals = 0;
     history->mRecords[index][history->mWriteIndex[index]].mCaptain = captain;
@@ -1339,7 +1339,7 @@ void AppendCupHistoryRecord(CupHistory* history, int index, OSCalendarTime* date
     history->mRecords[index][history->mWriteIndex[index]].mSidekick3 = sidekicks->mValues[2];
     history->mRecords[index][history->mWriteIndex[index]].mDay = date->mday - 1;
     history->mRecords[index][history->mWriteIndex[index]].mMonth = date->month;
-    history->mRecords[index][history->mWriteIndex[index]].mYearOffset = date->year - 2000;
+    history->mRecords[index][history->mWriteIndex[index]].mYearOffset = date->year - CupHistoryRecord::BASE_YEAR;
     CupRecordCounters difference(
         records.mCurrentRecord.mValues[0] - records.mSavedRecord.mValues[0],
         records.mCurrentRecord.mValues[1] - records.mSavedRecord.mValues[1],
