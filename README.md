@@ -40,12 +40,18 @@ your own legally obtained copy of the game.
 | Version | Region and title | Revision | Status | `main.dol` SHA-1 |
 | --- | --- | --- | --- | --- |
 | `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code and linking** | `e96d2298067b70652752145b4e63644e6e1b1560` |
-| `R4QP01` | Europe - *Mario Strikers Charged Football* | Rev 2 | **In progress** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
+| `R4QP01_rev1` | Europe - *Mario Strikers Charged Football* | Rev 1 | **In progress** | `0a066b755b469648a371d1cfc2d1bcad315b2b4a` |
+| `R4QP01_rev2` | Europe - *Mario Strikers Charged Football* | Rev 2 | **In progress** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
 
 `R4QE01` remains the default. Its build links entirely from reconstructed
-source. The EU build reuses matching source units from USA; regional differences
-and unresolved ranges still use extracted objects. Both builds reproduce their
-original DOL.
+source. Both EU revisions reuse verified source units from USA; regional and
+revision differences still use extracted objects. Each version has its own
+symbols, splits, progress report and retail DOL hash.
+
+The former `R4QP01` configuration is now named `R4QP01_rev2`. For an existing
+checkout, move the local files from `orig/R4QP01` into `orig/R4QP01_rev2` and
+configure again. Revision 1 needs its own disc image; the two EU revisions are
+not interchangeable.
 
 Decompilation
 =============
@@ -73,8 +79,9 @@ objdiff-cli, and wibo when needed.
 
 ## Building
 
-Place a supported disc image in `orig/<version>` (`orig/R4QE01` for USA or
-`orig/R4QP01` for Europe). ISO, RVZ, WIA, WBFS, CISO, NFS, GCZ, and TGC images
+Place a supported disc image in `orig/<version>`: `orig/R4QE01` for USA,
+`orig/R4QP01_rev1` for EU revision 1, or `orig/R4QP01_rev2` for EU revision 2.
+ISO, RVZ, WIA, WBFS, CISO, NFS, GCZ, and TGC images
 are supported. Use the disc revision listed above.
 
 Then configure and build:
@@ -84,10 +91,13 @@ python3 configure.py
 ninja
 ```
 
-To select the EU version:
+To select either EU revision:
 
 ```sh
-python3 configure.py --version R4QP01
+python3 configure.py --version R4QP01_rev1
+ninja
+
+python3 configure.py --version R4QP01_rev2
 ninja
 ```
 
@@ -99,12 +109,19 @@ On the first build, decomp-toolkit extracts `sys/main.dol` from the disc image
 and performs the initial analysis. Once extraction succeeds, the disc image can
 be removed from `orig/<version>` to save space.
 
-The generated `config/R4QE01/symbols.txt` and `config/R4QE01/splits.txt` are
-checked into the repository. A successful build ends with:
+The reconstructed `config/<version>/symbols.txt` and
+`config/<version>/splits.txt` are checked into the repository. Disc images,
+extracted game files, split objects and build outputs must remain untracked.
+A successful USA build ends with:
 
 ```text
 build/R4QE01/main.dol: OK
 ```
+
+Each EU build checks its own `build/<version>/main.dol` in the same way.
+The build prints code matching and source-linking percentages and writes
+`build/<version>/report.json`. A verified DOL can still contain extracted
+objects; the linking percentage counts only code linked from source.
 
 To generate a linker map for the reconstructed ELF, configure with `--map`:
 

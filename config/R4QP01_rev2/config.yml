@@ -1,10 +1,10 @@
 # Mario Strikers Charged Football (Europe), disc revision 2.
-object_base: orig/R4QP01
+object_base: orig/R4QP01_rev2
 object: sys/main.dol
 hash: c39e1eda1942aa2fc96a6a71bfef051698e23516
 extract_objects: true
-symbols: config/R4QP01/symbols.txt
-splits: config/R4QP01/splits.txt
+symbols: config/R4QP01_rev2/symbols.txt
+splits: config/R4QP01_rev2/splits.txt
 mw_comment_version: 14
 force_active:
   - __init_cpp_exceptions_reference

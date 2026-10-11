@@ -8,12 +8,23 @@ __pycache__
 .cache/
 
 # Original files
-*.rvz
 orig/*/*
 !orig/*/.gitkeep
-*.dol
-*.rel
-*.elf
+*.[rR][vV][zZ]
+*.[iI][sS][oO]
+*.[gG][cC][mM]
+*.[wW][iI][aA]
+*.[wW][bB][fF][sS]
+*.[cC][iI][sS][oO]
+*.[nN][fF][sS]
+*.[gG][cC][zZ]
+*.[tT][gG][cC]
+*.[bB][iI][nN]
+*.[iI][mM][gG]
+*.[dD][oO][lL]
+*.[rR][eE][lL]
+*.[rR][sS][oO]
+*.[eE][lL][fF]
 *.o
 *.map
 *.MAP
