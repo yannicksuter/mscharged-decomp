@@ -209,7 +209,9 @@ cBall::cBall()
     mnShotClockTeam = -1;
     mbStuckInRiotDone = false;
     mbBallOnFire = false;
+#if defined(VERSION_R4QE01)
     mbBallFrozen = false;
+#endif
 
     m_v3Position.x = 0.0f;
     m_v3Position.y = 0.0f;
@@ -2217,19 +2219,24 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 
 static bool sHeaderTargetVisible;
 
+#if defined(VERSION_R4QE01)
 static inline void RestoreFrozenBallPosition(cBall* pBall)
 {
     const nlVector3& position = pBall->m_v3PrevPosition;
     pBall->SetPosition(position);
 }
+#endif
 
 void cBall::Update(float fDeltaT)
 {
+#if defined(VERSION_R4QE01)
+    // The USA revision holds the ball in place during the Mega Strike freeze.
     if (mbBallFrozen)
     {
         RestoreFrozenBallPosition(this);
     }
     else
+#endif
     {
         UpdateBallStateAndTimers(this, fDeltaT);
         DecayBallCharge(this);
@@ -2656,7 +2663,9 @@ void ResetBall(cBall* pBall, bool bParam)
     pBall->mnShotClockTeam = -1;
     pBall->mbStuckInRiotDone = false;
     pBall->mbBallOnFire = false;
+#if defined(VERSION_R4QE01)
     pBall->mbBallFrozen = false;
+#endif
     pBall->m_v3PrevPosition = pBall->m_v3Position;
     pBall->m_v3PassIntercept.x = 0.0f;
     pBall->m_v3PassIntercept.y = 0.0f;
@@ -3320,8 +3329,10 @@ inline void RegisterBallDebugFields(cBall* ball, DebugWriteCache* cache)
         "mbStuckInRiotDone");
     cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&ball->mbBallOnFire - (u8*)ball, "mbBallOnFire");
+#if defined(VERSION_R4QE01)
     cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&ball->mbBallFrozen - (u8*)ball, "mbBallFrozen");
+#endif
     cache->AddField(17, gDebugFieldTypes[17].size,
         (u8*)&ball->m_fTotalPassTime - (u8*)ball, "m_fTotalPassTime");
     cache->AddField(8, gDebugFieldTypes[8].size,

@@ -69,6 +69,12 @@ This selects USA by default. For EU, configure with
 Keep the original files for each revision in its separate `orig/<version>`
 directory and verify against that revision's DOL hash.
 
+For differences in C or C++ source, use `#if defined(VERSION_R4QE01)`,
+`VERSION_R4QP01_REV2`, or `VERSION_R4QP01_REV1`, as defined by `configure.py`.
+Keep common code shared and gate only the behavior or data that differs in the
+retail executables. Add a version to a unit's `MatchingFor(...)` list only after
+linking its compiled source and verifying that version's complete DOL hash.
+
 The build downloads its pinned tools when needed. After configuration,
 `objdiff.json` is generated at the repository root; see
 [Diffing](README.md#diffing) for its use.
