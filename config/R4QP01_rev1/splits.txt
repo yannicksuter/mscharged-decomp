@@ -617,6 +617,7 @@ Game/Camera/noisefilter.cpp:
 Game/Camera/CameraMan.cpp:
 	.text       start:0x800EFB1C end:0x800F1DE0
 	.ctors      start:0x804DA7B8 end:0x804DA7BC
+	.rodata     start:0x804DB5C8 end:0x804DB6F0
 	.data       start:0x805036B8 end:0x80504238
 	.bss        start:0x8056CC20 end:0x8056D160
 	.sdata      start:0x806DB078 end:0x806DB098
