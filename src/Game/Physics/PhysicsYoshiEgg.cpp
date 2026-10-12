@@ -179,11 +179,13 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             QueueCollisionCrackEgg(crackData);
         }
 
+#if defined(VERSION_R4QE01)
         nlVector3 normal;
         normal.x = contact->geom.normal[0];
         normal.y = contact->geom.normal[1];
         normal.z = contact->geom.normal[2];
         mYoshiEgg->SetPendingDisplacement(normal, contact->geom.depth);
+#endif
         return ONE_WAY_CONTACT_THIS;
     }
     case PHYSOBJ_PATCH:

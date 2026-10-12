@@ -273,6 +273,7 @@ void ThwompObject::SetState(eThwompState state)
         axis.x = nlRandomf(2.0f) - 1.0f;
         axis.y = nlRandomf(2.0f) - 1.0f;
         axis.z = 0.0f;
+#if defined(VERSION_R4QE01)
         float lengthSquared = axis.GetLengthSq3D();
         if (lengthSquared > 0.01f)
         {
@@ -283,6 +284,9 @@ void ThwompObject::SetState(eThwompState state)
         {
             nlVec3Set(axis, 1.0f, 0.0f, 0.0f);
         }
+#else
+        nlVec3Normalize(axis, axis, false);
+#endif
 
         float angleRadians = nlRandomf(0.04f) - 0.02f;
         unsigned short angle

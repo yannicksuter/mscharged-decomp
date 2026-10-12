@@ -151,7 +151,11 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     screenInfo->ColourDepth[3] = 6;
     screenInfo->ZDepth = 24;
     screenInfo->StencilDepth = 0;
+#if defined(VERSION_R4QP01_REV1)
+    screenInfo->PixelCentre = 0.5f;
+#else
     screenInfo->PixelCentre = 0.0f;
+#endif
     screenInfo->FSAA = false;
     glx_CopyDispScaleFactor = 1.0f;
 

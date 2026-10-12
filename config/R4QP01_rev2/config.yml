@@ -22,6 +22,11 @@ add_relocations:
   - { source: .text:0x8009A4FC, type: l, target: "__vt__8RedShell" }
   - { source: .text:0x801EAADC, type: ha, target: "POWER_UP_IMAGE_NAMES" }
   - { source: .text:0x801EAB24, type: l, target: "POWER_UP_IMAGE_NAMES" }
+  # CreateBoxGeometry hoists its two index-table addresses through r0 and stack slots.
+  - { source: .text:0x802BA18C, type: ha, target: "ind_vert$1336" }
+  - { source: .text:0x802BA1A0, type: ha, target: "ind_uv$1337" }
+  - { source: .text:0x802BA1DC, type: l, target: "ind_vert$1336" }
+  - { source: .text:0x802BA1FC, type: l, target: "ind_uv$1337" }
   - { source: .text:0x802CF49C, type: ha, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
   - { source: .text:0x802CF4A8, type: ha, target: "glReleaseTexture__FP11PlatTexture" }
   - { source: .text:0x802CF4C8, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }

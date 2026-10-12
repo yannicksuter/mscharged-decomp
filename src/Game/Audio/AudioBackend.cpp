@@ -141,7 +141,9 @@ void OnControllerSpeakerReady(WPADChannel chan, WPADResult result)
     if (result == WPAD_ERR_OK)
     {
         self->m_ControllerSpeakerFlags[chan] |= 0xC0000000;
+#if !defined(VERSION_R4QP01_REV1)
         WPADControlSpeaker(chan, 2, 0);
+#endif
     }
 }
 

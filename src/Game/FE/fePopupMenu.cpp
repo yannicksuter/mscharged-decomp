@@ -42,7 +42,9 @@
 #include <cmath>
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
+#if defined(VERSION_R4QE01)
 static const char* optionOKName = "button_OK";
+#endif
 
 struct PopupEntry
 {
@@ -54,9 +56,17 @@ struct PopupEntry
 
 static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "POPUP_CANCEL", 0, 0 }, 1 },
+#if defined(VERSION_R4QE01)
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
+#else
+    { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
+#endif
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "POPUP_CANCEL", 0, 0 }, 1 },
+#if defined(VERSION_R4QE01)
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
+#else
+    { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
+#endif
     { 1, "POPUP_RESTART_CUP_MESSAGE", { "POPUP_YES", "POPUP_NO", 0, 0 }, 1 },
     { 2, "POPUP_FLOWER_LOCKED_MESSAGE", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 2, "POPUP_STAR_LOCKED_MESSAGE", { "POPUP_OK", 0, 0, 0 }, 0 },
@@ -100,6 +110,7 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_WIN_FIRECUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_CRYSTALCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_STRIKERCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
+#if defined(VERSION_R4QE01)
     { 0, "POPUP_CHALLENGE_UNLOCK_MARIO", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_SUCCEEDED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_FAILED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
@@ -107,6 +118,15 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_TUTORIAL_SUCCEEDED", { "POPUP_SELECT_NEW_TUTORIAL", "POPUP_RESTART_TUTORIAL", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_TUTORIAL_FAILED", { "POPUP_SELECT_NEW_TUTORIAL", "POPUP_RESTART_TUTORIAL", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_SERIES_OVER", { "POPUP_REPLAY_SERIES", "POPUP_CHOOSE_NEW_TEAMS", "POPUP_MAIN_MENU", 0 }, 0 },
+#else
+    { 0, "POPUP_CHALLENGE_UNLOCK_MARIO", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_CHALLENGE_SUCCEEDED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_CHALLENGE_FAILED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_CHALLENGE_UNLOCK_CLASSROOM", { "POPUP_SELECT_NEW_TUTORIAL", "POPUP_RESTART_TUTORIAL", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_TUTORIAL_SUCCEEDED", { "POPUP_SELECT_NEW_TUTORIAL", "POPUP_RESTART_TUTORIAL", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_TUTORIAL_FAILED", { "POPUP_SELECT_NEW_TUTORIAL", "POPUP_RESTART_TUTORIAL", "PAUSE_QUIT", 0 }, 0 },
+    { 0, "POPUP_SERIES_OVER", { "POPUP_REPLAY_SERIES", "POPUP_CHOOSE_NEW_TEAMS", "PAUSE_QUIT", 0 }, 0 },
+#endif
     { 2, "POPUP_NO_GAME_RESULTS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_GAME_OVER", { "POPUP_RESTART_CUP", 0, 0, 0 }, 0 },
     { 0, "STRIKER_CUP_COMPLETE", { "POPUP_OK", 0, 0, 0 }, 0 },
@@ -193,7 +213,9 @@ static const PopupEntry PopupEntries[] = {
     { 1, "POPUP_PROFILE_UNLINK_WARNING", { "POPUP_YES", "POPUP_NO", 0, 0 }, 1 },
     { 0, "POPUP_PROFILE_MII_DELETION_WARNING", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_PROFILE_NO_SLOTS_LEFT", { "POPUP_OK", 0, 0, 0 }, 0 },
+#if defined(VERSION_R4QE01)
     { 0, "POPUP_DELETED_MII", { "POPUP_OK", 0, 0, 0 }, 0 },
+#endif
     { 0, "POPUP_LOW_BATTERY", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_E3_THANKS_FOR_PLAYING", { "POPUP_OK", 0, 0, 0 }, 0 },
 };
@@ -301,20 +323,24 @@ void FEPopupMenu::SceneCreated()
         pText->fn_801CA5F0(boxSize);
     }
 
+#if defined(VERSION_R4QE01)
     TLComponentInstance* pOK = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
         presentation, "Slide1", "Layer", optionOKName);
     pOK->SetVisible(false);
+#endif
 
     for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
     {
         mOptionInstances[optionIndex] = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, "Slide1", "Layer", optionNames[optionIndex]);
+#if defined(VERSION_R4QE01)
         if (nlStrNCmp(PopupEntries[mType].mOptions[optionIndex], "POPUP_OK", 10) == 0)
         {
             mOptionInstances[optionIndex]->SetVisible(false);
             mOptionInstances[optionIndex] = pOK;
             pOK->SetVisible(true);
         }
+#endif
         mOptionTextInstances[optionIndex] = FEFinder<TLTextInstance, 3>::Find<TLComponentInstance>(
             mOptionInstances[optionIndex], "off", "Group", "btn_text");
         mOptionTextInstances[optionIndex]->SetString(mPopup.pOptionLabels[optionIndex]->begin());
@@ -740,7 +766,11 @@ void FEPopupMenu::SetPositions()
         nlColour optionColour = pText->GetAssetColour();
         optionColour.c[3] = 255;
         pText->SetAssetColour(optionColour);
+#if defined(VERSION_R4QE01)
         float optionHeight = 56.7f;
+#else
+        float optionHeight = 50.0f;
+#endif
         totalHeight += optionHeight;
         float optionY;
         if (optionIndex == 0)
@@ -766,11 +796,20 @@ void FEPopupMenu::SetPositions()
         mPresentation, "Slide1", "Layer", "Message");
     nlVector2 size = fn_801CC48C(pText);
     float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
+#if defined(VERSION_R4QE01)
     mBackgroundTargetScaleX = (40.0f + width) / 120.0f;
     mBackgroundTargetScaleY = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
+#else
+    mBackgroundTargetScaleX = (40.0f + width) / 125.0f;
+    mBackgroundTargetScaleY = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 125.0f;
+#endif
     pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
     feVector3 position = pImage->GetAssetPosition();
+#if defined(VERSION_R4QE01)
     pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
+#else
+    pImage->SetAssetPosition(5.0f + position.e[0], position.e[1] - 8.0f, position.e[2]);
+#endif
     SetMessageAndOptionsVisible(false);
     mMenuDisplayed = true;
 }

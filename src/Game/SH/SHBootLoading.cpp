@@ -33,7 +33,14 @@ BootLoadingScene::BootLoadingScene()
     , mHomeButtonWarningActive(false)
     , mWidescreen(false)
 {
+#if defined(VERSION_R4QE01)
     mPhase = PhaseStrap;
+#else
+    if (GetRegion() == GAME_REGION_US)
+        mPhase = PhaseRatings;
+    else
+        mPhase = PhaseStrap;
+#endif
 }
 
 BootLoadingScene::~BootLoadingScene()
@@ -84,7 +91,9 @@ void BootLoadingScene::SceneCreated()
     switch (g_Language)
     {
     case nlLocalization::LangFrench:
+#if defined(VERSION_R4QE01)
     case nlLocalization::LangNAFrench:
+#endif
         if (IsWidescreen())
             image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
                 InlineHasher("Layer"), InlineHasher("strap_16_9_French"));
@@ -101,7 +110,9 @@ void BootLoadingScene::SceneCreated()
                 InlineHasher("Layer"), InlineHasher("strap_German"));
         break;
     case nlLocalization::LangSpanish:
+#if defined(VERSION_R4QE01)
     case nlLocalization::LangNASpanish:
+#endif
         if (IsWidescreen())
             image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
                 InlineHasher("Layer"), InlineHasher("strap_16_9_Spanish"));
@@ -163,7 +174,11 @@ void BootLoadingScene::Update(float fDeltaT)
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
+#if defined(VERSION_R4QE01)
             mPhase = PhaseDeveloperLogo;
+#else
+            mPhase = PhaseStrap;
+#endif
             mElapsedTime = 0.0f;
             SetPhaseSlide();
         }
@@ -210,11 +225,16 @@ void BootLoadingScene::Update(float fDeltaT)
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
+#if defined(VERSION_R4QE01)
             mElapsedTime = 0.0f;
             if (GetRegion() == GAME_REGION_US)
                 mPhase = PhaseRatings;
             else
                 mPhase = PhaseDeveloperLogo;
+#else
+            mPhase = PhaseDeveloperLogo;
+            mElapsedTime = 0.0f;
+#endif
             SetPhaseSlide();
         }
     }
@@ -274,13 +294,18 @@ void BootLoadingScene::SetPhaseSlide()
     }
     if (mHomeButtonWarning != 0)
     {
+#if defined(VERSION_R4QE01)
         float time = mHomeButtonWarning->GetActiveSlide()->m_time;
+#else
+        TLSlide* previousSlide = mHomeButtonWarning->GetActiveSlide();
+#endif
         mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::FindOrDefault(
             mPresentation->GetActiveSlide(), "Layer", "no home");
         if (mWidescreen)
             mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
         else
             mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
+#if defined(VERSION_R4QE01)
         if (mHomeButtonWarningActive)
         {
             TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
@@ -288,6 +313,10 @@ void BootLoadingScene::SetPhaseSlide()
                 mHomeButtonWarning->m_bVisible = true;
         }
         mHomeButtonWarning->Update(time);
+#else
+        TLSlide* currentSlide = mHomeButtonWarning->GetActiveSlide();
+        currentSlide->m_time = previousSlide->m_time;
+#endif
     }
 }
 
@@ -298,7 +327,9 @@ void BootLoadingScene::ShowHomeButtonWarning()
         return;
     }
 
+#if defined(VERSION_R4QE01)
     if (mPhase != PhaseStrap || !(mElapsedTime <= 2.0f))
+#endif
     {
         mHomeButtonWarning->m_bVisible = true;
         if (mWidescreen)
@@ -309,6 +340,7 @@ void BootLoadingScene::ShowHomeButtonWarning()
     }
 }
 
+#if defined(VERSION_R4QE01)
 bool BootLoadingScene::IsBootScreenPending()
 {
     FEPresentation* presentation = GetPresentation();
@@ -345,3 +377,4 @@ bool BootLoadingScene::IsBootScreenPending()
     }
     return 255 > alpha;
 }
+#endif

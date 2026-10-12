@@ -17,8 +17,10 @@ float gHammerGrowScale = 1.4f;
 float gHammerGrowDuration = 0.15f;
 float gHammerSpinSpeed = 25.0f;
 float gHammerLandedDuration = 5.0f;
+#if defined(VERSION_R4QE01)
 float gHammerMinLandingAngle = 105.0f;
 float gHammerMaxLandingAngle = 165.0f;
+#endif
 
 extern const float sHammerOne;
 extern const float sHammerZero;
@@ -28,6 +30,9 @@ extern const float sHammerHalf;
 extern const float sHammerDegreesPerHalfTurn;
 extern const float sHammerRadiansToAngleUnits;
 extern const float sHammerQuarter;
+#if !defined(VERSION_R4QE01)
+extern const float sHammerLandingDotThreshold;
+#endif
 
 nlVector4 sHammerForward = { 1.0f, 0.0f, 0.0f, 0.0f };
 
@@ -202,6 +207,7 @@ void HammerObject::OnLanding()
         nlQuaternion orientation = mOrientation;
         nlQuaternion facing;
         nlQuaternion target;
+#if defined(VERSION_R4QE01)
         nlQuaternion tilt;
         nlMakeQuatY(tilt,
             (u16)(int)(sHammerRadiansToAngleUnits
@@ -215,18 +221,37 @@ void HammerObject::OnLanding()
         float maximumDot = nlSin((u16)((u16)(int)(sHammerRadiansToAngleUnits
             * (sHammerQuarter * ToRadians(gHammerMaxLandingAngle - gHammerMinLandingAngle)))
             + 0x4000));
+#else
+        nlQuaternion lowOrientation;
+        nlQuaternion highOrientation;
+        fn_802B549C(facing,
+            mOwner->m_DetChar.m_aActualFacingDirection);
+        nlMakeQuatY(target, DegreesToAngle(125.0f));
+        nlMultQuat(target, facing, target);
+        nlMakeQuatY(lowOrientation, DegreesToAngle(100.0f));
+        nlMultQuat(lowOrientation, facing, lowOrientation);
+        nlMakeQuatY(highOrientation, DegreesToAngle(150.0f));
+        nlMultQuat(highOrientation, facing, highOrientation);
+
+        float maximumDot = sHammerLandingDotThreshold;
+#endif
         float dot = nlQuatDot(orientation, target);
         if (dot < sHammerZero)
         {
+#if defined(VERSION_R4QE01)
             orientation.x = -orientation.x;
             orientation.y = -orientation.y;
             orientation.z = -orientation.z;
             orientation.w = -orientation.w;
+#else
+            nlQuatInverse(orientation, orientation);
+#endif
             dot = nlQuatDot(orientation, target);
         }
 
         if (dot < maximumDot)
         {
+#if defined(VERSION_R4QE01)
             nlQuaternion lowTilt;
             nlQuaternion highTilt;
             float lowDegrees;
@@ -243,6 +268,7 @@ void HammerObject::OnLanding()
             nlQuaternion highOrientation;
             nlMultQuat(lowOrientation, facing, lowTilt);
             nlMultQuat(highOrientation, facing, highTilt);
+#endif
 
             if (nlQuatDot(orientation, lowOrientation)
                 > nlQuatDot(orientation, highOrientation))
@@ -479,8 +505,12 @@ void HammerObject::Deactivate(bool emitEffect)
 extern const float sHammerOne = 1.0f;
 extern const float sHammerZero = 0.0f;
 extern const float sHammerLengthEpsilon = 0.001f;
+#if defined(VERSION_R4QE01)
 extern const float sHammerPi = 3.1415927f;
 extern const float sHammerHalf = 0.5f;
 extern const float sHammerDegreesPerHalfTurn = 180.0f;
 extern const float sHammerRadiansToAngleUnits = 10430.378f;
 extern const float sHammerQuarter = 0.25f;
+#else
+extern const float sHammerLandingDotThreshold = 0.9f;
+#endif

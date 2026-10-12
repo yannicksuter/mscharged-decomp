@@ -544,8 +544,10 @@ unsigned int CharacterLoader::StartLoadingHierarchy()
 {
     mHierarchyData = 0;
     mHierarchySize = 0;
+#if !defined(VERSION_R4QP01_REV1)
     CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
+#endif
     return nlLoadEntireFileAsync(mTemplateInfo->szHierarchyFilename, HierarchyLoaded_cb,
         mCurrent, 0x20, AllocateStart, 0, 0, 0);
 }
@@ -560,9 +562,11 @@ bool CharacterLoader::FinalizeLoadingHierarchy()
     mTemplate->pHierarchyInventory = new (nlMalloc(sizeof(cInventory<cSHierarchy>), 8, false)) cInventory<cSHierarchy>();
     mTemplate->pHierarchyInventory->AddFile((char*)mHierarchyData, mHierarchySize);
 
+#if !defined(VERSION_R4QP01_REV1)
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+#endif
     return true;
 }
 
@@ -576,8 +580,10 @@ unsigned int CharacterLoader::StartLoadingCharacterPhysicsElements()
 {
     mPhysicsData = 0;
     mPhysicsSize = 0;
+#if !defined(VERSION_R4QP01_REV1)
     CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
+#endif
     return nlLoadEntireFileAsync(mTemplateInfo->szPhysicsFilename, PhysicsElementsLoaded_cb,
         mCurrent, 0x20, AllocateEnd, 0, 0, 0);
 }
@@ -594,9 +600,11 @@ bool CharacterLoader::FinalizeLoadingCharacterPhysicsElements()
     LoadCharacterPhysicsElements(mPhysicsData, mPhysicsSize, (CharacterPhysicsData*)mTemplate->pPhysicsData, true);
     mPhysicsData = 0;
 
+#if !defined(VERSION_R4QP01_REV1)
     --AllocatorStackDepth;
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+#endif
     return true;
 }
 

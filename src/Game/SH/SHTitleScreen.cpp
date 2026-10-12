@@ -69,7 +69,9 @@ TitleScene::TitleScene(ScreenMovement movement)
         sTitleDimmingTimeSet = true;
     }
 
+#if !defined(VERSION_R4QP01_REV1)
     LoadMemoryCardIconData();
+#endif
 }
 
 TitleScene::~TitleScene()

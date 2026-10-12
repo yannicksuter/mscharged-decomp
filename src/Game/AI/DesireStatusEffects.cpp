@@ -385,11 +385,15 @@ bool DesireShrink::Initialize(void* context)
         }
     }
 
+#if defined(VERSION_R4QP01_REV1)
+    PlaySound(source->m_uSoundSlotId, 0xE6E31092, 0, 0);
+#else
     if (g_pGame->IsGameplayOrOvertime()
         && g_pGame->m_eGameState != GS_UNLOADING)
     {
         PlaySound(source->m_uSoundSlotId, 0xE6E31092, 0, 0);
     }
+#endif
     return result;
 }
 
@@ -567,6 +571,7 @@ void DesireFrozen::Update(DesireUpdate*, float)
             m_pFielder->m_fOpacity = 0.0f;
         }
     }
+#if defined(VERSION_R4QE01)
     if (!g_pGame->IsGameplayOrOvertime())
     {
         if (m_pFielder->IsMarioSuperPowerActive() || m_pFielder->IsLuigiSuperPowerActive())
@@ -574,6 +579,7 @@ void DesireFrozen::Update(DesireUpdate*, float)
             m_pFielder->EndSuperPower(0);
         }
     }
+#endif
 }
 
 /**
