@@ -109,6 +109,7 @@ void ControllerSpeaker::ApplyToSound(void*)
 
 void ControllerSpeaker::OnSoundStopped(void*)
 {
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
     if (sControllerSpeakerEnabled)
     {
         if (--m_ActiveSoundCount < 0)
@@ -116,15 +117,18 @@ void ControllerSpeaker::OnSoundStopped(void*)
         if (m_ActiveSoundCount == 0)
             WPADControlSpeaker(m_Channel, WPAD_SPEAKER_MUTE, 0);
     }
+#endif
 }
 
 void ControllerSpeaker::OnSoundStarted(void* handle)
 {
     if (sControllerSpeakerEnabled)
     {
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         if (m_ActiveSoundCount == 0)
             WPADControlSpeaker(m_Channel, WPAD_SPEAKER_UNMUTE, 0);
         ++m_ActiveSoundCount;
+#endif
         bool interruptsEnabled = OSDisableInterrupts();
         AudioSource* voices[8];
         unsigned int count;
@@ -170,7 +174,7 @@ void Volume::BlendParameter(AudioEffectParameter* destination,
     VolumeParameter* destinationParameter = (VolumeParameter*)destination;
     VolumeParameter* sourceParameter = (VolumeParameter*)source;
     float amount;
-    if (sourceParameter->m_State.m_Flags.bytes[0])
+    if (sourceParameter->IsOwnerBound())
     {
         amount = *(float*)sourceParameter->m_State.m_Current.pointer;
         amount = amount >= 0.0f ? amount : 0.0f;

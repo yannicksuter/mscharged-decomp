@@ -22,7 +22,9 @@ class AudioEffectParameter
 public:
     AudioEffectParameter()
     {
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         m_State.m_Flags.bytes[0] = false;
+#endif
     }
 
     virtual ~AudioEffectParameter() { }
@@ -31,6 +33,16 @@ public:
 
     float GetTargetScalar() const { return m_State.m_Target.scalar; }
     float GetCurrentScalar() const { return m_State.m_Current.scalar; }
+
+    bool IsOwnerBound() const
+    {
+#if defined(VERSION_R4QP01_REV1)
+        // Revision 1 stores the owner flag in the low bit of the target word.
+        return (m_State.m_Target.word & 1) != 0;
+#else
+        return m_State.m_Flags.bytes[0] != 0;
+#endif
+    }
 
     struct State
     {
@@ -43,11 +55,13 @@ public:
 
         Value m_Current;
         Value m_Target;
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         union Flags
         {
             u32 word;
             u8 bytes[4];
         } m_Flags;
+#endif
     } m_State;
 };
 
@@ -89,7 +103,11 @@ public:
     bool AddParameter(AudioEffectParameter* parameter, void* owner)
     {
         parameter->m_State.m_Current.pointer = owner;
+#if defined(VERSION_R4QP01_REV1)
+        parameter->m_State.m_Target.word |= 1;
+#else
         parameter->m_State.m_Flags.bytes[0] = true;
+#endif
         m_Parameters.AddEnd(parameter);
         return true;
     }
@@ -127,7 +145,7 @@ inline void AudioEffectBase::CreateParameter(
 
 inline bool AudioEffectParameter::IsFinished()
 {
-    return m_State.m_Flags.bytes[0]
+    return IsOwnerBound()
         ? ((AudioEffectBase*)m_State.m_Current.pointer)->m_Finished
         : (GetTargetScalar()
             && (GetCurrentScalar() - GetTargetScalar() > 0.0001f
@@ -136,7 +154,7 @@ inline bool AudioEffectParameter::IsFinished()
 
 inline void AudioEffectParameter::Update(float dt)
 {
-    if (!m_State.m_Flags.bytes[0] && m_State.m_Target.scalar != 0.0f)
+    if (!IsOwnerBound() && m_State.m_Target.scalar != 0.0f)
     {
         m_State.m_Current.scalar += dt;
         m_State.m_Current.scalar =

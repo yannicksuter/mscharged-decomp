@@ -85,7 +85,11 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (BasicStadium::GetCurrentStadium() != NULL)
     {
+#if defined(VERSION_R4QP01_REV1)
+        if (to == 0x10)
+#else
         if (to == 0x10 && GetPresentation()->mNisStadiumEffectsEnabled)
+#endif
         {
             BasicStadium::GetCurrentStadium()->SetEffectsActive(0x37, 1);
         }
@@ -194,4 +198,3 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 }
 
 TransitionTask gTransitionTask;
-

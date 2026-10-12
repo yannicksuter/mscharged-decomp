@@ -337,19 +337,24 @@ void* StrikerChallenge::DeserializeData(void* src)
 
 void RecordChallengeUnlock(ChallengeUnlockRecord* record, int flag)
 {
+#if defined(VERSION_R4QP01_REV1)
+    const int baseYear = 2006;
+#else
+    const int baseYear = 2000;
+#endif
     int shift = nlLog2(0x100) + 1;
     if (flag <= 0x100000)
     {
         int index = nlLog2(flag >> shift);
         OSCalendarTime date;
         OSTicksToCalendarTime(OSGetTime(), &date);
-        if (date.year < 2000)
+        if (date.year < baseYear)
         {
-            date.year = 2000;
+            date.year = baseYear;
         }
         record->mCompletionDates[index].mDay = date.mday - 1;
         record->mCompletionDates[index].mMonth = date.month;
-        record->mCompletionDates[index].mYearOffset = date.year - 2000;
+        record->mCompletionDates[index].mYearOffset = date.year - baseYear;
     }
     record->mUnlockedChallenges |= flag >> shift;
 }

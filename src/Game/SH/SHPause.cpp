@@ -191,11 +191,14 @@ void PauseMenuScene::SceneCreated()
     FEAudio::EnableSounds(true);
     if (GameInfoManager::Instance()->IsInMode4())
     {
+#if defined(VERSION_R4QE01)
         if (GetRegion() == GAME_REGION_EU)
         {
+#endif
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "down", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+#if defined(VERSION_R4QE01)
         }
         else
         {
@@ -205,6 +208,7 @@ void PauseMenuScene::SceneCreated()
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId(string);
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "down", "option")->SetStringId(string);
         }
+#endif
     }
 }
 
@@ -293,11 +297,17 @@ void PauseMenuScene::Update(float fDeltaT)
         mTransitionTo = TT_IN;
         return;
     }
+#if defined(VERSION_R4QP01_REV1)
+    if (mSelectionMade)
+        return;
+#endif
     u8 goToChooseSides = 0;
     for (int i = 0; i < 4; ++i)
     {
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
         if (mSelectionMade)
             return;
+#endif
         bool curConnected = g_pFEInput->IsConnected((eFEINPUT_PAD)i) && IsFreeStylePad(i);
         if (!curConnected && GameInfoManager::Instance()->GetPlayingSide((unsigned short)i) != -1)
         {
@@ -403,7 +413,9 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
 {
     if (mSelectionMade)
         return;
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
     mSelectionMade = true;
+#endif
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     switch ((unsigned int)context)
     {
