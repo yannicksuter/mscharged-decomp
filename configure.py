@@ -1798,7 +1798,7 @@ config.libs = [
             # RVL_SDK/wpad
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/debug_msg.c"),
             Object(MatchingFor("R4QE01"), "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
-            Object(MatchingFor("R4QE01"), "RVL_SDK/wpad/WPADEncrypt.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/WPADEncrypt.c"),
             Object(MatchingFor("R4QE01"), "RVL_SDK/wpad/WPADHIDParser.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/WPADMem.c"),
 

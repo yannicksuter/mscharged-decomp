@@ -152,6 +152,7 @@ typedef struct WPADExtConfig {
     };
 } WPADExtConfig;
 
+// Offsets below describe R4QE01; the EU SDK has a smaller extension command queue.
 typedef struct WPADCB {
     WPADGameInfo gameInfo; // at 0x0
     s32 gameInfoErr[2];
@@ -160,7 +161,11 @@ typedef struct WPADCB {
     WPADCommandQueue stdCmdQueue;      // at 0x160
     WPADCommand stdCmdQueueList[24];   // at 0x16C
     WPADCommandQueue extCmdQueue;      // at 0x5EC
+#if defined(VERSION_R4QE01)
     WPADCommand extCmdQueueList[12];   // at 0x5F8
+#else
+    WPADCommand extCmdQueueList[8];    // at 0x5F8
+#endif
     WPADInfo info;                      // at 0x838
     WPADInfo* infoOut;                  // at 0x850
     WPADDevConfig devConf;              // at 0x854
