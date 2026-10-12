@@ -988,7 +988,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/ResetTask.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/SmokeTestUpdateTask.cpp", extra_cflags=["-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/TextWindowTask.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/Task/TransitionTask.cpp", extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/TransitionTask.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/TweakerTask.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Task/WorldUpdateTask.cpp"),
 
