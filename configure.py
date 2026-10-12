@@ -1474,7 +1474,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_error.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_ghttp.c", cflags=cflags_rvl_dwc),
-            Object(MatchingFor("R4QE01"), "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc),

@@ -14,8 +14,16 @@
 
 static u32 dwci_gamecode = 0;
 
+#if defined(VERSION_R4QE01)
+#define DWC_LIBRARY_NAME "RVLDWC"
+#define DWC_BUILD_TIMESTAMP "May 11 2007 13:30:47"
+#else
+#define DWC_LIBRARY_NAME "RVLDWC_DEV"
+#define DWC_BUILD_TIMESTAMP "Apr 13 2007 21:03:02"
+#endif
+
 #define DWC_VERSION_STRING \
-  "<< RVL_SDK - DWC \trelease build: May 11 2007 13:30:47 (0x4199_60831) >>"
+  "<< RVL_SDK - DWC \trelease build: " DWC_BUILD_TIMESTAMP " (0x4199_60831) >>"
 
 #define DWC_SDKDEV_SERVER_HOSTNAME "sdkdev.gamespy.com"
 
@@ -33,11 +41,11 @@ int DWC_Init(DWC_AuthServer authSvr, const char* gameName, u32 gameCode,
              DWCAllocEx allocator, DWCFreeEx freeer) {
   char hostname[256];
 
-  if (strcmp("RVLDWC", "RVLDWC") == 0) {
+  if (strcmp(DWC_LIBRARY_NAME, "RVLDWC") == 0) {
     OSRegisterVersion(DWC_VERSION_STRING);
-  } else if (strcmp("RVLDWC", "RVLDWC_DL") == 0) {
+  } else if (strcmp(DWC_LIBRARY_NAME, "RVLDWC_DL") == 0) {
     OSRegisterVersion(
-        "<< RVL_SDK - DWCDL \trelease build: May 11 2007 13:30:47 (0x4199_60831) >>");
+        "<< RVL_SDK - DWCDL \trelease build: " DWC_BUILD_TIMESTAMP " (0x4199_60831) >>");
   } else {
     OSRegisterVersion(DWC_VERSION_STRING);
   }
