@@ -73,7 +73,7 @@ void LowPassFilter::BlendParameter(
     if (sourceParameter->m_Frequency != 0)
     {
         float amount;
-        if (sourceParameter->m_State.m_Flags.bytes[0])
+        if (sourceParameter->IsOwnerBound())
         {
             amount = *(float*)sourceParameter->m_State.m_Current.pointer;
             amount = amount >= 0.0f ? amount : 0.0f;
@@ -99,7 +99,7 @@ void LowPassFilter::BlendParameter(
     else
     {
         float amount;
-        if (sourceParameter->m_State.m_Flags.bytes[0])
+        if (sourceParameter->IsOwnerBound())
         {
             amount = *(float*)sourceParameter->m_State.m_Current.pointer;
             amount = amount >= 0.0f ? amount : 0.0f;

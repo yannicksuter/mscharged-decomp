@@ -47,7 +47,7 @@ void Pitch::BlendParameter(AudioEffectParameter* destination,
     PitchParameter* sourceParameter = (PitchParameter*)source;
 
     float amount;
-    if (sourceParameter->m_State.m_Flags.bytes[0])
+    if (sourceParameter->IsOwnerBound())
     {
         amount = *(float*)sourceParameter->m_State.m_Current.pointer;
         amount = amount >= 0.0f ? amount : 0.0f;
