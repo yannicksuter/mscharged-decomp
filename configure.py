@@ -1669,7 +1669,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/ipc/memory.c"),
 
             # RVL_SDK/kpad
-            Object(MatchingFor("R4QE01"), "RVL_SDK/kpad/KPAD.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/kpad/KPAD.c"),
 
             # RVL_SDK/mem
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/mem/mem_allocator.c"),
