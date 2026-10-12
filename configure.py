@@ -949,7 +949,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineLogin.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMatchmakingDraft.cpp", extra_cflags=["-ipa file", "-sym on"] + [flag for flag in cflags_rvl_dwc if flag.startswith("-i ")]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMiiSelect.cpp", extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01"), "Game/SH/SHOnlineMiiSelectOverlay.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMiiSelectOverlay.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/SH/SHOnlinePlayerCount.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineRanking.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOptions.cpp", extra_cflags=["-ipa file", "-sym on"]),

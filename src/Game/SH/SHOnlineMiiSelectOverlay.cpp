@@ -382,10 +382,20 @@ void SHOnlineMiiSelectOverlay::SanitizeMiiName(unsigned short* name)
         case 0x03CC:
         case 0x03CD:
         case 0x03CE:
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+        case 0x0387:
+        case 0x03AA:
+        case 0x03AB:
+        case 0x03AC:
+        case 0x03AD:
+        case 0x03AE:
+        case 0x03AF:
+#endif
             name[i] = '?';
             break;
         }
 
+#if defined(VERSION_R4QE01)
         if (g_pLocalization->m_CurrentLanguage != nlLocalization::LangJapanese)
         {
             switch (name[i])
@@ -401,6 +411,7 @@ void SHOnlineMiiSelectOverlay::SanitizeMiiName(unsigned short* name)
                 break;
             }
         }
+#endif
     }
 }
 
