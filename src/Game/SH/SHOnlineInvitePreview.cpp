@@ -97,7 +97,9 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
         else if (state == INVITE_PREVIEW_TRANSITIONING)
         {
             GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
+#if !defined(VERSION_R4QP01_REV1)
             return;
+#endif
         }
     }
 

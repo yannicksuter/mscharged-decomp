@@ -5715,6 +5715,7 @@ RVL_SDK/os/OSTime.c:
 
 RVL_SDK/os/OSUtf.c:
 	.text       start:0x803BB760 end:0x803BB998
+	.data       start:0x8053D670 end:0x805494B0
 
 RVL_SDK/os/OSIpc.c:
 	.text       start:0x803BB998 end:0x803BB9C0
@@ -5765,6 +5766,7 @@ RVL_SDK/si/SIBios.c:
 	.text       start:0x803BDF70 end:0x803BF364
 	.data       start:0x80549770 end:0x805497E0
 	.bss        start:0x805D4B40 end:0x805D4D60
+	.sdata      start:0x806DE928 end:0x806DE92C
 	.sbss       start:0x806E15A8 end:0x806E15B8
 
 RVL_SDK/si/SISamplingRate.c:
@@ -5781,6 +5783,7 @@ RVL_SDK/thp/THPDec.c:
 	.rodata     start:0x804EBA10 end:0x804EBAA0
 	.data       start:0x80549878 end:0x805498C0
 	.bss        start:0x805D4D60 end:0x805D4EAC
+	.sdata      start:0x806DE930 end:0x806DE934
 	.sbss       start:0x806E15C0 end:0x806E16E4 align:32
 	.sdata2     start:0x806E60F0 end:0x806E610C
 
@@ -5834,15 +5837,16 @@ RVL_SDK/wpad/WPADEncrypt.c:
 	.data       start:0x8054A9B8 end:0x8054BCE0
 	.sbss       start:0x806E17F0 end:0x806E17F8
 
+RVL_SDK/wpad/debug_msg.c:
+	.text       start:0x803D50C4 end:0x803D5114
+
 RVL_SDK/wud/WUD.c:
+	.text       start:0x803D5114 end:0x803D93DC
 	.data       start:0x8054BCE0 end:0x8054CAB0
 	.bss        start:0x805D84E0 end:0x805DA2C0 align:32
 	.sdata      start:0x806DE990 end:0x806DE998
 	.sbss       start:0x806E17F8 end:0x806E1818
 	.sdata2     start:0x806E6148 end:0x806E6150
-
-RVL_SDK/wpad/debug_msg.c:
-	.text       start:0x803D50C4 end:0x803D5114
 
 RVL_SDK/wud/WUDHidHost.c:
 	.text       start:0x803D93DC end:0x803D9928
@@ -5869,9 +5873,6 @@ RVL_SDK/bte/hcisu_h2.c:
 	.bss        start:0x80602DA0 end:0x80602DC4
 	.sdata2     start:0x806E6150 end:0x806E6160
 
-RVL_SDK/bte/bta_sys_cfg.c:
-	.sdata2     start:0x806E6160 end:0x806E6166
-
 RVL_SDK/bte/uusb_ppc.c:
 	.text       start:0x803DBC40 end:0x803DD11C
 	.data       start:0x8054CEE8 end:0x8054DC2E
@@ -5886,6 +5887,11 @@ RVL_SDK/bte/bta_dm_cfg.c:
 
 RVL_SDK/bte/bta_hh_cfg.c:
 	.rodata     start:0x804EBBC8 end:0x804EBBD4
+	.sdata      start:0x806DE9D0 end:0x806DE9DC
+
+RVL_SDK/bte/bta_sys_cfg.c:
+	.sdata      start:0x806DE9E0 end:0x806DE9E4
+	.sdata2     start:0x806E6160 end:0x806E6166
 
 RVL_SDK/bte/bte_hcisu.c:
 	.text       start:0x803DD11C end:0x803DD1D4
@@ -5954,7 +5960,7 @@ RVL_SDK/bte/bta_dm_pm.c:
 RVL_SDK/bte/bta_hh_act.c:
 	.text       start:0x803E13C0 end:0x803E2B08
 	.data       start:0x8054DDF8 end:0x8054E2F0
-	.sdata      start:0x806DEA00 end:0x806DEA04
+	.sdata      start:0x806DEA00 end:0x806DEA01
 
 RVL_SDK/bte/bta_hh_api.c:
 	.text       start:0x803E2B08 end:0x803E2ED8
@@ -6215,11 +6221,13 @@ RVL_SDK/nwc24/NWC24FileApi.c:
 RVL_SDK/nwc24/NWC24Config.c:
 	.text       start:0x80410610 end:0x80410A28
 	.data       start:0x80553E50 end:0x80553EB8
+	.sdata      start:0x806DEBD0 end:0x806DEBDC
 	.sbss       start:0x806E18A8 end:0x806E18B0
 
 RVL_SDK/nwc24/NWC24Manage.c:
 	.text       start:0x80410A28 end:0x80410CE0
 	.data       start:0x80553EB8 end:0x80553FC8
+	.sdata      start:0x806DEBE0 end:0x806DEBE4
 	.sbss       start:0x806E18B0 end:0x806E18C4
 
 RVL_SDK/nwc24/NWC24MBoxCtrl.c:
@@ -6240,10 +6248,12 @@ RVL_SDK/nwc24/NWC24Schedule.c:
 RVL_SDK/nwc24/NWC24FriendList.c:
 	.text       start:0x804118F0 end:0x80411A0C
 	.data       start:0x80554038 end:0x80554058
+	.sdata      start:0x806DEBF0 end:0x806DEBF4
 
 RVL_SDK/nwc24/NWC24SecretFList.c:
 	.text       start:0x80411A0C end:0x80411B28
 	.data       start:0x80554058 end:0x80554074
+	.sdata      start:0x806DEBF8 end:0x806DEBFC
 
 RVL_SDK/nwc24/NWC24Time.c:
 	.text       start:0x80411B28 end:0x80411D04
@@ -6258,11 +6268,13 @@ RVL_SDK/nwc24/NWC24Ipc.c:
 RVL_SDK/nwc24/NWC24Download.c:
 	.text       start:0x80411E78 end:0x804123A4
 	.data       start:0x805540A0 end:0x805540BC
+	.sdata      start:0x806DEC00 end:0x806DEC04
 
 RVL_SDK/nwc24/NWC24System.c:
 	.text       start:0x804123A4 end:0x804124F8
 	.data       start:0x805540BC end:0x80554104 align:4
 	.bss        start:0x80618340 end:0x806183A0
+	.sdata      start:0x806DEC08 end:0x806DEC0C
 	.sbss       start:0x806E18F0 end:0x806E1900
 
 RVL_SDK/so/soCommon.c:
@@ -7379,12 +7391,14 @@ RVL_SDK/rfl/RFL_NANDLoader.c:
 	.text       start:0x804CE220 end:0x804CF24C
 	.rodata     start:0x804F2600 end:0x804F2690
 	.data       start:0x80566C80 end:0x80566CA0
+	.sdata      start:0x806DF730 end:0x806DF734
 
 RVL_SDK/rfl/RFL_NANDAccess.c:
 	extab       start:0x80006830 end:0x800068A8
 	extabindex  start:0x80006FC8 end:0x8000707C
 	.text       start:0x804CF24C end:0x804D0EA4
 	.data       start:0x80566CA0 end:0x80566CE8
+	.sdata      start:0x806DF738 end:0x806DF740
 	.sdata2     start:0x806E65F0 end:0x806E65F2
 	.sbss2      start:0x806E6780 end:0x806E6782
 

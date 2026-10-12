@@ -95,10 +95,13 @@ public:
     /* 0x161 */ bool mLastGoalUsedLoserReaction;
     /* 0x162 */ bool mNextLoserReactionOutraged;
     /* 0x163 */ bool mDrawBlackOverlay;
+#if !defined(VERSION_R4QP01_REV1)
     /* 0x164 */ bool mNisStadiumEffectsEnabled;
     /* 0x165 */ u8 m_pad165[0x3];
-    /* 0x168 */ MegaStrikeEndData mMegaStrikeResult;
-}; // total size: 0x174
+#endif
+    // 0x164 in EU rev1; 0x168 in USA and EU rev2.
+    MegaStrikeEndData mMegaStrikeResult;
+}; // total size: 0x170 in EU rev1; 0x174 in USA and EU rev2.
 
 Presentation* GetPresentation();
 u32* GetPresentationRandomSeed(Presentation* presentation);

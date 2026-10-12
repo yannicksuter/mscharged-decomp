@@ -164,7 +164,9 @@ void SHHallOfFameRoom::Update(float fDeltaT)
 
             if (mPageControls->IsButtonPressed(1))
             {
+#if !defined(VERSION_R4QP01_REV1)
                 if (g_pFEInput->m_InputLockDepth == 0)
+#endif
                 {
                     StopHallOfFameTrophyEffects();
                     CycleHallOfFameCup(mMode, false);
@@ -174,7 +176,9 @@ void SHHallOfFameRoom::Update(float fDeltaT)
             }
             else if (mPageControls->IsButtonPressed(0))
             {
+#if !defined(VERSION_R4QP01_REV1)
                 if (g_pFEInput->m_InputLockDepth == 0)
+#endif
                 {
                     StopHallOfFameTrophyEffects();
                     CycleHallOfFameCup(mMode, true);

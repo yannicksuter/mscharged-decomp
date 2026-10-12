@@ -25,6 +25,9 @@ float gPeachPhotoFadeTime = 0.3f;
 int gPeachPhotoBorderAlpha = 0x30;
 int gPeachPhotoTextureRotation = 1;
 bool gPeachPhotoResetState = true;
+#if defined(VERSION_R4QP01_REV1)
+bool gPeachPhotoSubdivide = true;
+#endif
 float gPeachPhotoDepthOffset = 0.005f;
 
 unsigned int gPeachPhotoBorderIntensity;
@@ -351,7 +354,9 @@ void UpdatePeachPhoto(
 
 void RenderPeachPhoto(PeachPhotoState* photo)
 {
+#if !defined(VERSION_R4QP01_REV1)
     glModel* model;
+#endif
 
     if (photo->state == PEACH_PHOTO_INACTIVE)
     {
@@ -452,20 +457,75 @@ void RenderPeachPhoto(PeachPhotoState* photo)
     texture[2] = sPeachPhotoTexcoords[2];
     texture[3] = sPeachPhotoTexcoords[3];
 
-    if (writer.Begin(4, GLP_QuadList, 0))
+#if defined(VERSION_R4QP01_REV1)
+    if (!gPeachPhotoSubdivide)
+#endif
     {
-        for (int i = 0; i < 4; ++i)
+        if (writer.Begin(4, GLP_QuadList, 0))
         {
-            writer.Texcoord0(photo->projectedCorners[i]);
+            for (int i = 0; i < 4; ++i)
+            {
+                writer.Texcoord0(photo->projectedCorners[i]);
 
-            const nlVector2& tex = texture[(i + gPeachPhotoTextureRotation) % 4];
-            writer.Texcoord1(tex);
-            writer.Texcoord2(tex);
-            writer.Colour(colour);
+                const nlVector2& tex = texture[(i + gPeachPhotoTextureRotation) % 4];
+                writer.Texcoord1(tex);
+                writer.Texcoord2(tex);
+                writer.Colour(colour);
 
-            nlVector3 position = photo->corners[i];
-            position.z += gPeachPhotoDepthOffset;
-            writer.Vertex(position);
+                nlVector3 position = photo->corners[i];
+                position.z += gPeachPhotoDepthOffset;
+                writer.Vertex(position);
+            }
+
+            if (writer.End())
+            {
+                writer.Texture(0, glGetTexture(
+                    gPeachPhotoDisableImage ? sPeachPhotoWhiteTexture : sPeachPhotoTexture));
+
+                writer.Texture(1, glGetTexture(
+                    gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture1));
+
+                writer.Texture(2, glGetTexture(
+                    gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture2));
+
+#if !defined(VERSION_R4QP01_REV1)
+                model = writer.GetModel();
+                for (glModelPacket* packet = model->packets;
+                     packet < model->packets + model->numPackets;
+                     ++packet)
+                {
+                    glSetRasterState(
+                        packet->rasterState, GLS_AlphaTest, 1);
+                    glSetRasterState(
+                        packet->rasterState, GLS_AlphaTestRef, 0);
+                }
+#endif
+
+                GetLayerView(eCLV_PeachPhoto3D)->AttachModel(
+                    writer.GetModel(), 0);
+            }
+        }
+    }
+#if defined(VERSION_R4QP01_REV1)
+    else if (writer.Begin(36, GLP_QuadList, 0))
+    {
+        for (int x = 0; x < 3; ++x)
+        {
+            for (int y = 0; y < 3; ++y)
+            {
+                const PeachPhotoCell& cell = photo->cells[x][y];
+                for (int corner = 0; corner < 4; ++corner)
+                {
+                    writer.Texcoord0(cell.projected[corner]);
+                    writer.Texcoord1(cell.texture[corner]);
+                    writer.Texcoord2(cell.texture[corner]);
+                    writer.Colour(colour);
+
+                    nlVector3 position = cell.world[corner];
+                    position.z += gPeachPhotoDepthOffset;
+                    writer.Vertex(position);
+                }
+            }
         }
 
         if (writer.End())
@@ -479,19 +539,9 @@ void RenderPeachPhoto(PeachPhotoState* photo)
             writer.Texture(2, glGetTexture(
                 gPeachPhotoDisableMasks ? sPeachPhotoWhiteTexture : sPeachPhotoMaskTexture2));
 
-            model = writer.GetModel();
-            for (glModelPacket* packet = model->packets;
-                 packet < model->packets + model->numPackets;
-                 ++packet)
-            {
-                glSetRasterState(
-                    packet->rasterState, GLS_AlphaTest, 1);
-                glSetRasterState(
-                    packet->rasterState, GLS_AlphaTestRef, 0);
-            }
-
             GetLayerView(eCLV_PeachPhoto3D)->AttachModel(
                 writer.GetModel(), 0);
         }
     }
+#endif
 }

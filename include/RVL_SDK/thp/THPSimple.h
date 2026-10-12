@@ -11,7 +11,9 @@ extern "C"
 #endif
 
     int THPSimpleInit(long audioSystem);
+#if !defined(VERSION_R4QP01_REV1)
     void THPSimpleSetMono(bool mono);
+#endif
     void THPSimpleQuit(void);
     int THPSimpleOpen(const char* fileName);
     int THPSimpleClose(void);

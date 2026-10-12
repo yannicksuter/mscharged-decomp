@@ -207,7 +207,9 @@ Presentation::Presentation()
     mLastGoalUsedLoserReaction = true;
     mNextLoserReactionOutraged = false;
     mDrawBlackOverlay = false;
+#if !defined(VERSION_R4QP01_REV1)
     mNisStadiumEffectsEnabled = true;
+#endif
     mQueuedFunction[0] = '\0';
     mQueuedFilter[0] = '\0';
 
@@ -1783,7 +1785,9 @@ void Presentation::Reset()
     ReplayManager::Instance()->Flush();
 
     mDrawBlackOverlay = false;
+#if !defined(VERSION_R4QP01_REV1)
     mNisStadiumEffectsEnabled = true;
+#endif
 }
 
 /**
