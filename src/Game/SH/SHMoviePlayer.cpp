@@ -84,7 +84,11 @@ void MoviePlayerScene::Update(float fDeltaT)
     }
     if (!mMovieStarted)
     {
+#if defined(VERSION_R4QP01_REV1)
+        mMovieStarted = MovieStart(mMovieFilename, false, mLoopMovie);
+#else
         mMovieStarted = MovieStart(mMovieFilename, false, mLoopMovie, SCGetSoundMode() == 0);
+#endif
         SetSyncedDecode(true);
 
         const char* streamName;

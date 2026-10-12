@@ -953,7 +953,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHHallOfFameSummary.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHLoading.cpp", extra_cflags=["-inline auto", "-sym on", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHMainMenu.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/SH/SHMoviePlayer.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHMoviePlayer.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHNavigation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHNetworkStart.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineConnectionQuality.cpp", extra_cflags=["-ipa file", "-sym on"]),
@@ -978,7 +978,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHPause.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHPausePostGame.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHRoadToStrikersCupHub.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/SH/SHStadiumSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHStadiumSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHStrikerCupAwards.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHStrikerCupStandings.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHStrikerTimesBase.cpp", extra_cflags=["-ipa file", "-sym on"]),
@@ -987,7 +987,7 @@ config.libs = [
 
             # Game/Sys
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Sys/clock.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/Sys/movie.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Sys/movie.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Sys/simpleparser.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Sys/tweak.cpp", extra_cflags=["-ipa file", "-sym on"]),
 

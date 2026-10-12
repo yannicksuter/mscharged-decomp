@@ -67,8 +67,11 @@ void SetSyncedDecode(bool value)
     g_bSyncedDecode = value;
 }
 
-bool MovieStart(
-    const char* szFilename, bool bSound, bool bLoopMovie, bool bMono)
+#if defined(VERSION_R4QP01_REV1)
+bool MovieStart(const char* szFilename, bool bSound, bool bLoopMovie)
+#else
+bool MovieStart(const char* szFilename, bool bSound, bool bLoopMovie, bool bMono)
+#endif
 {
     if (g_bActive)
     {
@@ -140,7 +143,9 @@ bool MovieStart(
         return false;
     }
 
+#if !defined(VERSION_R4QP01_REV1)
     THPSimpleSetMono(bMono);
+#endif
     g_bFinished = false;
     start = true;
     g_bActive = true;
