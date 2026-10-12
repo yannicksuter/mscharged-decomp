@@ -2,7 +2,11 @@
 
 #include <internal/fdlibm.h>
 
+#if defined(VERSION_R4QE01)
 static const char* __KPADVersion = "<< RVL_SDK - KPAD \trelease build: May 17 2007 15:52:00 (0x4199_60831) >>";
+#else
+static const char* __KPADVersion = "<< RVL_SDK - KPAD \trelease build: Nov 30 2006 03:30:56 (0x4199_60831) >>";
+#endif
 
 static Vec2 icenter_org = {0.000f, 0.000f};
 static f32 idist_org = 1.000f;
@@ -1120,7 +1124,11 @@ s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
         } else {
             copy_ct = bufCount;
         }
+#if defined(VERSION_R4QE01)
         kp->bufCount = 0;
+#else
+        kp->bufCount -= copy_ct;
+#endif
         return_ct = copy_ct;
 
         tp += copy_ct;
@@ -1212,7 +1220,11 @@ s32 KPADRead(KPADChannel chan, KPADStatus samplingBufs[], u32 length) {
         if (lastClButton == KPAD_BUTTON_MASK) {
             lastClButton = kp->status.ex_status.cl.hold;
         }
+#if defined(VERSION_R4QE01)
         read_kpad_button(kp, lastDev, bufCount, lastCoreButton, lastFsButton, lastClButton);
+#else
+        read_kpad_button(kp, lastDev, return_ct, lastCoreButton, lastFsButton, lastClButton);
+#endif
 
         copy_ct = return_ct;
         tp = (KPADTmpStatus*)samplingBufs + copy_ct;
@@ -1281,7 +1293,9 @@ void KPADInit(void) {
 
         KPADSetBtnRepeat(i, 0.0f, 0.0f);
 
+#if defined(VERSION_R4QE01)
         KPADCalibrateDPD(i);
+#endif
 
         idx = 0;
         do {
@@ -1336,7 +1350,11 @@ static void KPADiSamplingCallback(s32 chan) {
     } table[] = {{0, WPAD_FMT_CORE_BTN_ACC},          {3, WPAD_FMT_CORE_BTN_ACC_DPD}, {0, WPAD_FMT_FS_BTN_ACC},
                  {1, WPAD_FMT_FS_BTN_ACC_DPD}, {0, WPAD_FMT_CLASSIC_BTN_ACC},  {1, WPAD_FMT_CLASSIC_BTN_ACC_DPD}};
 
+#if defined(VERSION_R4QE01)
     if (WPADProbe(chan, (WPADDeviceType*)&type) == WPAD_ERR_NO_CONTROLLER) {
+#else
+    if (WPADProbe(chan, (WPADDeviceType*)&type) != WPAD_ERR_OK) {
+#endif
         goto finish;
     }
 
