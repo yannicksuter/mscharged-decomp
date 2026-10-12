@@ -183,7 +183,7 @@ config.asflags = [
     "-mgekko",
     "--strip-local-absolute",
     "-I include",
-    f"-I build/{config.version}/include",
+    f"-I {config.out_path()}/include",
     f"--defsym BUILD_VERSION={version_num}",
 ]
 config.ldflags = [
@@ -201,6 +201,27 @@ config.reconfig_deps = [
     config.config_path.parent / "splits.txt",
     config.config_path.parent / "symbols.txt",
 ]
+
+# Disc-message images are generated locally from the selected original.
+config.custom_build_rules = [
+    {
+        "name": "disc_messages",
+        "command": '$python tools/extract_disc_messages.py --version $version "$in" "$out"',
+        "description": "EXTRACT disc-message images",
+        "restat": True,
+    },
+]
+config.custom_build_steps = {
+    "pre-compile": [
+        {
+            "rule": "disc_messages",
+            "outputs": config.out_path() / "include/Game/FE/DiscMessageImages.inc",
+            "inputs": Path("orig") / config.version / "sys/main.dol",
+            "implicit": [Path("tools/extract_disc_messages.py"), config.check_sha_path],
+            "variables": {"version": config.version},
+        },
+    ],
+}
 
 # Optional numeric ID for decomp.me preset
 # Can be overridden in libraries or objects
@@ -225,7 +246,7 @@ cflags_base = [
     "-str reuse",
     "-enc SJIS",
     "-i include",
-    f"-i build/{config.version}/include",
+    f"-i {config.out_path()}/include",
     "-i libs/Runtime/include",
     "-i libs/MSL_C/include",
     "-i libs/RVL_SDK/include",
@@ -751,7 +772,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/feTextureResource.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/feTimer.cpp", extra_cflags=["-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/GameSceneManager.cpp"),
-            Object(MatchingFor("R4QE01"), "Game/FE/LidOpenMessage.cpp", cflags=cflags_game),
+            Object(Matching, "Game/FE/LidOpenMessage.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/MatchSummary.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/OnlineRanking.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/tlComponent.cpp", extra_cflags=["-ipa file"]),

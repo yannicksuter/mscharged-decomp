@@ -109,6 +109,10 @@ On the first build, decomp-toolkit extracts `sys/main.dol` from the disc image
 and performs the initial analysis. Once extraction succeeds, the disc image can
 be removed from `orig/<version>` to save space.
 
+Ninja also generates the disc-message image include from that version's
+`main.dol`. The generated `DiscMessageImages.inc` stays in the build directory
+and is ignored by Git, including when using `--build-dir`.
+
 The reconstructed `config/<version>/symbols.txt` and
 `config/<version>/splits.txt` are checked into the repository. Disc images,
 extracted game files, split objects and build outputs must remain untracked.
