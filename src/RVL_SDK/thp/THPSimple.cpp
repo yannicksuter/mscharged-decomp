@@ -54,7 +54,9 @@ struct THPSimpleControlWork
     /* 0x124 */ THPAudioBuffer audioBuffer[6];
     /* 0x16C */ long audioDecodeIndex;
     /* 0x170 */ long audioOutputIndex;
+#if !defined(VERSION_R4QP01_REV1)
     /* 0x174 */ unsigned char mono;
+#endif
 };
 
 static THPSimpleControlWork SimpleControl;
@@ -723,6 +725,7 @@ static void MixAudio(short* destination, short* source, unsigned long sample)
                     }
 
                     vol = VolumeTable[(long)SimpleControl.curVolume];
+#if !defined(VERSION_R4QP01_REV1)
                     if (SimpleControl.mono)
                     {
                         mix = *libsrc++ + ((vol * *thpsrc++) >> 15);
@@ -737,6 +740,7 @@ static void MixAudio(short* destination, short* source, unsigned long sample)
                         dst += 2;
                     }
                     else
+#endif
                     {
                         mix = libsrc[0] + ((vol * thpsrc[0]) >> 15);
                         if (mix < -0x8000)
@@ -933,7 +937,9 @@ extern "C" int THPSimpleSetVolume(long vol, long time)
     return 0;
 }
 
+#if !defined(VERSION_R4QP01_REV1)
 extern "C" void THPSimpleSetMono(bool mono)
 {
     SimpleControl.mono = mono;
 }
+#endif

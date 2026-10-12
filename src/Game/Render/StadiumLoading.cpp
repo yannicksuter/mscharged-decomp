@@ -530,17 +530,38 @@ void DestroyStadium()
     }
 }
 
+#if defined(VERSION_R4QP01_REV1)
+extern "C" bool lbl_806DEE60 = false;
+#else
 extern "C" bool lbl_806DEE60 = true;
+#endif
 
 void UpdateStadium(float fDeltaT)
 {
+    bool bUpdateState = true;
     bool bUpdateNPCs = true;
     if (GameInfoManager::Instance() != 0
         && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && lbl_806DEE60
-        && GameInfoManager::Instance()->GetStadium() == STAD_VICE)
+        && (GameInfoManager::Instance()->GetStadium() == STAD_VICE
+#if defined(VERSION_R4QP01_REV1)
+            || GameInfoManager::Instance()->GetStadium() == STAD_BATTLEDOME
+            || GameInfoManager::Instance()->GetStadium() == STAD_UNDERGROUND
+            || GameInfoManager::Instance()->GetStadium() == STAD_THE_PALACE
+            || GameInfoManager::Instance()->GetStadium() == STAD_STORM_SHIP
+            || GameInfoManager::Instance()->GetStadium() == STAD_KONGA_COLISEUM
+#endif
+            ))
+    {
+        bUpdateState = false;
+    }
+#if defined(VERSION_R4QP01_REV1)
+    if (GameInfoManager::Instance() != 0
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && lbl_806DEE60
+        && GameInfoManager::Instance()->GetStadium() == STAD_WASTELANDS)
     {
         bUpdateNPCs = false;
     }
+#endif
 
     if (!IsStadiumWorldLoaded())
     {
@@ -554,7 +575,7 @@ void UpdateStadium(float fDeltaT)
     unsigned int state = nlTaskManager::m_pInstance->mCurrentState;
     if (state != 8 && state != 0x20000 && state != 0x10)
     {
-        pBasicStadiumInstance->Update(fDeltaT, bUpdateNPCs, true);
+        pBasicStadiumInstance->Update(fDeltaT, bUpdateState, bUpdateNPCs);
     }
     else
     {

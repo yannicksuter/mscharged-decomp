@@ -37,7 +37,9 @@ OptionsAudioMenuV2::OptionsAudioMenuV2(int mode)
     , mNavigation()
     , mPointerButtonsInitialized(false)
     , mIntroSoundPlayed(false)
+#if !defined(VERSION_R4QP01_REV1)
     , mSaveStarted(false)
+#endif
     , mState(AUDIO_OPTIONS_ENTERING)
 {
     for (int i = 0; i < 6; ++i)
@@ -221,8 +223,10 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
         for (int j = 0; j < 6; ++j)
             mButtonComponents[j].HandlePointerEvent(&event);
         mSaveButtonComponent.HandlePointerEvent(&event);
+#if !defined(VERSION_R4QP01_REV1)
         if (mSaveStarted)
             break;
+#endif
     }
 }
 
@@ -435,7 +439,9 @@ void OptionsAudioMenuV2::OnSaveButtonPointerPress(int, void*)
         navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
+#if !defined(VERSION_R4QP01_REV1)
     mSaveStarted = true;
+#endif
     mSaveButton->SetActiveSlide("down", true, false);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
@@ -485,7 +491,9 @@ OptionsVisualMenuV2::OptionsVisualMenuV2(int mode)
     , mNavigation()
     , mPointerButtonsInitialized(false)
     , mIntroSoundPlayed(false)
+#if !defined(VERSION_R4QP01_REV1)
     , mSaveStarted(false)
+#endif
     , mState(VISUAL_OPTIONS_ENTERING)
 {
     for (int i = 0; i < 5; ++i)
@@ -660,8 +668,10 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
         mZoomButtonComponents[0].HandlePointerEvent(&event);
         mZoomButtonComponents[1].HandlePointerEvent(&event);
         mSaveButtonComponent.HandlePointerEvent(&event);
+#if !defined(VERSION_R4QP01_REV1)
         if (mSaveStarted)
             break;
+#endif
     }
 }
 
@@ -852,6 +862,8 @@ void OptionsVisualMenuV2::OnSaveButtonPointerPress(int, void*)
     mSaveButton->SetActiveSlide("down", true, false);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
+#if !defined(VERSION_R4QP01_REV1)
     mSaveStarted = true;
+#endif
     SaveLoad::StartSave(false);
 }

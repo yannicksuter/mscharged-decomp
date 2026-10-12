@@ -29,7 +29,9 @@ void WUDStoredLinkKeyCallback(void* p1);
 void WUDPowerManagerCallback(BD_ADDR addr, tBTM_PM_STATUS status, UINT16 value,
                              UINT8 hciStatus);
 
+#if defined(VERSION_R4QE01)
 static void InitCore(void);
+#endif
 
 static void WUDiRemovePatch(void);
 static void WUDiWritePatch(void);
@@ -1043,6 +1045,7 @@ static void EnableStackHandler0(OSAlarm* pAlarm, OSContext* pContext) {
 }
 
 static WUDInitState WUDiWaitSCSetup(void) {
+#if defined(VERSION_R4QE01)
     s32 diff = 0;
     WUDInitState nextState = WUD_STATE_INIT_WAIT_FOR_INITIALIZATION;
     s64 time = __OSGetSystemTime();
@@ -1055,6 +1058,17 @@ static WUDInitState WUDiWaitSCSetup(void) {
     }
 
     return nextState;
+#else
+    u8 nextState;
+
+    if (SCCheckStatus() == SC_STATUS_BUSY) {
+        nextState = WUD_STATE_INIT_WAIT_FOR_INITIALIZATION;
+    } else {
+        nextState = WUD_STATE_INIT_GET_DEV_INFO;
+    }
+
+    return nextState;
+#endif
 }
 
 static WUDInitState WUDiGetRegisteredDevice(void) {
@@ -1167,6 +1181,7 @@ static void ShutdownHandler0(OSAlarm* pAlarm, OSContext* pContext) {
                     __WUDHandlerStack + sizeof(__WUDHandlerStack));
 }
 
+#if defined(VERSION_R4QE01)
 static void InitCore(void) {
     WUDCB* p = &_wcb;
     int i;
@@ -1225,13 +1240,84 @@ static void InitCore(void) {
 
     WUDiClearDevice();
 }
+#endif
 
 BOOL WUDInit(void) {
     WUDCB* p = &_wcb;
+#if !defined(VERSION_R4QE01)
+    int i;
+    BOOL enabled;
+#endif
 
     if (_initialized) {
         return FALSE;
     }
+
+#if !defined(VERSION_R4QE01)
+    enabled = OSDisableInterrupts();
+
+    for (i = 0; i < WUD_MAX_DEV_ENTRY; i++) {
+        _dev_handle_to_bda[i] = NULL;
+        _dev_handle_queue_size[i] = 0;
+        _dev_handle_notack_num[i] = 0;
+    }
+
+    p->smpListTail = &p->smpList[WUD_MAX_DEV_ENTRY_FOR_SMP - 1];
+    p->smpListHead = &p->smpList[0];
+
+    for (i = 0; i < WUD_MAX_DEV_ENTRY_FOR_SMP; i++) {
+        p->smpList[i].devInfo = &p->smpDevs[WUD_MAX_DEV_ENTRY_FOR_SMP - 1 - i];
+        p->smpList[i].prev = i == 0 ? NULL : &p->smpList[i - 1];
+        p->smpList[i].next =
+            i == WUD_MAX_DEV_ENTRY_FOR_SMP - 1 ? NULL : &p->smpList[i + 1];
+    }
+
+    p->stdListTail = &p->stdList[WUD_MAX_DEV_ENTRY_FOR_STD - 1];
+    p->stdListHead = &p->stdList[0];
+
+    for (i = 0; i < WUD_MAX_DEV_ENTRY_FOR_STD; i++) {
+        p->stdList[i].devInfo = &p->stdDevs[i];
+        p->stdList[i].prev = i == 0 ? NULL : &p->stdList[i - 1];
+        p->stdList[i].next =
+            i == WUD_MAX_DEV_ENTRY_FOR_STD - 1 ? NULL : &p->stdList[i + 1];
+    }
+
+    p->syncStdCB = NULL;
+    p->syncSmpCB = NULL;
+    p->clearDevCB = NULL;
+
+    p->hidConnCB = NULL;
+    p->hidRecvCB = NULL;
+
+    p->syncState = WUD_STATE_START;
+    p->linkKeyState = WUD_STATE_START;
+    p->deleteState = WUD_STATE_START;
+    p->stackState = WUD_STATE_START;
+    p->initState = WUD_STATE_START;
+    p->shutdownState = WUD_STATE_START;
+
+    p->syncSkipChecks = FALSE;
+    p->syncType = WUD_SYNC_TYPE_STANDARD;
+    p->syncLoopNum = 1;
+
+    p->connectable = FALSE;
+    p->discoverable = FALSE;
+
+    p->libStatus = WUD_LIB_STATUS_0;
+    p->pmID = 0;
+    p->syncRssi = -65;
+
+    memset(p->hostAddr, 0, BD_ADDR_LEN);
+    memset(p->pairAddr, 0, BD_ADDR_LEN);
+
+    p->bufferStatus0 = 0;
+    p->bufferStatus1 = 10;
+
+    WUDiClearDevice();
+
+    p->initState = WUD_STATE_INIT_WAIT_FOR_INITIALIZATION;
+    OSRestoreInterrupts(enabled);
+#endif
 
     DEBUGPrint("BTA_Init() is started\n");
 
@@ -1242,6 +1328,7 @@ BOOL WUDInit(void) {
 
     DEBUGPrint("BTA_Init() is done\n");
 
+#if defined(VERSION_R4QE01)
     p->syncStdCB = NULL;
     p->syncSmpCB = NULL;
     p->clearDevCB = NULL;
@@ -1250,6 +1337,7 @@ BOOL WUDInit(void) {
     p->hidRecvCB = NULL;
 
     p->initState = WUD_STATE_INIT_WAIT_FOR_INITIALIZATION;
+#endif
 
     SCInit();
 
@@ -1667,7 +1755,11 @@ void reset_again(void) {
 
 static u8 patch_binary[] = {
     0x70, 0x99, 0x08, 0x00, // address (little-endian)
+#if defined(VERSION_R4QE01)
     0xB4, 0x00, 0x00, 0x00, // size (little-endian)
+#else
+    0x38, 0x00, 0x00, 0x00, // size (little-endian)
+#endif
 
     // patch data
     0x88, 0x43, 0xD1, 0x07,
@@ -1684,6 +1776,7 @@ static u8 patch_binary[] = {
     0x01, 0x49, 0x0B, 0x60,
     0x90, 0xF7, 0x96, 0xFB,
     0xD8, 0x1D, 0x08, 0x00,
+#if defined(VERSION_R4QE01)
     0x00, 0xF0, 0x04, 0xF8,
     0x00, 0x23, 0x79, 0xF7,
     0xE3, 0xFA, 0x00, 0x00,
@@ -1715,12 +1808,17 @@ static u8 patch_binary[] = {
     0xFF, 0x9F, 0x00, 0x00,
     0x30, 0xFC, 0x0E, 0x00,
     0x7F, 0xFF, 0x00, 0x00
+#endif
 };
 
 
 
 static WUDPatchList patch_install = {
+#if defined(VERSION_R4QE01)
     7,
+#else
+    6,
+#endif
     {
         {0x20, 0xBC, 0x65, 0x01, 0x00, 0x84, 0x42, 0x09, 0xD2, 0x84, 0x42, 0x09, 0xD1},
         {0x21, 0x84, 0x5A, 0x00, 0x00, 0x83, 0xF0, 0x74, 0xFF, 0x09, 0x0C, 0x08, 0x43},
@@ -1728,7 +1826,9 @@ static WUDPatchList patch_install = {
         {0x23, 0xCC, 0x9F, 0x01, 0x00, 0x6F, 0xF0, 0xE4, 0xFC, 0x03, 0x28, 0x7D, 0xD1},
         {0x24, 0x3C, 0x62, 0x01, 0x00, 0x28, 0x20, 0x00, 0xE0, 0x60, 0x8D, 0x23, 0x68},
         {0x25, 0x04, 0x12, 0x01, 0x00, 0x20, 0x1C, 0x20, 0x1C, 0x24, 0xE0, 0xB0, 0x21},
+#if defined(VERSION_R4QE01)
         {0x26, 0x74, 0x2F, 0x00, 0x00, 0x86, 0xF0, 0x18, 0xFD, 0x21, 0x4F, 0x3B, 0x60}
+#endif
     }
 };
 
@@ -1744,7 +1844,11 @@ static u32 size = 0;
 
 static void remove_patch_cb(tBTM_VSC_CMPL* p1) {
     if (p1 == NULL) {
+#if defined(VERSION_R4QE01)
         reset_again();
+#else
+        WUDiInitSub();
+#endif
     } else {
         offset = 0;
         WUDiWritePatch();
@@ -1767,7 +1871,11 @@ static void write_patch_cb(tBTM_VSC_CMPL* p1) {
             WUDiWritePatch();
         }
     } else {
+#if defined(VERSION_R4QE01)
         reset_again();
+#else
+        WUDiInitSub();
+#endif
     }
 }
 
@@ -1795,12 +1903,20 @@ static void WUDiWritePatch(void) {
 static void install_patch_cb(tBTM_VSC_CMPL* p1) {
     if (p1 != NULL) {
         if (patch_num == install_num) {
+#if defined(VERSION_R4QE01)
             reset_again();
+#else
+            WUDiInitSub();
+#endif
         } else {
             WUDiInstallPatch();
         }
     } else {
+#if defined(VERSION_R4QE01)
         reset_again();
+#else
+        WUDiInitSub();
+#endif
     }
 }
 
@@ -1886,7 +2002,11 @@ void WUDiInitSub(void) {
     BTM_WritePageTimeout(32768);
     BTM_SetDefaultLinkPolicy(HCI_ENABLE_MASTER_SLAVE_SWITCH |
                              HCI_ENABLE_SNIFF_MODE);
+#if defined(VERSION_R4QE01)
     BTM_SetDefaultLinkSuperTout(1600);
+#else
+    BTM_SetDefaultLinkSuperTout(3200);
+#endif
 
     for (i = 0; i < WUD_MAX_DEV_ENTRY_FOR_STD; i++) {
         if (p->stdDevs[i].status == 1) {
@@ -2766,8 +2886,11 @@ void WUDVendorSpecificCallback(UINT8 len, UINT8* pData) {
         DEBUGPrint("VSE:- WATCH_DOG_RESET  HW error = %d\n", pData[1]);
 
 
-#line 3877
-        OS_ERROR("MODULE FATAL ERROR\n");
+#if defined(VERSION_R4QE01)
+        OSPanic(__FILE__, 3877, "MODULE FATAL ERROR\n");
+#else
+        OSPanic(__FILE__, 3792, "MODULE FATAL ERROR\n");
+#endif
 
         break;
     }
@@ -2899,8 +3022,11 @@ void WUDStoredLinkKeyCallback(void* p1) {
 
     default: {
 
-#line 4029
-        OS_ERROR("Unknown event\n");
+#if defined(VERSION_R4QE01)
+        OSPanic(__FILE__, 4029, "Unknown event\n");
+#else
+        OSPanic(__FILE__, 3944, "Unknown event\n");
+#endif
 
     }
     }

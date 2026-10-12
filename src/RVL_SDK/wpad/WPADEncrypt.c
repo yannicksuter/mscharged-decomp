@@ -2,6 +2,12 @@
 #include <revolution/wpad.h>
 #include <revolution/wpad/WPADEncrypt.h>
 
+#if defined(VERSION_R4QE01)
+#define WPAD_ENCRYPT_REPORT DEBUGPrint
+#else
+#define WPAD_ENCRYPT_REPORT OSReport
+#endif
+
 static u8 SEED;
 static u8 NUM_A;
 static u8 NUM_B;
@@ -378,11 +384,13 @@ void WPADiCreateKey(s32 chan)
         tblRnd[i] = tb[random()];
     }
 
+#if defined(VERSION_R4QE01)
     DEBUGPrint("ans : %d %d %d %d %d %d\n", base[baseIdx], base[baseIdx + 1], base[baseIdx + 2], base[baseIdx + 3], base[baseIdx + 4], base[baseIdx + 5]);
 
     DEBUGPrint("rand: %d %d %d %d %d %d %d %d %d %d\n", tblRnd[0], tblRnd[1], tblRnd[2], tblRnd[3], tblRnd[4], tblRnd[5], tblRnd[6], tblRnd[7], tblRnd[8], tblRnd[9]);
 
     DEBUGPrint("t0  : %d %d %d %d %d %d %d %d %d %d\n", tb[tblRnd[0]], tb[tblRnd[1]], tb[tblRnd[2]], tb[tblRnd[3]], tb[tblRnd[4]], tb[tblRnd[5]], tb[tblRnd[6]], tb[tblRnd[7]], tb[tblRnd[8]], tb[tblRnd[9]]);
+#endif
 
     enable = OSDisableInterrupts();
     key[0] = (u8)((ror((u8)(base[baseIdx] ^ tb[tblRnd[5]]), tb[tblRnd[2]]) - tb[tblRnd[9]]) ^ tb[tblRnd[4]]);
@@ -392,7 +400,9 @@ void WPADiCreateKey(s32 chan)
     key[4] = (u8)((ror((u8)(base[baseIdx + 4] ^ tb[tblRnd[1]]), tb[tblRnd[6]]) - tb[tblRnd[3]]) ^ tb[tblRnd[4]]);
     key[5] = (u8)((ror((u8)(base[baseIdx + 5] ^ tb[tblRnd[7]]), tb[tblRnd[8]]) - tb[tblRnd[5]]) ^ tb[tblRnd[9]]);
 
+#if defined(VERSION_R4QE01)
     DEBUGPrint("key : %d %d %d %d %d %d \n", key[0], key[1], key[2], key[3], key[4], key[5]);
+#endif
 
     ft[0] = (u8)(tb[(idx + 1) * 256 + key[4]] ^ tb[(idx + 2) * 256 + tblRnd[3]]);
     ft[1] = (u8)(tb[(idx + 1) * 256 + key[2]] ^ tb[(idx + 2) * 256 + tblRnd[5]]);
@@ -411,8 +421,10 @@ void WPADiCreateKey(s32 chan)
     sb[6] = (u8)(tb[(idx + 1) * 256 + tblRnd[3]] ^ tb[(idx + 2) * 256 + tblRnd[5]]);
     sb[7] = (u8)(tb[(idx + 1) * 256 + tblRnd[2]] ^ tb[(idx + 2) * 256 + tblRnd[6]]);
 
+#if defined(VERSION_R4QE01)
     DEBUGPrint("ft  : %d %d %d %d %d %d %d %d\n", ft[0], ft[1], ft[2], ft[3], ft[4], ft[5], ft[6], ft[7]);
     DEBUGPrint("sb  : %d %d %d %d %d %d %d %d\n", sb[0], sb[1], sb[2], sb[3], sb[4], sb[5], sb[6], sb[7]);
+#endif
 
     for (i = 0; i < 10; i++)
     {
@@ -455,11 +467,11 @@ void WPADiCreateKeyFor3rd(s32 chan)
         tblRnd[i] = tb3[random()];
     }
 
-    DEBUGPrint("ans : %d %d %d %d %d %d\n", base3[baseIdx], base3[baseIdx + 1], base3[baseIdx + 2], base3[baseIdx + 3], base3[baseIdx + 4], base3[baseIdx + 5]);
+    WPAD_ENCRYPT_REPORT("ans : %d %d %d %d %d %d\n", base3[baseIdx], base3[baseIdx + 1], base3[baseIdx + 2], base3[baseIdx + 3], base3[baseIdx + 4], base3[baseIdx + 5]);
 
-    DEBUGPrint("rand: %d %d %d %d %d %d %d %d %d %d\n", tblRnd[0], tblRnd[1], tblRnd[2], tblRnd[3], tblRnd[4], tblRnd[5], tblRnd[6], tblRnd[7], tblRnd[8], tblRnd[9]);
+    WPAD_ENCRYPT_REPORT("rand: %d %d %d %d %d %d %d %d %d %d\n", tblRnd[0], tblRnd[1], tblRnd[2], tblRnd[3], tblRnd[4], tblRnd[5], tblRnd[6], tblRnd[7], tblRnd[8], tblRnd[9]);
 
-    DEBUGPrint("t0  : %d %d %d %d %d %d %d %d %d %d\n", tb3[tblRnd[0]], tb3[tblRnd[1]], tb3[tblRnd[2]], tb3[tblRnd[3]], tb3[tblRnd[4]], tb3[tblRnd[5]], tb3[tblRnd[6]], tb3[tblRnd[7]], tb3[tblRnd[8]], tb3[tblRnd[9]]);
+    WPAD_ENCRYPT_REPORT("t0  : %d %d %d %d %d %d %d %d %d %d\n", tb3[tblRnd[0]], tb3[tblRnd[1]], tb3[tblRnd[2]], tb3[tblRnd[3]], tb3[tblRnd[4]], tb3[tblRnd[5]], tb3[tblRnd[6]], tb3[tblRnd[7]], tb3[tblRnd[8]], tb3[tblRnd[9]]);
 
     enable = OSDisableInterrupts();
     key[0] = (u8)((rol((u8)(base3[baseIdx] ^ tb3[tblRnd[0]]), tb3[tblRnd[1]]) + tb3[tblRnd[6]]) ^ tb3[tblRnd[7]]);
@@ -469,7 +481,7 @@ void WPADiCreateKeyFor3rd(s32 chan)
     key[4] = (u8)((rol((u8)(base3[baseIdx + 4] ^ tb3[tblRnd[5]]), tb3[tblRnd[4]]) + tb3[tblRnd[8]]) ^ tb3[tblRnd[1]]);
     key[5] = (u8)((rol((u8)(base3[baseIdx + 5] ^ tb3[tblRnd[9]]), tb3[tblRnd[3]]) + tb3[tblRnd[8]]) ^ tb3[tblRnd[5]]);
 
-    DEBUGPrint("key : %d %d %d %d %d %d \n", key[0], key[1], key[2], key[3], key[4], key[5]);
+    WPAD_ENCRYPT_REPORT("key : %d %d %d %d %d %d \n", key[0], key[1], key[2], key[3], key[4], key[5]);
 
     ft[0] = (u8)(tb3[(idx + 1) * 256 + key[4]] ^ tb3[(idx + 2) * 256 + tblRnd[3]]);
     ft[1] = (u8)(tb3[(idx + 1) * 256 + key[2]] ^ tb3[(idx + 2) * 256 + tblRnd[5]]);
@@ -488,8 +500,8 @@ void WPADiCreateKeyFor3rd(s32 chan)
     sb[6] = (u8)(tb3[(idx + 1) * 256 + tblRnd[3]] ^ tb3[(idx + 2) * 256 + tblRnd[5]]);
     sb[7] = (u8)(tb3[(idx + 1) * 256 + tblRnd[2]] ^ tb3[(idx + 2) * 256 + tblRnd[6]]);
 
-    DEBUGPrint("ft  : %d %d %d %d %d %d %d %d\n", ft[0], ft[1], ft[2], ft[3], ft[4], ft[5], ft[6], ft[7]);
-    DEBUGPrint("sb  : %d %d %d %d %d %d %d %d\n", sb[0], sb[1], sb[2], sb[3], sb[4], sb[5], sb[6], sb[7]);
+    WPAD_ENCRYPT_REPORT("ft  : %d %d %d %d %d %d %d %d\n", ft[0], ft[1], ft[2], ft[3], ft[4], ft[5], ft[6], ft[7]);
+    WPAD_ENCRYPT_REPORT("sb  : %d %d %d %d %d %d %d %d\n", sb[0], sb[1], sb[2], sb[3], sb[4], sb[5], sb[6], sb[7]);
 
     for (i = 0; i < 10; i++)
     {

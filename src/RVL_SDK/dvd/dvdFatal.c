@@ -5,19 +5,30 @@
 static funcptr_t FatalFunc = NULL;
 
 const char* const __DVDErrorMessage[] = {
-    // clang-format off
-
-    // SC_LANG_JP
-    "\n\n\nエラーが発生しました。\n\n"
-    "イジェクトボタンを押してディスクを取り出してか\n"
-    "ら、本体の電源をOFFにして、本体の取扱説明書の\n"
-    "指示に従ってください。",
+    // SC_LANG_JP (Shift-JIS)
+    // An error has occurred. Press Eject to remove the disc, turn the console
+    // power OFF, then follow the instructions in the console manual.
+    "\n\n\n\x83\x47\x83\x89\x81\x5B\x82\xAA\x94\xAD\x90\xB6\x82\xB5\x82\xDC\x82\xB5"
+    "\x82\xBD\x81\x42\n\n"
+    "\x83\x43\x83\x57\x83\x46\x83\x4E\x83\x67\x83\x7B\x83\x5E\x83\x93\x82\xF0\x89\x9F"
+    "\x82\xB5\x82\xC4\x83\x66\x83\x42\x83\x58\x83\x4E\x82\xF0\x8E\xE6\x82\xE8\x8F\x6F"
+    "\x82\xB5\x82\xC4\x82\xA9\n"
+    "\x82\xE7\x81\x41\x96\x7B\x91\xCC\x82\xCC\x93\x64\x8C\xB9\x82\xF0OFF\x82\xC9"
+    "\x82\xB5\x82\xC4\x81\x41\x96\x7B\x91\xCC\x82\xCC\x8E\xE6\x88\xB5\x90\xE0\x96\xBE"
+    "\x8F\x91\x82\xCC\n"
+    "\x8E\x77\x8E\xA6\x82\xC9\x8F\x5D\x82\xC1\x82\xC4\x82\xAD\x82\xBE\x82\xB3\x82\xA2"
+    "\x81\x42",
 
     // SC_LANG_EN
     "\n\n\nAn error has occurred.\n"
     "Press the Eject Button, remove the\n"
+#if defined(VERSION_R4QE01)
     "Game Disc, and turn the power off.\n"
     "Please read the Wii operations manual\n"
+#else
+    "Game Disc, and turn the power OFF.\n"
+    "Please read the Wii Operations Manual\n"
+#endif
     "for more information.",
 
     // SC_LANG_DE
@@ -42,21 +53,20 @@ const char* const __DVDErrorMessage[] = {
     "apaga la consola. Consulta el manual de\n"
     "instrucciones de la consola Wii para\n"
     "obtener m\xE1s informaci\xF3n.",
-    
+
     // SC_LANG_IT
     "\n\n\nSi \xE8 verificato un errore.\n"
     "Premi il pulsante EJECT, estrai il disco\n"
     "di gioco e spegni la console. Per maggiori\n"
     "informazioni consulta il manuale di\n"
     "istruzioni della console Wii.",
-    
+
     // SC_LANG_NL
     "\n\n\nEr is een fout opgetreden.\n"
     "Druk op de ejectknop, verwijder de\n"
     "speldisk en zet het systeem uit. Lees\n"
     "de Wii-handleiding voor meer informatie."
 
-    // clang-format on
 };
 
 void __DVDShowFatalMessage(void) {

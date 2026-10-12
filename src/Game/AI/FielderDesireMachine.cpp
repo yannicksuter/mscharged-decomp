@@ -212,7 +212,7 @@ void FielderDesireMachine::Update(float deltaTime)
     {
         DesireUpdate result;
         UpdateStateMachine(frozen, &result, true, deltaTime);
-        if (result.mData.pointer != 0)
+        if (result.mData.i != DESIRE_CONTINUE)
         {
             RequestStateMachineDeactivation(frozen);
         }

@@ -510,7 +510,11 @@ void MoviePlayerControl::Start(const char* filename)
     if (!mMovieStarted)
     {
         nlStrNCpy<char>(mMovieFilename, filename, sizeof(mMovieFilename));
+#if defined(VERSION_R4QP01_REV1)
+        mMovieStarted = MovieStart(mMovieFilename, mWithSound, mLoopMovie);
+#else
         mMovieStarted = MovieStart(mMovieFilename, mWithSound, mLoopMovie, SCGetSoundMode() == 0);
+#endif
         SetSyncedDecode(false);
 
         const char* streamName;

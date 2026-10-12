@@ -115,7 +115,9 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
         {
             GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, true);
             FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
+#if !defined(VERSION_R4QP01_REV1)
             return;
+#endif
         }
         else if (state == StateForward)
         {
@@ -124,7 +126,9 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
                 FEAudio::PlayAnimAudioEvent(0xC385EFFB, 0, 0, 1);
             }
             GameSceneManager::Instance()->Push((SceneList)mNextScene, SCREEN_NOTHING, true);
+#if !defined(VERSION_R4QP01_REV1)
             return;
+#endif
         }
     }
 

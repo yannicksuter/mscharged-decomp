@@ -1,5 +1,42 @@
 #include "Game/Task/GameTaskState.h"
 #include "Game/Game.h"
+
+// Stadium-effect control was inserted at ID 63 after EU rev1, shifting the
+// subsequent script function IDs by one.
+enum PresentationFunction
+{
+    PRESENTATION_SET_NUMBER_DISPLAY_VISIBLE = 62,
+#if !defined(VERSION_R4QP01_REV1)
+    PRESENTATION_SET_STADIUM_EFFECTS_ENABLED,
+#endif
+    PRESENTATION_SET_WAIT_TIME,
+    PRESENTATION_SET_TEAM_LOGO,
+    PRESENTATION_IS_CUP_WINNER,
+    PRESENTATION_SHOULD_PLAY_LOSER_REACTION,
+    PRESENTATION_IS_LOSER_REACTION_OUTRAGED,
+    PRESENTATION_DID_MEGASTRIKE_SCORE,
+    PRESENTATION_IS_MEGASTRIKE_ATTEMPT_IN_RANGE,
+    PRESENTATION_IS_LAST_MEGASTRIKE_ATTEMPT_GOAL,
+    PRESENTATION_IS_LAST_MEGASTRIKE_ATTEMPT_WITHOUT_GOALS,
+    PRESENTATION_IS_MEGASTRIKE_ATTEMPT_NOT_GOAL,
+    PRESENTATION_RANDOM_CHOICE,
+    PRESENTATION_IS_CUP_PERSONA_WINNER,
+    PRESENTATION_STOP_JUMBOTRON,
+    PRESENTATION_STOP_NIS_CUE,
+    PRESENTATION_STOP_OVERLAY,
+    PRESENTATION_STOP_AND_RESET_JUMBOTRON,
+    PRESENTATION_UNLOCK_FRAME_RATE,
+    PRESENTATION_WAIT_FOR_AUTO_REPLAY,
+    PRESENTATION_WAIT_FOR_NIS_LOADED,
+    PRESENTATION_WAIT_FOR_CHARACTER_DIRECTION,
+    PRESENTATION_WAIT_FOR_REPLAY_SAVED,
+    PRESENTATION_WAIT_FOR_REPLAY_LOADED,
+    PRESENTATION_WAIT_FOR_NIS,
+    PRESENTATION_WAIT_FOR_TIMER,
+    PRESENTATION_IS_TEAM_ZERO_GOAL_WINNER,
+    PRESENTATION_WIPE,
+};
+
 /**
  * Address/Size: 0x80288FF8 | size: 0x1444
  */
@@ -480,14 +517,15 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 62:
+    case PRESENTATION_SET_NUMBER_DISPLAY_VISIBLE:
     {
         bool visible = m_SP[-1] != 0;
         --m_SP;
         gpNumberDisplay->mVisible = visible;
         break;
     }
-    case 63:
+#if !defined(VERSION_R4QP01_REV1)
+    case PRESENTATION_SET_STADIUM_EFFECTS_ENABLED:
     {
         bool enabled = m_SP[-1] != 0;
         --m_SP;
@@ -495,14 +533,15 @@ void Presentation::DoFunctionCall(unsigned int function)
         BasicStadium::GetCurrentStadium()->SetEffectsActive(55, enabled);
         break;
     }
-    case 64:
+#endif
+    case PRESENTATION_SET_WAIT_TIME:
     {
         float value = *(float*)&m_SP[-1];
         --m_SP;
         mWaitTimeRemaining = value;
         break;
     }
-    case 65:
+    case PRESENTATION_SET_TEAM_LOGO:
     {
         NisWinnerType winner = (NisWinnerType)m_SP[-1];
         NisTarget target = (NisTarget)m_SP[-2];
@@ -510,23 +549,23 @@ void Presentation::DoFunctionCall(unsigned int function)
         NisPlayer::Instance()->SetTeamLogo(target, winner);
         break;
     }
-    case 66:
+    case PRESENTATION_IS_CUP_WINNER:
         ++m_SP;
         m_SP[-1] = IsCupWinner();
         break;
-    case 67:
+    case PRESENTATION_SHOULD_PLAY_LOSER_REACTION:
         ++m_SP;
         m_SP[-1] = mPlayLoserReaction;
         break;
-    case 68:
+    case PRESENTATION_IS_LOSER_REACTION_OUTRAGED:
         ++m_SP;
         m_SP[-1] = mLoserReactionOutraged;
         break;
-    case 69:
+    case PRESENTATION_DID_MEGASTRIKE_SCORE:
         ++m_SP;
         m_SP[-1] = mMegaStrikeScored;
         break;
-    case 70:
+    case PRESENTATION_IS_MEGASTRIKE_ATTEMPT_IN_RANGE:
     {
         int original = m_SP[-1];
         m_SP[-1] = (s8)mMegaStrikeResult.attempts > original;
@@ -536,7 +575,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 71:
+    case PRESENTATION_IS_LAST_MEGASTRIKE_ATTEMPT_GOAL:
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
@@ -547,7 +586,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 72:
+    case PRESENTATION_IS_LAST_MEGASTRIKE_ATTEMPT_WITHOUT_GOALS:
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
@@ -558,7 +597,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 73:
+    case PRESENTATION_IS_MEGASTRIKE_ATTEMPT_NOT_GOAL:
     {
         int original = m_SP[-1];
         m_SP[-1] = (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) == 0;
@@ -568,37 +607,37 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 74:
+    case PRESENTATION_RANDOM_CHOICE:
         ++m_SP;
         m_SP[-1] = nlRandomf(1.0f, &mRandomSeed) <= gPresentationRandomChoiceChance;
         break;
-    case 75:
+    case PRESENTATION_IS_CUP_PERSONA_WINNER:
         ++m_SP;
         m_SP[-1] = IsCupPersonaWinner();
         break;
-    case 76:
+    case PRESENTATION_STOP_JUMBOTRON:
         if (Jumbotron::instance.m_State == 4)
         {
             Jumbotron::instance.StopPlaying();
         }
         break;
-    case 77:
+    case PRESENTATION_STOP_NIS_CUE:
         NisPlayer::Instance()->StopNisCue();
         break;
-    case 78:
+    case PRESENTATION_STOP_OVERLAY:
         StopOverlay();
         break;
-    case 79:
+    case PRESENTATION_STOP_AND_RESET_JUMBOTRON:
         if (Jumbotron::instance.m_State == 4)
         {
             Jumbotron::instance.StopPlaying();
         }
         Jumbotron::instance.Reset();
         break;
-    case 80:
+    case PRESENTATION_UNLOCK_FRAME_RATE:
         BeginFrameTask::s_FramerateLocked = false;
         break;
-    case 81:
+    case PRESENTATION_WAIT_FOR_AUTO_REPLAY:
     {
         u32* stack = m_SP;
         const char* filter = (const char*)*--stack;
@@ -609,10 +648,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 82:
+    case PRESENTATION_WAIT_FOR_NIS_LOADED:
         WaitForNisLoaded();
         break;
-    case 83:
+    case PRESENTATION_WAIT_FOR_CHARACTER_DIRECTION:
     {
         int maximumWait = 1;
         if (!mByPassing && mWaitingForCharacterDirectionSince > 0.0f
@@ -624,19 +663,19 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 84:
+    case PRESENTATION_WAIT_FOR_REPLAY_SAVED:
         if (ReplayManager::Instance()->IsSavingReplay() == true)
         {
             StopWithUndo();
         }
         break;
-    case 85:
+    case PRESENTATION_WAIT_FOR_REPLAY_LOADED:
         if (ReplayManager::Instance()->IsLoadingReplay() == true)
         {
             StopWithUndo();
         }
         break;
-    case 86:
+    case PRESENTATION_WAIT_FOR_NIS:
     {
         u32* stack = m_SP;
         const char* wipe = (const char*)*--stack;
@@ -647,18 +686,18 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     }
-    case 87:
+    case PRESENTATION_WAIT_FOR_TIMER:
         if (mWaitTimeRemaining > 0.0f)
         {
             StopWithUndo();
         }
         break;
-    case 88:
+    case PRESENTATION_IS_TEAM_ZERO_GOAL_WINNER:
         ++m_SP;
         m_SP[-1]
             = NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] == 0;
         break;
-    case 89:
+    case PRESENTATION_WIPE:
     {
         u32* stack = m_SP;
         const char* wipe = (const char*)*--stack;

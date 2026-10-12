@@ -255,7 +255,7 @@ bool ScriptState::Initialize(void*)
 void ScriptState::Update(
     DesireUpdate* update, float deltaTime)
 {
-    if (update->mData.pointer != 0)
+    if (update->mData.i != DESIRE_CONTINUE)
     {
         return;
     }

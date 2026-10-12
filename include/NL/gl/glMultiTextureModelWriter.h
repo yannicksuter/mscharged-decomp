@@ -46,8 +46,12 @@ public:
 
     void Texcoord1(const nlVector2& value)
     {
-        *texcoords1++ = value.x;
-        *texcoords1++ = value.y;
+        float u;
+        float v;
+
+        v = value.y;
+        u = value.x;
+        Texcoord1(u, v);
     }
 
     void Texcoord1(float u, float v)
@@ -58,8 +62,12 @@ public:
 
     void Texcoord2(const nlVector2& value)
     {
-        *texcoords2++ = value.x;
-        *texcoords2++ = value.y;
+        float u;
+        float v;
+
+        v = value.y;
+        u = value.x;
+        Texcoord2(u, v);
     }
 
     void Texcoord2(float u, float v)

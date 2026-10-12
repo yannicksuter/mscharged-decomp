@@ -5965,7 +5965,7 @@ RVL_SDK/bte/bta_dm_pm.c:
 RVL_SDK/bte/bta_hh_act.c:
 	.text       start:0x803E3308 end:0x803E4A50
 	.data       start:0x8054EEA0 end:0x8054F398
-	.sdata      start:0x806DFE38 end:0x806DFE3C
+	.sdata      start:0x806DFE38 end:0x806DFE39
 
 RVL_SDK/bte/bta_hh_api.c:
 	.text       start:0x803E4A50 end:0x803E4E20

@@ -108,8 +108,12 @@ public:
     /* 0x5D0 */ FEPointerButton mSaveButtonComponent;
     /* 0x684 */ bool mPointerButtonsInitialized;
     /* 0x685 */ bool mIntroSoundPlayed;
+#if defined(VERSION_R4QP01_REV1)
+    /* 0x686 */ u8 mPadding686[2];
+#else
     /* 0x686 */ bool mSaveStarted;
     /* 0x687 */ u8 mPadding687;
+#endif
     /* 0x688 */ int mSettings[3];
     /* 0x694 */ int mBackupSettings[3];
     /* 0x6A0 */ u16 mFormattedSettings[3][16];
@@ -153,8 +157,12 @@ public:
     /* 0x610 */ FEPointerButton mSaveButtonComponent;
     /* 0x6C4 */ bool mPointerButtonsInitialized;
     /* 0x6C5 */ bool mIntroSoundPlayed;
+#if defined(VERSION_R4QP01_REV1)
+    /* 0x6C6 */ u8 mPadding6C6[2];
+#else
     /* 0x6C6 */ bool mSaveStarted;
     /* 0x6C7 */ u8 mPadding6C7;
+#endif
     /* 0x6C8 */ int mSettings[2];
     /* 0x6D0 */ u16 mFormattedZoomLevel[16];
     /* 0x6F0 */ int mState;

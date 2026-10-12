@@ -135,8 +135,10 @@ void CrowdModelCollection::BeginNextModelLoad()
 
     mHierarchyData = 0;
     mHierarchySize = 0;
+#if !defined(VERSION_R4QP01_REV1)
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
     CurrentAllocator = &StandardAllocator;
+#endif
     if (sLoadCrowdModelsSynchronously)
     {
         mHierarchyData = nlLoadEntireFile(
@@ -151,8 +153,10 @@ void CrowdModelCollection::BeginNextModelLoad()
 
     mAnimationData = 0;
     mAnimationSize = 0;
+#if !defined(VERSION_R4QP01_REV1)
     CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
+#endif
     mCurrentAnimationInventory = 0;
 
     const char* path = mDefinitions[mLoadIndex].mAnimationFile;
@@ -246,9 +250,11 @@ bool CrowdModelCollection::UpdateModelLoad()
                 data,
                 hierarchySize);
 
+#if !defined(VERSION_R4QP01_REV1)
             --AllocatorStackDepth;
             AllocatorStack[AllocatorStackDepth] = 0;
             CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+#endif
             loaded = true;
         }
         mHierarchiesLoaded = loaded;
@@ -271,9 +277,11 @@ bool CrowdModelCollection::UpdateModelLoad()
             mAnimationInventories[mLoadIndex]
                 = mCurrentAnimationInventory;
 
+#if !defined(VERSION_R4QP01_REV1)
             --AllocatorStackDepth;
             AllocatorStack[AllocatorStackDepth] = 0;
             CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+#endif
             loaded = true;
         }
         mAnimationsLoaded = loaded;
