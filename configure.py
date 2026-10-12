@@ -663,7 +663,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/BasicGameInfo.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/CupManager.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/GameProgress.cpp", extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2"), "Game/DB/StrikerChallenge.cpp", extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/StrikerChallenge.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/SaveLoad.cpp", extra_cflags=["-ipa file", "-inline noauto", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/Simmer.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/DB/StadiumInfo.cpp"),
