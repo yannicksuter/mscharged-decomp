@@ -673,7 +673,11 @@ void HUDCaptainMeter::Update(float fDeltaT)
             {
                 fScale = mMeterFullScale[i];
             }
+#if defined(VERSION_R4QE01)
             else if (fScale <= 0.0f)
+#else
+            else if (fScale < 0.01f)
+#endif
             {
                 fScale = 0.01f;
                 m_pPowerUpPad[i]->SetActiveSlide("no pup", true, false);

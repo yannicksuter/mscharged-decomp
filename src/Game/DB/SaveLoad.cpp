@@ -138,6 +138,11 @@ static inline void WriteLocalizedBanner(NANDResultCallback callback)
     SaveLoad::HandleNANDResult(nlFlashWrite(BannerBuffer, NAND_BANNER_SIZE(8), callback));
 }
 
+static inline void RefreshLoadedBanner()
+{
+    WriteLocalizedBanner(SaveLoad::BannerWriteFinishedCallback);
+}
+
 void SaveLoad::CheckSaveSpace()
 {
     if (!SaveEnabled)
@@ -652,7 +657,11 @@ void SaveLoad::OpenBannerCallback(long result)
 {
     if (BannerFileExists && (result == 0 || result == -6))
     {
+#if defined(VERSION_R4QP01_REV1)
+        LoadMemoryCardIconData();
+#else
         WriteLocalizedBanner(BannerWriteFinishedCallback);
+#endif
     }
     else
     {
@@ -761,13 +770,20 @@ void SaveLoad::WriteBannerCallback(long result)
         HandleNANDResult(result);
         return;
     }
+#if defined(VERSION_R4QP01_REV1)
+    LoadMemoryCardIconData();
+#else
     WriteLocalizedBanner(BannerWriteFinishedCallback);
+#endif
 }
 
 void LoadMemoryCardIconData()
 {
     if (IconDataLoaded)
     {
+#if defined(VERSION_R4QP01_REV1)
+        RefreshLoadedBanner();
+#endif
         return;
     }
 
@@ -837,6 +853,9 @@ void SaveLoad::IconLoadsComplete()
 
 void SaveLoad::RegionBannerLoadedCallback(void* data, unsigned long, void* userData)
 {
+#if defined(VERSION_R4QP01_REV1)
+    ResetTask::s_resetPaused = true;
+#endif
     *(TPLPalette**)userData = (TPLPalette*)data;
     TPLBind(RegionBannerTPL);
 
@@ -849,6 +868,9 @@ void SaveLoad::RegionBannerLoadedCallback(void* data, unsigned long, void* userD
     memcpy(BannerBuffer->iconTexture[6], IconTPLs[2]->descriptorArray[0].textureHeader->data, NAND_BANNER_ICON_SIZE);
     memcpy(BannerBuffer->iconTexture[7], IconTPLs[1]->descriptorArray[0].textureHeader->data, NAND_BANNER_ICON_SIZE);
     memcpy(BannerBuffer->bannerTexture, RegionBannerTPL->descriptorArray[0].textureHeader->data, NAND_BANNER_TEXTURE_SIZE);
+#if defined(VERSION_R4QP01_REV1)
+    HandleNANDResult(nlFlashWrite(BannerBuffer, NAND_BANNER_SIZE(8), BannerWriteFinishedCallback));
+#else
     IconDataLoaded = true;
 
     for (s32 i = 0; i < 4; ++i)
@@ -858,12 +880,28 @@ void SaveLoad::RegionBannerLoadedCallback(void* data, unsigned long, void* userD
     }
     ::operator delete[](RegionBannerTPL);
     RegionBannerTPL = 0;
+#endif
 }
 
 void SaveLoad::BannerWriteFinishedCallback(long)
 {
+#if defined(VERSION_R4QP01_REV1)
+    IconDataLoaded = true;
+
+    for (s32 i = 0; i < 4; ++i)
+    {
+        ::operator delete[](IconTPLs[i]);
+        IconTPLs[i] = 0;
+    }
+    ::operator delete[](RegionBannerTPL);
+    RegionBannerTPL = 0;
+
+    HandleNANDResult(nlFlashClose(FinishOperation));
+    ResetTask::s_resetPaused = false;
+#else
     ResetTask::s_resetPaused = false;
     HandleNANDResult(nlFlashClose(FinishOperation));
+#endif
 }
 
 void SaveLoad::FinishOperation(long)

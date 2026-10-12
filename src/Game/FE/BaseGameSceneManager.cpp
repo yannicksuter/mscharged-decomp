@@ -87,7 +87,11 @@ void CreateFEResourcePool()
     {
         GLMemoryRequirement requirements[2] = {
             { GLM_Header, 0x5000 },
+#if defined(VERSION_R4QE01)
             { GLM_TextureData, 0x2CCCCC },
+#else
+            { GLM_TextureData, 0x380000 },
+#endif
         };
         gFEResourcePool
             = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
@@ -110,7 +114,11 @@ void CreateLargeFEResourcePool()
 {
     GLMemoryRequirement requirements[2] = {
         { GLM_Header, 0xC800 },
+#if defined(VERSION_R4QE01)
         { GLM_TextureData, 0xA00000 },
+#else
+        { GLM_TextureData, 0x900000 },
+#endif
     };
     gFEResourcePool
         = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
@@ -288,6 +296,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         filename = "art/fe/sms2_start.fen";
     }
 
+#if defined(VERSION_R4QE01)
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
         if (newscene == SCENE_CUP_NEWS || newscene == SCENE_CHALLENGE_NEWS || newscene == OVERLAY_POST_GAME_RESULTS)
@@ -299,6 +308,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
             filename = "art/fe/controller_config_jp.fen";
         }
     }
+#endif
 
     switch (newscene)
     {

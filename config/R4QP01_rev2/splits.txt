@@ -1474,6 +1474,8 @@ Game/Render/HammerObject.cpp:
 	.rodata     start:0x804DC5B0 end:0x804DC5C8
 	.data       start:0x805114F0 end:0x80511500
 	.bss        start:0x80571488 end:0x805714A0
+	.sdata      start:0x806DBFC0 end:0x806DBFD0
+	.sdata2     start:0x806E41A0 end:0x806E41B0
 
 Game/Render/HighRange.cpp:
 	.text       start:0x801A1758 end:0x801A2990
@@ -1641,11 +1643,13 @@ Game/Render/ThwompObject.cpp:
 	.bss        start:0x80573638 end:0x80573650
 	.sdata      start:0x806DC270 end:0x806DC2A8
 	.sbss       start:0x806E0818 end:0x806E0820
+	.sdata2     start:0x806E4490 end:0x806E44B8
 
 Game/Render/WarbleOwner.cpp:
 	.text       start:0x801B2DD0 end:0x801B2FF8
 	.bss        start:0x80573650 end:0x80573680
 	.sbss       start:0x806E0820 end:0x806E0828
+	.sdata2     start:0x806E44B8 end:0x806E44D8
 
 Game/Render/Warble.cpp:
 	.text       start:0x801B2FF8 end:0x801B3B2C
@@ -1748,6 +1752,7 @@ Game/FE/feManager.cpp:
 	.ctors      start:0x804DAEEC end:0x804DAEF0
 	.data       start:0x80515798 end:0x80515838
 	.bss        start:0x80577748 end:0x80577778
+	.sdata      start:0x806DC3F0 end:0x806DC420
 	.sbss       start:0x806E0968 end:0x806E0988
 	.sdata2     start:0x806E45E8 end:0x806E4620
 
@@ -1766,7 +1771,9 @@ Game/FE/fePopupMenu.cpp:
 	.text       start:0x801C5834 end:0x801CB15C
 	.rodata     start:0x804E6C78 end:0x804E7C00
 	.data       start:0x80516748 end:0x80517A10
+	.sdata      start:0x806DC420 end:0x806DC478
 	.sbss       start:0x806E09A0 end:0x806E09A8
+	.sdata2     start:0x806E4620 end:0x806E46A0
 
 Game/FE/FEAudio.cpp:
 	.text       start:0x801CB15C end:0x801CB330
@@ -1781,6 +1788,7 @@ Game/FE/feHelpFuncs.cpp:
 	.data       start:0x80517A10 end:0x805180F0
 	.sdata      start:0x806DC488 end:0x806DC4B0
 	.sbss       start:0x806E09A8 end:0x806E09B8
+	.sdata2     start:0x806E46A0 end:0x806E46E0
 
 Game/SH/SHLoading.cpp:
 	.text       start:0x801CCF0C end:0x801D02E0
@@ -1987,12 +1995,14 @@ Game/Render/FrontEndPresentation.cpp:
 	.bss        start:0x805777E8 end:0x805778A8
 	.sdata      start:0x806DCC60 end:0x806DCC88
 	.sbss       start:0x806E09F8 end:0x806E0A00
-	.sdata2     start:0x806E4928 end:0x806E4948
+	.sdata2     start:0x806E4928 end:0x806E4940
 
 Game/Font/FontLoading.cpp:
-	.text       start:0x801FF7A0 end:0x801FFA04
+	.text       start:0x801FF7A0 end:0x801FFC10
 	.data       start:0x8051A838 end:0x8051AA18
+	.sdata      start:0x806DCC88 end:0x806DCC90
 	.sbss       start:0x806E0A00 end:0x806E0A08
+	.sdata2     start:0x806E4940 end:0x806E4948
 
 Game/SH/SHCupHub.cpp:
 	.text       start:0x801FFC10 end:0x802031D0
@@ -2304,6 +2314,7 @@ Game/SH/SHBootLoading.cpp:
 	.data       start:0x8051FCC8 end:0x8051FDF0
 	.bss        start:0x80577AC8 end:0x80577AE0
 	.sdata      start:0x806DDD30 end:0x806DDD70
+	.sdata2     start:0x806E4CA8 end:0x806E4CD0
 
 Game/SH/SHOnlineMiiSelect.cpp:
 	.text       start:0x80263A7C end:0x80265CEC

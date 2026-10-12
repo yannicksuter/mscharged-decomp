@@ -366,10 +366,14 @@ void StadiumWorldDrawable::UpdateBlend()
 
     bool hide = sForceBannerHidden;
     int cameraType = cCameraManager::m_BeginFrameCameraType;
+#if defined(VERSION_R4QP01_REV1)
+    if (cameraType == eCameraType_Gameplay || cameraType == eCameraType_Goal)
+#else
     if (cameraType == eCameraType_Gameplay
         || cameraType == eCameraType_ShootToScore
         || cameraType == eCameraType_Goal
         || !GetPresentation()->mNisStadiumEffectsEnabled)
+#endif
     {
         hide = true;
     }

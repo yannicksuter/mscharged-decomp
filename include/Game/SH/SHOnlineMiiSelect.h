@@ -14,7 +14,9 @@ public:
     virtual ~SHOnlineMiiSelect();
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
+#if defined(VERSION_R4QE01)
     void ClearMissingMiiSaveSlots();
+#endif
     void BuildMiiList();
     void UpdatePage();
     void InitializeButtons();

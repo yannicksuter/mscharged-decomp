@@ -95,9 +95,17 @@ void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont
             {
                 pCurrentChar--;
             }
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+            if (*pCurrentChar == ' ')
+            {
+                CharWidth = 0;
+            }
+#endif
             CurrentRowWidth = 0;
         }
+#if defined(VERSION_R4QE01)
         else
+#endif
         {
             CurrentRowWidth += CharWidth;
         }

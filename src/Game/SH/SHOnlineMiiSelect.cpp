@@ -117,6 +117,7 @@ void SHOnlineMiiSelect::SceneCreated()
     UpdatePage();
 }
 
+#if defined(VERSION_R4QE01)
 void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
 {
     bool changed = false;
@@ -154,6 +155,7 @@ void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
         }
     }
 }
+#endif
 
 void SHOnlineMiiSelect::BuildMiiList()
 {
@@ -269,7 +271,9 @@ void SHOnlineMiiSelect::Update(float fDeltaT)
         InitializeButtons();
         mInitialized = true;
         UpdatePage();
+#if defined(VERSION_R4QE01)
         ClearMissingMiiSaveSlots();
+#endif
     }
 
     for (unsigned int pad = 0; pad < 4; ++pad)

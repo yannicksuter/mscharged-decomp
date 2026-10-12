@@ -25,7 +25,9 @@ public:
     virtual void ShowHomeButtonWarning();
 
     void SetPhaseSlide();
+#if defined(VERSION_R4QE01)
     bool IsBootScreenPending();
+#endif
 
     /* 0x1C */ float mElapsedTime;
     /* 0x20 */ float mStrapAlpha;

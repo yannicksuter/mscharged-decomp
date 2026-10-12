@@ -33,8 +33,10 @@ YoshiEggObject::YoshiEggObject(RenderObject* drawable)
     mActive = false;
     mFielder = 0;
     mDelay = 0.0f;
+#if defined(VERSION_R4QE01)
     mDisplacementDirection = gYoshiEggZeroDisplacement;
     mDisplacementDistance = 0.0f;
+#endif
     mPosition = gYoshiEggHiddenPosition;
     mOrientation.x = mOrientation.y = mOrientation.z = 0.0f;
     mOrientation.w = 1.0f;
@@ -105,6 +107,7 @@ void YoshiEggObject::Update(float dt)
         mPhysics->SetRadius(mRadius);
     }
 
+#if defined(VERSION_R4QE01)
     if (mDisplacementDistance != 0.0f)
     {
         nlVector3 position = mFielder->m_DetChar.m_v3Position;
@@ -118,6 +121,7 @@ void YoshiEggObject::Update(float dt)
         mFielder->SetPosition(position);
         mDisplacementDistance = 0.0f;
     }
+#endif
 
     UpdateTransform(dt);
     if (fabsf(mPosition.y) > cField::GetSidelineY(1))
@@ -258,8 +262,10 @@ void YoshiEggObject::Reset()
     mDelay = 0.0f;
     mPhysics->SetRadius(0.1f);
     mPhysics->SetPosition(mPosition, PhysicsObject::WORLD_COORDINATES);
+#if defined(VERSION_R4QE01)
     mDisplacementDistance = 0.0f;
     mDisplacementDirection = gYoshiEggZeroDisplacement;
+#endif
 }
 
 void YoshiEggObject::Break()
@@ -267,8 +273,10 @@ void YoshiEggObject::Break()
     Deactivate(false);
 }
 
+#if defined(VERSION_R4QE01)
 void YoshiEggObject::SetPendingDisplacement(const nlVector3& direction, float distance)
 {
     mDisplacementDirection = direction;
     mDisplacementDistance = distance;
 }
+#endif

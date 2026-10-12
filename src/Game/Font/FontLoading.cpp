@@ -13,16 +13,23 @@ struct FontLanguagePrefix
     char value[4];
 };
 
+#if defined(VERSION_R4QE01)
 static FontLanguagePrefix sDefaultLanguagePrefix = { "eur" };
+#endif
 static FontLanguagePrefix sJapaneseInGameLanguagePrefix = { "jpn" };
 static FontLanguagePrefix sJapanese101LanguagePrefix = { "jpn" };
 
 bool gLoadInGameFonts;
 
-static inline void LoadFonts()
+#if defined(VERSION_R4QE01)
+static inline void LoadFonts(bool*)
+#else
+static void LoadFonts(bool*)
+#endif
 {
     const char* TEXT_FONT_NAME = "fot-rodinprob18";
     const char* HEADING_FONT_NAME = "Scratchy36";
+#if defined(VERSION_R4QE01)
     FontLanguagePrefix langprefix = sDefaultLanguagePrefix;
 
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
@@ -31,6 +38,57 @@ static inline void LoadFonts()
         langprefix.value[1] = 'p';
         langprefix.value[2] = 'n';
     }
+#else
+    FontLanguagePrefix langprefix = { "eng" };
+    switch (g_pLocalization->m_CurrentLanguage)
+    {
+    case nlLocalization::LangFrench:
+        langprefix.value[0] = 'f';
+        langprefix.value[1] = 'r';
+        langprefix.value[2] = 'e';
+        break;
+    case nlLocalization::LangGerman:
+        langprefix.value[0] = 'd';
+        langprefix.value[1] = 'e';
+        langprefix.value[2] = 'u';
+        break;
+    case nlLocalization::LangItalian:
+        langprefix.value[0] = 'i';
+        langprefix.value[1] = 't';
+        langprefix.value[2] = 'a';
+        break;
+    case nlLocalization::LangJapanese:
+        langprefix.value[0] = 'j';
+        langprefix.value[1] = 'p';
+        langprefix.value[2] = 'n';
+        break;
+    case nlLocalization::LangSpanish:
+        langprefix.value[0] = 's';
+        langprefix.value[1] = 'p';
+        langprefix.value[2] = 'a';
+        break;
+    case nlLocalization::LangUKEnglish:
+        langprefix.value[0] = 'u';
+        langprefix.value[1] = 'k';
+        langprefix.value[2] = 'e';
+        break;
+    case nlLocalization::LangLongestStrings:
+        langprefix.value[0] = 'l';
+        langprefix.value[1] = 'n';
+        langprefix.value[2] = 'g';
+        break;
+    case nlLocalization::LangEnglish:
+        break;
+    }
+
+    if (g_pLocalization->m_CurrentLanguage != nlLocalization::LangJapanese
+        && GetRegion() == GAME_REGION_EU)
+    {
+        langprefix.value[0] = 'e';
+        langprefix.value[1] = 'u';
+        langprefix.value[2] = 'r';
+    }
+#endif
 
     char textfontbundlename[64];
     char textfontfilename[64];
@@ -109,12 +167,12 @@ bool BeginFontLoading(bool* inGame)
         }
         else
         {
-            LoadFonts();
+            LoadFonts(inGame);
         }
     }
     else
     {
-        LoadFonts();
+        LoadFonts(inGame);
     }
 
     if (g_pLocalization->m_pFile == 0)

@@ -31,9 +31,14 @@ ControllerMapOverlay::ControllerMapOverlay()
     , mDonePressed(false)
     , mAsyncImage("art/fe/controllermapui.res", 0)
 {
+#if defined(VERSION_R4QE01)
     if ((GetRegion() == GAME_REGION_US
             && g_pLocalization->m_CurrentLanguage == nlLocalization::LangEnglish)
         || g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+#else
+    if (GetRegion() == GAME_REGION_US
+        && g_pLocalization->m_CurrentLanguage == nlLocalization::LangEnglish)
+#endif
     {
         mImageLoaded = true;
     }
@@ -108,11 +113,13 @@ void ControllerMapOverlay::SceneCreated()
         mDoneButtonInstance->m_bVisible = false;
     }
 
+#if defined(VERSION_R4QE01)
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
         mMapImage = FEFinder<TLImageInstance, TLAT_IMAGE>::Find<>(mPresentation->m_currentSlide, "Layer", "CONTROLLER_CONFIG_jp");
     }
     else
+#endif
     {
         mMapImage = FEFinder<TLImageInstance, TLAT_IMAGE>::Find<>(mPresentation->m_currentSlide, "Layer", "CONTROLLER CONFIG_TEST");
     }

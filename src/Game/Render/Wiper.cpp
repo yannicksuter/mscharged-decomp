@@ -103,8 +103,12 @@ void Wiper::Run(float dt)
 {
     if (!FrontEnd::m_bGameOver)
     {
+#if defined(VERSION_R4QE01)
         bool frameLocked = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
         if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
+#else
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED)
+#endif
         {
             dt = 0.0f;
         }

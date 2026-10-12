@@ -77,6 +77,7 @@ void EmitMainMenuCallbackTemplates(SHMainMenu* menu)
 void SHMainMenu::SceneCreated()
 {
     GetPresentation()->SetActiveSlide("MAIN", true);
+#if defined(VERSION_R4QE01)
     TLComponentInstance* hiddenItem;
     if (g_pLocalization->GetCurrentLanguage() == nlLocalization::LangJapanese)
     {
@@ -90,12 +91,16 @@ void SHMainMenu::SceneCreated()
     }
 
     hiddenItem->SetVisible(false);
+#endif
 
     mMenuItemInstances[0] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "Domination_Menu_Item");
     mMenuItemInstances[1] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "Online _Menu_Item");
     mMenuItemInstances[2] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "RTSC_Menu_Item");
     mMenuItemInstances[3] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "Challenges_Menu_Item");
     mMenuItemInstances[6] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "Options_Menu_Item");
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+    mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
+#endif
     mMenuItemInstances[5] = FEFinder<TLComponentInstance, 4>::FindOrDefault(GetPresentation()->GetActiveSlide(), "Layer", "HOF_Menu_Item");
 
     mMenuHighlights[0] = FEFinder<TLComponentInstance, 4>::FindOrDefault(mMenuItemInstances[0]->GetActiveSlide(), "GRUDGE");

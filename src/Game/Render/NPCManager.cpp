@@ -363,6 +363,15 @@ void OnNPCModelLoaded(
     nlFree(pData);
 }
 
+static inline MemoryAllocator* GetNPCTemplateFileAllocator()
+{
+#if defined(VERSION_R4QP01_REV1)
+    return 0;
+#else
+    return &StandardAllocator;
+#endif
+}
+
 void NPCManager::BeginLoadNPCTemplate()
 {
     CurrentAllocator = &VirtualAllocator;
@@ -380,7 +389,8 @@ void NPCManager::BeginLoadNPCTemplate()
 
     char path[256];
     nlSNPrintf(path, sizeof(path), "art/animation/%s.sanim.zlib", mPendingTemplate->mName, mPendingTemplate->mName);
-    if (nlLoadCompressedFileAsync(path, OnNPCAnimationsLoaded, &mPendingTemplate->mInventorySAnim, 0x20, AllocateStart, 0x40000, 0, 0, 0, 0, &StandardAllocator))
+    if (nlLoadCompressedFileAsync(path, OnNPCAnimationsLoaded, &mPendingTemplate->mInventorySAnim,
+            0x20, AllocateStart, 0x40000, 0, 0, 0, 0, GetNPCTemplateFileAllocator()))
     {
         mPendingTemplate->mAnimationLoadStarted = true;
     }
@@ -389,7 +399,8 @@ void NPCManager::BeginLoadNPCTemplate()
     cInventory<cSHierarchy>* pInventory = mPendingTemplate->mPersistent
                                             ? mPersistentHierarchies
                                             : mTransientHierarchies;
-    nlLoadEntireFileAsync(path, OnNPCHierarchyLoaded, pInventory, 0x20, AllocateStart, 0, 0, &StandardAllocator);
+    nlLoadEntireFileAsync(path, OnNPCHierarchyLoaded, pInventory,
+        0x20, AllocateStart, 0, 0, GetNPCTemplateFileAllocator());
 
     nlSNPrintf(path, sizeof(path), "art/characters/npcs/%s/%s.rlt", mPendingTemplate->mName, mPendingTemplate->mName);
     glBeginLoadTextureBundle(path, OnNPCTexturesLoaded, mPendingTemplate, pContext);

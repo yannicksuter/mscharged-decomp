@@ -187,7 +187,9 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
                 GameSceneManager::Instance()->Push(SCENE_GAMEPLAY_OPTIONS, SCREEN_FORWARD, true);
             }
             FrontEnd::SetControllerState();
+#if !defined(VERSION_R4QP01_REV1)
             return;
+#endif
         }
         else if (state == GUEST_CONTROLLER_SELECT_EXITING_BACK)
         {
