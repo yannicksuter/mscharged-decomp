@@ -109,13 +109,28 @@ const CupMatchup TEN_TEAM_MATCHUPS[45] = {
     { 4, 0 },
 };
 
-const int gFireCupStadiums[6] = { 13, 14, 4, 11, 15, 5 };
+const int gFireCupStadiums[6] = {
+    STAD_VICE, STAD_WASTELANDS, STAD_DUMP,
+    STAD_THUNDER_ISLAND, STAD_SAND_TOMB, STAD_GALACTIC_STADIUM,
+};
 
-const int gCrystalCupStadiums[7] = { 13, 14, 4, 7, 11, 15, 5 };
+const int gCrystalCupStadiums[7] = {
+    STAD_VICE, STAD_WASTELANDS, STAD_DUMP,
+    STAD_LAVA_PIT, STAD_THUNDER_ISLAND, STAD_SAND_TOMB,
+    STAD_GALACTIC_STADIUM,
+};
 
-const int gStrikerCupStadiums[8] = { 13, 14, 4, 7, 3, 11, 15, 5 };
+const int gStrikerCupStadiums[8] = {
+    STAD_VICE, STAD_WASTELANDS, STAD_DUMP,
+    STAD_LAVA_PIT, STAD_CRYSTAL_CANYON, STAD_THUNDER_ISLAND,
+    STAD_SAND_TOMB, STAD_GALACTIC_STADIUM,
+};
 
-const int gCommonCupStadiums[7] = { 0, 1, 2, 6, 8, 10, 12 };
+const int gCommonCupStadiums[7] = {
+    STAD_BATTLEDOME, STAD_BOWSER_STADIUM, STAD_CRATERFIELD,
+    STAD_KONGA_COLISEUM, STAD_PIPELINE_CENTRAL, STAD_THE_PALACE,
+    STAD_UNDERGROUND,
+};
 
 const int gCupSkillLevelCounts[6][4] = {
     { 0, 0, 0, 0 },
@@ -190,7 +205,7 @@ inline void CupManager::IncreaseGameNumber(bool shouldIncreaseRound)
 inline void CupManager::SetUserSelectedCupTeam(int team)
 {
     mCurrentCup->mUserSelectedTeam = team;
-    if (team != -1)
+    if (team != TEAM_INVALID)
     {
         mCurrentCup->mHumanTeams = 0;
         mCurrentCup->mHumanTeams |= 1 << team;
@@ -204,17 +219,17 @@ inline void CupManager::SetUserSelectedCupSidekicks(CupSidekicks sidekicks)
 
 CupManager::CupManager()
     : mForceHighestSkillLevel(false)
-    , mCurrentMode(-1)
+    , mCurrentMode(CUP_NONE)
     , mCurrentCup(0)
     , mShowCupPhasePopup(false)
-    , mPendingCupTeam(-1)
+    , mPendingCupTeam(TEAM_INVALID)
     , mPreGameUnlockedState(0)
 {
     mFireCupSeries.mRoundNumber = -6;
     mCrystalCupSeries.mRoundNumber = -6;
     mStrikerCupSeries.mRoundNumber = -6;
-    mPreviousGameTeams[0] = -1;
-    mPreviousGameTeams[1] = -1;
+    mPreviousGameTeams[0] = TEAM_INVALID;
+    mPreviousGameTeams[1] = TEAM_INVALID;
 }
 
 CupManager::~CupManager()
@@ -273,12 +288,12 @@ BasicGameInfo* CupManager::GetGameInfo(int phase, int matchup)
 {
     if (phase == CUP_ROUND_KNOCKOUT)
     {
-        matchup += GetNumGames(0);
+        matchup += GetNumGames(CUP_ROUND_LEAGUE);
     }
     else if (phase == CUP_ROUND_FINALS)
     {
-        matchup += GetNumGames(0);
-        matchup += GetNumGames(1);
+        matchup += GetNumGames(CUP_ROUND_LEAGUE);
+        matchup += GetNumGames(CUP_ROUND_KNOCKOUT);
     }
     return mCurrentCup->GetGameInfo(matchup);
 }
@@ -417,29 +432,29 @@ int CupManager::PickStadium(bool isLastRound) const
     int mode = mCurrentMode;
     const int* stadiums = 0;
     int count = 0;
-    if (mode == 0)
+    if (mode == CUP_FIRE)
     {
         if (isLastRound)
         {
-            return 7;
+            return STAD_LAVA_PIT;
         }
         stadiums = gFireCupStadiums;
         count = 6;
     }
-    else if (mode == 1)
+    else if (mode == CUP_CRYSTAL)
     {
         if (isLastRound)
         {
-            return 3;
+            return STAD_CRYSTAL_CANYON;
         }
         stadiums = gCrystalCupStadiums;
         count = 7;
     }
-    else if (mode == 2)
+    else if (mode == CUP_STRIKER)
     {
         if (isLastRound)
         {
-            return 9;
+            return STAD_STORM_SHIP;
         }
         stadiums = gStrikerCupStadiums;
         count = 8;
@@ -526,7 +541,7 @@ void CupManager::SetupRoundRobinSchedule(int* lineup, CupSidekicks* sklineup)
 {
     int numplayingteams = mCurrentCup->GetNumTeams();
     int numRounds = mCurrentCup->GetNumRegularRounds();
-    int numGamesPerRound = GetNumGamesPerRound(0, 0);
+    int numGamesPerRound = GetNumGamesPerRound(CUP_ROUND_LEAGUE, 0);
     mState = CUP_STATE_ACTIVE;
     BasicGameInfo* g;
     int home;
@@ -557,7 +572,7 @@ void CupManager::SetupRoundRobinSchedule(int* lineup, CupSidekicks* sklineup)
                 away = TEN_TEAM_MATCHUPS[index].mAway;
                 break;
             }
-            g = mCurrentCup->GetGameInfo(0, round, game);
+            g = mCurrentCup->GetGameInfo(CUP_ROUND_LEAGUE, round, game);
             g->mTeamIndex[0] = lineup[home];
             g->mTeamIndex[1] = lineup[away];
             for (int i = 0; i < 3; i++)
@@ -615,9 +630,9 @@ void CupManager::SetupPlayoffSchedule()
     StatsTracker::Instance()->GetSortedTeamStats(mCurrentCup->GetTeamStats(0), mCurrentCup->GetNumTeams(), indices, mCurrentCup->GetNumTeams());
     bool human = false;
     u16 playoffTeams = GetNumPlayoffTeams();
-    for (int i = 0; i < GetNumGamesPerRound(1, 0); i++)
+    for (int i = 0; i < GetNumGamesPerRound(CUP_ROUND_KNOCKOUT, 0); i++)
     {
-        BasicGameInfo* info = mCurrentCup->GetGameInfo(1, 0, i);
+        BasicGameInfo* info = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, 0, i);
         TeamStats* home = mCurrentCup->GetTeamStats(indices[i]);
         TeamStats* away = mCurrentCup->GetTeamStats(indices[playoffTeams - i - 1]);
         int homeTeam = home->mTeamIndex;
@@ -673,7 +688,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
                 stats->mSkillLevel = gFinalOpponentSkillLevels[mCurrentMode];
                 for (unsigned int i = 0; i < 3; i++)
                 {
-                    BasicGameInfo* next = mCurrentCup->GetGameInfo(2, i, 0);
+                    BasicGameInfo* next = mCurrentCup->GetGameInfo(CUP_ROUND_FINALS, i, 0);
                     short sides[2] = { i == 1 ? AWAY : HOME, i == 1 ? HOME : AWAY };
                     next->mTeamIndex[sides[0]] = captain;
                     next->mTeamIndex[sides[1]] = team;
@@ -703,7 +718,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
             }
             if (round == numRounds - 2)
             {
-                next = mCurrentCup->GetGameInfo(1, round + 1, 0);
+                next = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, round + 1, 0);
                 if (game == 0)
                 {
                     side = 0;
@@ -717,22 +732,22 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
             {
                 if (game == 0)
                 {
-                    next = mCurrentCup->GetGameInfo(1, round + 1, 0);
+                    next = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, round + 1, 0);
                     side = 0;
                 }
                 else if (game == 1)
                 {
-                    next = mCurrentCup->GetGameInfo(1, round + 1, 0);
+                    next = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, round + 1, 0);
                     side = 1;
                 }
                 else if (game == 2)
                 {
-                    next = mCurrentCup->GetGameInfo(1, round + 1, 1);
+                    next = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, round + 1, 1);
                     side = 0;
                 }
                 else if (game == 3)
                 {
-                    next = mCurrentCup->GetGameInfo(1, round + 1, 1);
+                    next = mCurrentCup->GetGameInfo(CUP_ROUND_KNOCKOUT, round + 1, 1);
                     side = 1;
                 }
             }
@@ -751,7 +766,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
         int losses = 0;
         for (int i = 0; i < round; i++)
         {
-            BasicGameInfo* game = mCurrentCup->GetGameInfo(2, i, 0);
+            BasicGameInfo* game = mCurrentCup->GetGameInfo(CUP_ROUND_FINALS, i, 0);
             eTeamSide side = (eTeamSide)game->GetWinningSide();
             if (team == game->GetTeam(side))
             {
@@ -915,7 +930,7 @@ void CupManager::StartCupSeries()
     int team = mPendingCupTeam;
     CupSidekicks userSidekicks = GetPendingCupSidekicks();
     SelectFinalOpponents();
-    mPendingCupTeam = -1;
+    mPendingCupTeam = TEAM_INVALID;
     eTeamID usedTeams[10];
     for (int i = 0; i < 10; i++)
     {
@@ -933,11 +948,11 @@ void CupManager::StartCupSeries()
         int teams[10];
         for (int i = 0; i < count; i++)
         {
-            teams[i] = -1;
+            teams[i] = TEAM_INVALID;
         }
         teams[userIndex] = team;
         sidekicks[userIndex] = userSidekicks;
-        if (mode != 0)
+        if (mode != CUP_FIRE)
         {
             bossIndex = nlRandom(count, &nlDefaultSeed);
             int boss = mFinalOpponentTeams[mode - 1];
@@ -947,15 +962,15 @@ void CupManager::StartCupSeries()
             }
             teams[bossIndex] = boss;
             sidekicks[bossIndex] = GetRandomCupSidekicks();
-            if (mode == 1)
+            if (mode == CUP_CRYSTAL)
             {
                 usedTeams[4 + bossIndex] = (eTeamID)boss;
             }
         }
-        int excluded[2] = { mode == 0, 2 };
+        int excluded[2] = { mode == CUP_FIRE, 2 };
         excluded[1] = 2;
         eTeamID opponent = (eTeamID)mFinalOpponentTeams[mode];
-        if (mode == 2)
+        if (mode == CUP_STRIKER)
         {
             excluded[1] = 1;
         }
@@ -975,7 +990,7 @@ void CupManager::StartCupSeries()
                 {
                     continue;
                 }
-                if (mode != 2 && (candidate == mFinalOpponentTeams[excluded[0]] || candidate == mFinalOpponentTeams[excluded[1]]))
+                if (mode != CUP_STRIKER && (candidate == mFinalOpponentTeams[excluded[0]] || candidate == mFinalOpponentTeams[excluded[1]]))
                 {
                     continue;
                 }
@@ -987,7 +1002,7 @@ void CupManager::StartCupSeries()
                         break;
                     }
                 }
-                if (mode == 1 && available)
+                if (mode == CUP_CRYSTAL && available)
                 {
                     for (int j = 0; j < 4; j++)
                     {
@@ -998,7 +1013,7 @@ void CupManager::StartCupSeries()
                         }
                     }
                 }
-                else if (mode == 2 && available)
+                else if (mode == CUP_STRIKER && available)
                 {
                     available = false;
                     for (int j = 0; j < 10; j++)
@@ -1017,11 +1032,11 @@ void CupManager::StartCupSeries()
             }
             teams[i] = candidate;
             sidekicks[i] = GetRandomCupSidekicks();
-            if (mode == 0)
+            if (mode == CUP_FIRE)
             {
                 usedTeams[i] = (eTeamID)candidate;
             }
-            else if (mode == 1)
+            else if (mode == CUP_CRYSTAL)
             {
                 usedTeams[4u + i] = (eTeamID)candidate;
             }
@@ -1049,7 +1064,7 @@ void CupManager::RestartCupSeries()
         int previousTeams[10];
         for (int i = 0; i < count; i++)
         {
-            teams[i] = -1;
+            teams[i] = TEAM_INVALID;
             previousTeams[i] = mCurrentCup->GetTeamStats(i)->mTeamIndex;
         }
         teams[userIndex] = team;
@@ -1064,7 +1079,7 @@ void CupManager::RestartCupSeries()
                 do
                 {
                     index = nlRandom(count, &nlDefaultSeed);
-                } while (teams[index] != -1);
+                } while (teams[index] != TEAM_INVALID);
                 teams[index] = previousTeams[i];
                 sidekicks[index] = GetRandomCupSidekicks();
             }
@@ -1126,15 +1141,15 @@ void CupManager::SelectFinalOpponents()
 {
     int team = mPendingCupTeam;
     int bowserJr;
-    int diddy = -1;
-    int petey = -1;
+    int diddy = TEAM_INVALID;
+    int petey = TEAM_INVALID;
     if (!IsDiddyKongUnlocked())
     {
-        diddy = 10;
+        diddy = TEAM_DIDDYKONG;
     }
     if (!IsPeteyUnlocked())
     {
-        petey = 11;
+        petey = TEAM_PETEY;
     }
     if (IsBowserJrUnlocked())
     {
@@ -1145,7 +1160,7 @@ void CupManager::SelectFinalOpponents()
     }
     else
     {
-        bowserJr = 9;
+        bowserJr = TEAM_BOWSERJR;
     }
     mFinalOpponentTeams[0] = bowserJr;
     if (IsDiddyKongUnlocked())
@@ -1271,12 +1286,12 @@ void CupManager::AwardGoalTrophies()
         {
             int flag0;
             int flag1;
-            if (GetCurrentMode() == 0)
+            if (GetCurrentMode() == CUP_FIRE)
             {
                 flag0 = 16;
                 flag1 = 8;
             }
-            else if (GetCurrentMode() == 1)
+            else if (GetCurrentMode() == CUP_CRYSTAL)
             {
                 flag0 = 64;
                 flag1 = 32;
