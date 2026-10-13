@@ -47,9 +47,10 @@ public:
 
     /* 0x01C */ WiiRemotePadStatus* mCurrentStatus;
     /* 0x020 */ WiiRemotePadStatus* mPreviousStatus;
+    // The offsets below use the 2007 SDK layout; Korea has larger, 8-byte-aligned statuses.
     /* 0x024 */ WiiRemotePadStatus mStatusBuffers[2];
     /* 0x184 */ float mButtonStateTime[11];
     /* 0x1B0 */ DPDData mDPDData;
-}; // size 0x1D0
+}; // size 0x1D0, 0x238 in Korea
 
 #endif // NL_PLAT_WII_REMOTE_PAD_H

@@ -149,6 +149,9 @@ float gfGoalieSTSKickContactDistance = 1.0f;
 float gfGoalieDekeReachMargin = 0.5f;
 float gfGoalieDekeKickReachMargin = 0.5f;
 float gfGoalieMontyGrabReach = 1.75f;
+#if defined(VERSION_R4QK01)
+float gfGoalieSTSPursuitRange = 8.0f;
+#endif
 float gfGoalieSTSLungeReachMargin = 0.5f;
 float gfGoalieSTSKickReachMargin = 0.5f;
 float gfGoalieSTSAbortOnPassChance = 30.0f;
@@ -165,6 +168,9 @@ unsigned char gbShowMegaStrikeTargets;
 unsigned char gbKeepStoppedMegaBallSpin;
 unsigned char gbAnimateMissedMegaBalls;
 float gfMegaLaunchStartDelay;
+#if defined(VERSION_R4QK01)
+float gfGoalieLooseBallChaseDistance;
+#endif
 unsigned char gbForceLobDeflection;
 unsigned char gbDisableLobPredictionUpdates;
 unsigned char gbForceGoalieUserMovement;
@@ -658,7 +664,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         && !bOffplayActive)
     {
         TacklePlayer(g_pBall->m_pOwner);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         StealBall(g_pBall->m_pOwner);
 #endif
 
@@ -833,8 +839,12 @@ void Goalie::ActionLooseBallPursueRolling(float deltaTime)
 
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
+#if defined(VERSION_R4QK01)
+        || (!IsLooseBallClose(gfGoalieLooseBallChaseDistance))
+#else
         || (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
+#endif
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
     {
@@ -849,8 +859,12 @@ void Goalie::ActionLooseBallSetup(float fDeltaT)
 {
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
+#if defined(VERSION_R4QK01)
+        || (!IsLooseBallClose(gfGoalieLooseBallChaseDistance))
+#else
         || (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
+#endif
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
     {
@@ -2153,7 +2167,23 @@ void Goalie::ActionMove(float deltaTime)
     {
         mbDoIntercept = false;
         FindDesiredGoaliePosition(mv3TargetPosition, desiredDir, desiredOffset, desiredFacing, 0);
+#if defined(VERSION_R4QK01)
+        cBall* pBall = g_pBall;
+        targetPos = pBall->m_v3Position;
+        if (pBall->meBallState == BALL_STATE_LOOSE
+            && !pBall->m_pPhysicsBall->mbUseMagnusEffect
+            && nlVec3LengthSquared(pBall->m_v3Velocity) > 100.0f
+            && IsLooseBallTowardNet())
+        {
+            mv3TargetPosition.y = targetPos.y
+                + pBall->m_v3Velocity.y * (mv3TargetPosition.x - targetPos.x)
+                    / pBall->m_v3Velocity.x;
+            if (mUrgency == URGENCY_LOW)
+                mUrgency = URGENCY_MED;
+        }
+#else
         targetPos = g_pBall->m_v3Position;
+#endif
     }
 
     bool bWallBlocked = mfWallBlock > 0.0f;
@@ -2386,8 +2416,12 @@ void Goalie::ActionMove(float deltaTime)
     }
 
     if (!isPassThreat && !CheckForLobSave(true)
+#if defined(VERSION_R4QK01)
+        && IsLooseBallClose(gfGoalieLooseBallChaseDistance))
+#else
         && IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
+#endif
     {
         InitActionLooseBallSetup();
     }
@@ -4647,7 +4681,7 @@ void Goalie::ActionSnapBall(float fDeltaT)
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime == 0 && g_pBall->m_pOwner != this)
     {
         TacklePlayer(g_pBall->m_pOwner);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         StealBall(g_pBall->m_pOwner);
 #endif
 
@@ -5015,8 +5049,12 @@ void Goalie::InitActionLooseBallSetup()
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    if (!IsLooseBallClose(gfGoalieLooseBallChaseDistance))
+#else
     if (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
+#endif
     {
         InitActionMove(true);
         return;
@@ -5024,6 +5062,11 @@ void Goalie::InitActionLooseBallSetup()
 
     g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
 
+#if defined(VERSION_R4QK01)
+    if (mGoalieActionState != GOALIEACTION_MOVE
+        && mGoalieActionState != GOALIEACTION_LOOSEBALL_SETUP)
+        SetGoalieAction(GOALIEACTION_LOOSEBALL_SETUP, 0);
+#endif
     m_pPhysicsCharacter->m_CanCollideWithBall = true;
     mbDoHeadTrack = true;
     mbPickedUp = false;
@@ -5068,6 +5111,13 @@ void Goalie::InitActionLooseBallSetup()
                     if (1.0f + mBlendInfo.mv3BlendedSavePos.z
                         >= mv3LocalContactPosition.z)
                     {
+#if defined(VERSION_R4QK01)
+                        if (mpSaveData == 0)
+                        {
+                            InitActionMove(false);
+                            return;
+                        }
+#endif
                         mfWaitTime = mfTimeTilSave
                                    - mBlendInfo.mfMilestoneTime[2];
                         if (mfWaitTime < gfGoalieSaveStartTimeMargin)
@@ -5309,7 +5359,11 @@ void Goalie::InitActionLooseBallSetup()
                     m_m4WorldMatrix.m12,
                     m_m4WorldMatrix.m13);
 
+#if defined(VERSION_R4QK01)
+                if (fBallDist < 1.5f)
+#else
                 if (fBallDist < 1.2f)
+#endif
                 {
                     bDoGrab = true;
                 }
@@ -5392,6 +5446,9 @@ void Goalie::InitActionLooseBallSetup()
                 = &LooseBallAnims::mLooseBallKickInfo[1];
         }
 
+#if defined(VERSION_R4QK01)
+        bool bBallIsClose = nlVec3DistanceSquared2D(GetPosition(), v3BallPosition) < 2.25f;
+#endif
         float fInterceptTime;
         float fClosestDist;
         bool bFound = FakeBallWorld::FindBallIntercept(m_DetChar.m_v3Position,
@@ -5404,7 +5461,11 @@ void Goalie::InitActionLooseBallSetup()
             3.0f);
 
         if (bFound && mv3TargetPosition.z < 1.0f
+#if defined(VERSION_R4QK01)
+            && (fClosestDist < 0.4f || bBallIsClose))
+#else
             && fClosestDist < 0.4f)
+#endif
         {
             float fDistSq = nlVec3DistanceSquared2D(mv3TargetPosition, GetPosition());
             float fAnimTime = mpLooseBallInfo->mfPickupTime
@@ -5426,7 +5487,11 @@ void Goalie::InitActionLooseBallSetup()
         {
             return;
         }
+#if defined(VERSION_R4QK01)
+        InitActionMove(false);
+#else
         InitActionMove(true);
+#endif
         return;
     }
 
@@ -5507,7 +5572,10 @@ void Goalie::InitActionLooseBallSetup()
         }
     }
 
-    SetGoalieAction(GOALIEACTION_LOOSEBALL_SETUP, 0);
+#if defined(VERSION_R4QK01)
+    if (mGoalieActionState != GOALIEACTION_LOOSEBALL_SETUP)
+#endif
+        SetGoalieAction(GOALIEACTION_LOOSEBALL_SETUP, 0);
     float fDxFace = v3BallPosition.x - m_DetChar.m_v3Position.x;
     float fDyFace = v3BallPosition.y - m_DetChar.m_v3Position.y;
     m_DetChar.m_aDesiredFacingDirection
@@ -5695,6 +5763,7 @@ void Goalie::ActionLobSave(float fDeltaT)
 
     if (muBallChangeCount != g_pBall->m_bBallPathChangeCount)
     {
+#if !defined(VERSION_R4QK01)
         if (g_pBall->m_pOwner != 0)
         {
             // Matching workaround: CodeWarrior removes this unused float copy
@@ -5702,6 +5771,7 @@ void Goalie::ActionLobSave(float fDeltaT)
             const float fUnusedDeltaT = fDeltaT;
             (void)fUnusedDeltaT;
         }
+#endif
         InitActionMove(false);
         return;
     }
@@ -6059,7 +6129,7 @@ void Goalie::ActionLobSaveContact(float fDeltaT)
                    < fDX)
         {
             TacklePlayer(g_pBall->m_pOwner);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
             StealBall(g_pBall->m_pOwner);
 #endif
             MakeSaveEvent(false);
@@ -6420,6 +6490,14 @@ void Goalie::ActionSTSPursue(float fDeltaT)
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    if (mpShooter->m_eActionState == ACTION_DEKE || mpShooter->m_eActionState == ACTION_RUNNING_WB)
+    {
+        if (!IsAttackDisabled())
+            InitActionPursueBallCarrier();
+        return;
+    }
+#endif
     if (IsOpponentInSTS() && CheckForSTSAttack())
     {
         return;
@@ -6448,6 +6526,13 @@ void Goalie::ActionSTSPursue(float fDeltaT)
     }
     else
     {
+#if defined(VERSION_R4QK01)
+        if (fDistanceSq > nlGetLengthSquared1D(gfGoalieSTSPursuitRange))
+        {
+            InitActionMove(false);
+            return;
+        }
+#endif
         float dx = mpShooter->m_DetChar.m_v3Position.x - m_DetChar.m_v3Position.x;
         float dy = mpShooter->m_DetChar.m_v3Position.y - m_DetChar.m_v3Position.y;
         m_DetChar.m_aDesiredFacingDirection
@@ -6952,7 +7037,11 @@ void Goalie::InitActionMoveWB()
     m_pPhysicsCharacter->m_CanCollideWithWall = true;
 }
 
+#if defined(VERSION_R4QK01)
+void Goalie::InitActionSaveSetup(bool bCanReposition, bool bCheckLobSave)
+#else
 void Goalie::InitActionSaveSetup(bool bCanReposition)
+#endif
 {
     if (mGoalieActionState == GOALIEACTION_STS_RECOVER
         || mGoalieActionState == GOALIEACTION_ELECTROCUTION
@@ -6998,7 +7087,11 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    if (bCheckLobSave && CheckForLobSave(false))
+#else
     if (CheckForLobSave(false))
+#endif
     {
         return;
     }
@@ -7197,6 +7290,13 @@ void Goalie::InitActionSave()
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    if (mpSaveData == 0)
+    {
+        InitActionMove(false);
+        return;
+    }
+#endif
     SetGoalieAction(GOALIEACTION_SAVE, 0);
     mFatigue.RegisterShot(mpSaveData->mfFatigueValue);
     mbBallImpacted = false;

@@ -14,6 +14,7 @@ unsigned char SCGetAspectRatio(void);
 unsigned char SCGetLanguage(void);
 unsigned char SCGetSoundMode(void);
 unsigned long SCGetSimpleAddressID(void);
+int SCCheckPCMessageRestriction(void);
 
 #ifdef __cplusplus
 }

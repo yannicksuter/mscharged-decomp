@@ -210,7 +210,7 @@ void RenderSnapshot::Grab()
         mNegativeGoalieNetCheck = Goalie::mbNegGoalieNetCheck;
     }
     mCameraUp = g_CameraWorldUpVector;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (lbl_806E12C8 != 0)
     {
         for (int i = 0; i < 60; i++)
@@ -491,7 +491,7 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
     mpNetMeshNegativeX->Blend(blendFactors[0], *lhs.mpNetMeshNegativeX, *rhs.mpNetMeshNegativeX);
     nlVecLerp(mCameraUp, lhs.mCameraUp, rhs.mCameraUp, blendFactors[0]);
     nlVec3Normalize(mCameraUp, mCameraUp);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (lbl_806E12C8 != 0 && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) == 0)
     {
         const RenderSnapshot& previous = lhs;

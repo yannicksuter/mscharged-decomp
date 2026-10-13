@@ -44,7 +44,7 @@ public:
     bool SaveReplay(int index);
     bool LoadReplay(int index);
 
-    // Offsets below describe the USA layout; EU snapshots omit patch positions.
+    // USA, Japan and Korea share this layout; EU snapshots omit patch positions.
     /* 0x0000 */ RenderSnapshot mSnapshots[3];
     /* 0x7554 */ RenderSnapshot* mCurrent;
     /* 0x7558 */ RenderSnapshot* mPrevious;
@@ -59,6 +59,6 @@ public:
     /* 0x761C */ f32 mBlend[3];
     /* 0x7628 */ Replay* mReplay;
     /* 0x762C */ u8* mMemory;
-}; // total size: USA 0x7630, EU 0x6DC0
+}; // total size: USA/Japan/Korea 0x7630, EU 0x6DC0
 
 #endif // _REPLAYMANAGER_H_

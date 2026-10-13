@@ -32,7 +32,11 @@ static int CheckRcode(int rcode, int errCode) {
 }
 
 int socket(int pf, int type, int protocol) {
+#if defined(VERSION_R4QK01)
+  int rcode = SOSocket(pf, type, 0);
+#else
   int rcode = SOSocket2(pf, type, 0);
+#endif
   GSI_UNUSED(protocol);
   return CheckRcode(rcode, INVALID_SOCKET);
 }

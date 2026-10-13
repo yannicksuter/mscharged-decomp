@@ -76,12 +76,18 @@ void PausePostGameScene::OnCountdownTick(FETimer* timer)
 
 bool IsCurrentSeriesComplete()
 {
-    int wins0 = StatsTracker::Instance()->mNumGamesWon[0];
-    int wins1 = StatsTracker::Instance()->mNumGamesWon[1];
+    StatsTracker* tracker = StatsTracker::Instance();
+    int wins0 = tracker->GetNumGamesWon(0);
+    int wins1 = tracker->GetNumGamesWon(1);
     int needed = GameInfoManager::Instance()->GetCurrentSettings()->NumGames / 2 + 1;
     if ((wins0 > wins1 && wins0 == needed) || (wins1 > wins0 && wins1 == needed))
         return true;
     return false;
+}
+
+static inline bool ShouldSavePostGameStats()
+{
+    return Config::Global().Get<bool>("save_stats", false);
 }
 
 void ContinuePostGame(bool online)
@@ -107,7 +113,7 @@ void ContinuePostGame(bool online)
     }
     else
     {
-        if (GetConfigBool(Config::Global(), "save_stats", false))
+        if (ShouldSavePostGameStats())
         {
             StatsTracker* tracker = StatsTracker::Instance();
             tracker->WriteStats(g_pGame->GetGameTime(), -1.0f, 0);
@@ -232,18 +238,30 @@ void PausePostGameScene::OnDoneTransitionComplete()
 void PausePostGameScene::BuildStoryArticle()
 {
     BasicGameInfo* game = GameInfoManager::Instance()->GetCurrentGameInfo();
+#if defined(VERSION_R4QK01)
+    int homeTeam = game->GetTeam(0);
+    int awayTeam = game->GetTeam(1);
+    int homeScore = game->GetFinalScore(0);
+    int awayScore = game->GetFinalScore(1);
+#else
     int homeTeam = game->mTeamIndex[0];
     int homeScore = game->mFinalScore[0];
     int awayScore = game->mFinalScore[1];
     int awayTeam = game->mTeamIndex[1];
+#endif
     int winScore = homeScore > awayScore ? homeScore : awayScore;
     int loseScore = homeScore < awayScore ? homeScore : awayScore;
+#if defined(VERSION_R4QK01)
+    int winner = homeScore > awayScore ? homeTeam : awayTeam;
+    int loser = homeScore < awayScore ? homeTeam : awayTeam;
+#else
     int winner = awayTeam;
     if (homeScore > awayScore)
         winner = homeTeam;
     int loser = awayTeam;
     if (homeScore < awayScore)
         loser = homeTeam;
+#endif
     const CharacterInfo& winningCharacter = GetCharacterInfo(GetCharacterIndexFromCaptain(winner));
     const CharacterInfo& losingCharacter = GetCharacterInfo(GetCharacterIndexFromCaptain(loser));
     typedef BasicString<unsigned short, Detail::TempStringAllocator> String;
@@ -252,8 +270,13 @@ void PausePostGameScene::BuildStoryArticle()
     String body;
     mUseCustomText = true;
     int variant = nlRandom(4, &nlDefaultSeed);
+#if defined(VERSION_R4QK01)
+    int wins0 = StatsTracker::Instance()->GetNumGamesWon(0);
+    int wins1 = StatsTracker::Instance()->GetNumGamesWon(1);
+#else
     int wins0 = StatsTracker::Instance()->mNumGamesWon[0];
     int wins1 = StatsTracker::Instance()->mNumGamesWon[1];
+#endif
     int numGames = wins0 + wins1;
     int maxWins = wins0 > wins1 ? wins0 : wins1;
     int minWins = wins0 > wins1 ? wins1 : wins0;
@@ -268,6 +291,126 @@ void PausePostGameScene::BuildStoryArticle()
     nlStrToWcs(loseScoreText, wLoseScore, 4);
     nlSNPrintf(numGamesText, 4, "%d", numGames);
     nlStrToWcs(numGamesText, wNumGames, 4);
+#if defined(VERSION_R4QK01)
+    if (winScore - loseScore <= 2)
+    {
+        switch (variant)
+        {
+        case 0:
+            mStoryText = FormatKorean("ST_DOMINATION_CLOSE_GAME_0",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 1:
+            mStoryText = FormatKorean("ST_DOMINATION_CLOSE_GAME_1",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(loseScore));
+            break;
+        case 2:
+            mStoryText = FormatKorean("ST_DOMINATION_CLOSE_GAME_2",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 3:
+        default:
+            mStoryText = FormatKorean("ST_DOMINATION_CLOSE_GAME_3",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(loseScore),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        }
+    }
+    else if (winScore - loseScore <= 4)
+    {
+        switch (variant)
+        {
+        case 0:
+            mStoryText = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_0",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 1:
+            mStoryText = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_1",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 2:
+            mStoryText = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_2",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(loseScore),
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())));
+            break;
+        case 3:
+        default:
+            mStoryText = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_3",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        }
+    }
+    else
+    {
+        switch (variant)
+        {
+        case 0:
+            mStoryText = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_0",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 1:
+            mStoryText = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_1",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        case 2:
+            mStoryText = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_2",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(loseScore));
+            break;
+        case 3:
+        default:
+            mStoryText = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_3",
+                g_pLocalization->GetString(winningCharacter.GetDisplayNameKey()),
+                g_pLocalization->GetString(losingCharacter.GetDisplayNameKey()),
+                wWinScore, wLoseScore, wNumGames,
+                GetKoreanParticle(g_pLocalization->GetString(winningCharacter.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(losingCharacter.GetDisplayNameKey())));
+            break;
+        }
+    }
+#else
     if (winScore - loseScore <= 2)
         nlSNPrintf(mStoryStringID, 64, "ST_DOMINATION_CLOSE_GAME_%d", variant);
     else if (winScore - loseScore <= 4)
@@ -277,14 +420,21 @@ void PausePostGameScene::BuildStoryArticle()
     body = String(g_pLocalization->GetString(mStoryStringID));
     mStoryText = Format(body, g_pLocalization->GetString(winningCharacter.mDisplayNameKey),
         g_pLocalization->GetString(losingCharacter.mDisplayNameKey), wWinScore, wLoseScore, wNumGames);
+#endif
     const CharacterInfo& seriesWinner = GetCharacterInfo(GetCharacterIndexFromCaptain(wins0 > wins1 ? homeTeam : awayTeam));
     const CharacterInfo& seriesLoser = GetCharacterInfo(GetCharacterIndexFromCaptain(wins0 > wins1 ? awayTeam : homeTeam));
     int needed = GameInfoManager::Instance()->GetCurrentSettings()->NumGames / 2 + 1;
     if ((wins0 > wins1 && wins0 == needed) || (wins1 > wins0 && wins1 == needed))
     {
         nlSNPrintf(mHeadlineStringID, 64, "STH_DOMINATION_WINS_SERIES_%d", 0);
+#if defined(VERSION_R4QK01)
+        mHeadlineText = FormatKorean(mHeadlineStringID,
+            g_pLocalization->GetString(seriesWinner.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(seriesWinner.GetDisplayNameKey())), wMaxWins, wMinWins);
+#else
         headline = String(g_pLocalization->GetString(mHeadlineStringID));
         mHeadlineText = Format(headline, g_pLocalization->GetString(seriesWinner.mDisplayNameKey), wMaxWins, wMinWins);
+#endif
     }
     else if (wins0 == wins1)
     {
@@ -295,17 +445,21 @@ void PausePostGameScene::BuildStoryArticle()
     else
     {
         nlSNPrintf(mHeadlineStringID, 64, "STH_DOMINATION_LEADS_SERIES_%d", 0);
+#if defined(VERSION_R4QK01)
+        mHeadlineText = FormatKorean(mHeadlineStringID,
+            g_pLocalization->GetString(seriesWinner.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(seriesWinner.GetDisplayNameKey())), wMaxWins, wMinWins);
+#else
         headline = String(g_pLocalization->GetString(mHeadlineStringID));
         mHeadlineText = Format(headline, g_pLocalization->GetString(seriesWinner.mDisplayNameKey), wMaxWins, wMinWins);
+#endif
     }
     SetArticleImageName(winner, NEWS_MOOD_POSITIVE, -1);
 }
 
 void PausePostGameScene::OnSelectRematch()
 {
-    const char* key = "save_stats";
-    Config& cfg = Config::Global();
-    if (cfg.Get<bool>(key, false))
+    if (ShouldSavePostGameStats())
     {
         StatsTracker* tracker = StatsTracker::s_pInstance;
         tracker->WriteStats(g_pGame->GetGameTime(), -1.0f, 0);

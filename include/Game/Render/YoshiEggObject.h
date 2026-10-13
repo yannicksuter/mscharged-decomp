@@ -23,7 +23,7 @@ public:
     void UpdateTransform(float);
     void Reset();
     void Break();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     void SetPendingDisplacement(const nlVector3&, float);
 #endif
 
@@ -37,10 +37,10 @@ public:
     /* 0x30 */ RenderObject* mDrawable;
     /* 0x34 */ cFielder* mFielder;
     /* 0x38 */ float mDelay;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     /* 0x3C */ nlVector3 mDisplacementDirection;
     /* 0x48 */ float mDisplacementDistance;
 #endif
-}; // size: 0x4C (USA), 0x3C (Europe)
+}; // size: 0x4C (USA/Japan/Korea), 0x3C (Europe)
 
 #endif

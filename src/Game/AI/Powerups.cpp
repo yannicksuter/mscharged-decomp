@@ -1331,7 +1331,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         nChanceForChainChomp = nChanceForStar = nChanceForBanana
             = nChanceForBoBomb = nChanceForCaptainPowerup
             = nChanceForMushroom = 0;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         powerUpType = nlRandomf(1.0f, &nlDefaultSeed) < 0.66f
             ? POWER_UP_RED_SHELL
             : POWER_UP_GREEN_SHELL;
@@ -1349,7 +1349,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBoBomb
             = nChanceForGreenShell = nChanceForFreezeShell = 0;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         powerUpType = nlRandomf(1.0f, &nlDefaultSeed) < 0.5f
             ? POWER_UP_BANANA
             : POWER_UP_MUSHROOM;

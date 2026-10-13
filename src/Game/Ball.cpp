@@ -209,7 +209,7 @@ cBall::cBall()
     mnShotClockTeam = -1;
     mbStuckInRiotDone = false;
     mbBallOnFire = false;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     mbBallFrozen = false;
 #endif
 
@@ -269,6 +269,10 @@ void cBall::ClearOwner()
     m_pOwner->SetBall(NULL);
     m_pOwner = NULL;
     m_pPhysicsBall->EnableCollisions();
+#if defined(VERSION_R4QK01)
+    g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
+    g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
+#endif
     m_v3PrevPosition = m_v3Position;
     m_pPhysicsBall->GetPosition(&m_v3Position);
     m_pPhysicsBall->GetLinearVelocity(&m_v3Velocity);
@@ -1858,6 +1862,22 @@ void cBall::SetOwner(cPlayer* pOwner)
     PhysicsBall* pPhysicsBall = m_pPhysicsBall;
     pPhysicsBall->mbUseMagnusEffect = false;
     pPhysicsBall->mfChargeBonus = 0.0f;
+
+#if defined(VERSION_R4QK01)
+    if (pOwner->m_eClassType == FIELDER)
+    {
+        if (((cFielder*)pOwner)->mbTangible)
+        {
+            g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
+            g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
+        }
+    }
+    else
+    {
+        g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
+        g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
+    }
+#endif
 }
 
 void cBall::SetPosition(const nlVector3& pos)
@@ -2219,7 +2239,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 
 static bool sHeaderTargetVisible;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 static inline void RestoreFrozenBallPosition(cBall* pBall)
 {
     const nlVector3& position = pBall->m_v3PrevPosition;
@@ -2229,8 +2249,8 @@ static inline void RestoreFrozenBallPosition(cBall* pBall)
 
 void cBall::Update(float fDeltaT)
 {
-#if defined(VERSION_R4QE01)
-    // The USA revision holds the ball in place during the Mega Strike freeze.
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+    // Hold the ball in place during the Mega Strike freeze.
     if (mbBallFrozen)
     {
         RestoreFrozenBallPosition(this);
@@ -2663,7 +2683,7 @@ void ResetBall(cBall* pBall, bool bParam)
     pBall->mnShotClockTeam = -1;
     pBall->mbStuckInRiotDone = false;
     pBall->mbBallOnFire = false;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     pBall->mbBallFrozen = false;
 #endif
     pBall->m_v3PrevPosition = pBall->m_v3Position;
@@ -3329,7 +3349,7 @@ inline void RegisterBallDebugFields(cBall* ball, DebugWriteCache* cache)
         "mbStuckInRiotDone");
     cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&ball->mbBallOnFire - (u8*)ball, "mbBallOnFire");
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&ball->mbBallFrozen - (u8*)ball, "mbBallFrozen");
 #endif

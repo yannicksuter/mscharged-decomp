@@ -26,6 +26,15 @@ typedef union KPADEXStatus {
         f32 ltrigger; // at 0x1C
         f32 rtrigger; // at 0x20
     } cl;             // at 0x0
+#if defined(VERSION_R4QK01)
+    struct {
+        f64 tgc_weight;     // at 0x0
+        f64 weight[4];      // at 0x8
+        f64 weight_ave[4];  // at 0x28
+        s32 weight_err;     // at 0x48
+        s32 tgc_weight_err; // at 0x4C
+    } bl;                   // at 0x0
+#endif
 } KPADEXStatus;
 
 typedef struct KPADStatus {

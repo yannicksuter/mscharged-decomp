@@ -425,7 +425,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 16:
     {
         SetLoadingComment("AsyncFEResourceLoadFinalize");
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         BootLoadingScene* loadingScene;
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
@@ -439,7 +439,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
 #endif
         if (lbl_806E1068 && lbl_806E1069
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             && (loadingScene == 0 || !loadingScene->IsBootScreenPending())
 #endif
         )

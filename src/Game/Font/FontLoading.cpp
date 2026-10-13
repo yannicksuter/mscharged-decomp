@@ -13,23 +13,34 @@ struct FontLanguagePrefix
     char value[4];
 };
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static FontLanguagePrefix sDefaultLanguagePrefix = { "eur" };
 #endif
+#if defined(VERSION_R4QK01)
+namespace
+{
+extern FontLanguagePrefix sJapaneseInGameLanguagePrefix;
+extern FontLanguagePrefix sJapanese101LanguagePrefix;
+}
+#else
 static FontLanguagePrefix sJapaneseInGameLanguagePrefix = { "jpn" };
 static FontLanguagePrefix sJapanese101LanguagePrefix = { "jpn" };
+#endif
 
 bool gLoadInGameFonts;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QK01)
+static void LoadFonts(bool* inGame);
+#else
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static inline void LoadFonts(bool*)
 #else
-static void LoadFonts(bool*)
+static void LoadFonts(bool* inGame)
 #endif
 {
     const char* TEXT_FONT_NAME = "fot-rodinprob18";
     const char* HEADING_FONT_NAME = "Scratchy36";
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     FontLanguagePrefix langprefix = sDefaultLanguagePrefix;
 
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
@@ -102,6 +113,7 @@ static void LoadFonts(bool*)
     FontManager::Instance()->LoadFont(textfontbundlename, textfontfilename, TEXT_FONT_NAME);
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
+#endif
 
 static inline void LoadFontsJapaneseInGame()
 {
@@ -139,7 +151,7 @@ static inline void LoadFontsJapanese101()
     FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
 }
 
-bool UpdateFontLoading(bool*)
+static inline bool IsFontLoadingComplete()
 {
     if (g_pLocalization->m_pFile == 0)
     {
@@ -148,10 +160,24 @@ bool UpdateFontLoading(bool*)
     return FontManager::Instance()->IsLoadingComplete();
 }
 
+#if !defined(VERSION_R4QK01)
+bool UpdateFontLoading(bool*)
+{
+    return IsFontLoadingComplete();
+}
+#endif
+
 bool BeginFontLoading(bool* inGame)
 {
     g_pLocalization->Load(g_Language, false, &VirtualAllocator);
 
+#if defined(VERSION_R4QK01)
+    if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangKorean)
+    {
+        LoadFonts(inGame);
+    }
+    else
+#endif
     if (*inGame)
     {
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
@@ -175,9 +201,55 @@ bool BeginFontLoading(bool* inGame)
         LoadFonts(inGame);
     }
 
-    if (g_pLocalization->m_pFile == 0)
-    {
-        return false;
-    }
-    return FontManager::Instance()->IsLoadingComplete();
+    return IsFontLoadingComplete();
 }
+
+#if defined(VERSION_R4QK01)
+bool UpdateFontLoading(bool*)
+{
+    return IsFontLoadingComplete();
+}
+
+static void LoadFonts(bool* inGame)
+{
+    const char* TEXT_FONT_NAME = "fot-rodinprob18";
+    const char* HEADING_FONT_NAME = "Scratchy36";
+    const char* fontSuffix = "";
+    FontLanguagePrefix langprefix = { "eur" };
+
+    if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+    {
+        langprefix.value[0] = 'j';
+        langprefix.value[1] = 'p';
+        langprefix.value[2] = 'n';
+    }
+    else if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangKorean)
+    {
+        langprefix.value[0] = 'k';
+        langprefix.value[1] = 'o';
+        langprefix.value[2] = 'r';
+        if (*inGame)
+        {
+            fontSuffix = "ingame";
+        }
+    }
+
+    char textfontbundlename[64];
+    char textfontfilename[64];
+    char headingfontbundlename[64];
+    char headingfontfilename[64];
+
+    nlSNPrintf(textfontbundlename, 64, "art/fe/fonts/%sfonttext%s18.res", langprefix.value, fontSuffix);
+    nlSNPrintf(textfontfilename, 64, "fe/fonts/%sfonttext%s18", langprefix.value, fontSuffix);
+    nlSNPrintf(headingfontbundlename, 64, "art/fe/fonts/%sfontheading%s36.res", langprefix.value, fontSuffix);
+    nlSNPrintf(headingfontfilename, 64, "fe/fonts/%sfontheading%s36", langprefix.value, fontSuffix);
+    FontManager::Instance()->LoadFont(textfontbundlename, textfontfilename, TEXT_FONT_NAME);
+    FontManager::Instance()->LoadFont(headingfontbundlename, headingfontfilename, HEADING_FONT_NAME);
+}
+
+namespace
+{
+FontLanguagePrefix sJapaneseInGameLanguagePrefix = { "jpn" };
+FontLanguagePrefix sJapanese101LanguagePrefix = { "jpn" };
+}
+#endif

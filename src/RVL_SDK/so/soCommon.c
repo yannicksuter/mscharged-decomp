@@ -3,18 +3,25 @@
 
 
 #include <revolution/ipc.h>
+#include <revolution/net/NETMem.h>
 #include <revolution/os.h>
 #include <revolution/os.h>
 #include <string.h>
 
 const char* __SO_VERSION =
+#if defined(VERSION_R4QK01)
+    "<< RVL_SDK - SO \trelease build: Jun  9 2009 12:00:00 (0x4199_60831) >>";
+#else
     "<< RVL_SDK - SO \trelease build: Mar  9 2007 15:08:35 (0x4199_60831) >>";
+#endif
 
 u8 soState = 0;
 SOSysWork soWork;
 s32 soError = 0;
-// ???
 static int soRegistered = false;
+#if defined(VERSION_R4QK01)
+enum { SO_VERSION_REGISTERED = 1 };
+#endif
 int soBufAddrCheck = true;
 static char NET_RM_SOCK[] = "/dev/net/ip/top";
 
@@ -33,10 +40,17 @@ int SOInit(SOLibraryConfig* config) {
   int result = SO_SUCCESS;
   int enabled = OSDisableInterrupts();
 
+#if defined(VERSION_R4QK01)
+  if (!(soRegistered & SO_VERSION_REGISTERED)) {
+    OSRegisterVersion(__SO_VERSION);
+    soRegistered |= SO_VERSION_REGISTERED;
+  }
+#else
   if (!soRegistered) {
     OSRegisterVersion(__SO_VERSION);
     soRegistered = true;
   }
+#endif
 
   switch (soState) {
   case SO_INTERNAL_STATE_READY:
@@ -50,7 +64,11 @@ int SOInit(SOLibraryConfig* config) {
       break;
     }
 
+#if defined(VERSION_R4QK01)
+    NETMemSet(&soWork, 0, sizeof(soWork));
+#else
     memset(&soWork, 0, sizeof(soWork));
+#endif
     soWork.allocFunc = config->alloc;
     soWork.freeFunc = config->free;
     soWork.allocCount = 0;
@@ -113,7 +131,13 @@ int SOFinish(void) {
   return result;
 }
 
-int SOStartup(void) { return SOStartupEx(0x927c0); }
+int SOStartup(void) {
+#if defined(VERSION_R4QK01)
+  return SOStartupEx(60000);
+#else
+  return SOStartupEx(600000);
+#endif
+}
 
 inline int SO_Startup_ErrWtf(s32 errNwc24, s32 exErr) {
   s32 result = -0x1c;

@@ -25,6 +25,7 @@ public:
     void OnHomeButtonPressed();
 
     /* 0x004 */ HBMDataInfo mDataInfo;
+    // The following offsets increase by four in Korea with HBMDataInfo.
     /* 0x040 */ HBMControllerData mControllerData;
     /* 0x080 */ TPLPalette* mIconPalette;
     /* 0x084 */ void* mSoundData;
@@ -35,7 +36,7 @@ public:
     /* 0x092 */ bool mBlocked;
     /* 0x093 */ u8 mPad93;
     /* 0x094 */ unsigned int mPreviousTaskState;
-}; // size 0x98
+}; // size 0x98, 0x9C in Korea
 
 extern HBMManager* gpHBMManager;
 HBMManager* GetHBMManager();

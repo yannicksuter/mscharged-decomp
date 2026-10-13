@@ -21,6 +21,9 @@
 #include "Game/Team.h"
 #include "Game/Render/RLViewLayers.h"
 #include "NL/nlFormat.h"
+#if defined(VERSION_R4QK01)
+#include "NL/nlKoreanParticle.h"
+#endif
 #include "NL/nlFunction.inl"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
@@ -371,8 +374,13 @@ void GoalOverlay::DoMatchEndOverlay()
         const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(winnerID));
         if ((scoreLeft > scoreRight && scoreLeft == winsNeeded) || (scoreRight > scoreLeft && scoreRight == winsNeeded))
         {
+#if defined(VERSION_R4QK01)
+            formatted = FormatKorean("STH_DOMINATION_WINS_SERIES_0", g_pLocalization->GetString(character.mDisplayNameKey),
+                GetKoreanParticle(g_pLocalization->GetString(character.mDisplayNameKey)), scoreLeftWideString, scoreRightWideString);
+#else
             BasicString<unsigned short, Detail::TempStringAllocator> unformatted(g_pLocalization->GetString("STH_DOMINATION_WINS_SERIES_0"));
             formatted = Format(unformatted, g_pLocalization->GetString(character.mDisplayNameKey), scoreLeftWideString, scoreRightWideString);
+#endif
         }
         else if (scoreLeft == scoreRight)
         {
@@ -381,8 +389,13 @@ void GoalOverlay::DoMatchEndOverlay()
         }
         else
         {
+#if defined(VERSION_R4QK01)
+            formatted = FormatKorean("STH_DOMINATION_LEADS_SERIES_0", g_pLocalization->GetString(character.mDisplayNameKey),
+                GetKoreanParticle(g_pLocalization->GetString(character.mDisplayNameKey)), scoreLeftWideString, scoreRightWideString);
+#else
             BasicString<unsigned short, Detail::TempStringAllocator> unformatted(g_pLocalization->GetString("STH_DOMINATION_LEADS_SERIES_0"));
             formatted = Format(unformatted, g_pLocalization->GetString(character.mDisplayNameKey), scoreLeftWideString, scoreRightWideString);
+#endif
         }
     }
     else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
@@ -419,10 +432,13 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     nlStrToWcs(scoreLeftString, scoreLeftWideString, 32);
     nlStrToWcs(scoreRightString, scoreRightWideString, 32);
     BasicString<unsigned short, Detail::TempStringAllocator> formatted;
+    const unsigned short* unformatted;
+#if defined(VERSION_R4QK01)
+    const char* particleKey = 0;
+#endif
     if (homeAway == 2)
         homeAway = scoreLeft <= scoreRight ? 1 : 0;
     int otherSide = !homeAway;
-    const unsigned short* unformatted;
     if (isMatchEnd)
     {
         if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
@@ -442,11 +458,23 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
         }
     }
     else if (score[homeAway] > score[otherSide])
+#if defined(VERSION_R4QK01)
+        particleKey = "GOAL_TITLE_LEADS";
+#else
         unformatted = g_pLocalization->GetString("GOAL_TITLE_LEADS");
+#endif
     else if (score[homeAway] < score[otherSide])
+#if defined(VERSION_R4QK01)
+        particleKey = "GOAL_TITLE_TRAILS";
+#else
         unformatted = g_pLocalization->GetString("GOAL_TITLE_TRAILS");
+#endif
     else
+#if defined(VERSION_R4QK01)
+        particleKey = "GOAL_TITLE_TIED";
+#else
         unformatted = g_pLocalization->GetString("GOAL_TITLE_TIED");
+#endif
     eTeamID winningTeam = (eTeamID)GameInfoManager::Instance()->GetTeam((short)homeAway);
     if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
@@ -454,13 +482,37 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     }
     else if (scoreLeft > scoreRight)
     {
-        formatted = Format(BasicString<unsigned short, Detail::TempStringAllocator>(unformatted),
-            g_pLocalization->GetString(GetLOCTeamName(winningTeam)), scoreLeftWideString, scoreRightWideString);
+#if defined(VERSION_R4QK01)
+        if (particleKey == 0)
+#endif
+        {
+            formatted = Format(BasicString<unsigned short, Detail::TempStringAllocator>(unformatted),
+                g_pLocalization->GetString(GetLOCTeamName(winningTeam)), scoreLeftWideString, scoreRightWideString);
+        }
+#if defined(VERSION_R4QK01)
+        else
+        {
+            formatted = FormatKorean(particleKey, g_pLocalization->GetString(GetLOCTeamName(winningTeam)),
+                scoreLeftWideString, scoreRightWideString, GetKoreanParticle(scoreRight));
+        }
+#endif
     }
     else
     {
-        formatted = Format(BasicString<unsigned short, Detail::TempStringAllocator>(unformatted),
-            g_pLocalization->GetString(GetLOCTeamName(winningTeam)), scoreRightWideString, scoreLeftWideString);
+#if defined(VERSION_R4QK01)
+        if (particleKey == 0)
+#endif
+        {
+            formatted = Format(BasicString<unsigned short, Detail::TempStringAllocator>(unformatted),
+                g_pLocalization->GetString(GetLOCTeamName(winningTeam)), scoreRightWideString, scoreLeftWideString);
+        }
+#if defined(VERSION_R4QK01)
+        else
+        {
+            formatted = FormatKorean(particleKey, g_pLocalization->GetString(GetLOCTeamName(winningTeam)),
+                scoreRightWideString, scoreLeftWideString, GetKoreanParticle(scoreLeft));
+        }
+#endif
     }
     memcpy(mScoresBuffer, formatted.c_str(), sizeof(mScoresBuffer));
     TLSlide* slide = mPresentation->GetActiveSlide();

@@ -185,6 +185,10 @@ void SHGameplayOptions::Update(float dt)
             mFlowState = GAMEPLAY_OPTIONS_ENTERING;
             mPresentation->SetActiveSlide("IN", true);
             mPresentation->Update(0.0f);
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+            mDoneButton.Enable();
+            mNavigation.Enable();
+#endif
             return;
         }
     }
@@ -237,6 +241,10 @@ void SHGameplayOptions::Update(float dt)
         {
             FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
             FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+            mDoneButton.Disable();
+            mNavigation.Disable();
+#endif
             mFlowState = GAMEPLAY_OPTIONS_REENTERING;
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             mPresentation->Update(0.0f);

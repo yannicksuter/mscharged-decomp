@@ -107,7 +107,12 @@ void AudioBackend::ResumeControllerSpeakers()
 {
     for (int i = 0; i < 4; ++i)
     {
+#if defined(VERSION_R4QK01)
+        int type = g_pPlatPadManager->type[i];
+        if (type == PLAT_PAD_REMOTE || type == PLAT_PAD_FREESTYLE)
+#else
         if (WPADProbe(i, 0) == WPAD_ERR_OK)
+#endif
             WPADControlSpeaker(i, 1, OnControllerSpeakerEnabled);
     }
     OSCreateAlarm(&m_ControllerSpeakerAlarm);

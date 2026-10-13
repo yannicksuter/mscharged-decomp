@@ -25,16 +25,12 @@
 #include "Game/SharedStaticStorage.h"
 #include <math.h>
 
-// Instantiate the Function classes RegisterEventListeners uses, in its order,
-// before BindMember is declared. MWCC emits late template copies grouped by
-// declaration point in reverse, which gives retail's tail: the BindMember
-// copies, then the Function constructors from the last event to the first.
-typedef char GoalScoredCallbackInstantiation[sizeof(Function<GoalScoredData*>)];
-typedef char VoidCallbackInstantiation[sizeof(Function<FnVoidVoid>)];
-typedef char MegaStrikeMeterCallbackInstantiation[sizeof(Function<MegaStrikeMeterData*>)];
-typedef char GoalieSaveCallbackInstantiation[sizeof(Function<GoalieSaveData*>)];
-typedef char ThwompCollisionCallbackInstantiation[sizeof(Function<CollisionThwompPlayerData*>)];
-typedef char PlayerAttackCallbackInstantiation[sizeof(Function<PlayerAttackData*>)];
+typedef EventListener<GoalScoredData>::Callback GoalScoredCallback;
+typedef EventListener<NoEventData>::Callback VoidCallback;
+typedef EventListener<MegaStrikeMeterData>::Callback MegaStrikeMeterCallback;
+typedef EventListener<GoalieSaveData>::Callback GoalieSaveCallback;
+typedef EventListener<CollisionThwompPlayerData>::Callback ThwompCollisionCallback;
+typedef EventListener<PlayerAttackData>::Callback PlayerAttackCallback;
 
 #include "NL/nlBindMember.h"
 
@@ -130,21 +126,21 @@ GameplayCameraEffects::GameplayCameraEffects()
 
 void GameplayCameraEffects::RegisterEventListeners()
 {
-    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
-    FindEvent<NoEventData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
-    FindEvent<NoEventData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
-    FindEvent<NoEventData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
-    FindEvent<NoEventData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
-    FindEvent<NoEventData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
-    FindEvent<NoEventData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
-    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
-    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
-    GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSave)), 0, -1);
-    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
-    FindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
-    FindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
-    FindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
-    FindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(GoalScoredCallback(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentation", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentationEnd", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentation", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentationEnd", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentation", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentationEnd", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
+    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(MegaStrikeMeterCallback(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(VoidCallback(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
+    GetGoalieSaveEvent("GoalieSave", -1)->Add(GoalieSaveCallback(BindMember(this, &GameplayCameraEffects::OnGoalieSave)), 0, -1);
+    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(ThwompCollisionCallback(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(PlayerAttackCallback(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(PlayerAttackCallback(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(PlayerAttackCallback(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(PlayerAttackCallback(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
 }
 
 void GameplayCameraEffects::Update(float deltaTime)

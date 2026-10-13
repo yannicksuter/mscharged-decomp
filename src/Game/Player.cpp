@@ -428,7 +428,7 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlMultQuat(qOrient, qFacing, qAnimated);
     if (m_DetPlayer.m_ResetBaseBallOrientation)
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         startInverse.x = -qOrient.x;
         startInverse.y = -qOrient.y;
         startInverse.z = -qOrient.z;

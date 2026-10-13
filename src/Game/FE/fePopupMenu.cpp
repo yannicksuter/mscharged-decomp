@@ -213,10 +213,13 @@ static const PopupEntry PopupEntries[] = {
     { 1, "POPUP_PROFILE_UNLINK_WARNING", { "POPUP_YES", "POPUP_NO", 0, 0 }, 1 },
     { 0, "POPUP_PROFILE_MII_DELETION_WARNING", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_PROFILE_NO_SLOTS_LEFT", { "POPUP_OK", 0, 0, 0 }, 0 },
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     { 0, "POPUP_DELETED_MII", { "POPUP_OK", 0, 0, 0 }, 0 },
 #endif
     { 0, "POPUP_LOW_BATTERY", { "POPUP_OK", 0, 0, 0 }, 0 },
+#if defined(VERSION_R4QK01)
+    { 0, "POPUP_ONLINE_RESTRICTED_RVLDWC_MESSAGE_0003", { "POPUP_OK", 0, 0, 0 }, 0 },
+#endif
     { 0, "POPUP_E3_THANKS_FOR_PLAYING", { "POPUP_OK", 0, 0, 0 }, 0 },
 };
 

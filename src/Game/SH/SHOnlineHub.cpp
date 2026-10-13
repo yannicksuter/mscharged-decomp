@@ -306,7 +306,7 @@ void SHOnlineHub::UpdateLocalStats()
 void SHOnlineHub::UpdateStrikerOfTheDay()
 {
     NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(1);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (category != 0)
 #else
     if (category != 0 && category->mAvailable)
@@ -318,7 +318,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
             mStrikerOfTheDayStats = category->mMetadata[0];
             mHasStrikerOfTheDay = true;
         }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         else
         {
             mStrikerOfTheDay.mName[0] = 0;
@@ -347,7 +347,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
         nlStrNCpy(mStrikerDescriptionText, string.c_str(), 128);
         text->SetString(mStrikerDescriptionText);
         text->m_bVisible = true;
-#if !defined(VERSION_R4QE01)
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
         bool valid = MiiManager::s_pInstance->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
         unsigned long texture = MiiManager::s_pInstance->mIconTextureIds[1];
@@ -357,7 +357,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     }
     else
         text->m_bVisible = false;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     bool valid = false;
     if (mHasStrikerOfTheDay)
         valid = MiiManager::s_pInstance->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);

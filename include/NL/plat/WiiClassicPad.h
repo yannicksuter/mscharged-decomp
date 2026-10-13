@@ -47,11 +47,12 @@ public:
 
     /* 0x01C */ WiiClassicPadStatus* mCurrentStatus;
     /* 0x020 */ WiiClassicPadStatus* mPreviousStatus;
+    // The offsets below use the 2007 SDK layout; Korea has larger, 8-byte-aligned statuses.
     /* 0x024 */ WiiClassicPadStatus mStatusBuffers[2];
     /* 0x19C */ nlVector2 mAnalogLeft;
     /* 0x1A4 */ nlVector2 mAnalogRight;
     /* 0x1AC */ float mButtonStateTime[16];
     /* 0x1EC */ DPDData mDPDData;
-}; // size 0x20C
+}; // size 0x20C, 0x268 in Korea
 
 #endif // NL_PLAT_WII_CLASSIC_PAD_H

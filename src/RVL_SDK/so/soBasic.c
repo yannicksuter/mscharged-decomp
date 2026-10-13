@@ -1,13 +1,23 @@
 #include <revolution/so.h>
 
 #include <revolution/ipc.h>
+#include <revolution/net/NETMem.h>
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
-const char* __SOCKET_VERSION = "<< RVL_SDK - SOCKET \trelease build: Dec 10 "
-                               "2007 10:02:35 (0x4199_60831) >>";
+const char* __SOCKET_VERSION =
+#if defined(VERSION_R4QK01)
+    "<< RVL_SDK - SOCKET \trelease build: Jun  9 2009 12:00:01 (0x4199_60831) >>";
+#else
+    "<< RVL_SDK - SOCKET \trelease build: Dec 10 2007 10:02:35 (0x4199_60831) >>";
+#endif
+
+#if defined(VERSION_R4QK01)
+static BOOL socketRegistered = FALSE;
+enum { SO_MAX_RECV_SIZE = 32768 };
+#endif
 
 enum
 {
@@ -47,6 +57,15 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
 static int SendTo(const char* funcName, int s, const void* buf, int len,
     int flags, const void* sockTo);
 
+static inline void* CopyBuffer(void* dst, const void* src, u32 size)
+{
+#if defined(VERSION_R4QK01)
+    return NETMemCpy(dst, src, size);
+#else
+    return memcpy(dst, src, size);
+#endif
+}
+
 int SOSocket2(int pf, int type, int protocol)
 {
     int result;
@@ -78,6 +97,18 @@ int SOSocket2(int pf, int type, int protocol)
     }
     return result;
 }
+
+#if defined(VERSION_R4QK01)
+int SOSocket(int pf, int type, int protocol)
+{
+    if (!socketRegistered)
+    {
+        OSRegisterVersion(__SOCKET_VERSION);
+        socketRegistered = TRUE;
+    }
+    return SOSocket2(pf, type, protocol);
+}
+#endif
 
 int SOClose(int s)
 {
@@ -203,7 +234,7 @@ int SOBind(int s, const void* sockAddr)
 
         args->s = s;
         args->hasAddr = TRUE;
-        memcpy(args->addr, addr, addr->len);
+        CopyBuffer(args->addr, addr, addr->len);
         result = IOS_Ioctl(rmId, NET_SO_BIND, args, 36, NULL, 0);
         SOiFree(12, args, 64);
 
@@ -239,7 +270,7 @@ int SOConnect(int s, const void* sockAddr)
 
         args->s = s;
         args->hasAddr = TRUE;
-        memcpy(args->addr, addr, addr->len);
+        CopyBuffer(args->addr, addr, addr->len);
         result = IOS_Ioctl(rmId, NET_SO_CONNECT, args, 36, NULL, 0);
         SOiFree(12, args, 64);
 
@@ -277,11 +308,11 @@ int SOGetSockName(int s, void* sockAddr)
 
         args[0] = s;
         addrBuffer = (SOSockAddr*)((u8*)args + 32);
-        memcpy((u8*)args + 32, addr, addr->len);
+        CopyBuffer((u8*)args + 32, addr, addr->len);
         result = IOS_Ioctl(rmId, NET_SO_GETSOCKNAME, args, 4, addrBuffer, addr->len);
         if (result >= 0)
         {
-            memcpy(addr, addrBuffer, addrBuffer->len);
+            CopyBuffer(addr, addrBuffer, addrBuffer->len);
         }
         SOiFree(12, args, bufferSize);
 
@@ -399,17 +430,17 @@ int SOPoll(SOPollFD fds[], unsigned nfds, OSTime timeout)
         fdBuffer = (SOPollFD*)((u8*)args + 32);
         if (timeout <= -1)
         {
-            memcpy(args, &timeout, sizeof(timeout));
+            CopyBuffer(args, &timeout, sizeof(timeout));
         }
         else
         {
             *args = OSTicksToMilliseconds(timeout);
         }
-        memcpy(fdBuffer, fds, fdsSize);
+        CopyBuffer(fdBuffer, fds, fdsSize);
         result = IOS_Ioctl(rmId, NET_SO_POLL, args, 8, fdBuffer, fdsSize);
         if (result >= 0)
         {
-            memcpy(fds, fdBuffer, fdsSize);
+            CopyBuffer(fds, fdBuffer, fdsSize);
         }
         SOiFree(12, args, bufferSize);
 
@@ -453,7 +484,7 @@ int SOInetAtoN(const char* cp, SOInAddr* inp)
         result = IOS_Ioctl(rmId, NET_SO_INETATON, stringBuffer, strlen(cp), args, sizeof(SOInAddr));
         if (result >= 0 && inp != NULL)
         {
-            memcpy(inp, args, sizeof(SOInAddr));
+            CopyBuffer(inp, args, sizeof(SOInAddr));
         }
         SOiFree(12, args, bufferSize);
 
@@ -504,6 +535,13 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
     int result;
     SOSockAddr* addrBuffer;
     s32 rmId;
+
+#if defined(VERSION_R4QK01)
+    if (len > SO_MAX_RECV_SIZE)
+    {
+        len = SO_MAX_RECV_SIZE;
+    }
+#endif
 
     result = SOiPrepare(funcName, &rmId);
     if (result == SO_SUCCESS)
@@ -582,18 +620,18 @@ static int RecvFrom(const char* funcName, int s, void* buf, int len, int flags,
         }
         else
         {
-            memcpy(addrBuffer, from, from->len);
+            CopyBuffer(addrBuffer, from, from->len);
             vectors[2].base = addrBuffer;
             vectors[2].length = from->len;
             result = IOS_Ioctlv(rmId, NET_SO_RECVFROM, 1, 2, vectors);
             if (result >= 0)
             {
-                memcpy(from, addrBuffer, from->len > addrBuffer->len ? addrBuffer->len : from->len);
+                CopyBuffer(from, addrBuffer, from->len > addrBuffer->len ? addrBuffer->len : from->len);
             }
         }
         if (result >= 0 && !direct)
         {
-            memcpy(buf, dataBuffer, len);
+            CopyBuffer(buf, dataBuffer, len);
         }
 
     freeBuffers:
@@ -693,11 +731,11 @@ static int SendTo(const char* funcName, int s, const void* buf, int len,
         else
         {
             args->hasAddr = TRUE;
-            memcpy(args->addr, to, to->len);
+            CopyBuffer(args->addr, to, to->len);
         }
         if (!direct)
         {
-            memcpy(dataBuffer, buf, len);
+            CopyBuffer(dataBuffer, buf, len);
         }
 
         vectors[0].base = dataBuffer;
