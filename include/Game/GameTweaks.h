@@ -13,7 +13,7 @@ public:
     virtual ~GameTweaks();
     virtual void Init();
     void RegisterTweaks(bool registerTweaks);
-    void fn_800756B4();
+    void OnGameCreated();
 
     /* 0x044 */ TweakFloatBinding fGameDuration;
     /* 0x054 */ TweakFloatBinding fFielderAttributeWeight;

@@ -1,8 +1,9 @@
 #include "NL/gl/glState.h"
+#include "Game/Physics/Physics.h"
 
 #include "Game/SharedStaticStorage.h"
 
-extern "C" bool fn_8013E2E4()
+bool OnBeforeCreatePhysicsWorld()
 {
     return true;
 }

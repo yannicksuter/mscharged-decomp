@@ -294,7 +294,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 4:
     {
-        fn_80111654(4);
+        OnResourceLoadBegin(4);
         PersistentResourceRequirements requirements = gPersistentResourceRequirements;
         sPersistentResourcePool = glCreateResourcePool(
             requirements.entries, 2, "PersistentResourcePool");
@@ -686,7 +686,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             CharacterLoader::sInstance.FinalizeAudio());
         break;
     case 63:
-        CharacterLoader::sInstance.fn_8000BD70();
+        CharacterLoader::sInstance.OnCharactersLoaded();
         break;
     case 64:
         SetLoadingComment("FinalizeLoadingAnimRetarget");
@@ -796,7 +796,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 84:
         mLoadingState = ASYNC_RESOURCES_LOADING;
-        fn_80111660(2);
+        OnResourceReloadBegin(2);
         DestroyFEResourcePool();
         CreateLargeFEResourcePool();
         CreatePadBackends();
@@ -981,9 +981,9 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 120:
     {
         u32* stackPointer = m_SP;
-        u32 value = stackPointer[-1];
+        const char* checkpoint = (const char*)stackPointer[-1];
         m_SP = stackPointer - 1;
-        fn_8011165C(value);
+        OnLoadingCheckpoint(checkpoint);
         break;
     }
     case 121:
@@ -1406,7 +1406,7 @@ void DestroyFrontEndFast(AsyncLoadingManager* manager)
     glCompact();
     g_PendingAnimationRequestPool.FreeBlocks();
 
-    fn_80111658(2);
+    OnResourceUnloadEnd(2);
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     FinishLoadingStep(manager);
 }
@@ -1415,7 +1415,7 @@ void InitializeFrontEndState1(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeFEState1");
-    fn_80111654(2);
+    OnResourceLoadBegin(2);
     ClearTweakRegistryReset();
     GLMemoryRequirement requirements[] = {
         { GLM_Header, 0x100000 },
@@ -1668,7 +1668,7 @@ void DestroyFrontEndState(AsyncLoadingManager* manager)
 
     MovieQuit();
     DestroyPadBackends();
-    fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
+    OnSlotPoolStateRelease(&Detail::sTempStringAllocatorPool.allocator.pool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
     cPN_SAnimController::m_SAnimControllerSlotPool.FreeBlocks();
     cPN_Blender::m_BlenderSlotPool.FreeBlocks();
@@ -1687,7 +1687,7 @@ void DestroyFrontEndState(AsyncLoadingManager* manager)
     glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mPoolResourceMark);
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
-    fn_80111658(2);
+    OnResourceUnloadEnd(2);
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     FinishLoadingStep(manager);
 }
@@ -1696,7 +1696,7 @@ void InitializeGameState1(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeGameState1");
-    fn_80111654(1);
+    OnResourceLoadBegin(1);
     ClearTweakRegistryReset();
     if (GameInfoManager::Instance()->IsInMode3())
     {
@@ -1720,7 +1720,7 @@ void InitializeGameState1(AsyncLoadingManager* manager)
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 3, "InGame"));
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
-    NisPlayer::Instance()->fn_8027BD60();
+    NisPlayer::Instance()->OnSceneLoad();
     gDispatchEventsTask->dispatcher.Dispatch(true);
     if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
@@ -1756,7 +1756,7 @@ void InitializeGameState2(AsyncLoadingManager* manager)
     ReplayChoreo::Instance().RegisterEventHandlers();
     NisPlayer::Instance()->RegisterEventHandlers();
     GetPresentation()->RegisterEventListeners();
-    GetPresentation()->fn_80285E1C();
+    GetPresentation()->OnGameCreated();
     ExcitementSystem::Instance().RegisterEventHandlers();
     RegisterCharacterEventCallbacks();
     RegisterBallEventCallbacks();
@@ -2005,7 +2005,7 @@ void DestroyGameState(AsyncLoadingManager* manager)
     DestroyGameTweaks(&gGameTweaks);
     DestroyPhysicsWorld();
 
-    fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
+    OnSlotPoolStateRelease(&Detail::sTempStringAllocatorPool.allocator.pool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
 
     FlushAudio(g_pAudioSystem, true, true);
@@ -2076,7 +2076,7 @@ void DestroyGameState(AsyncLoadingManager* manager)
     glSetCurrentResourcePool(0);
     FreeEventDataPools();
     FreePhysicsEventDataPools();
-    fn_80111658(1);
+    OnResourceUnloadEnd(1);
 
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     PopFunctionMemoryState();
@@ -2239,7 +2239,7 @@ void InitializeStadiumViewer(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeStadiumViewer");
-    fn_80111654(1);
+    OnResourceLoadBegin(1);
     ClearTweakRegistryReset();
     GLMemoryRequirement requirements[] = {
         { GLM_Header, 0x200000 },
@@ -2248,7 +2248,7 @@ void InitializeStadiumViewer(AsyncLoadingManager* manager)
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "StadiumViewer"));
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
-    NisPlayer::Instance()->fn_8027BD60();
+    NisPlayer::Instance()->OnSceneLoad();
     GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, 0);
     GameInfoManager::Instance()->mCurrentDifficulty[0] = 2;
     GameInfoManager::Instance()->mCurrentDifficulty[1] = 2;

@@ -10,6 +10,7 @@ class PhysicsObject;
 
 void InitializeODEAllocators();
 void RegisterUserGeomClasses();
+bool OnBeforeCreatePhysicsWorld();
 void CreatePhysicsWorld();
 void CreateStaticPhysicsPrimitives();
 void DestroyStaticPhysicsPrimitives();

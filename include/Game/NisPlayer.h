@@ -78,7 +78,7 @@ public:
     void ParseDoNotMirrorList(char* data, unsigned long size);
     void ParseDoNotShowPIPList(char* data, unsigned long size);
     void ResetEffects();
-    void fn_8027BD60();
+    void OnSceneLoad();
     void SelectCameras();
     void ReleaseNisCue();
     void PrepareNisCue(unsigned long cue);
@@ -112,7 +112,7 @@ public:
     void EnableWorldDarkening(bool fade);
     void ResetToPIPOverlay();
     void ClearSecondaryNis();
-    void fn_8027E5D0();
+    void OnRenderFrame();
     void SwapCameras();
     void StopNisCue();
     int GetWinnerSide(NisWinnerType winnerType) const;

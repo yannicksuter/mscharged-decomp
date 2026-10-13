@@ -29,7 +29,7 @@ public:
     bool DetectSkipPress();
     void Finish();
     void Update(float deltaT);
-    void fn_80285E1C();
+    void OnGameCreated();
     void Call(const char* functionName, const char* nisFilter);
     void PlayGameBegin();
     void RegisterEventListeners();

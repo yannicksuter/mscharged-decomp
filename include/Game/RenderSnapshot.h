@@ -102,11 +102,11 @@ public:
 
 DrawableBulletBill& GetSnapshotBulletBill(RenderSnapshot* snapshot, unsigned int index);
 
-inline void SaveFrame::fn_80191504()
+inline void SaveFrame::OnSectionBoundary()
 {
 }
 
-inline void LoadFrame::fn_80191504()
+inline void LoadFrame::OnSectionBoundary()
 {
 }
 

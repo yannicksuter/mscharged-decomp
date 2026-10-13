@@ -6,7 +6,7 @@
 typedef void* (*SlotPoolAllocatorFunc)(unsigned long size);
 typedef void (*SlotPoolFreeFunc)(void* data);
 
-void fn_802B467C(void* pool);
+void OnSlotPoolStateRelease(void* pool);
 
 struct SlotPoolBlock;
 struct SlotPoolEntry;
@@ -65,7 +65,7 @@ public:
 
     void FreeBlocks()
     {
-        fn_802B467C(this);
+        OnSlotPoolStateRelease(this);
         SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
     }
 
@@ -163,7 +163,7 @@ public:
 
     void FreeBlocks()
     {
-        fn_802B467C(this);
+        OnSlotPoolStateRelease(this);
         SlotPoolBase::BaseFreeBlocks(this, sizeof(T));
     }
 };

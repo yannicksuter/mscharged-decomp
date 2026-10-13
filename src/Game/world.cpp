@@ -73,7 +73,7 @@ World::~World()
         delete pIterator;
     }
 
-    mWorldAnimManager.fn_80342324();
+    mWorldAnimManager.OnBeforeWorldUnload();
     OnBeforeUnload();
     mWorldAnimManager.Clear();
     if (m_pOwnedData != 0)

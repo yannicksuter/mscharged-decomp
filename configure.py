@@ -636,7 +636,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioBundleManagerPlatform.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioCalculation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioEffectBinding.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Audio/AudioEffects.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioEffects.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioResourceBundle.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioResourceLoader.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Audio/AudioResourceLoadOwner.cpp"),
@@ -680,7 +680,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/ReplayCamera.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Camera/rumblefilter.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Camera/ShootToScoreCam.cpp", cflags=cflags_game_deferred),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/TopDownCamera.cpp", cflags=cflags_game_deferred),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Camera/TopDownCamera.cpp", cflags=cflags_game_deferred),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Camera/GameplayCameraEffects.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
 
             # Game/Core
@@ -1772,7 +1772,7 @@ config.libs = [
             # RVL_SDK/so
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/so/soBasic.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/so/soCommon.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/so/SOInformation.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/so/SOInformation.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/so/SOOption.c"),
 
             # RVL_SDK/sp

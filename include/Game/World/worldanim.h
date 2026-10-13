@@ -103,7 +103,7 @@ public:
     WorldAnimManager();
     ~WorldAnimManager();
 
-    void fn_80342324();
+    void OnBeforeWorldUnload();
     void Clear();
     void BindHierarchy(
         WorldAnimController* pController, unsigned long uHierarchyHash);

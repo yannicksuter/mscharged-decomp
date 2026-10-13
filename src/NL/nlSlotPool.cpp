@@ -46,7 +46,7 @@ SlotPoolBase::~SlotPoolBase()
 {
 }
 
-void fn_802B467C(void*)
+void OnSlotPoolStateRelease(void*)
 {
 }
 

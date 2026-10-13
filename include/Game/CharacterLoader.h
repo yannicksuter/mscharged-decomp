@@ -68,7 +68,7 @@ public:
     void StartLoadingCharINIFiles();
     bool FinalizeLoadingCharINIFiles();
     void CreateCharacterInstance();
-    void fn_8000BD70();
+    void OnCharactersLoaded();
     bool HasAlternateSwapTexture();
     bool StartLoadingCaptainOrGoalieAlternateSwapTexture();
     bool FinalizeLoadingCaptainOrGoalieAlternateSwapTexture();

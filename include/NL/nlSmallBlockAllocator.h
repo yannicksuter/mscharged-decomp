@@ -29,7 +29,7 @@ public:
 
     void FreeBlocks()
     {
-        fn_802B467C(this);
+        OnSlotPoolStateRelease(this);
         SlotPoolBase::BaseFreeBlocks(this, kBlockSize);
     }
 
@@ -56,7 +56,7 @@ public:
 
     void PopState()
     {
-        fn_802B467C(this);
+        OnSlotPoolStateRelease(this);
         int index = m_Depth - 1;
         m_BlockList = m_States[index].block;
         m_FreeList = m_States[index].free;
@@ -299,7 +299,7 @@ public:
 
     ~TempStringSlotPool()
     {
-        fn_802B467C(this);
+        OnSlotPoolStateRelease(this);
         BaseFreeBlocks(this, 0x40);
     }
 };
@@ -337,9 +337,9 @@ public:
     {
         while (mDepth > 0)
         {
-            fn_802B467C(this);
+            OnSlotPoolStateRelease(this);
             BaseFreeBlocks(this, 0x40);
-            fn_802B467C(this);
+            OnSlotPoolStateRelease(this);
 
             SavedSlotPool& saved = mSavedPools[mDepth - 1];
             m_BlockList = saved.blockList;

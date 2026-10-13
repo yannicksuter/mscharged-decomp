@@ -20,7 +20,7 @@ void GameTweaks::RegisterTweaks(bool registerTweaks)
         LoadTweakConfigFile(mszFileName, mCategory, true);
 }
 
-void GameTweaks::fn_800756B4()
+void GameTweaks::OnGameCreated()
 {
 }
 

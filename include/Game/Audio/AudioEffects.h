@@ -101,7 +101,7 @@ public:
     ControllerSpeaker()
         : AudioEffectBase("ControllerSpeaker")
         , m_Channel(-1)
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
         , m_ActiveSoundCount(0)
 #endif
     {
@@ -127,7 +127,7 @@ public:
 
     ControllerSpeakerParameter m_Parameter;
     int m_Channel;
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
     int m_ActiveSoundCount;
 #endif
     unsigned int m_Unknown44[8];

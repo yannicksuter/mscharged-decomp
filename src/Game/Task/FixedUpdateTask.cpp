@@ -50,19 +50,19 @@ bool g_bRunSimAndRenderInLockStep;
 static u16 sSimulationTimeType = 0xFFFF;
 static u16 sTimeScaleType = 0xFFFF;
 
-void fn_80111654(int)
+void OnResourceLoadBegin(int)
 {
 }
 
-void fn_80111658(int)
+void OnResourceUnloadEnd(int)
 {
 }
 
-void fn_8011165C(int)
+void OnLoadingCheckpoint(const char*)
 {
 }
 
-void fn_80111660(int)
+void OnResourceReloadBegin(int)
 {
 }
 

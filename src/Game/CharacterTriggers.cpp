@@ -2013,7 +2013,7 @@ void EmitLightningBall()
     pController->SetUpdateCallback(update);
 }
 
-extern "C" void fn_801BDF08(cCharacter* pCharacter)
+void OnBallLightningEnd(cCharacter* pCharacter)
 {
 }
 

@@ -58,10 +58,10 @@ public:
 
 FixedUpdateTask* GetFixedUpdateTask();
 EventDispatcher* GetFixedUpdateEventDispatcher();
-void fn_80111654(int);
-void fn_80111658(int);
-void fn_8011165C(int);
-void fn_80111660(int);
+void OnResourceLoadBegin(int resourceGroup);
+void OnResourceUnloadEnd(int resourceGroup);
+void OnLoadingCheckpoint(const char* checkpoint);
+void OnResourceReloadBegin(int resourceGroup);
 bool fn_80111664();
 
 #endif // GAME_FIXED_UPDATE_TASK_H

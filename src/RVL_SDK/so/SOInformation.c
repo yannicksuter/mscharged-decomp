@@ -1,6 +1,7 @@
 #include <revolution/so.h>
 
 #include <revolution/ipc.h>
+#include <revolution/net/NETMem.h>
 #include <revolution/os.h>
 
 #include <string.h>
@@ -137,11 +138,19 @@ int SOGetAddrInfo(const char* nodeName, const char* servName,
 
                 if (hints != NULL)
                 {
+#if defined(VERSION_R4QK01)
+                    NETMemCpy(hintsBuffer, hints, sizeof(SOAddrInfo));
+#else
                     memcpy(hintsBuffer, hints, sizeof(SOAddrInfo));
+#endif
                 }
                 else
                 {
+#if defined(VERSION_R4QK01)
+                    NETMemSet(hintsBuffer, 0, sizeof(SOAddrInfo));
+#else
                     memset(hintsBuffer, 0, sizeof(SOAddrInfo));
+#endif
                 }
                 if (hintsBuffer->family == 0)
                 {

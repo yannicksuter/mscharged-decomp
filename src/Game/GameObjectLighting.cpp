@@ -194,7 +194,7 @@ void UpdateCharacterLightColour()
     gCharacterLight.colour.c[2] = gCharacterLightBlue.mValue;
 }
 
-void fn_80182164()
+void OnStadiumLightingLoad()
 {
 }
 

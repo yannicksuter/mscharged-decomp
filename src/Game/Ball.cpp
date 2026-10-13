@@ -1625,7 +1625,7 @@ void ChangeBallState(cBall* pBall, int nBallState)
     if (pBall->meBallState == BALL_STATE_LIGHTNING)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
-        fn_801BDF08(0);
+        OnBallLightningEnd(0);
         pBall->m_tLightningTimer.Clear();
     }
 
