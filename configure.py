@@ -1571,7 +1571,7 @@ config.libs = [
             # RVL_SDK/hbm
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/hbm/HBMAnmController.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/hbm/HBMBase.cpp", cflags=[*cflags_rvl_hbm, "-DHBM_REVISION=2"]),
-            Object(MatchingFor("R4QE01"), "RVL_SDK/hbm/HBMController.cpp", cflags=cflags_rvl_hbm),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/hbm/HBMController.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/hbm/HBMFrameController.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/hbm/HBMGUIManager.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01"), "RVL_SDK/hbm/HBMRemoteSpk.cpp", cflags=cflags_rvl_hbm),
