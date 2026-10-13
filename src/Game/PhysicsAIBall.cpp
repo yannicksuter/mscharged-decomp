@@ -88,7 +88,7 @@ ContactType PhysicsAIBall::Contact(
 
     if (objID == PHYSOBJ_WALUIGI_WALL)
     {
-        return fn_800167A8(m_pAIBall) ? NO_CONTACT : ONE_WAY_CONTACT_THIS;
+        return IsBooSkillshotBall(m_pAIBall) ? NO_CONTACT : ONE_WAY_CONTACT_THIS;
     }
 
     if (objID == PHYSOBJ_SPHERE_BONE || objID == PHYSOBJ_CAPSULE_BONE)

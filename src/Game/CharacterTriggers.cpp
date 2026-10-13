@@ -236,17 +236,17 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
 
         case 0x6E78F532:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
-                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40() != 0)
+                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->GetBall() != 0)
             {
-                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40(), false);
+                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->GetBall(), false);
             }
             break;
 
         case 0x63907309:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
-                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40() != 0)
+                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->GetBall() != 0)
             {
-                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40(), true);
+                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->GetBall(), true);
             }
             break;
 
@@ -269,7 +269,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x3A7ADECB:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004E8B8();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->BeginSkillshotInvincibility();
             }
             break;
 
@@ -306,7 +306,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xBBA47C42:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004E92C();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->ReleaseSkillshotBall();
             }
             break;
 
@@ -320,7 +320,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xA5C86614:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004EA9C();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->EndSkillshotInvincibility();
             }
             break;
 
@@ -640,7 +640,7 @@ void UpdateBallGlow(cBall* pBall)
     if (!pBall->m_bVisible)
     {
         KillBallGlow();
-        fn_800189C4(pBall);
+        StopBallGlowSound(pBall);
     }
     else
     {
@@ -650,7 +650,7 @@ void UpdateBallGlow(cBall* pBall)
             if (uHash == 0)
             {
                 KillBallGlow();
-                fn_800189C4(pBall);
+                StopBallGlowSound(pBall);
             }
             else
             {
@@ -1144,7 +1144,7 @@ void EmitGoalieCatch(cPlayer* pPlayer, const char* szEffectName, bool bDoRumble)
 
     GoalieSaveData data;
     data.pGoalie = pPlayer;
-    fn_8005D74C(g_pGame, &data);
+    DeliverGoalieCatchEvent(g_pGame, &data);
 }
 
 void EmitLandingFeetTrigger(cCharacter* pCharacter)
@@ -1907,7 +1907,7 @@ void EndDeke(cFielder* pFielder)
             event.v3Position = pFielder->m_DetChar.m_v3Position;
             event.fRadius = sWarioGroundPoundRadius;
             event.pCharacter = pFielder;
-            fn_800611F0(g_pGame, &event);
+            DeliverWarioGroundPoundEvent(g_pGame, &event);
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x5BF8E132, 0, 0);
         }
@@ -1917,7 +1917,7 @@ void EndDeke(cFielder* pFielder)
             event.v3Position = pFielder->m_DetChar.m_v3Position;
             event.fRadius = sBowserJrGroundPoundRadius;
             event.pCharacter = pFielder;
-            fn_800611F0(g_pGame, &event);
+            DeliverWarioGroundPoundEvent(g_pGame, &event);
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
@@ -1939,7 +1939,7 @@ void EndDeke(cFielder* pFielder)
             nlVec3Set(event.v3Position, x, y, z);
             event.fRadius = sHammerBroHammerRadius;
             event.pCharacter = pFielder;
-            fn_80060FF4(g_pGame, &event);
+            DeliverHammerBroHammerEvent(g_pGame, &event);
 
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(s_szHammerGroundBig);
             EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);

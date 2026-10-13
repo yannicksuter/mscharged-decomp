@@ -62,7 +62,7 @@ void DesireSlideAttack::Update(
             return;
         }
 
-        if (fn_800D7B00(pFielder) >= 0.5f)
+        if (AbleToSlideTackleBall(pFielder) >= 0.5f)
         {
             pFielder->InitActionSlideAttack(mpTarget, -1.0f, 0);
             meDesireSubState = DESIRE_SLIDE_ATTACKING;

@@ -150,14 +150,14 @@ RLView* SetCharacterShadowView(RLView* view)
     return previous;
 }
 
-extern "C" float fn_80184AF8(float antiFlimmer)
+float SetShadowAntiFlimmer(float antiFlimmer)
 {
     float previous = g_AntiFlimmer;
     g_AntiFlimmer = antiFlimmer;
     return previous;
 }
 
-extern "C" float fn_80184B08()
+float ResetShadowAntiFlimmer()
 {
     float previous = g_AntiFlimmer;
     g_AntiFlimmer = GetDefaultAntiFlimmer();

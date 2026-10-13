@@ -40,4 +40,7 @@ RLView* SetCharacterShadowView(RLView* view);
 void ClearCharacterShadowsUpdated();
 void DrawBallShadowAndGlow(ChargeShadowDrawable* object);
 
+float SetShadowAntiFlimmer(float antiFlimmer);
+float ResetShadowAntiFlimmer();
+
 #endif // GAME_RENDER_RENDERSHADOW_H

@@ -26,7 +26,7 @@ bool DesireGetOpen::Initialize(void* context)
         formationPosition = m_pFielder->m_DetChar.m_v3Position;
     }
 
-    cFielder* ballCarrier = fn_800DF790(m_pFielder->m_pTeam);
+    cFielder* ballCarrier = GetStrategicBallCarrier(m_pFielder->m_pTeam);
     nlVector3 bestPosition = formationPosition;
     nlVector3 targetPosition = ballCarrier != NULL
         ? ballCarrier->m_DetChar.m_v3Position
@@ -74,7 +74,7 @@ DesireUpdate TransDesireGetOpen(AIContext* input)
 {
     DesireUpdate result(FT_INT, gTransDesireGetOpenContinue);
     cFielder* fielder = (cFielder*)input->mData.pPlayer;
-    cFielder* ballCarrier = fn_800DF790(fielder->m_pTeam);
+    cFielder* ballCarrier = GetStrategicBallCarrier(fielder->m_pTeam);
     if (fielder->m_pBall != 0)
     {
         result = DESIRE_FINISHED;

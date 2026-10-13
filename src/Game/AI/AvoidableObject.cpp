@@ -178,7 +178,7 @@ float AvoidableFielder::GetAttackReach()
     else
     {
         float fTime = m_pFielder->m_DetChar.m_fPlayerScale;
-        float fValue = fn_8002BFA8(m_pFielder->GetTweaks(), fTime);
+        float fValue = GetScaledPlayerWidth(m_pFielder->GetTweaks(), fTime);
         fRadius = GetFielderHitReach(m_pFielder) - fValue;
     }
     if (m_pFielder->IsYoshiSuperPowerActive())
@@ -211,7 +211,7 @@ bool AvoidableFielder::IsWithinRange(
     }
     if (nOtherIndex >= 0)
     {
-        float fDist = g_pGame->fn_8005B748(nIndex, nOtherIndex);
+        float fDist = g_pGame->GetCachedPlayerDistance(nIndex, nOtherIndex);
         float fOtherRadius = other->GetRadius();
         float fRadius = GetRadius();
         float fGap = fDist - (fRadius + fOtherRadius);
@@ -234,7 +234,7 @@ bool AvoidableFielder::IsWithinRange(
 float AvoidableFielder::GetAvoidanceStrength(
     AvoidableObject* other)
 {
-    float fSkill = fn_800A636C(g_pCurrentlyUpdatingTeam)->Off_Avoidance->GetValue();
+    float fSkill = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Off_Avoidance->GetValue();
     float fMin = sAvoidanceStrengthRange.x;
     float fMax = sAvoidanceStrengthRange.y;
     float fStrength = InterpolateClamped(fMin, fMax, fSkill);
@@ -260,7 +260,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         if (pPolygon->mPolygonType == AVOID_POLYGON_WALUIGI_WALL)
         {
             if (IsWaluigiSuperPowerActive(m_pFielder) && m_pFielder->m_pBall == 0
-                && fn_800DED80(m_pFielder) > 0.7f)
+                && PursuingBall(m_pFielder) > 0.7f)
             {
                 fStrength = 0.0f;
             }
@@ -275,7 +275,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         }
         else if (pPolygon->mPolygonType != AVOID_POLYGON_THWOMP)
         {
-            if (fn_800DED80(m_pFielder))
+            if (PursuingBall(m_pFielder))
             {
                 fStrength *= 0.0f;
             }
@@ -286,7 +286,7 @@ float AvoidableFielder::GetAvoidanceStrength(
     {
         cFielder* pOther
             = ((AvoidableFielder*)other)->m_pFielder;
-        if (fn_800DED80(m_pFielder) && !Incapacitated(pOther))
+        if (PursuingBall(m_pFielder) && !Incapacitated(pOther))
         {
             fStrength *= 0.2f;
         }
@@ -388,7 +388,7 @@ float AvoidableFielder::GetAvoidanceWeight(
             return 0.0f;
         }
         if (pPowerup != 0 && pPowerup->mtNoHitTimer.GetSeconds() > 0.0f
-            && fn_800DEAB4(m_pFielder) && pPowerup->m_pThrower == m_pFielder)
+            && WindingUpOrShooting(m_pFielder) && pPowerup->m_pThrower == m_pFielder)
         {
             return 0.0f;
         }
@@ -547,7 +547,7 @@ const nlVector3& AvoidablePatch::GetVelocity()
     if (m_pPatch->m_Type == PATCH_CHAIN_LIGHTNING)
     {
         float fSpeed = m_pPatch->m_PathSpeed;
-        nlVec3Scale(mPathVelocity, m_pPatch->fn_80173CCC(), fSpeed);
+        nlVec3Scale(mPathVelocity, m_pPatch->GetPathDirection(), fSpeed);
         return mPathVelocity;
     }
     return m_pPatch->m_Velocity;

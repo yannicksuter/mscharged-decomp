@@ -146,7 +146,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             break;
         }
 
-        if (!fn_800167A8(g_pBall))
+        if (!IsBooSkillshotBall(g_pBall))
         {
             eventData = 0;
             g_CollisionEggDataPool.Allocate(eventData);

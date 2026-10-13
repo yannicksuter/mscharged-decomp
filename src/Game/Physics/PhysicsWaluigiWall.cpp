@@ -150,12 +150,12 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         }
         if (ball->m_tShotTimer.m_uPackedTime != 0 || ball->HasActivePassTarget())
         {
-            if (fn_800167A8(ball))
+            if (IsBooSkillshotBall(ball))
                 return NO_CONTACT;
             ++ball->m_bBallPathChangeCount;
             ++ball->m_bBallDeflectCount;
             FakeBallWorld::InvalidateBallCache();
-            ApplyDamage(Interpolate(gWaluigiWallMinBallDamage, gWaluigiWallMaxBallDamage, fn_800156A8(ball)));
+            ApplyDamage(Interpolate(gWaluigiWallMinBallDamage, gWaluigiWallMaxBallDamage, GetBallChargeBonus(ball)));
             QueueCollisionBallTronWall();
             return ONE_WAY_CONTACT_OTHER;
         }
@@ -249,7 +249,7 @@ bool PhysicsWaluigiWall::SetContactInfo(dContact* contact, PhysicsObject*, bool 
 void PhysicsWaluigiWall::PreCollide()
 {
     const nlVector3& velocity = g_pBall->m_v3Velocity;
-    if (g_pBall->m_pOwner == 0 && !fn_800167A8(g_pBall)
+    if (g_pBall->m_pOwner == 0 && !IsBooSkillshotBall(g_pBall)
         && nlVec3DotProduct(velocity, velocity) > 400.0f
         && g_pBall->meBallState != BALL_STATE_FALLING)
     {

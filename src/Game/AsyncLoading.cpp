@@ -133,6 +133,7 @@
 
 #include <revolution/os/OSThread.h>
 #include <revolution/os/OSTime_fwd.h>
+#include "Game/Character.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
@@ -141,10 +142,7 @@
 bool IsNetworkOrRecordedGame();
 
 void ShutdownWarbleRendering(void*);
-extern "C" void fn_8001FE80();
-void fn_80056CF4(void*, int, bool);
 
-void fn_80056EA8();
 void DestroyCharacters();
 
 extern SlotPool<cSAnimCallback> lbl_805840D8;
@@ -246,7 +244,7 @@ static inline void FinishLoadingStepOrUndo(
     }
 }
 
-extern "C" void fn_80116988(AudioResourceLoadOwner*, void* context)
+void OnAsyncSoundBankLoaded(AudioResourceLoadOwner*, void* context)
 {
     const char* bankName = (const char*)context;
     if (nlStrCmp<char>(bankName, "FE_GEN") == 0)
@@ -307,7 +305,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader::sInstance.ShareDuplicateAnimInventory();
         break;
     case 6:
-        fn_8011B2E4(this);
+        BeginAsyncInGameFrontEndResourceLoad(this);
         break;
     case 7:
         SetLoadingComment("AsyncFEGameResourceLoadFinalize");
@@ -326,7 +324,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             lbl_806E106A = false;
             LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_TO_GAME_LOOP, 0x14,
-                fn_8011B40C, (void*)"FE2GameLoop");
+                OnLoadingSoundBankLoaded, (void*)"FE2GameLoop");
         }
         else
         {
@@ -354,13 +352,13 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         lbl_806E1048 = nlGetTicker();
         lbl_806E104C = 0.0f;
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN, 0x15,
-            fn_80116988, (void*)"FE_GEN");
+            OnAsyncSoundBankLoaded, (void*)"FE_GEN");
 #if defined(VERSION_R4QP01_REV1)
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_MUSIC_STREAMS, 0x16,
 #else
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_MUSIC, 0x16,
 #endif
-            fn_80116988, (void*)"FE_GEN_MUSIC");
+            OnAsyncSoundBankLoaded, (void*)"FE_GEN_MUSIC");
         FEAudio::SetSoundCategory(0x15);
         FEMusic::SetInGame(false);
         break;
@@ -382,7 +380,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             {
                 lbl_806E106A = false;
                 LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x17,
-                    fn_8011B40C, (void*)"FE_GEN_SPLASH");
+                    OnLoadingSoundBankLoaded, (void*)"FE_GEN_SPLASH");
             }
         }
         else if (gAudioEnabled)
@@ -390,7 +388,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             lbl_806E106A = false;
             g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
             LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_SOUND_LOOP, 0x17,
-                fn_8011B40C, (void*)"FESoundLoop");
+                OnLoadingSoundBankLoaded, (void*)"FESoundLoop");
         }
         else
         {
@@ -422,7 +420,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x12);
         break;
     case 15:
-        fn_8011B178(this);
+        BeginAsyncFrontEndResourceLoad(this);
         break;
     case 16:
     {
@@ -459,14 +457,14 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         lbl_806E1048 = nlGetTicker();
         lbl_806E104C = 0.0f;
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x15,
-            fn_80116988, (void*)"FE_GEN_SPLASH");
+            OnAsyncSoundBankLoaded, (void*)"FE_GEN_SPLASH");
         FEAudio::SetSoundCategory(0x15);
         break;
     case 18:
         lbl_806E1058 += gAudioEnabled ? 1 : 0;
         g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x12);
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_MUSIC_STREAMS, 0x12,
-            fn_80116988, (void*)"MUSICSTREAMS");
+            OnAsyncSoundBankLoaded, (void*)"MUSICSTREAMS");
         break;
     case 19:
         SetLoadingComment("AsyncFinalizeCameraLoading");
@@ -578,11 +576,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         AsyncStartCameraLoadingForStadiumViewer();
         break;
     case 38:
-        fn_8011A2E8(this);
+        StartAsyncGameWorldLoading(this);
         break;
     case 39:
         SetLoadingComment("AsyncStartGameWorldLoadingForStadiumViewer");
-        fn_802772D0(GetStadiumName(GameInfoManager::Instance()->GetStadium()), true);
+        LoadStadium(GetStadiumName(GameInfoManager::Instance()->GetStadium()), true);
         FinishLoadingStep(this);
         break;
     case 40:
@@ -599,7 +597,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         SetLoadingComment("AsyncStartLoadingGameFE");
         lbl_806E1060 = 0;
         lbl_806E1064 = 0;
-        glBeginLoadTextureBundle("art/fe/fe.rlt", fn_8011A2DC, 0,
+        glBeginLoadTextureBundle("art/fe/fe.rlt", OnFrontEndTextureBundleLoaded, 0,
             glGetCurrentResourcePool());
         FinishLoadingStep(this);
         break;
@@ -668,16 +666,16 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 57:
-        fn_8011926C(this);
+        DestroyFrontEndFast(this);
         break;
     case 58:
-        fn_80119B0C(this);
+        DestroyFrontEndState(this);
         break;
     case 59:
-        fn_8011A9DC(this);
+        DestroyGameState(this);
         break;
     case 60:
-        fn_8011B02C(this);
+        InitializeLegalScreenAndMovies(this);
         break;
     case 61:
         --m_SP;
@@ -813,23 +811,23 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         mLoadingState = ASYNC_RESOURCES_LOADED;
         break;
     case 85:
-        fn_80119454(this);
+        InitializeFrontEndState1(this);
         break;
     case 86:
-        fn_80119528(this);
+        InitializeFrontEndState2(this);
         break;
     case 87:
-        fn_80119EC0(this);
+        InitializeGameState1(this);
         break;
     case 88:
-        fn_8011A0A8(this);
+        InitializeGameState2(this);
         break;
     case 89:
         SetLoadingComment("AudioLoader");
         FinishLoadingStep(this);
         break;
     case 90:
-        fn_8011A800(this);
+        FinalizeGameStateLoading(this);
         break;
     case 91:
         SetLoadingComment("InitializeGameStateFinalizeForStadimViewer");
@@ -840,7 +838,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 92:
-        fn_8011A570(this);
+        InitializeInGameFrontEnd(this);
         break;
     case 93:
         SetLoadingComment("InitializeGameStateInGameFE2");
@@ -878,12 +876,12 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 98:
-        fn_8011B6E8(this);
+        InitializeStadiumViewer(this);
         break;
     case 99:
     {
         SetLoadingComment("InitializeStadiumViewer2");
-        fn_80056CF4((void*)gGameTweaks.mTerrainType,
+        CreateGame((void*)gGameTweaks.mTerrainType,
             gGameTweaks.mWeatherType, gGameTweaks.mCrowdRiotEnabled);
         ParticleUpdateTask* particleUpdateTask = ParticleUpdateTask::sInstance;
         RLView* particleView = GetLayerView(eCLV_Particles);
@@ -1156,20 +1154,20 @@ AsyncLoadingManager::~AsyncLoadingManager()
     ReleaseEventConnection(&mGameOverConnection);
 }
 
-extern "C" void fn_80118B38(void* data, unsigned long, void*)
+void OnAsyncLoadingByteCodeLoaded(void* data, unsigned long, void*)
 {
     AsyncLoadingManager* manager = &sAsyncLoadingManager;
     manager->mByteCode = data;
     manager->LoadByteCode(data);
 }
 
-extern "C" void fn_80118B50(AsyncLoadingManager*)
+void LoadAsyncLoadingByteCode(AsyncLoadingManager*)
 {
-    nlLoadEntireFileAsync("art/Scripts/async_loading.byte_code", fn_80118B38,
+    nlLoadEntireFileAsync("art/Scripts/async_loading.byte_code", OnAsyncLoadingByteCodeLoaded,
         0, 0x20, AllocateStart, 0, 0, 0);
 }
 
-extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
+u32 UpdateAsyncLoadingSequence(AsyncLoadingManager* manager)
 {
     if (manager->mByteCode == 0)
     {
@@ -1334,43 +1332,43 @@ static inline void BeginLoadingSequence(AsyncLoadingManager* manager, u32 state)
     manager->mSequenceStartTime = nlGetTime();
 }
 
-extern "C" void fn_80119054(AsyncLoadingManager* manager)
+void BeginBootToFrontEndLoading(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_BOOT_TO_FE_BEGIN);
 }
 
-extern "C" void fn_801190A0(AsyncLoadingManager* manager)
+void BeginCleanBootShutdown(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_CLEAN_BOOT_BEGIN);
 }
 
-extern "C" void fn_801190EC(AsyncLoadingManager* manager)
+void BeginFrontEndToGameLoading(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_FE_TO_GAME_BEGIN);
 }
 
-extern "C" void fn_80119138(AsyncLoadingManager* manager)
+void BeginGameToFrontEndLoading(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_GAME_TO_FE_BEGIN);
 }
 
-extern "C" void fn_80119184(AsyncLoadingManager* manager)
+void BeginGameToTitleLoading(AsyncLoadingManager* manager)
 {
     lbl_806E1044 = false;
     BeginLoadingSequence(manager, ASYNC_LOADING_GAME_TO_FE_BEGIN);
 }
 
-extern "C" void fn_801191D4(AsyncLoadingManager* manager)
+void BeginBootToGameLoading(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_BOOT_TO_GAME_BEGIN);
 }
 
-extern "C" void fn_80119220(AsyncLoadingManager* manager)
+void BeginStadiumViewerLoading(AsyncLoadingManager* manager)
 {
     BeginLoadingSequence(manager, ASYNC_LOADING_STADIUM_VIEWER_BEGIN);
 }
 
-extern "C" void fn_8011926C(AsyncLoadingManager* manager)
+void DestroyFrontEndFast(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
     manager->SetLoadingComment("DestroyFEFast");
@@ -1413,7 +1411,7 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_80119454(AsyncLoadingManager* manager)
+void InitializeFrontEndState1(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeFEState1");
@@ -1436,7 +1434,7 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
     }
 }
 
-extern "C" void fn_80119528(AsyncLoadingManager* manager)
+void InitializeFrontEndState2(AsyncLoadingManager* manager)
 {
     static GLMemoryRequirement requirements[] = {
         { GLM_Header, 0x400 },
@@ -1597,7 +1595,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
+void DestroyFrontEndState(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
     manager->SetLoadingComment("DestroyFEState");
@@ -1694,7 +1692,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
+void InitializeGameState1(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeGameState1");
@@ -1746,10 +1744,10 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
+void InitializeGameState2(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameState2");
-    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mCrowdRiotEnabled);
+    CreateGame((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mCrowdRiotEnabled);
     static_cast<OverlayManager*>(g_pOverlayManager)->RegisterEventHandlers();
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
@@ -1760,8 +1758,8 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();
     ExcitementSystem::Instance().RegisterEventHandlers();
-    fn_8001FE80();
-    fn_80018A00();
+    RegisterCharacterEventCallbacks();
+    RegisterBallEventCallbacks();
     GameplayCameraEffects::Instance()->RegisterEventListeners();
     FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mGameOverConnection, -1);
     GLResourcePool* pool = glGetCurrentResourcePool();
@@ -1776,27 +1774,27 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011A2DC(void* value0, unsigned long value1, void*)
+void OnFrontEndTextureBundleLoaded(void* value0, unsigned long value1, void*)
 {
     lbl_806E1060 = value0;
     lbl_806E1064 = (void*)value1;
 }
 
-extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
+void StartAsyncGameWorldLoading(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("AsyncStartGameWorldLoading");
     int stadium = GameInfoManager::Instance()->GetStadium();
-    fn_802772D0(GetStadiumName(stadium), false);
+    LoadStadium(GetStadiumName(stadium), false);
     fxSetTerrain(nlStringLowerHash(GetStadiumTerrain(stadium)));
     lbl_806E1058 += gAudioEnabled ? 7 : 0;
     GameAudio* audio = static_cast<GameAudio*>(g_pAudioSystem);
-    LoadSoundBank(audio, GetStadiumUnknown0x14(stadium), 0xB, fn_80116988, (void*)"STAD_*");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_STAD_GEN, 0xA, fn_80116988, (void*)"STAD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_WEATHER_LIGHTNING, 0xC, fn_80116988, (void*)"WEATHER_LIGHTNING");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_GEN, 0xD, fn_80116988, (void*)"CROWD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_STREAMS, 0xE, fn_80116988, (void*)"CROWDStreams");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_MUSIC_STREAMS, 0x12, fn_80116988, (void*)"MUSICSTREAMS");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_NIS_STREAMS, 0x13, fn_80116988, (void*)"NisStreams");
+    LoadSoundBank(audio, GetStadiumUnknown0x14(stadium), 0xB, OnAsyncSoundBankLoaded, (void*)"STAD_*");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_STAD_GEN, 0xA, OnAsyncSoundBankLoaded, (void*)"STAD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_WEATHER_LIGHTNING, 0xC, OnAsyncSoundBankLoaded, (void*)"WEATHER_LIGHTNING");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_GEN, 0xD, OnAsyncSoundBankLoaded, (void*)"CROWD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_STREAMS, 0xE, OnAsyncSoundBankLoaded, (void*)"CROWDStreams");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_MUSIC_STREAMS, 0x12, OnAsyncSoundBankLoaded, (void*)"MUSICSTREAMS");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_NIS_STREAMS, 0x13, OnAsyncSoundBankLoaded, (void*)"NisStreams");
     {
         int parameter[2];
         parameter[0] = 1;
@@ -1841,14 +1839,14 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011A570(AsyncLoadingManager* manager)
+void InitializeInGameFrontEnd(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameStateInGameFE1");
     g_pOverlayManager->Push(OVERLAY_IN_GAME_TEXT, SCREEN_NOTHING, false);
     g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
     lbl_806E1058 += gAudioEnabled ? 2 : 0;
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_GEN, 0xF, fn_80116988, (void*)"HUD_GEN");
-    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_PU, 0x10, fn_80116988, (void*)"HUD_PU");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_GEN, 0xF, OnAsyncSoundBankLoaded, (void*)"HUD_GEN");
+    LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_PU, 0x10, OnAsyncSoundBankLoaded, (void*)"HUD_PU");
     FEAudio::SetSoundCategory(0xF);
     FEMusic::SetInGame(true);
     if (GameInfoManager::Instance()->mIsInStrikers101Mode)
@@ -1872,7 +1870,7 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011A800(AsyncLoadingManager* manager)
+void FinalizeGameStateLoading(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("GameStateFinalize");
 
@@ -1913,7 +1911,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
+void DestroyGameState(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("DestroyGameState");
 
@@ -1922,7 +1920,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
 
-    fn_80056EA8();
+    BeginGameUnloading();
 
     if (IsSmokeTestEnabled())
     {
@@ -1932,7 +1930,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
             pNISTimeRegion->m_fThreshold / (float)pNISTimeRegion->m_unk10);
         SmokeTestLogGraphValue("FrameTime_AutoReplay", "ms",
             pAutoReplayTimeRegion->m_fThreshold / (float)pAutoReplayTimeRegion->m_unk10);
-        g_FrameCounter.fn_802B80C4();
+        g_FrameCounter.LogGameplayFrameTimes();
     }
 
     DestroyTimeRegions();
@@ -1986,7 +1984,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     gNPCManager->UnloadTransientNPCTemplates();
     ParticleUpdateTask::sInstance->Shutdown();
     DestroyStadium();
-    fn_80115FB4();
+    ClearDeferredEvents();
     GetFixedUpdateTask()->Reset();
     DestroyPhysicsEventQueue();
     DestroyStaticPhysicsPrimitives();
@@ -2086,7 +2084,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
+void InitializeLegalScreenAndMovies(AsyncLoadingManager* manager)
 {
     if (g_e3_Build)
     {
@@ -2112,7 +2110,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
 }
 
-extern "C" void fn_8011B178(AsyncLoadingManager* manager)
+void BeginAsyncFrontEndResourceLoad(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("AsyncFEResourceLoadBeing");
     lbl_806E1068 = false;
@@ -2151,14 +2149,14 @@ extern "C" void fn_8011B178(AsyncLoadingManager* manager)
             lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_ASYNC_LOADING, SCREEN_NOTHING, false);
         }
     }
-    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/MainUI.Dmn", fn_8011B418);
+    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/MainUI.Dmn", OnPermanentFrontEndBundleLoaded);
     lbl_806E1068 = false;
     lbl_806E1069 = true;
     CreatePadBackends();
     EnableAutoPressed();
 }
 
-extern "C" void fn_8011B2E4(AsyncLoadingManager* manager)
+void BeginAsyncInGameFrontEndResourceLoad(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("AsyncFEGameResourceLoadBegin");
     lbl_806E1068 = false;
@@ -2182,21 +2180,21 @@ extern "C" void fn_8011B2E4(AsyncLoadingManager* manager)
     }
     FESceneManager::Instance()->SetTopMostScene(lbl_806E1040);
     FEResourceManager::Instance()->m_bPermanentBundleLoadInProgress = true;
-    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/InGameUI.Res", fn_8011B418);
-    FEResourceManager::Instance()->OpenOnDemandResourceBundle("art/fe/InGameUI.Dmn", fn_8011B424);
+    FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/InGameUI.Res", OnPermanentFrontEndBundleLoaded);
+    FEResourceManager::Instance()->OpenOnDemandResourceBundle("art/fe/InGameUI.Dmn", OnOnDemandFrontEndBundleLoaded);
 }
 
-extern "C" void fn_8011B40C(AudioResourceLoadOwner*, void*)
+void OnLoadingSoundBankLoaded(AudioResourceLoadOwner*, void*)
 {
     lbl_806E106A = true;
 }
 
-extern "C" void fn_8011B418()
+void OnPermanentFrontEndBundleLoaded()
 {
     lbl_806E1068 = true;
 }
 
-extern "C" void fn_8011B424(void*, unsigned long, unsigned long)
+void OnOnDemandFrontEndBundleLoaded(void*, unsigned long, unsigned long)
 {
     lbl_806E1069 = true;
 }
@@ -2237,7 +2235,7 @@ void AsyncLoadingManager::LoadTrophyTemplates()
     }
 }
 
-extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
+void InitializeStadiumViewer(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeStadiumViewer");

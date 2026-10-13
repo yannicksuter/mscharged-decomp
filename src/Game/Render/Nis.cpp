@@ -129,7 +129,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 if (nlStrCmp(npcTemplate->mName, "vice_image_plane_top") == 0
                     || nlStrCmp(npcTemplate->mName, "vice_image_plane_bottom") == 0)
                 {
-                    nlSNPrintf(textureName, sizeof(textureName), "_%s/%s", fn_802772C4(), npcTemplate->mName + 5);
+                    nlSNPrintf(textureName, sizeof(textureName), "_%s/%s", GetLoadedStadiumName(), npcTemplate->mName + 5);
                     unsigned long texture = nlStringLowerHash(textureName);
                     if (glTextureLoad(texture))
                     {
@@ -633,7 +633,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         FireEffect(nis);
         break;
     case NIS_TRIGGER_TYPE_STADIUM_EFFECTS:
-        fn_802789A8(BasicStadium::GetCurrentStadium(), params.param1);
+        EmitStadiumEffects(BasicStadium::GetCurrentStadium(), params.param1);
         break;
     case NIS_TRIGGER_TYPE_CHARACTER_DIRT:
     {
@@ -650,7 +650,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         {
             cCharacter* character = g_pCharacters[charIdx];
             character->m_Dirt = params.float1;
-            character->fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
+            character->SetDamageTextureType(DAMAGE_TEXTURE_SCORCH);
         }
         break;
     }

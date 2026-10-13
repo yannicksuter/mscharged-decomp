@@ -33,8 +33,8 @@ public:
     void SetString(const unsigned short* utf16);
     void SetScissorBox(u16 left, u16 top, u16 width, u16 height);
 
-    const nlVector2& fn_801CA5E8() const { return m_OverloadedAttributes.BoxSize; }
-    void fn_801CA5F0(const nlVector2& size)
+    const nlVector2& GetBoxSize() const { return m_OverloadedAttributes.BoxSize; }
+    void SetBoxSize(const nlVector2& size)
     {
         m_OverloadedAttributes.BoxSize = size;
         m_OverloadFlags |= 4;

@@ -40,6 +40,7 @@
 #include "NL/gl/glState.h"
 
 #include "Game/SharedStaticStorage.h"
+#include "Game/Render/RLViewLayers.h"
 extern "C"
 {
     extern bool lbl_806DEE60;
@@ -51,12 +52,6 @@ extern "C"
     unsigned long lbl_806DEE30 = -1;
     unsigned long lbl_806DEE34 = -1;
 }
-DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
-void fn_80278818(BasicStadium* stadium, nlVector4* corners);
-float fn_802789A0(BasicStadium* stadium);
-float fn_8027313C();
-void fn_802785FC(BasicStadium* stadium, float fDeltaT);
-void fn_8027876C(BasicStadium* stadium, DrawableObject* object);
 
 bool gSkipGameplayModels;
 void* gStadiumResourceData;
@@ -129,7 +124,7 @@ bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
         pObject = new (pObject) PlanarShadowDrawable(
             context, model, model->id);
         pObject->m_uHashID = model->id;
-        fn_8027876C(pBasicStadiumInstance, pObject);
+        RegisterStadiumDrawable(pBasicStadiumInstance, pObject);
     }
 
     delete context;
@@ -171,7 +166,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
         pObject = (DrawableObject*)nlMalloc(sizeof(ChargeShadowDrawable), 8, false);
         pObject = new (pObject) ChargeShadowDrawable(
             context, models, models->id);
-        fn_8027876C(pBasicStadiumInstance, pObject);
+        RegisterStadiumDrawable(pBasicStadiumInstance, pObject);
         instance = 0;
     }
     else
@@ -181,7 +176,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
             pObject = (DrawableObject*)nlMalloc(sizeof(PlanarShadowDrawable), 8, false);
             pObject = new (pObject) PlanarShadowDrawable(
                 context, models, models->id);
-            fn_8027876C(pBasicStadiumInstance, pObject);
+            RegisterStadiumDrawable(pBasicStadiumInstance, pObject);
         }
     }
 
@@ -192,7 +187,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
         nlSNPrintf(name, sizeof(name), "npc%dclone%d", entry, instance);
         DrawableObject* pClone = pObject->Clone(nlStringLowerHash(name));
         pClone->m_uObjectFlags &= ~1;
-        fn_8027876C(pBasicStadiumInstance, pClone);
+        RegisterStadiumDrawable(pBasicStadiumInstance, pClone);
         gStadiumModelEntries[entry].mInstances[instance] = pClone;
     }
 
@@ -579,7 +574,7 @@ void UpdateStadium(float fDeltaT)
     }
     else
     {
-        fn_802785FC(pBasicStadiumInstance, fDeltaT);
+        UpdateStadiumWorld(pBasicStadiumInstance, fDeltaT);
     }
 
     if (gNPCManager != 0)
@@ -651,7 +646,7 @@ bool IsStadiumWorldLoaded()
 
 DrawableObject* FindStadiumDrawableObject(unsigned long uHashID)
 {
-    DrawableObject* pObject = fn_802787AC(pBasicStadiumInstance, uHashID);
+    DrawableObject* pObject = FindStadiumDrawable(pBasicStadiumInstance, uHashID);
     if (pObject == 0)
     {
         pObject = pBasicStadiumInstance->FindDrawableObject(uHashID);
@@ -659,13 +654,13 @@ DrawableObject* FindStadiumDrawableObject(unsigned long uHashID)
     return pObject;
 }
 
-void fn_802772A4(DrawableObject* pObject)
+void RegisterStadiumDrawable(DrawableObject* pObject)
 {
     if (pObject == 0)
     {
         return;
     }
-    fn_8027876C(pBasicStadiumInstance, pObject);
+    RegisterStadiumDrawable(pBasicStadiumInstance, pObject);
 }
 
 BasicStadium* BasicStadium::GetCurrentStadium()
@@ -673,7 +668,7 @@ BasicStadium* BasicStadium::GetCurrentStadium()
     return pBasicStadiumInstance;
 }
 
-char* fn_802772C4()
+char* GetLoadedStadiumName()
 {
     return gStadiumName;
 }
@@ -701,7 +696,7 @@ void InitializeStadiumLighting()
     LoadShadowLightingLookup(glGetTexture(name));
 }
 
-void fn_802772D0(const char* name, bool)
+void LoadStadium(const char* name, bool)
 {
     char path[255];
 
@@ -808,9 +803,9 @@ bool FinishLoadStadium(bool stadiumViewer)
 
 void StadiumScreenToWorldPosition(nlVector3& result, float screenX, float screenY, float distance)
 {
-    fn_802785FC(pBasicStadiumInstance, 0.0f);
+    UpdateStadiumWorld(pBasicStadiumInstance, 0.0f);
     nlVector4 corners[8];
-    fn_80278818(pBasicStadiumInstance, corners);
+    GetStadiumFrustumCorners(pBasicStadiumInstance, corners);
     nlVector3 point = *(nlVector3*)&corners[0];
     nlVector3 horizontal;
     nlVector3 vertical;
@@ -819,7 +814,7 @@ void StadiumScreenToWorldPosition(nlVector3& result, float screenX, float screen
     nlVec3ScaleAdd(point, (-screenX + 1.0f) / 2.0f, horizontal, point);
     nlVec3ScaleAdd(point, (screenY + 1.0f) / 2.0f, vertical, point);
     nlVector3 cameraPosition = cCameraManager::PeekCamera()->GetCameraPosition();
-    float scale = distance / fn_8027313C();
+    float scale = distance / GetNearClipDistance();
     nlVector3 offset;
     nlVec3Sub(offset, point, cameraPosition);
     nlVec3Scale(offset, offset, scale);
@@ -879,7 +874,7 @@ float GetStadiumTime()
 {
     if (pBasicStadiumInstance != 0)
     {
-        return fn_802789A0(pBasicStadiumInstance);
+        return GetStadiumTime(pBasicStadiumInstance);
     }
     return 0.0f;
 }

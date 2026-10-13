@@ -770,7 +770,7 @@ extern "C" void FuzzySetContextTransition(
     machine->SetTransition(name);
 }
 
-extern "C" bool fn_80314798(void*)
+extern "C" bool FuzzyCheckScriptTimeBudget(void*)
 {
     return CheckScriptTimeBudget();
 }

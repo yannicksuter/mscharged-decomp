@@ -246,7 +246,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
     }
 }
 
-void cFielder::fn_8004FF40()
+void cFielder::InitActionSuperPowerEndReact()
 {
     if (!IsFallenDown())
     {
@@ -452,11 +452,11 @@ bool cFielder::TurnOnSuperPowerTank()
     return true;
 }
 
-void ActBowserSuper::fn_800504A4()
+void ActBowserSuper::OnReset()
 {
 }
 
-void WaluigiWallState::fn_800504A8()
+void WaluigiWallState::ClearWalls()
 {
     if (mWallManager != 0)
     {

@@ -845,7 +845,7 @@ cPlayer* FormationEval::GetKeyPlayer()
     cPlayer* pKeyPlayer;
 
     GetTeamFuzzyRuntime(team);
-    cPlayer* strategicBallCarrier = fn_800DF790(team);
+    cPlayer* strategicBallCarrier = GetStrategicBallCarrier(team);
     pKeyPlayer = strategicBallCarrier;
 
     if (pKeyPlayer == 0)
@@ -855,7 +855,7 @@ cPlayer* FormationEval::GetKeyPlayer()
 
     if (pKeyPlayer == 0)
     {
-        otherCarrier = fn_800DF790(team->GetOtherTeam());
+        otherCarrier = GetStrategicBallCarrier(team->GetOtherTeam());
 
         if (otherCarrier != 0)
         {
@@ -1432,7 +1432,7 @@ inline void FormationBallPosition::CalcBallPosition(nlVector2& v2DestAIBallPos)
     }
     else
     {
-        fn_800180F4(g_pBall, &v3AIBallLoc, 0.1f);
+        PredictBallPosition(g_pBall, &v3AIBallLoc, 0.1f);
     }
 
     FieldLocToAILoc(v3AIBallLoc, v3AIBallLoc,
@@ -1462,7 +1462,7 @@ void FormationBallPosition::Update(float fDeltaT)
                 pEval = pEval->next;
             }
 
-            if (fn_800DFF1C())
+            if (IsPassInPlay())
             {
                 m_SortTimer = g_pBall->m_tPassTargetTimer;
             }

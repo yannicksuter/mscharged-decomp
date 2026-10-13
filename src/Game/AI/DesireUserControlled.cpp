@@ -67,7 +67,7 @@ void DesireUserControlled::Update(
     }
     else
     {
-        fn_80098098(m_pFielder);
+        HandlePlayerPowerupInput(m_pFielder);
         if (m_pFielder->m_eActionState == ACTION_NEED_ACTION
             || m_pFielder->m_eActionState == ACTION_WAIT)
         {
@@ -77,7 +77,7 @@ void DesireUserControlled::Update(
         SetDesiredFacingDirection(m_pFielder);
         if (m_pFielder->m_eActionState == ACTION_RUNNING)
         {
-            float fMaxSpeed = fn_8002C254(
+            float fMaxSpeed = GetTurboSpeed(
                 m_pFielder->GetTweaks());
             float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());

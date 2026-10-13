@@ -27,7 +27,7 @@ public:
     void Activate();
     void Deactivate(bool);
     void Reset();
-    void fn_801B4C14(float duration);
+    void Freeze(float duration);
 
     /* 0x84 */ cSAnim* mpTumbleAnim;
     /* 0x88 */ unsigned long mActivationSoundCue;

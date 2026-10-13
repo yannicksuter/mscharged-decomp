@@ -106,7 +106,6 @@ void UpdateTeamTimers(cTeam*, float);
 unsigned long GetTeamCaptainChantCue(cTeam*);
 void UpdateTeamCaptainChant(cTeam*);
 void AssignTeamRoles(cTeam*, bool);
-extern "C" void fn_80015B38(cBall*, bool);
 
 
 static inline cAIPad* GetPlayerController(const cPlayer* player)
@@ -122,7 +121,7 @@ float cTeam::GetAverageDefenseRating()
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        result += fn_8002BE38(GetFielder(i)->GetNormalTweaks());
+        result += GetDefensiveRating(GetFielder(i)->GetNormalTweaks());
     }
     return result / 4.0f;
 }
@@ -370,7 +369,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     }
 
     cFielder* pSBC =
-        (cFielder*)fn_800DF790(GetOtherTeam());
+        (cFielder*)GetStrategicBallCarrier(GetOtherTeam());
     float fDownfield;
     float fScore;
     cFielder* pBestFielder = NULL;
@@ -512,7 +511,7 @@ bool cTeam::AssignSituation()
             if (!ReceivingPass((cFielder*)pBallOwner))
             {
                 nlPrintf("cTeam::AssignSituation - caught bad pass case, with no proper receiver.\n");
-                fn_80015B38(g_pBall, false);
+                CancelBallShot(g_pBall, false);
                 pBallOwner = NULL;
             }
         }
@@ -699,7 +698,7 @@ void cTeam::CalculateNewBallInterceptTimes()
         if (Incapacitated(pPlayer))
         {
             interceptTime = 5.0f;
-            fn_800180F4(
+            PredictBallPosition(
                 g_pBall, &mvBallInterceptPosition[i], interceptTime);
         }
         else if (pPlayer->m_pBall != NULL)
@@ -773,7 +772,7 @@ void cTeam::CalculateNewBallInterceptTimes()
                         interceptTime = pSolutions[0];
                     }
 
-                    fn_800180F4(g_pBall, &mvBallInterceptPosition[i],
+                    PredictBallPosition(g_pBall, &mvBallInterceptPosition[i],
                         (interceptTime <= 2.0f) ? interceptTime : 2.0f);
                 }
                 else
@@ -1522,7 +1521,7 @@ cPlayer* cTeam::GetControlledPlayer(cGlobalPad* pController)
     return pRetval;
 }
 
-extern "C" ScriptMachine* fn_800A6968(cTeam* pTeam)
+ScriptMachine* GetTeamScriptMachine(cTeam* pTeam)
 {
     return pTeam->m_pAIContext->mScriptMachine;
 }
@@ -1619,7 +1618,7 @@ PowerUpTeamType cTeam::GetCurrentPowerUp() const
 /**
  * Offset/Address/Size: 0xA18 | 0x800A6764 | size: 0xE0
  */
-bool cTeam::fn_800A6764() const
+bool cTeam::HasCaptainPowerup() const
 {
     cFielder* pCaptain = (cFielder*)m_pPlayers[0];
     int nCaptainPowerup = pCaptain->m_pCharacterInfo->mCaptainPowerup;
@@ -1703,7 +1702,7 @@ bool cTeam::TogglePowerup(bool bIsSilent)
 /**
  * Offset/Address/Size: 0x814 | 0x800A6560 | size: 0x88
  */
-bool cTeam::fn_800A6560()
+bool cTeam::CanTogglePowerup()
 {
     bool result = false;
     if (mtToggleTimer.m_uPackedTime == 0
@@ -1775,13 +1774,13 @@ void cTeam::SetDifficulty(int difficulty, bool blend, bool reload)
         difficulty = 3;
     }
 
-    fn_800A636C(this)->Init(difficulty, blend, reload);
+    GetTeamSkillTweaks(this)->Init(difficulty, blend, reload);
 }
 
 /**
  * Offset/Address/Size: 0x63C | 0x800A6388 | size: 0x84
  */
-float fn_800A6388(cTeam* team)
+float CountFallingFielders(cTeam* team)
 {
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
@@ -1794,7 +1793,7 @@ float fn_800A6388(cTeam* team)
     return result;
 }
 
-SkillTweaks* fn_800A636C(cTeam* pTeam)
+SkillTweaks* GetTeamSkillTweaks(cTeam* pTeam)
 {
     return gGameTweaks.mSkillTweaks[pTeam->m_nSide];
 }

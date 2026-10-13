@@ -760,7 +760,7 @@ void cCameraManager::GetUpVector(nlVector3& upVector)
  */
 void cCameraManager::SetWorldUpVectorTilt(float fXAxisTilt, float fYAxisTilt)
 {
-    fn_8005B330(&g_CameraWorldUpVector, fXAxisTilt, fYAxisTilt);
+    CalculateTiltDirection(&g_CameraWorldUpVector, fXAxisTilt, fYAxisTilt);
 }
 
 /**

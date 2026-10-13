@@ -1,0 +1,139 @@
+# Mario Strikers Charged (Japan), disc revision 0.
+# See config.example.yml for documentation.
+object_base: orig/R4QJ01
+object: sys/main.dol
+hash: 74be723403329158b1645d9961a3cd6be755cdb8
+extract_objects: true
+symbols: config/R4QJ01/symbols.txt
+splits: config/R4QJ01/splits.txt
+mw_comment_version: 14 # GC Linker 3.0+
+add_relocations:
+  - { source: .text:0x8009A7CC, type: ha, target: __vt__6Bobomb }
+  - { source: .text:0x8009A7D8, type: ha, target: __vt__10GreenShell }
+  - { source: .text:0x8009A7F0, type: ha, target: __vt__11FreezeShell }
+  - { source: .text:0x8009A7F4, type: l, target: __vt__6Bobomb }
+  - { source: .text:0x8009A810, type: ha, target: __vt__8RedShell }
+  - { source: .text:0x8009A814, type: l, target: __vt__10GreenShell }
+  - { source: .text:0x8009A834, type: l, target: __vt__11FreezeShell }
+  - { source: .text:0x8009A854, type: l, target: __vt__8RedShell }
+  # The HUD power-up name table is hoisted through r0 and a stack slot.
+  - { source: .text:0x801EB5B0, type: ha, target: POWER_UP_IMAGE_NAMES }
+  - { source: .text:0x801EB5F8, type: l, target: POWER_UP_IMAGE_NAMES }
+  # CreateBoxGeometry hoists its two index-table addresses through r0 and stack slots.
+  - { source: .text:0x802BBB10, type: ha, target: "ind_vert$1336" }
+  - { source: .text:0x802BBB24, type: ha, target: "ind_uv$1337" }
+  - { source: .text:0x802BBB60, type: l, target: "ind_vert$1336" }
+  - { source: .text:0x802BBB80, type: l, target: "ind_uv$1337" }
+  # GLInventory::~GLInventory hoists release-function and AVL vtable addresses
+  # through r0 and stack slots.
+  - { source: .text:0x802D0E20, type: ha, target: glReleaseTextureAnim__FP13GLTextureAnim }
+  - { source: .text:0x802D0E2C, type: ha, target: glReleaseTexture__FP11PlatTexture }
+  - { source: .text:0x802D0E4C, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0E50, type: l, target: glReleaseTextureAnim__FP13GLTextureAnim }
+  - { source: .text:0x802D0E6C, type: ha, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0E70, type: l, target: glReleaseTexture__FP11PlatTexture }
+  - { source: .text:0x802D0E8C, type: ha, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0E90, type: l, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0EAC, type: ha, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0EB0, type: l, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0ED0, type: l, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0EF0, type: l, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  # inflate hoists these literal addresses through r0 and stack slots.
+  - { source: .text:0x802ACE50, type: ha, target: "lbl_8052B600" }
+  - { source: .text:0x802ACE5C, type: ha, target: "lenfix$247" }
+  - { source: .text:0x802ACE84, type: ha, target: "distfix$248" }
+  - { source: .text:0x802ACE88, type: l, target: "lbl_8052B600" }
+  - { source: .text:0x802ACEA4, type: ha, target: "lbl_8052B588" }
+  - { source: .text:0x802ACEA8, type: l, target: "lenfix$247" }
+  - { source: .text:0x802ACEC4, type: ha, target: "lbl_8052B5BC" }
+  - { source: .text:0x802ACEC8, type: l, target: "distfix$248" }
+  - { source: .text:0x802ACEE4, type: ha, target: "lbl_8052B5D0" }
+  - { source: .text:0x802ACEE8, type: l, target: "lbl_8052B588" }
+  - { source: .text:0x802ACEF8, type: ha, target: "lbl_8052B5EC" }
+  - { source: .text:0x802ACEFC, type: l, target: "lbl_8052B5BC" }
+  - { source: .text:0x802ACF0C, type: ha, target: "lbl_8052B614" }
+  - { source: .text:0x802ACF10, type: l, target: "lbl_8052B5D0" }
+  - { source: .text:0x802ACF20, type: ha, target: "lbl_8052B634" }
+  - { source: .text:0x802ACF24, type: l, target: "lbl_8052B5EC" }
+  - { source: .text:0x802ACF34, type: ha, target: "lbl_8052B658" }
+  - { source: .text:0x802ACF38, type: l, target: "lbl_8052B614" }
+  - { source: .text:0x802ACF48, type: ha, target: "lbl_8052B690" }
+  - { source: .text:0x802ACF4C, type: l, target: "lbl_8052B634" }
+  - { source: .text:0x802ACF5C, type: ha, target: "lbl_8052B6AC" }
+  - { source: .text:0x802ACF60, type: l, target: "lbl_8052B658" }
+  - { source: .text:0x802ACF70, type: ha, target: "lbl_8052B6C4" }
+  - { source: .text:0x802ACF74, type: l, target: "lbl_8052B690" }
+  - { source: .text:0x802ACF84, type: ha, target: "lbl_8052B6E0" }
+  - { source: .text:0x802ACF88, type: l, target: "lbl_8052B6AC" }
+  - { source: .text:0x802ACF98, type: ha, target: "lbl_8052B6F8" }
+  - { source: .text:0x802ACF9C, type: l, target: "lbl_8052B6C4" }
+  - { source: .text:0x802ACFAC, type: ha, target: "lbl_8052B718" }
+  - { source: .text:0x802ACFB0, type: l, target: "lbl_8052B6E0" }
+  - { source: .text:0x802ACFC4, type: l, target: "lbl_8052B6F8" }
+  - { source: .text:0x802ACFD4, type: l, target: "lbl_8052B718" }
+block_relocations:
+  # gHitReactFacingOffsets begins with the u16 angles 0x8000 and 0x4000.
+  - { source: 0x806DBDF8 }
+  # cField::mCorners[2] packs angles 0x8000 and 0xC000, not a code pointer.
+  - { source: 0x804FA150 }
+  # RLGReader chunk IDs 0x8001B200 and 0x8001B008 are switch values, not
+  # references into the function at 0x8001AD24.
+  - { source: 0x802CB2E8 }
+  - { source: 0x802CB39C }
+  - { source: 0x802CB3AC }
+  # Chunk IDs 0x8001B000 and 0x8001B100 are values, not code pointers.
+  - { source: 0x802D08CC }
+  - { source: 0x802D08D4 }
+  - { source: 0x802D08F4 }
+  # World::LoadChunks compares these chunk IDs; their values overlap .text.
+  - { source: 0x803414B8 }
+  - { source: 0x803414C0 }
+  - { source: 0x803414C8 }
+  - { source: 0x80341504 }
+  - { source: 0x80341514 }
+  - { source: 0x80341524 }
+  - { source: 0x80341544 }
+  # OnAudioResourceBundleLoaded compares chunk IDs that overlap .text.
+  - { source: 0x802ED654 }
+  - { source: 0x802ED674 }
+  - { source: 0x802ED684 }
+  - { source: 0x802ED694 }
+  # AudioBundleManager::ParseChunk compares chunk IDs that overlap .text.
+  - { source: 0x802EE094 }
+  - { source: 0x802EE09C }
+  - { source: 0x802EE0BC }
+  - { source: 0x802EE0CC }
+  - { source: 0x802EE0DC }
+  # AudioBankLoader::ParseChunk compares chunk ID 0x80023200, which overlaps .text.
+  - { source: 0x802EFB0C }
+  - { source: 0x802EFB10 }
+  # The platform manager compares chunk ID 0x80023600, which overlaps .text.
+  - { source: 0x802EFE1C }
+  - { source: 0x802EFE24 }
+  # OSInit's MEM1 arena-lo default is the constant 0x80004000 (donor-supported
+  # source spelling); it is not a reference to the .init routine at that address
+  - { source: 0x803B39AC }
+  - { source: 0x803B3A24 }
+  # nlMain.cpp crcTable[] value that scans as a plausible pointer
+  - { source: 0x8052B384 }
+  # Blowfish bf_S[1][239] is the constant 0x800BCADC, not a code pointer.
+  - { source: 0x805313D4 }
+  # WPADEncrypt.c tb[] bytes that scan as plausible pointers
+  - { source: 0x8054BEDC }
+  - { source: 0x8054C350 }
+  - { source: 0x8054C4D0 }
+  - { source: 0x804F0410 }
+  - { source: 0x804F0414 }
+  - { source: 0x804F0418 }
+  - { source: 0x8052D630 }
+  - { source: 0x8052D634 }
+  - { source: 0x8052D6A8 }
+  - { source: 0x8052D8EC }
+  - { source: 0x8052E080 }
+  - { source: 0x8052E084 }
+  - { source: 0x8052E0E0 }
+  - { source: 0x8052E2D0 }
+force_active:
+  - __init_cpp_exceptions_reference
+  - __destroy_global_chain_reference
+  - __fini_cpp_exceptions_reference

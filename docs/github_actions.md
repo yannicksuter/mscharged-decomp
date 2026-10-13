@@ -1,18 +1,18 @@
 # GitHub Actions
 
 The [build workflow](../.github/workflows/build.yml) supports `R4QE01`,
-`R4QP01_rev1` and `R4QP01_rev2`. It uses a private container for original
-executables and the compiler packages.
+`R4QP01_rev1`, `R4QP01_rev2`, `R4QJ01` and `R4QK01`. It uses a private container
+for original executables and the compiler packages.
 
 Supply each original as `/orig/<version>/sys/main.dol` in that container.
 Keep game files out of Git, including the private build repository: provide
 them through a private build context or private storage instead. The public
 workflow uploads only reconstructed linker maps and progress reports.
 
-USA remains required. EU jobs report a notice and skip their build until the
-corresponding original is available in the container. Once supplied, each job
-builds all sources and checks its revision's retail DOL hash. Local builds do
-not require a container.
+USA remains required. The other jobs report a notice and skip their build until
+the corresponding original is available in the container. Once supplied, each
+job builds the available sources and checks its version's retail DOL hash.
+Local builds do not require a container.
 
 - [Build Repository](#build-repository)
 - [Workflow](#workflow)
@@ -43,7 +43,7 @@ This repository will be used to build and store the CI build container.
 1. In `.github/workflows/build.yml`, set `container:` to the private
    [build image](#build-repository).
 
-2. Make all three original executables available in that image under their
+2. Make all five original executables available in that image under their
    separate version directories.
 
 The workflow builds each available version on every push or pull request.

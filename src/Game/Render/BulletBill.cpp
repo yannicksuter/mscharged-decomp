@@ -97,7 +97,7 @@ void BulletBillObject::Update(float deltaTime)
 
     if (target != 0)
     {
-        fn_802B549C(
+        nlMakeQuatZ(
             orientation, target->m_DetChar.m_aActualFacingDirection);
     }
 }
@@ -126,7 +126,7 @@ void BulletBillObject::Show(cFielder* fielder)
     target = fielder;
     if (fielder != 0)
     {
-        fn_802B549C(orientation, fielder->m_DetChar.m_aActualFacingDirection);
+        nlMakeQuatZ(orientation, fielder->m_DetChar.m_aActualFacingDirection);
     }
 
     nlVector3 newPosition = g_pBall->m_v3Position;

@@ -5,25 +5,25 @@
 #include "Game/InterpreterCore.h"
 #include "NL/nlString.h"
 
-extern "C" inline DesireUpdate fn_800996D0(
+inline DesireUpdate CallPlayerFuzzyFunction(
     FuzzyRuntimeBase*, const unsigned int&, cPlayer*);
-extern "C" inline DesireUpdate fn_80099670(
+inline DesireUpdate CallPlayerFuzzyFunction(
     FuzzyRuntimeBase*, cPlayer*, const char*);
 
-extern "C" inline DesireUpdate fn_80099660(
+inline DesireUpdate CallPlayerFuzzyFunction(
     FuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
 {
-    return fn_80099670(runtime, player, name);
+    return CallPlayerFuzzyFunction(runtime, player, name);
 }
 
-extern "C" inline DesireUpdate fn_80099670(
+inline DesireUpdate CallPlayerFuzzyFunction(
     FuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
 {
     unsigned int functionHash = nlStringHash(name);
-    return fn_800996D0(runtime, functionHash, player);
+    return CallPlayerFuzzyFunction(runtime, functionHash, player);
 }
 
-extern "C" inline DesireUpdate fn_800996D0(
+inline DesireUpdate CallPlayerFuzzyFunction(
     FuzzyRuntimeBase* runtime, const unsigned int& functionHash, cPlayer* player)
 {
     unsigned int localHash = functionHash;
@@ -32,29 +32,29 @@ extern "C" inline DesireUpdate fn_800996D0(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(player), 0));
 }
 
-extern "C" inline DesireUpdate fn_800C3448(
+inline DesireUpdate CallPlayersFuzzyFunction(
     InterpreterCore*, const unsigned int&, cPlayer*, cPlayer*);
-extern "C" inline DesireUpdate fn_800C33D8(
+inline DesireUpdate CallPlayersFuzzyFunction(
     InterpreterCore*, cPlayer*, const char*, cPlayer*);
 
-extern "C" inline DesireUpdate fn_800C33C8(
+inline DesireUpdate CallPlayersFuzzyFunction(
     InterpreterCore* pInterpreter, const char* pFunctionName,
     cPlayer* pPlayer, cPlayer* pTarget)
 {
-    return fn_800C33D8(
+    return CallPlayersFuzzyFunction(
         pInterpreter, pPlayer, pFunctionName, pTarget);
 }
 
-extern "C" inline DesireUpdate fn_800C33D8(
+inline DesireUpdate CallPlayersFuzzyFunction(
     InterpreterCore* pInterpreter, cPlayer* pPlayer,
     const char* pFunctionName, cPlayer* pTarget)
 {
     unsigned int functionHash = nlStringHash(pFunctionName);
-    return fn_800C3448(
+    return CallPlayersFuzzyFunction(
         pInterpreter, functionHash, pPlayer, pTarget);
 }
 
-extern "C" inline DesireUpdate fn_800C3448(
+inline DesireUpdate CallPlayersFuzzyFunction(
     InterpreterCore* pInterpreter, const unsigned int& functionHash,
     cPlayer* pPlayer, cPlayer* pTarget)
 {

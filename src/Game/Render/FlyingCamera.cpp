@@ -79,11 +79,11 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     flatDirection = direction;
     flatDirection.z = 0.0f;
 
-    fn_802B549C(facing, camera->mAngle);
+    nlMakeQuatZ(facing, camera->mAngle);
 
     if (flatDirection.GetLengthSq3D() < 0.001f)
     {
-        fn_802B549C(targetOrientation, 0x4000);
+        nlMakeQuatZ(targetOrientation, 0x4000);
     }
     else
     {

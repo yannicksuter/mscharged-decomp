@@ -121,15 +121,15 @@ public:
     virtual void Destroy(bool bSilent);
     virtual void PreThrow(cFielder* pFielder);
     virtual void ThrowAt(cFielder* pThrower);
-    virtual void fn_8009CAC0(cFielder* pFielder);
+    virtual void ActivateAtFielder(cFielder* pFielder);
     virtual void Init(cFielder* pFielder);
     virtual void Update(float dt);
 
     float GetRadius() const;
     ePowerUpType GetType() const { return m_eType; }
-    void fn_8009CEBC(const nlVector3& v3ShockwaveOrigin);
-    void fn_8009D500();
-    void fn_8009D74C(float seconds, bool bEnableCollisions);
+    void ReactToShockwave(const nlVector3& v3ShockwaveOrigin);
+    void UpdatePhysicsState();
+    void FreezeMotion(float seconds, bool bEnableCollisions);
     void SpeedManagement();
     void InitVisuals();
     void UpdateTransform();

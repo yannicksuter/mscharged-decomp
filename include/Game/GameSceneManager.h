@@ -12,6 +12,6 @@ public:
     virtual void Pop();
 };
 
-GameSceneManager* fn_801CA660();
+GameSceneManager* GetGameSceneManager();
 
 #endif // GAME_GAME_SCENE_MANAGER_H

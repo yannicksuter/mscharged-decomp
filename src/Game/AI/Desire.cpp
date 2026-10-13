@@ -65,7 +65,7 @@ void DesireFinishAction::Update(DesireUpdate* update, float)
             "** WARNING! DesireFinishAction has expired after %f seconds, probably a bug!\n",
             mAgeTimer.GetSeconds());
     }
-    fn_80098098(m_pFielder);
+    HandlePlayerPowerupInput(m_pFielder);
 }
 
 bool DesireWait::Initialize(void*)

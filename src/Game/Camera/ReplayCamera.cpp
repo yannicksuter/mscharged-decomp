@@ -517,7 +517,7 @@ nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float directi
 
         nlQuaternion rotation;
         nlVector3 rotationAxis = { 0.0f, 0.0f, 1.0f };
-        fn_802B5370(rotation, rotationAxis,
+        nlMakeQuat(rotation, rotationAxis,
             DegreesToAngle(mBallToGoalRotationDegrees));
         RotateVector(ballToGoal, ballToGoal, rotation);
 

@@ -264,7 +264,7 @@ void MakeTextBoxReallyWide(TLTextInstance& textInstance)
     textInstance.m_OverloadFlags |= 0x4;
 }
 
-nlVector2 fn_801CC48C(TLTextInstance* pText)
+nlVector2 GetTextDimensions(TLTextInstance* pText)
 {
     FEText* pFeText = (FEText*)pText->m_component;
     nlFont* pFont;

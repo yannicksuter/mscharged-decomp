@@ -239,7 +239,7 @@ void FielderDesireMachine::Update(float deltaTime)
 
     if (!waitForController && g_pGame->IsGameplayOrOvertime()
         && !UserControlledT(GetFielder()->m_pTeam)
-        && !IsConcurrentStateActive(this, FIELDER_DESIRE_USE_POWERUP) && fn_800D85F8(GetFielder()))
+        && !IsConcurrentStateActive(this, FIELDER_DESIRE_USE_POWERUP) && AbleToUseAnyPowerup(GetFielder()))
     {
         FuzzyVariantCollection params;
         params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));

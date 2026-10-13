@@ -51,11 +51,11 @@ public:
     ~cTeam();
     void ClearAllPowerUps();
     void ClearCurrentPowerUp();
-    bool fn_800A6560();
+    bool CanTogglePowerup();
     bool TogglePowerup(bool bIsSilent);
     bool IncrementPowerupMeter(
         float fAdjustAmount, cFielder* pFielder, bool param3);
-    bool fn_800A6764() const;
+    bool HasCaptainPowerup() const;
     PowerUpTeamType GetCurrentPowerUp() const;
     void SetIsPowerUpNew(int index, bool isNew);
     void SetPlayer(cPlayer* pPlayer, int nIndex);
@@ -148,11 +148,11 @@ public:
 
 extern cTeam* g_pTeams[];
 FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam*);
-extern "C" ScriptMachine* fn_800A6968(cTeam*);
+ScriptMachine* GetTeamScriptMachine(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
 class SkillTweaks;
-SkillTweaks* fn_800A636C(cTeam* pTeam);
-float fn_800A6388(cTeam*);
+SkillTweaks* GetTeamSkillTweaks(cTeam* pTeam);
+float CountFallingFielders(cTeam*);
 
 #endif // GAME_TEAM_H

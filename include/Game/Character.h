@@ -202,10 +202,10 @@ public:
 
     void UpdateMovementState(float fDeltaT);
     void SetPlayerScale(float unidentifiedScale);
-    void fn_80022D58(float fDeltaT);
+    void UpdateMegaBlend(float fDeltaT);
 
     void SetElectrocutionTextureEnabled(bool isEnabled);
-    void fn_8001F1D8();
+    void IncreaseDirt();
     bool IsPlayingEffect(const EffectsGroup* effectGroup) const;
     bool IsEffectDying(const EffectsGroup* effectGroup) const;
     void EndEffect(const EffectsGroup* effectGroup);
@@ -248,25 +248,25 @@ public:
     GLSkinMesh* GetSkinMesh(int modelType) const;
     void PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType);
     void SetModelType(int modelType);
-    bool fn_8001C534(int modelType);
-    void fn_8001C574();
-    void fn_80022DAC(unsigned long uTextureID);
-    void fn_80022DE8(unsigned long uTextureID);
-    void fn_80022E24(unsigned long uTextureID);
-    void fn_80022E60();
-    void fn_80022D3C(float fParam0, float fParam1);
-    void fn_8001EF78(float fParam);
+    bool HasSkinMesh(int modelType);
+    void InvalidateSkinMeshPoses();
+    void SetNormalTexture(unsigned long uTextureID);
+    void SetSwapTexture(unsigned long uTextureID);
+    void SetShockTexture(unsigned long uTextureID);
+    void ResolveTextures();
+    void SetMegaBlend(float fParam0, float fParam1);
+    void UpdatePoseTree(float fParam);
     void AddRandomDirt();
     float GetDirt() const { return m_Dirt; }
     float GetMinDirt() const { return m_MinDirt; }
-    void fn_8001F1C0(int nParam);
-    void fn_8001EE74(float fParam0, float fParam1, float fParam2);
-    void fn_8001E304(float fSpeed, float fDeltaT);
-    void fn_8001EF6C(float movementScale);
-    void fn_8001DCE0(unsigned short aDirection);
-    bool fn_8001E160();
+    void SetDamageTextureType(int nParam);
+    void BlendPlayerScale(float fParam0, float fParam1, float fParam2);
+    void SeekMovementSpeed(float fSpeed, float fDeltaT);
+    void SetMovementScale(float movementScale);
+    void SetDesiredMovementDirection(unsigned short aDirection);
+    bool IsOnScreen();
     bool IsCaptain() const;
-    bool fn_8001E184();
+    bool IsInsideScreenMargin();
     const CharacterInfo* GetCharacterInfoData() const { return m_pCharacterInfo; }
     cPN_SAnimController* GetCurrentAnimController() const { return m_pCurrentAnimController; }
 
@@ -369,5 +369,7 @@ public:
 private:
     void CaptureHammerTransform();
 }; // total size: 0x1E4
+
+void RegisterCharacterEventCallbacks();
 
 #endif // GAME_CHARACTER_H

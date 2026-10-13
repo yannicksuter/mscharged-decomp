@@ -12,6 +12,7 @@ TABLE_ADDRESSES = {
     "R4QE01": 0x804E70E0,
     "R4QP01_rev2": 0x804E6A08,
     "R4QP01_rev1": 0x804E6488,
+    "R4QJ01": 0x804E7520,
 }
 LANGUAGES = ("eng", "fre", "deu", "spa", "ita", "jpn", "uke")
 IMAGE_TYPES = ("FatalErrorImage", "NoDiskImage", "WrongDiskImage", "RetryImage", "Loading")

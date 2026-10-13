@@ -1,5 +1,6 @@
 #include "Game/AI/HeadTrack.h"
 #include "NL/nlMath.inl"
+#include "NL/nlMath.h"
 
 u16 g_headTrackSyncLogType = 0xFFFF;
 
@@ -137,7 +138,6 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
     }
 }
 
-extern "C" void fn_802B53EC(nlQuaternion&, unsigned short);
 
 void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     cPoseAccumulator* cPoseAccumulator, int headNodeIndex)
@@ -154,8 +154,8 @@ void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     nlQuaternion& qAnimatedHead
         = cPoseAccumulator->GetNodeQuaternion(headNodeIndex);
 
-    fn_802B53EC(qSpin, spin);
-    fn_802B549C(qTilt, tilt);
+    nlMakeQuatX(qSpin, spin);
+    nlMakeQuatZ(qTilt, tilt);
     nlMultQuat(qRotation, qSpin, qTilt);
     nlMultQuat(qNewHead, qAnimatedHead, qRotation);
     nlQuatToMatrix(m4RotMatrix, qRotation, true);

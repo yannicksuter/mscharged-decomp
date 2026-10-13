@@ -18,12 +18,12 @@ inline UserInfo& GameInfoManager::GetUserInfo()
     return mUserInfo;
 }
 
-inline int GameInfoManager::fn_801CA658() const
+inline int GameInfoManager::GetCurrentMode() const
 {
     return mCurrentMode;
 }
 
-inline GameSceneManager* fn_801CA660()
+inline GameSceneManager* GetGameSceneManager()
 {
     return nlSingleton<GameSceneManager>::s_pInstance;
 }

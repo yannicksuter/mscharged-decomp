@@ -194,8 +194,8 @@ void RenderSnapshot::Grab()
     {
         for (i = 0; i < 3; i++)
         {
-            if (gNPCManager->fn_801A9DE0(i) != 0)
-                mWindDebris[i].Grab(*gNPCManager->fn_801A9DE0(i));
+            if (gNPCManager->GetWindDebris(i) != 0)
+                mWindDebris[i].Grab(*gNPCManager->GetWindDebris(i));
         }
     }
     mBall.Grab();
@@ -215,7 +215,7 @@ void RenderSnapshot::Grab()
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch != 0)
                 mPatchPositions[i] = patch->GetPosition();
             else
@@ -390,7 +390,7 @@ void RenderSnapshot::Render(float deltaTime)
             for (i = 0; i < 3; i++)
             {
                 if (mWindDebris[i].visible == true)
-                    mWindDebris[i].Render(*gNPCManager->fn_801A9DE0(i));
+                    mWindDebris[i].Render(*gNPCManager->GetWindDebris(i));
             }
         }
         for (i = 0; i < 10; i++)
@@ -482,7 +482,7 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
     {
         for (int i = 0; i < 3; i++)
         {
-            if (gNPCManager->fn_801A9DE0(i) != 0)
+            if (gNPCManager->GetWindDebris(i) != 0)
                 mWindDebris[i].Blend(blendFactors, lhs.mWindDebris[i], rhs.mWindDebris[i]);
         }
     }
@@ -498,7 +498,7 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
         const RenderSnapshot& current = rhs;
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch != 0)
             {
                 if (previous.mPatchPositions[i].z > -100.0f && current.mPatchPositions[i].z > -100.0f)

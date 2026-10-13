@@ -850,7 +850,7 @@ inline void PowerupModelPool::Initialize(int type, unsigned long objHashName)
         nlSNPrintf(name, sizeof(name), "powerup_generated_%d", mNum);
         mObjs[type][i] = obj->Clone(nlStringLowerHash(name));
         mObjs[type][i]->m_uObjectFlags &= ~1;
-        fn_802772A4(mObjs[type][i]);
+        RegisterStadiumDrawable(mObjs[type][i]);
         mFree[type][i] = true;
         mNum++;
     }
@@ -1114,7 +1114,7 @@ void PowerupBase::Update(float dt)
             m_fSpawnGrowTimeRemaining = 0.0f;
         }
 
-        fn_8009D500();
+        UpdatePhysicsState();
         mtActiveTimer.Countdown(dt, 0.0f);
         m_unk34.Countdown(dt, 0.0f);
 
@@ -1255,7 +1255,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     {
         nChanceForCaptainPowerup = 0;
     }
-    if (pTeam->fn_800A6764() || pTeam->GetCaptain()->IsShattered() == 1)
+    if (pTeam->HasCaptainPowerup() || pTeam->GetCaptain()->IsShattered() == 1)
     {
         nChanceForCaptainPowerup = 0;
     }
@@ -1375,7 +1375,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             = nChanceForRedShell = nChanceForBanana = nChanceForMushroom
             = nChanceForBoBomb = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
-        if (!pTeam->fn_800A6764()
+        if (!pTeam->HasCaptainPowerup()
             && pTeam->GetCaptain()->IsShattered() != 1)
         {
             powerUpType = *(ePowerUpType*)(
@@ -1450,7 +1450,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         }
 
         if (GameInfoManager::Instance()->IsRule0x0Equal10()
-            && powerUpType == POWER_UP_NONE && !pTeam->fn_800A6764()
+            && powerUpType == POWER_UP_NONE && !pTeam->HasCaptainPowerup()
             && pTeam->GetCaptain()->IsShattered() == 0)
         {
             powerUpType = *(ePowerUpType*)(
@@ -1835,7 +1835,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
 /**
  * Offset/Address/Size: 0x3460 | 0x8009CAC0 | size: 0xCC
  */
-void PowerupBase::fn_8009CAC0(cFielder* pFielder)
+void PowerupBase::ActivateAtFielder(cFielder* pFielder)
 {
     unsigned long soundID = powerupSounds[m_eType].sndActivate;
     if (soundID != 0)
@@ -1960,7 +1960,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
 /**
  * Offset/Address/Size: 0x385C | 0x8009CEBC | size: 0x23C
  */
-void PowerupBase::fn_8009CEBC(const nlVector3& v3ShockwaveOrigin)
+void PowerupBase::ReactToShockwave(const nlVector3& v3ShockwaveOrigin)
 {
     if (m_unk44.m_uPackedTime == 0)
     {
@@ -2162,7 +2162,7 @@ void PowerupBase::Destroy(bool bSilent)
 /**
  * Offset/Address/Size: 0x3EA0 | 0x8009D500 | size: 0x17C
  */
-void PowerupBase::fn_8009D500()
+void PowerupBase::UpdatePhysicsState()
 {
     m_v3PrevPosition = m_v3Position;
     m_pPhysicsObject->GetPosition(&m_v3Position);
@@ -2230,7 +2230,7 @@ void PowerupBase::PreThrow(cFielder* pFielder)
 /**
  * Offset/Address/Size: 0x40EC | 0x8009D74C | size: 0x98
  */
-void PowerupBase::fn_8009D74C(float seconds, bool bEnableCollisions)
+void PowerupBase::FreezeMotion(float seconds, bool bEnableCollisions)
 {
     m_unk44.SetSeconds(seconds);
     m_v3SavedVelocity = m_v3Velocity;
@@ -2698,7 +2698,7 @@ void Banana::ThrowAt(cFielder* pThrower)
     unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
     float fThrowerScale = pThrower->m_DetChar.m_fPlayerScale;
     float fRadius = GetRadius();
-    float fThrowerRadius = fn_8002BFA8(
+    float fThrowerRadius = GetScaledPlayerWidth(
         pThrower->GetTweaks(), fThrowerScale);
 
     nlPolarToCartesian(v3SpawnPosition.x, v3SpawnPosition.y,

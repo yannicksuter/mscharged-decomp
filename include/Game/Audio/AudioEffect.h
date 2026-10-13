@@ -22,7 +22,7 @@ class AudioEffectParameter
 public:
     AudioEffectParameter()
     {
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
         m_State.m_Flags.bytes[0] = false;
 #endif
     }
@@ -55,7 +55,7 @@ public:
 
         Value m_Current;
         Value m_Target;
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
         union Flags
         {
             u32 word;

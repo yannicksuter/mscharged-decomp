@@ -85,8 +85,8 @@ bool DesireSteering::Initialize(void* context)
     m_fDesiredArrivalTime = -1.0f;
     m_ePositionSeekState = PSS_ARRIVED;
     m_fForcedArrivalRadius = 0.0f;
-    fn_8000F178(m_pAvoidance);
-    fn_8000F178(m_pAvoidance);
+    ResetAvoidController(m_pAvoidance);
+    ResetAvoidController(m_pAvoidance);
     m_fAvoidanceMult = 1.0f;
     m_ThingsToAvoid = AVOID_EVERYTHING;
     mMaxDuration = -1.0f;
@@ -95,7 +95,7 @@ bool DesireSteering::Initialize(void* context)
 
 void DesireSteering::Cleanup()
 {
-    fn_8000F178(m_pAvoidance);
+    ResetAvoidController(m_pAvoidance);
     m_AvoidanceHistory.Reset();
 }
 
@@ -106,7 +106,7 @@ void ResetSteeringHistory(DesireSteering* desire)
 
 void ResetSteeringAvoidance(DesireSteering* desire)
 {
-    fn_8000F178(desire->m_pAvoidance);
+    ResetAvoidController(desire->m_pAvoidance);
 }
 
 void ResetSteeringTargets(DesireSteering* desire)
@@ -186,9 +186,9 @@ void DesireSteering::Update(
     }
     if (sUseAvoidance && bUseAvoidance)
     {
-        fn_800C5DBC(this, fDeltaT);
+        UpdateSteeringAvoidance(this, fDeltaT);
     }
-    fn_800C6FDC(this, fDeltaT);
+    UpdateSteeringFacing(this, fDeltaT);
     m_pFielder->ShouldIWave();
 
     desiredVelocity.a = m_pFielder->m_DetChar.m_aDesiredMovementDirection;
@@ -197,7 +197,7 @@ void DesireSteering::Update(
     m_v3DesiredVel.z = 0.0f;
 }
 
-extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
+void UpdateSteeringAvoidance(DesireSteering* desire, float fDeltaT)
 {
     bool bHasGlobalPad;
     float fRepulsionMult = desire->m_fAvoidanceMult;
@@ -222,7 +222,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
             else if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
                 || GameInfoManager::Instance()->IsRule0x4Equal3())
             {
-                if (desire->m_pFielder->fn_8001E160()
+                if (desire->m_pFielder->IsOnScreen()
                     && !gForceSidelineAvoidance)
                 {
                     nThingsToAvoid = AVOID_NOTHING;
@@ -238,7 +238,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
                 nThingsToAvoid = AVOID_SIDELINES;
             }
         }
-        else if (fn_800DED80(desire->m_pFielder))
+        else if (PursuingBall(desire->m_pFielder))
         {
             fRepulsionMult = 1.0f;
         }
@@ -252,7 +252,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
 
     if (nThingsToAvoid & AVOID_SIDELINES)
     {
-        float fInterceptScore = fn_800DED80(desire->m_pFielder);
+        float fInterceptScore = PursuingBall(desire->m_pFielder);
         bool bHasBall = desire->m_pFielder->HasBall();
         float fCloseToTheirNet
             = CloseToTheirNet(desire->m_pFielder);
@@ -374,7 +374,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
     nlVector3 v3FixedPos = v3Position;
     float fPlayerScale
         = desire->m_pFielder->m_DetChar.m_fPlayerScale;
-    float fRadius = fn_8002BFA8(desire->m_pFielder->GetTweaks(),
+    float fRadius = GetScaledPlayerWidth(desire->m_pFielder->GetTweaks(),
         fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
@@ -425,7 +425,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
         nlVec3Sub(v3Direction, v3FixedPos,
             desire->m_pFielder->m_DetChar.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
-        desire->m_pFielder->fn_8001DCE0(aDirection);
+        desire->m_pFielder->SetDesiredMovementDirection(aDirection);
         desire->m_pFielder->SetDesiredFacingDirection(
             aDirection, false);
     }
@@ -448,7 +448,7 @@ void SeekSteeringTarget(DesireSteering* desire,
 {
     nlVector3 v3FixedPos = v3Pos;
     float fPlayerScale = desire->m_pFielder->m_DetChar.m_fPlayerScale;
-    float fRadius = fn_8002BFA8(
+    float fRadius = GetScaledPlayerWidth(
         desire->m_pFielder->GetTweaks(), fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
 
@@ -475,7 +475,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             desire->m_pFielder->m_DetChar.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
         desire->m_pFielder->SetDesiredFacingDirection(aDirection, false);
-        desire->m_pFielder->fn_8001DCE0(aDirection);
+        desire->m_pFielder->SetDesiredMovementDirection(aDirection);
     }
 
     float fSpeedPercent = 0.0f;
@@ -562,7 +562,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             break;
         case PSS_FAR_SEEKING:
             fMinSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
-            fMaxSpeed = fn_8002C254(desire->m_pFielder->GetTweaks());
+            fMaxSpeed = GetTurboSpeed(desire->m_pFielder->GetTweaks());
             break;
         default:
             break;
@@ -577,7 +577,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             || (turboRequest == TR_MOVING_TARGET
                 && IsNotNearlyZero(fDesiredPositionRateOfChange, 0.0f)))
         {
-            fMinSpeed = fn_8002C254(desire->m_pFielder->GetTweaks());
+            fMinSpeed = GetTurboSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = fMinSpeed;
         }
     }
@@ -643,17 +643,17 @@ float GetBallFacingWeight(cFielder* pFielder)
         else
         {
             bool bHasPad = pFielder->GetGlobalPad() != NULL;
-            if (!bHasPad && fn_800D6A90(pFielder) >= 0.5f)
+            if (!bHasPad && MovingSlowly(pFielder) >= 0.5f)
             {
                 result = 1.0f;
             }
-            else if (Defensive(fn_800D6670(pFielder)) >= 0.5f)
+            else if (Defensive(TeamOf(pFielder)) >= 0.5f)
             {
                 result = 1.0f - FarToMyNet(pFielder);
-                float fBall = fn_800DC19C(pFielder, g_pBall);
+                float fBall = InBetweenMyNetAndBall(pFielder, g_pBall);
                 result = fBall / 2.0f + result / 2.0f;
             }
-            else if (Offensive(fn_800D6670(pFielder)) >= 0.5f)
+            else if (Offensive(TeamOf(pFielder)) >= 0.5f)
             {
                 result = 1.0f - FarToTheirNet(pFielder);
             }
@@ -668,12 +668,12 @@ float GetBallFacingWeight(cFielder* pFielder)
 
 static float GetMarkFacingWeight(cFielder* TheFielder)
 {
-    cFielder* mark = fn_800D6734(TheFielder);
+    cFielder* mark = MarkOf(TheFielder);
     float inBetween = InBetweenMyNetAnd(TheFielder, mark);
     return inBetween;
 }
 
-extern "C" void fn_800C6FDC(DesireSteering* desire, float)
+void UpdateSteeringFacing(DesireSteering* desire, float)
 {
     bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
                      && !desire->m_pFielder->IsConfused()
@@ -685,7 +685,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                      && !IsBowserSuperPowerActive(desire->m_pFielder)
                      && !desire->m_pFielder->IsPeachSuperPowerActive()
                      && !(bool)ReceivingPass(desire->m_pFielder)
-                     && fn_800DED80(desire->m_pFielder) < 0.2f;
+                     && PursuingBall(desire->m_pFielder) < 0.2f;
 
     int aFacingDirection = desire->m_pFielder->m_DetChar.m_aDesiredMovementDirection;
     eStrafeDirection eMovement = STRAFE_IDLE;
@@ -785,7 +785,7 @@ eStrafeDirection GetSteeringStrafeDirection(DesireSteering* desire,
     }
 
     float fRunThreshold
-        = 0.5f * (fn_8002C254(desire->m_pFielder->GetTweaks())
+        = 0.5f * (GetTurboSpeed(desire->m_pFielder->GetTweaks())
               - GetRunSpeed(pFielder->GetTweaks()))
         + GetRunSpeed(desire->m_pFielder->GetTweaks());
     float fDesiredSpeed = desire->m_pFielder->m_DetChar.m_fDesiredSpeed;
@@ -820,7 +820,7 @@ eStrafeDirection GetSteeringStrafeDirection(DesireSteering* desire,
 bool DesireWaluigiWall::Initialize(void*)
 {
     mMaxDuration = 10.0f;
-    fn_8006040C(g_pGame, m_pFielder);
+    DeliverWaluigiWallStartEvent(g_pGame, m_pFielder);
     m_pFielder->mWaluigiWallState.mSegmentTimeRemaining
         = m_pFielder->mWaluigiWallState.mMinSegmentTime;
     return true;
@@ -836,13 +836,13 @@ void DesireWaluigiWall::Update(
     if (!CanUsePowerup(m_pFielder, -1))
     {
         m_pFielder->TurnOffSuperPowerTank(true);
-        fn_80060804(g_pGame, m_pFielder);
+        DeliverWaluigiWallAbortEvent(g_pGame, m_pFielder);
         return;
     }
 
     float fSpeed = m_pFielder->m_pBall != NULL
                  ? m_pFielder->GetTweaks()->GetRunningSpeed()
-                 : fn_8002C254(m_pFielder->GetTweaks());
+                 : GetTurboSpeed(m_pFielder->GetTweaks());
     m_pFielder->m_DetChar.m_fDesiredSpeed = fSpeed;
     m_pFielder->m_fSuperPowerTankLevel -= fDeltaT;
     bool bRunning = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
@@ -885,17 +885,17 @@ void DesireWaluigiWall::Update(
                 m_pFielder->SetFacingDirection(
                     m_pFielder->m_DetChar.m_aActualFacingDirection - 0x4000, true);
             }
-            fn_8006040C(g_pGame, m_pFielder);
+            DeliverWaluigiWallStartEvent(g_pGame, m_pFielder);
             m_pFielder->mWaluigiWallState.mSegmentTimeRemaining
                 = m_pFielder->mWaluigiWallState.mMinSegmentTime;
         }
     }
 
-    m_pFielder->fn_8001DCE0(
+    m_pFielder->SetDesiredMovementDirection(
         m_pFielder->m_DetChar.m_aActualFacingDirection);
     m_pFielder->m_DetChar.m_aActualMovementDirection
         = m_pFielder->m_DetChar.m_aActualFacingDirection;
-    m_pFielder->fn_8001E304(fSpeed, fDeltaT);
+    m_pFielder->SeekMovementSpeed(fSpeed, fDeltaT);
 }
 
 void DesireWaluigiWall::Cleanup()

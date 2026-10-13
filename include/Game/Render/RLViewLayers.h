@@ -150,9 +150,11 @@ void SetShadowPartitionCamera(int partition, const nlMatrix4& view,
 
 extern const nlMatrix4 sIdentityMatrix;
 
-void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect,
+void UpdateLayerCameras(const nlMatrix4& view, const nlMatrix4& pipView, float aspect,
     float fov, float pipAspect, float pipFov);
 void ShowLayerView(eCLV layer);
 void HideLayerView(eCLV layer);
+
+float GetNearClipDistance();
 
 #endif // GAME_RENDER_RL_VIEW_LAYERS_H

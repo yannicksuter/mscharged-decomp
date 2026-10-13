@@ -38,6 +38,6 @@ public:
 
 float GetStandardAspectRatio();
 float GetWidescreenAspectRatio();
-glModel* fn_80112E1C(glModel* model);
+glModel* ParticleLightingCallback(glModel* model);
 
 #endif // GAME_BEGIN_FRAME_TASK_H

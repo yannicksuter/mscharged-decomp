@@ -96,10 +96,10 @@ float FuzzyAIRuntime::BeginActionQueue()
     switch (mAIContext->GetType())
     {
     case FT_PLAYER:
-        value = fn_800A636C(mAIContext->GetPlayer()->m_pTeam);
+        value = GetTeamSkillTweaks(mAIContext->GetPlayer()->m_pTeam);
         break;
     case FT_TEAM:
-        value = fn_800A636C(mAIContext->GetTeam());
+        value = GetTeamSkillTweaks(mAIContext->GetTeam());
         break;
     case FT_GAME:
         value = 0;
@@ -152,7 +152,7 @@ float FuzzyAIRuntime::GetSkillValue(unsigned long hash)
     case FT_PLAYER:
     {
         cPlayer* player = mAIContext->GetPlayer();
-        skillTweaks = fn_800A636C(player->GetTeam());
+        skillTweaks = GetTeamSkillTweaks(player->GetTeam());
         if (player->m_eClassType == FIELDER)
         {
             fielder = static_cast<cFielder*>(player);
@@ -162,7 +162,7 @@ float FuzzyAIRuntime::GetSkillValue(unsigned long hash)
     case FT_TEAM:
     {
         cTeam* team = mAIContext->GetTeam();
-        skillTweaks = fn_800A636C(team);
+        skillTweaks = GetTeamSkillTweaks(team);
         fielder = team->GetCaptain();
         break;
     }

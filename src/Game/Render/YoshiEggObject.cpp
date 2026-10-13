@@ -147,7 +147,7 @@ void YoshiEggObject::Activate(cFielder* fielder)
 {
     mFielder = fielder;
     if (fielder != 0)
-        fn_802B549C(mOrientation, fielder->m_DetChar.m_aActualFacingDirection);
+        nlMakeQuatZ(mOrientation, fielder->m_DetChar.m_aActualFacingDirection);
     mTargetRadius = gYoshiEggStartRadius;
     mRadiusTime = 0.0f;
     mRadius = mTargetRadius;
@@ -239,7 +239,7 @@ void YoshiEggObject::UpdateTransform(float dt)
         nlVec3Scale(displacement, player->m_DetChar.m_v3Velocity, dt);
         float length = nlVec3Length(displacement);
         float angle = length * gYoshiEggRollScale / mRadius;
-        fn_802B5370(rotation, axis, (unsigned short)(int)(10430.378f * angle));
+        nlMakeQuat(rotation, axis, (unsigned short)(int)(10430.378f * angle));
         nlMultQuat(mOrientation, rotation, mOrientation);
     }
     else

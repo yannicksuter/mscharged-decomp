@@ -6,18 +6,18 @@
 
 
 class DesireSuperPower;
-extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
+bool ActivateYoshiSuperPower(DesireSuperPower*, void*);
 bool InitializeBowserJr(DesireSuperPower*, void*);
 bool InitializeDiddy(DesireSuperPower*, void*);
-extern "C" void fn_800C9D74(DesireSuperPower*, int);
+void EndSuperPowerDesire(DesireSuperPower*, int);
 void EmitBowserJrShriek(DesireSuperPower*);
 
 class DesireSuperPower : public Desire
 {
-    friend bool fn_800D0DB0(DesireSuperPower*, void*);
+    friend bool ActivateYoshiSuperPower(DesireSuperPower*, void*);
     friend bool InitializeBowserJr(DesireSuperPower*, void*);
     friend bool InitializeDiddy(DesireSuperPower*, void*);
-    friend void fn_800C9D74(DesireSuperPower*, int);
+    friend void EndSuperPowerDesire(DesireSuperPower*, int);
     friend void EmitBowserJrShriek(DesireSuperPower*);
 
 public:

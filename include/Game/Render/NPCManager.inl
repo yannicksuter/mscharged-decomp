@@ -3,7 +3,7 @@
 
 #include "Game/Render/NPCManager.h"
 
-inline NPCManager* NPCManager::fn_801948A0()
+inline NPCManager* NPCManager::Instance()
 {
     return gNPCManager;
 }

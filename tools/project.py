@@ -66,7 +66,7 @@ class Object:
             "progress_category": None,
             "scratch_preset_id": None,
             "shift_jis": None,
-            "source": name,
+            "source": name,  # False when this version has no reconstructed source yet
             "src_dir": None,
         }
         self.options.update(options)
@@ -115,8 +115,12 @@ class Object:
 
         # Resolve paths
         build_dir = config.out_path()
-        obj.src_path = Path(obj.options["src_dir"]) / obj.options["source"]
-        if obj.options["asm_dir"] is not None:
+        obj.src_path = (
+            Path(obj.options["src_dir"]) / obj.options["source"]
+            if obj.options["source"] is not False
+            else None
+        )
+        if obj.options["asm_dir"] is not None and obj.options["source"] is not False:
             obj.asm_path = (
                 Path(obj.options["asm_dir"]) / obj.options["source"]
             ).with_suffix(".s")

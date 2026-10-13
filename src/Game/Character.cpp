@@ -104,8 +104,6 @@ struct CharAnim
 
 inline float ClampMin(float speedRatio, const float min);
 inline float ClampMax(float speedRatio, const float max);
-extern "C" void fn_80015B38(cBall*, bool);
-extern "C" void fn_800156F8(cBall*, cPlayer*);
 
 
 float lbl_806DB5D8 = 12.5f;
@@ -136,51 +134,50 @@ unsigned long lbl_8056B7B0[10] = {
 };
 nlVector3 g_v3PrevJointPosition = { 0.0f, 0.0f, 0.0f };
 
-extern "C" void fn_8001FE80();
-extern "C" void fn_80020B8C(cFielder* pFielder);
-extern "C" void fn_80020BB0(PlayerAttackData* pEventData);
-extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData);
-extern "C" void fn_80020CDC(GoalScoredData* pEventData);
-extern "C" void fn_80020E04(MegaStrikeEndData* pEventData);
-extern "C" void fn_80020E1C(CharacterDirectionData*);
-extern "C" void fn_80020E20(ReceiveBallData* pEventData);
-extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData);
-extern "C" void fn_80020FB8(CollisionBulletBillData* pEventData);
-extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData);
-extern "C" void fn_80021050(LightningStrikeData* pEventData);
-extern "C" void fn_80021120(CharacterImpactEvent* pEventData);
-extern "C" void fn_800212A0(CharacterImpactEvent* pEventData);
-extern "C" void fn_8002147C(CollisionPatchData* pEventData);
-extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData);
-extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData);
-extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData);
-extern "C" void fn_80021B68(CollisionBallShellData* pEventData);
-extern "C" void fn_80021BA8(CollisionBallChainData* pEventData);
-extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData);
-extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData);
-extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData);
-extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData);
-extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData);
-extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData);
-extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData);
-extern "C" void fn_800224DC(CollisionBallWallData* pEventData);
-extern "C" void fn_80022594(CollisionBallGroundData* pEventData);
-extern "C" void fn_80022614(BallNetmeshEventData*);
-extern "C" void fn_80022664(CollisionPlayerPlayerData* pEventData);
-extern "C" void fn_8002268C(CollisionPlayerWallData* pEventData);
-extern "C" void fn_800226B4(CollisionPlayerBallData* pEventData);
-extern "C" void fn_8002276C();
-extern "C" void fn_800227C8();
-extern "C" void fn_80022810(MegaStrikeMeterData*);
-extern "C" void fn_80022824(cPlayer*);
-extern "C" void fn_80022908();
-extern "C" void fn_80022968(CollisionChainPlayerData* pEventData);
-extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData);
-extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData);
-extern "C" void fn_80022A98(CollisionProjectileData* pEventData);
-extern "C" void fn_80022B04(CollisionPatchData* pEventData);
-extern "C" void fn_80022B1C(CollisionProjectileData* pEventData);
-extern "C" void fn_80022BD8(CollisionEggData* pEventData);
+void OnKnockYoshiTongue(cFielder* pFielder);
+void OnAttackSuccess(PlayerAttackData* pEventData);
+void OnPowerupStats(CollisionPowerupStatsData* pEventData);
+void OnCharactersGoalScored(GoalScoredData* pEventData);
+void OnCharactersMegaStrikeEnd(MegaStrikeEndData* pEventData);
+void OnCharacterDirectionBegin(CharacterDirectionData*);
+void OnReceiveBall(ReceiveBallData* pEventData);
+void OnCollisionBulletBillPlayer(CollisionBulletBillData* pEventData);
+void OnCollisionBulletBillFreeze(CollisionBulletBillData* pEventData);
+void OnBulletBillExplosion(CollisionBulletBillData* pEventData);
+void OnLightningStrike(LightningStrikeData* pEventData);
+void OnCharacterGroundImpact(CharacterImpactEvent* pEventData);
+void OnMontyReappear(CharacterImpactEvent* pEventData);
+void OnCollisionTongue(CollisionPatchData* pEventData);
+void OnCollisionPlayerFreeze(CollisionPlayerFreezeData* pEventData);
+void OnCollisionPlayerShell(CollisionPlayerShellData* pEventData);
+void OnCollisionPlayerBanana(CollisionPlayerBananaData* pEventData);
+void OnCollisionBallShell(CollisionBallShellData* pEventData);
+void OnCollisionBallChain(CollisionBallChainData* pEventData);
+void OnCollisionBallGoalpost(CollisionBallGoalpostData* pEventData);
+void OnCollisionPowerupWall(CollisionPowerupWallData* pEventData);
+void OnCollisionKoopaShellGoalie(CollisionKoopaShellGoalieData* pEventData);
+void OnCollisionBirdoEggGoalie(CollisionBirdoEggGoalieData* pEventData);
+void OnCollisionKoopaShotBallPlayer(CollisionKoopaShotBallPlayerData* pEventData);
+void OnCollisionBirdoShotBallPlayer(CollisionBirdoShotBallPlayerData* pEventData);
+void OnCollisionHammerbroShotBallPlayer(CollisionHammerbroShotBallPlayerData* pEventData);
+void OnCollisionBallWall(CollisionBallWallData* pEventData);
+void OnCollisionBallGround(CollisionBallGroundData* pEventData);
+void OnCollisionBallNetmesh(BallNetmeshEventData*);
+void OnCollisionPlayerPlayer(CollisionPlayerPlayerData* pEventData);
+void OnCollisionPlayerWall(CollisionPlayerWallData* pEventData);
+void OnCollisionPlayerBall(CollisionPlayerBallData* pEventData);
+void OnCharactersGameOver();
+void OnCharactersKickoff();
+void OnMegaStrikeMeterStart(MegaStrikeMeterData*);
+void OnCharactersMegaStrikeIntro(cPlayer*);
+void OnMegaStrikeMeterEnd();
+void OnCollisionChainPlayer(CollisionChainPlayerData* pEventData);
+void OnCollisionWindDebrisPlayer(CollisionWindDebrisPlayerData* pEventData);
+void OnCollisionThwompPlayer(CollisionThwompPlayerData* pEventData);
+void OnCollisionHammerGround(CollisionProjectileData* pEventData);
+void OnCollisionPatchPlayer(CollisionPatchData* pEventData);
+void OnCollisionHammerPlayer(CollisionProjectileData* pEventData);
+void OnCollisionEggPlayer(CollisionEggData* pEventData);
 
 inline void cCharacter::CreateWorldMatrix()
 {
@@ -244,7 +241,7 @@ inline void cCharacter::SetPlayerScale(float unidentifiedScale)
     m_pPoseAccumulator->m_Scale = unidentifiedScale;
     float unidentifiedRadius;
     if (m_eClassType == FIELDER)
-        unidentifiedRadius = fn_8002BFA8(((cFielder*)this)->GetTweaks(), 1.0f);
+        unidentifiedRadius = GetScaledPlayerWidth(((cFielder*)this)->GetTweaks(), 1.0f);
     else if (m_eClassType == GOALIE)
         unidentifiedRadius = ((Goalie*)this)->m_pTweaks->fPhysCapsuleRadius;
     unidentifiedRadius *= unidentifiedScale;
@@ -410,7 +407,7 @@ void cCharacter::SetModelType(int modelType)
     }
 }
 
-bool cCharacter::fn_8001C534(int modelType)
+bool cCharacter::HasSkinMesh(int modelType)
 {
     return m_pSkinMesh[modelType] != NULL;
 }
@@ -425,7 +422,7 @@ GLSkinMesh* cCharacter::GetSkinMesh(int modelType) const
     return m_pSkinMesh[0];
 }
 
-void cCharacter::fn_8001C574()
+void cCharacter::InvalidateSkinMeshPoses()
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -1016,7 +1013,7 @@ void cCharacter::SetDesiredFacingDirection(unsigned short aDirection, bool bPara
     }
 }
 
-void cCharacter::fn_8001DCE0(unsigned short aDirection)
+void cCharacter::SetDesiredMovementDirection(unsigned short aDirection)
 {
     m_DetChar.m_aDesiredMovementDirection = aDirection;
     if (m_DetChar.m_eMovementState != MOVEMENT_STRAFING)
@@ -1048,7 +1045,7 @@ void cCharacter::Update(float fDeltaT)
                 m_DetChar.m_fMovementScale = m_DetChar.m_fDesiredMovementScale;
             }
         }
-        fn_8001EF78(fDeltaT);
+        UpdatePoseTree(fDeltaT);
         UpdateMovementState(fDeltaT);
     }
     if (m_bIsUsingElectrocutionTexture)
@@ -1101,7 +1098,7 @@ void cCharacter::Update(float fDeltaT)
     }
 }
 
-bool cCharacter::fn_8001E160()
+bool cCharacter::IsOnScreen()
 {
     return m_DetChar.m_bOnScreen;
 }
@@ -1111,7 +1108,7 @@ bool cCharacter::IsCaptain() const
     return m_pCharacterInfo->mCaptainId != -1;
 }
 
-bool cCharacter::fn_8001E184()
+bool cCharacter::IsInsideScreenMargin()
 {
     return fabsf(m_v3ScreenPosition.x) <= 0.95f
         && fabsf(m_v3ScreenPosition.y) <= 0.95f
@@ -1141,7 +1138,7 @@ bool cCharacter::IsEffectDying(const EffectsGroup* effectGroup) const
         (unsigned long)this, effectGroup);
 }
 
-void cCharacter::fn_8001E304(float fSpeed, float fDeltaT)
+void cCharacter::SeekMovementSpeed(float fSpeed, float fDeltaT)
 {
     m_DetChar.m_fActualSpeed = SeekSpeed(m_DetChar.m_fActualSpeed,
         fSpeed, m_DetChar.m_fAccel, m_DetChar.m_fDecel, fDeltaT);
@@ -1313,13 +1310,13 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             SetFacingDirection(aNewFacingDirection, true);
         }
 
-        fn_8001E304(fDesiredSpeed, fDeltaT);
+        SeekMovementSpeed(fDesiredSpeed, fDeltaT);
         break;
     }
 
     case MOVEMENT_RUNNING_NO_TURN:
     {
-        fn_8001E304(fDesiredSpeed, fDeltaT);
+        SeekMovementSpeed(fDesiredSpeed, fDeltaT);
         break;
     }
 
@@ -1330,7 +1327,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
 
         m_DetChar.m_aActualMovementDirection = SeekDirection(m_DetChar.m_aActualMovementDirection, m_DetChar.m_aDesiredMovementDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
 
-        fn_8001E304(fDesiredSpeed, fDeltaT);
+        SeekMovementSpeed(fDesiredSpeed, fDeltaT);
         break;
     }
 
@@ -1339,7 +1336,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         break;
     }
 
-    if (pFielder != NULL && !fn_80014D38(g_pBall)
+    if (pFielder != NULL && !UpdateBallPassLock(g_pBall)
         && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != ACTION_KNOCKDOWN_REACT)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
@@ -1431,7 +1428,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     m_pPhysicsCharacter->SetCharacterVelocityXY(m_DetChar.m_v3Velocity);
 }
 
-void cCharacter::fn_8001EE74(float fParam0, float fParam1, float fParam2)
+void cCharacter::BlendPlayerScale(float fParam0, float fParam1, float fParam2)
 {
     m_DetChar.m_fDesiredPlayerScale = fParam0;
     if (fParam2 > 0.0f)
@@ -1454,7 +1451,7 @@ void cCharacter::fn_8001EE74(float fParam0, float fParam1, float fParam2)
     }
 }
 
-void cCharacter::fn_8001EF6C(float movementScale)
+void cCharacter::SetMovementScale(float movementScale)
 {
     m_DetChar.m_fMovementScale = movementScale;
 }
@@ -1463,7 +1460,7 @@ void cCharacter::StopPlayingAllTrackedSFX()
 {
 }
 
-void cCharacter::fn_8001EF78(float fParam)
+void cCharacter::UpdatePoseTree(float fParam)
 {
     m_pPoseTree = m_pPoseTree->Update(fParam);
 }
@@ -1540,7 +1537,7 @@ void cCharacter::AddRandomDirt()
     }
 }
 
-void cCharacter::fn_8001F1C0(int nParam)
+void cCharacter::SetDamageTextureType(int nParam)
 {
     m_nDamageType = nParam;
     if (nParam == DAMAGE_TEXTURE_SCORCH)
@@ -1549,7 +1546,7 @@ void cCharacter::fn_8001F1C0(int nParam)
     }
 }
 
-void cCharacter::fn_8001F1D8()
+void cCharacter::IncreaseDirt()
 {
     m_MinDirt += 0.5f + nlRandomf(0.5f);
     if (m_MinDirt > 1.0f)
@@ -1589,7 +1586,7 @@ void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_bShadowVisible = true;
     ResetEffects();
     EndBlur();
-    fn_8001C574();
+    InvalidateSkinMeshPoses();
 }
 
 u16 lbl_806DB602 = 0xFFFF;
@@ -1761,65 +1758,65 @@ void cCharacter::ChecksumState(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_DetChar.m_nAnimTurnAdjust, sizeof(m_DetChar.m_nAnimTurnAdjust));
 }
 
-extern "C" void fn_8001FE80()
+void RegisterCharacterEventCallbacks()
 {
-    FindEvent<CollisionChainPlayerData>("CollisionChainPlayer", -1)->Add(Function<CollisionChainPlayerData*>(fn_80022968), 0, -1);
-    FindEvent<CollisionWindDebrisPlayerData>("CollisionWindDebrisPlayer", -1)->Add(Function<CollisionWindDebrisPlayerData*>(fn_800229F0), 0, -1);
-    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(fn_80022A78), 0, -1);
-    FindEvent<cFielder>("KnockYoshiTongue", -1)->Add(Function<cFielder*>(fn_80020B8C), 0, -1);
-    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8002276C), 0, -1);
-    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800227C8), 0, -1);
-    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(fn_80022810), 0, -1);
-    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(fn_80022908), 0, -1);
-    FindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(fn_80022824), 0, -1);
-    FindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(fn_80022664), 0, -1);
-    FindEvent<CollisionPlayerWallData>("CollisionPlayerWall", -1)->Add(Function<CollisionPlayerWallData*>(fn_8002268C), 0, -1);
-    FindEvent<CollisionPlayerBallData>("CollisionPlayerBall", -1)->Add(Function<CollisionPlayerBallData*>(fn_800226B4), 0, -1);
-    FindEvent<BallNetmeshEventData>("CollisionBallNetmesh", -1)->Add(Function<BallNetmeshEventData*>(fn_80022614), 0, -1);
-    FindEvent<CollisionBallGroundData>("CollisionBallGround", -1)->Add(Function<CollisionBallGroundData*>(fn_80022594), 0, -1);
-    FindEvent<CollisionBallWallData>("CollisionBallWall", -1)->Add(Function<CollisionBallWallData*>(fn_800224DC), 0, -1);
-    FindEvent<CollisionBallShellData>("CollisionBallShell", -1)->Add(Function<CollisionBallShellData*>(fn_80021B68), 0, -1);
-    FindEvent<CollisionBallChainData>("CollisionBallChain", -1)->Add(Function<CollisionBallChainData*>(fn_80021BA8), 0, -1);
-    FindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(fn_80021BB4), 0, -1);
-    FindEvent<CollisionKoopaShotBallPlayerData>("CollisionKoopaShotBallPlayer", -1)->Add(Function<CollisionKoopaShotBallPlayerData*>(fn_80021E30), 0, -1);
-    FindEvent<CollisionBirdoShotBallPlayerData>("CollisionBirdoShotBallPlayer", -1)->Add(Function<CollisionBirdoShotBallPlayerData*>(fn_80022050), 0, -1);
-    FindEvent<CollisionKoopaShellGoalieData>("CollisionKoopaShellGoalie", -1)->Add(Function<CollisionKoopaShellGoalieData*>(fn_80021D70), 0, -1);
-    FindEvent<CollisionBirdoEggGoalieData>("CollisionBirdoEggGoalie", -1)->Add(Function<CollisionBirdoEggGoalieData*>(fn_80021DCC), 0, -1);
-    FindEvent<CollisionHammerbroShotBallPlayerData>("CollisionHammerbroShotBallPlayer", -1)->Add(Function<CollisionHammerbroShotBallPlayerData*>(fn_80022280), 0, -1);
-    FindEvent<CollisionPowerupWallData>("CollisionPowerupWall", -1)->Add(Function<CollisionPowerupWallData*>(fn_80021C98), 0, -1);
-    FindEvent<CollisionPlayerBananaData>("CollisionPlayerBanana", -1)->Add(Function<CollisionPlayerBananaData*>(fn_80021924), 0, -1);
-    FindEvent<CollisionPlayerShellData>("CollisionPlayerShell", -1)->Add(Function<CollisionPlayerShellData*>(fn_800216C4), 0, -1);
-    FindEvent<CollisionPlayerFreezeData>("CollisionPlayerFreeze", -1)->Add(Function<CollisionPlayerFreezeData*>(fn_80021484), 0, -1);
-    FindEvent<CollisionPatchData>("CollisionTongue", -1)->Add(Function<CollisionPatchData*>(fn_8002147C), 0, -1);
-    FindEvent<CharacterImpactEvent>("MontyReappear", -1)->Add(Function<CharacterImpactEvent*>(fn_800212A0), 0, -1);
-    FindEvent<CharacterImpactEvent>("HammerBroHammer", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
-    FindEvent<CharacterImpactEvent>("WarioGroundPound", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
-    FindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(fn_80020E20), 0, -1);
-    FindEvent<CharacterDirectionData>("DirectionBegin", -1)->Add(Function<CharacterDirectionData*>(fn_80020E1C), 0, -1);
-    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(fn_80020CDC), 0, -1);
-    FindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(fn_80020E04), 0, -1);
-    FindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(fn_80021050), 0, -1);
-    FindEvent<CollisionBulletBillData>("CollisionBulletBillPlayer", -1)->Add(Function<CollisionBulletBillData*>(fn_80020EE8), 0, -1);
-    FindEvent<CollisionBulletBillData>("CollisionBulletBillFreeze", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FB8), 0, -1);
-    FindEvent<CollisionBulletBillData>("ExplosionBulletBill", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
-    FindEvent<CollisionBulletBillData>("BulletBillExplode", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
-    FindEvent<CollisionPowerupStatsData>("PowerupStats", -1)->Add(Function<CollisionPowerupStatsData*>(fn_80020C70), 0, -1);
-    FindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(fn_80020BB0), 0, -1);
-    FindEvent<CollisionProjectileData>("CollisionHammerPlayer", -1)->Add(Function<CollisionProjectileData*>(fn_80022B1C), 0, -1);
-    FindEvent<CollisionPatchData>("CollisionPatchPlayer", -1)->Add(Function<CollisionPatchData*>(fn_80022B04), 0, -1);
-    FindEvent<CollisionProjectileData>("CollisionHammerGround", -1)->Add(Function<CollisionProjectileData*>(fn_80022A98), 0, -1);
-    FindEvent<CollisionEggData>("CollisionEggPlayer", -1)->Add(Function<CollisionEggData*>(fn_80022BD8), 0, -1);
-    fn_80098750();
+    FindEvent<CollisionChainPlayerData>("CollisionChainPlayer", -1)->Add(Function<CollisionChainPlayerData*>(OnCollisionChainPlayer), 0, -1);
+    FindEvent<CollisionWindDebrisPlayerData>("CollisionWindDebrisPlayer", -1)->Add(Function<CollisionWindDebrisPlayerData*>(OnCollisionWindDebrisPlayer), 0, -1);
+    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(OnCollisionThwompPlayer), 0, -1);
+    FindEvent<cFielder>("KnockYoshiTongue", -1)->Add(Function<cFielder*>(OnKnockYoshiTongue), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnCharactersGameOver), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnCharactersKickoff), 0, -1);
+    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(OnMegaStrikeMeterStart), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(OnMegaStrikeMeterEnd), 0, -1);
+    FindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(OnCharactersMegaStrikeIntro), 0, -1);
+    FindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(OnCollisionPlayerPlayer), 0, -1);
+    FindEvent<CollisionPlayerWallData>("CollisionPlayerWall", -1)->Add(Function<CollisionPlayerWallData*>(OnCollisionPlayerWall), 0, -1);
+    FindEvent<CollisionPlayerBallData>("CollisionPlayerBall", -1)->Add(Function<CollisionPlayerBallData*>(OnCollisionPlayerBall), 0, -1);
+    FindEvent<BallNetmeshEventData>("CollisionBallNetmesh", -1)->Add(Function<BallNetmeshEventData*>(OnCollisionBallNetmesh), 0, -1);
+    FindEvent<CollisionBallGroundData>("CollisionBallGround", -1)->Add(Function<CollisionBallGroundData*>(OnCollisionBallGround), 0, -1);
+    FindEvent<CollisionBallWallData>("CollisionBallWall", -1)->Add(Function<CollisionBallWallData*>(OnCollisionBallWall), 0, -1);
+    FindEvent<CollisionBallShellData>("CollisionBallShell", -1)->Add(Function<CollisionBallShellData*>(OnCollisionBallShell), 0, -1);
+    FindEvent<CollisionBallChainData>("CollisionBallChain", -1)->Add(Function<CollisionBallChainData*>(OnCollisionBallChain), 0, -1);
+    FindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(OnCollisionBallGoalpost), 0, -1);
+    FindEvent<CollisionKoopaShotBallPlayerData>("CollisionKoopaShotBallPlayer", -1)->Add(Function<CollisionKoopaShotBallPlayerData*>(OnCollisionKoopaShotBallPlayer), 0, -1);
+    FindEvent<CollisionBirdoShotBallPlayerData>("CollisionBirdoShotBallPlayer", -1)->Add(Function<CollisionBirdoShotBallPlayerData*>(OnCollisionBirdoShotBallPlayer), 0, -1);
+    FindEvent<CollisionKoopaShellGoalieData>("CollisionKoopaShellGoalie", -1)->Add(Function<CollisionKoopaShellGoalieData*>(OnCollisionKoopaShellGoalie), 0, -1);
+    FindEvent<CollisionBirdoEggGoalieData>("CollisionBirdoEggGoalie", -1)->Add(Function<CollisionBirdoEggGoalieData*>(OnCollisionBirdoEggGoalie), 0, -1);
+    FindEvent<CollisionHammerbroShotBallPlayerData>("CollisionHammerbroShotBallPlayer", -1)->Add(Function<CollisionHammerbroShotBallPlayerData*>(OnCollisionHammerbroShotBallPlayer), 0, -1);
+    FindEvent<CollisionPowerupWallData>("CollisionPowerupWall", -1)->Add(Function<CollisionPowerupWallData*>(OnCollisionPowerupWall), 0, -1);
+    FindEvent<CollisionPlayerBananaData>("CollisionPlayerBanana", -1)->Add(Function<CollisionPlayerBananaData*>(OnCollisionPlayerBanana), 0, -1);
+    FindEvent<CollisionPlayerShellData>("CollisionPlayerShell", -1)->Add(Function<CollisionPlayerShellData*>(OnCollisionPlayerShell), 0, -1);
+    FindEvent<CollisionPlayerFreezeData>("CollisionPlayerFreeze", -1)->Add(Function<CollisionPlayerFreezeData*>(OnCollisionPlayerFreeze), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionTongue", -1)->Add(Function<CollisionPatchData*>(OnCollisionTongue), 0, -1);
+    FindEvent<CharacterImpactEvent>("MontyReappear", -1)->Add(Function<CharacterImpactEvent*>(OnMontyReappear), 0, -1);
+    FindEvent<CharacterImpactEvent>("HammerBroHammer", -1)->Add(Function<CharacterImpactEvent*>(OnCharacterGroundImpact), 0, -1);
+    FindEvent<CharacterImpactEvent>("WarioGroundPound", -1)->Add(Function<CharacterImpactEvent*>(OnCharacterGroundImpact), 0, -1);
+    FindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(OnReceiveBall), 0, -1);
+    FindEvent<CharacterDirectionData>("DirectionBegin", -1)->Add(Function<CharacterDirectionData*>(OnCharacterDirectionBegin), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(OnCharactersGoalScored), 0, -1);
+    FindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(OnCharactersMegaStrikeEnd), 0, -1);
+    FindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(OnLightningStrike), 0, -1);
+    FindEvent<CollisionBulletBillData>("CollisionBulletBillPlayer", -1)->Add(Function<CollisionBulletBillData*>(OnCollisionBulletBillPlayer), 0, -1);
+    FindEvent<CollisionBulletBillData>("CollisionBulletBillFreeze", -1)->Add(Function<CollisionBulletBillData*>(OnCollisionBulletBillFreeze), 0, -1);
+    FindEvent<CollisionBulletBillData>("ExplosionBulletBill", -1)->Add(Function<CollisionBulletBillData*>(OnBulletBillExplosion), 0, -1);
+    FindEvent<CollisionBulletBillData>("BulletBillExplode", -1)->Add(Function<CollisionBulletBillData*>(OnBulletBillExplosion), 0, -1);
+    FindEvent<CollisionPowerupStatsData>("PowerupStats", -1)->Add(Function<CollisionPowerupStatsData*>(OnPowerupStats), 0, -1);
+    FindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(OnAttackSuccess), 0, -1);
+    FindEvent<CollisionProjectileData>("CollisionHammerPlayer", -1)->Add(Function<CollisionProjectileData*>(OnCollisionHammerPlayer), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionPatchPlayer", -1)->Add(Function<CollisionPatchData*>(OnCollisionPatchPlayer), 0, -1);
+    FindEvent<CollisionProjectileData>("CollisionHammerGround", -1)->Add(Function<CollisionProjectileData*>(OnCollisionHammerGround), 0, -1);
+    FindEvent<CollisionEggData>("CollisionEggPlayer", -1)->Add(Function<CollisionEggData*>(OnCollisionEggPlayer), 0, -1);
+    RegisterPlayerEventCallbacks();
 }
 
-extern "C" void fn_80020B8C(cFielder* pFielder)
+void OnKnockYoshiTongue(cFielder* pFielder)
 {
-    pFielder->fn_80047240(pFielder,
+    pFielder->InitActionHitReact(pFielder,
         (unsigned short)(pFielder->m_DetChar.m_aActualFacingDirection + 0x8000),
         HIT_REACTION_LIGHT, false, false);
 }
 
-extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
+void OnAttackSuccess(PlayerAttackData* pEventData)
 {
     if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
         && pEventData->pTarget != NULL && pEventData->pAttacker != NULL
@@ -1838,7 +1835,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
     }
 }
 
-extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData)
+void OnPowerupStats(CollisionPowerupStatsData* pEventData)
 {
     if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
         && pEventData->pThrower != NULL)
@@ -1848,7 +1845,7 @@ extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData)
     }
 }
 
-extern "C" void fn_80020CDC(GoalScoredData* pEventData)
+void OnCharactersGoalScored(GoalScoredData* pEventData)
 {
     if (pEventData != NULL && pEventData->uGoalType != GOAL_MEGA_STRIKE)
     {
@@ -1882,19 +1879,19 @@ extern "C" void fn_80020CDC(GoalScoredData* pEventData)
     }
 }
 
-extern "C" void fn_80020E04(MegaStrikeEndData* pEventData)
+void OnCharactersMegaStrikeEnd(MegaStrikeEndData* pEventData)
 {
     if (pEventData->goals > 0)
     {
-        fn_80020CDC(NULL);
+        OnCharactersGoalScored(NULL);
     }
 }
 
-extern "C" void fn_80020E1C(CharacterDirectionData*)
+void OnCharacterDirectionBegin(CharacterDirectionData*)
 {
 }
 
-extern "C" void fn_80020E20(ReceiveBallData* pEventData)
+void OnReceiveBall(ReceiveBallData* pEventData)
 {
     cPlayer* pReceiver = pEventData->pReceiver;
     if (pReceiver == NULL)
@@ -1911,7 +1908,7 @@ extern "C" void fn_80020E20(ReceiveBallData* pEventData)
     pOtherTeam->mtRoleTimer.Clear();
 }
 
-extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
+void OnCollisionBulletBillPlayer(CollisionBulletBillData* pEventData)
 {
     if (pEventData->bulletBill->active)
     {
@@ -1923,9 +1920,9 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
             if (pFielder->IsSuperGrowActive() || pFielder->IsStarActive())
             {
                 CollisionBulletBillData data = { pEventData->player, pEventData->bulletBill };
-                g_pGame->fn_80060BFC(data);
+                g_pGame->DeliverBulletBillExplodeEvent(data);
             }
-            else if (pFielder->fn_800470B4(pFielder, pAttacker))
+            else if (pFielder->ApplyCharacterHitReaction(pFielder, pAttacker))
             {
                 PlayOwnedSound(pFielder->m_uSoundSlotId, 0xFD0DC03DUL,
                     (XSoundOwner*)g_pBall->m_pSoundOwner, NULL, NULL);
@@ -1934,7 +1931,7 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
     }
 }
 
-extern "C" void fn_80020FB8(CollisionBulletBillData* pEventData)
+void OnCollisionBulletBillFreeze(CollisionBulletBillData* pEventData)
 {
     if (pEventData->bulletBill->active)
     {
@@ -1942,7 +1939,7 @@ extern "C" void fn_80020FB8(CollisionBulletBillData* pEventData)
     }
 }
 
-extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
+void OnBulletBillExplosion(CollisionBulletBillData* pEventData)
 {
     if (g_pGame != NULL && pEventData->bulletBill->active)
     {
@@ -1953,7 +1950,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
     }
 }
 
-extern "C" void fn_80021050(LightningStrikeData* pEventData)
+void OnLightningStrike(LightningStrikeData* pEventData)
 {
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
@@ -1962,13 +1959,13 @@ extern "C" void fn_80021050(LightningStrikeData* pEventData)
             && g_pBall->m_pOwner == NULL
             && g_pBall->meBallState != BALL_STATE_FALLING && g_pBall->meBallState != BALL_STATE_LIGHTNING)
         {
-            fn_80015C38(g_pBall, BALL_STATE_LIGHTNING);
+            ChangeBallState(g_pBall, BALL_STATE_LIGHTNING);
         }
         CreateLightningShockwave(&pEventData->position, pEventData->radius);
     }
 }
 
-extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
+void OnCharacterGroundImpact(CharacterImpactEvent* pEventData)
 {
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
@@ -1992,7 +1989,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                         {
                             if (fDistance >= pEventData->fRadius * lbl_806DB5EC)
                             {
-                                pFielder->fn_800470B4(pFielder, (cPlayer*)pEventData->pCharacter);
+                                pFielder->ApplyCharacterHitReaction(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
                             else
                             {
@@ -2006,7 +2003,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
     }
 }
 
-extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
+void OnMontyReappear(CharacterImpactEvent* pEventData)
 {
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
@@ -2030,7 +2027,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                         {
                             if (fDistance >= pEventData->fRadius * lbl_806DB5F0)
                             {
-                                pFielder->fn_800470B4(pFielder, (cPlayer*)pEventData->pCharacter);
+                                pFielder->ApplyCharacterHitReaction(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
                             else
                             {
@@ -2053,12 +2050,12 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
     }
 }
 
-extern "C" void fn_8002147C(CollisionPatchData* pEventData)
+void OnCollisionTongue(CollisionPatchData* pEventData)
 {
     ((cFielder*)pEventData->pPlayer)->EndAction();
 }
 
-extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData)
+void OnCollisionPlayerFreeze(CollisionPlayerFreezeData* pEventData)
 {
     if (pEventData->pPlayer != NULL)
     {
@@ -2088,7 +2085,7 @@ extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData)
     }
 }
 
-extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData)
+void OnCollisionPlayerShell(CollisionPlayerShellData* pEventData)
 {
     if (pEventData->pPlayer != NULL)
     {
@@ -2120,7 +2117,7 @@ extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData)
     }
 }
 
-extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData)
+void OnCollisionPlayerBanana(CollisionPlayerBananaData* pEventData)
 {
     if (pEventData->pPlayer != NULL)
     {
@@ -2150,18 +2147,18 @@ extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData)
     }
 }
 
-extern "C" void fn_80021B68(CollisionBallShellData* pEventData)
+void OnCollisionBallShell(CollisionBallShellData* pEventData)
 {
-    fn_80015B38(pEventData->pBall, false);
+    CancelBallShot(pEventData->pBall, false);
     pEventData->pPowerup->m_pTarget = NULL;
 }
 
-extern "C" void fn_80021BA8(CollisionBallChainData* pEventData)
+void OnCollisionBallChain(CollisionBallChainData* pEventData)
 {
-    fn_80015B38(pEventData->pBall, false);
+    CancelBallShot(pEventData->pBall, false);
 }
 
-extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData)
+void OnCollisionBallGoalpost(CollisionBallGoalpostData* pEventData)
 {
     if (g_pBall != NULL)
     {
@@ -2169,7 +2166,7 @@ extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData)
         EffectsGroup* pGroup = unidentifiedManager->GetEffectsGroup("ball_impact");
         EmissionController* pControl = unidentifiedManager->Create(pGroup, 0, true, 0);
         pControl->SetPosition(pEventData->v3CollisionPosition);
-        fn_80015B38(g_pBall, false);
+        CancelBallShot(g_pBall, false);
         if (g_pBall->m_pPrevOwner != NULL
             && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
         {
@@ -2180,7 +2177,7 @@ extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData)
     }
 }
 
-extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData)
+void OnCollisionPowerupWall(CollisionPowerupWallData* pEventData)
 {
     const nlVector3& pos = pEventData->position;
     const nlVector3& nrm = pEventData->normal;
@@ -2197,20 +2194,20 @@ extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData)
     }
 }
 
-extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
+void OnCollisionKoopaShellGoalie(CollisionKoopaShellGoalieData* pEventData)
 {
     ((Goalie*)pEventData->goalie)->HandleSkillShotImpact(pEventData->shell->mOwner != NULL);
     pEventData->shell->Deactivate(false);
-    fn_80015B38(g_pBall, false);
+    CancelBallShot(g_pBall, false);
 }
 
-extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
+void OnCollisionBirdoEggGoalie(CollisionBirdoEggGoalieData* pEventData)
 {
     ((Goalie*)pEventData->goalie)->HandleSkillShotImpact(pEventData->egg->mShooter != NULL);
     PlaySound(pEventData->egg->mShooter->m_uSoundSlotId, 0x16BA5AE9UL, NULL, NULL);
 }
 
-extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
+void OnCollisionKoopaShotBallPlayer(CollisionKoopaShotBallPlayerData* pEventData)
 {
     if (!pEventData->player->CanBeHitBySkillshot())
     {
@@ -2248,13 +2245,13 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     nlVector3 v3Position;
     nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
     pEventData->player->SetPosition(v3Position);
-    if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, HIT_REACTION_HEAVY, false, false))
+    if (pEventData->player->InitActionHitReact(pEventData->shell->mOwner, aDirection, HIT_REACTION_HEAVY, false, false))
     {
         pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
     }
 }
 
-extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
+void OnCollisionBirdoShotBallPlayer(CollisionBirdoShotBallPlayerData* pEventData)
 {
     if (pEventData->player->CanBeHitBySkillshot())
     {
@@ -2290,16 +2287,16 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
             pEventData->player->SetPosition(v3Position);
-            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, HIT_REACTION_HEAVY, false, false))
+            if (pEventData->player->InitActionHitReact(pEventData->egg->mShooter, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
         }
     }
-    fn_800156F8(g_pBall, pEventData->egg->mShooter);
+    DeflectSkillshotBall(g_pBall, pEventData->egg->mShooter);
 }
 
-extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
+void OnCollisionHammerbroShotBallPlayer(CollisionHammerbroShotBallPlayerData* pEventData)
 {
     if (pEventData->pFielder->CanBeHitBySkillshot())
     {
@@ -2333,7 +2330,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->m_DetChar.m_v3Position);
             pEventData->pFielder->SetPosition(v3Position);
-            if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, HIT_REACTION_HEAVY, false, false))
+            if (pEventData->pFielder->InitActionHitReact(pEventData->pBall->m_pPrevOwner, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->pFielder->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
@@ -2341,7 +2338,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             pEventData->pFielder->SetNoPickUpTime(0.06f);
             Goalie* pGoalie = pEventData->pBall->m_pShooter->m_pTeam->GetOtherTeam()->GetGoalie();
             pGoalie->mpSkillShooter = NULL;
-            fn_80015C38(pEventData->pBall, BALL_STATE_SHOT);
+            ChangeBallState(pEventData->pBall, BALL_STATE_SHOT);
         }
     }
     if (pEventData->pBall != NULL && pEventData->pFielder != NULL)
@@ -2350,11 +2347,11 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
+void OnCollisionBallWall(CollisionBallWallData* pEventData)
 {
     if (pEventData->pBall != NULL)
     {
-        fn_800145A4(pEventData->pBall);
+        HandleBallWallContact(pEventData->pBall);
         if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND
             || fabsf(pEventData->pBall->m_v3Position.x) > cField::GetGoalLineX(1U) - 2.5f)
         {
@@ -2366,27 +2363,27 @@ extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
     }
 }
 
-extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
+void OnCollisionBallGround(CollisionBallGroundData* pEventData)
 {
     if (pEventData->pBall != NULL
         && (pEventData->pBall->meBallState == BALL_STATE_VOLLEY_PASS || pEventData->pBall->meBallState == BALL_STATE_GOALIE_DEFLECTION || pEventData->bIsShot))
     {
-        fn_80014494(pEventData->pBall);
+        HandleBallGroundContact(pEventData->pBall);
     }
     PlaySound(11, 0x94AC3A20UL, NULL, NULL);
     SetLastSoundParameter(6, pEventData->fVecZComponent);
 }
 
-extern "C" void fn_80022614(BallNetmeshEventData*)
+void OnCollisionBallNetmesh(BallNetmeshEventData*)
 {
     if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
     {
         PlaySound(10, 0xE07B30E9UL, NULL, NULL);
     }
-    fn_80015B38(g_pBall, false);
+    CancelBallShot(g_pBall, false);
 }
 
-extern "C" void fn_80022664(CollisionPlayerPlayerData* pEventData)
+void OnCollisionPlayerPlayer(CollisionPlayerPlayerData* pEventData)
 {
     if (pEventData->player1 != NULL)
     {
@@ -2394,7 +2391,7 @@ extern "C" void fn_80022664(CollisionPlayerPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_8002268C(CollisionPlayerWallData* pEventData)
+void OnCollisionPlayerWall(CollisionPlayerWallData* pEventData)
 {
     if (pEventData->pPlayer != NULL)
     {
@@ -2402,7 +2399,7 @@ extern "C" void fn_8002268C(CollisionPlayerWallData* pEventData)
     }
 }
 
-extern "C" void fn_800226B4(CollisionPlayerBallData* pEventData)
+void OnCollisionPlayerBall(CollisionPlayerBallData* pEventData)
 {
     if (pEventData->pPlayer != NULL && pEventData->pBall != NULL)
     {
@@ -2420,7 +2417,7 @@ extern "C" void fn_800226B4(CollisionPlayerBallData* pEventData)
     }
 }
 
-extern "C" void fn_8002276C()
+void OnCharactersGameOver()
 {
     for (int i = 0; i < 2; i++)
     {
@@ -2432,7 +2429,7 @@ extern "C" void fn_8002276C()
     GoalieOnGameOver();
 }
 
-extern "C" void fn_800227C8()
+void OnCharactersKickoff()
 {
     if (g_pGame != NULL)
     {
@@ -2441,15 +2438,15 @@ extern "C" void fn_800227C8()
     }
 }
 
-extern "C" void fn_80022810(MegaStrikeMeterData*)
+void OnMegaStrikeMeterStart(MegaStrikeMeterData*)
 {
     if (g_pGame != NULL)
     {
-        g_pGame->fn_80058704();
+        g_pGame->StopGameClock();
     }
 }
 
-extern "C" void fn_80022824(cPlayer*)
+void OnCharactersMegaStrikeIntro(cPlayer*)
 {
     if (g_pGame != NULL)
     {
@@ -2481,19 +2478,19 @@ extern "C" void fn_80022824(cPlayer*)
     }
 }
 
-extern "C" void fn_80022908()
+void OnMegaStrikeMeterEnd()
 {
     if (g_pGame != NULL)
     {
         ShootToScoreMeter::instance.TurnOffMeter();
         if (g_pGame->IsGameplayOrOvertime())
         {
-            g_pGame->fn_800586C0();
+            g_pGame->StartGameClock();
         }
     }
 }
 
-extern "C" void fn_80022968(CollisionChainPlayerData* pEventData)
+void OnCollisionChainPlayer(CollisionChainPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pChain != NULL)
     {
@@ -2504,7 +2501,7 @@ extern "C" void fn_80022968(CollisionChainPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData)
+void OnCollisionWindDebrisPlayer(CollisionWindDebrisPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pDebris != NULL)
     {
@@ -2515,7 +2512,7 @@ extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData)
+void OnCollisionThwompPlayer(CollisionThwompPlayerData* pEventData)
 {
     if (pEventData->target->m_eClassType == FIELDER)
     {
@@ -2523,23 +2520,23 @@ extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_80022A98(CollisionProjectileData* pEventData)
+void OnCollisionHammerGround(CollisionProjectileData* pEventData)
 {
     CharacterImpactEvent event;
     event.v3Position = pEventData->v3Position;
     event.v3Position.z = 0.0f;
     event.fRadius = lbl_806DB5F4;
     event.pCharacter = pEventData->pFielder;
-    fn_80060FF4(g_pGame, &event);
+    DeliverHammerBroHammerEvent(g_pGame, &event);
     pEventData->pFielder->PlayImpactCameraRumble();
 }
 
-extern "C" void fn_80022B04(CollisionPatchData* pEventData)
+void OnCollisionPatchPlayer(CollisionPatchData* pEventData)
 {
     pEventData->pPlayer->CollideWithPatchCallback(pEventData);
 }
 
-extern "C" void fn_80022B1C(CollisionProjectileData* pEventData)
+void OnCollisionHammerPlayer(CollisionProjectileData* pEventData)
 {
     cCharacter* pCharacter = (cCharacter*)pEventData->pTarget;
     if (pCharacter->m_eClassType == FIELDER)
@@ -2562,7 +2559,7 @@ extern "C" void fn_80022B1C(CollisionProjectileData* pEventData)
     }
 }
 
-extern "C" void fn_80022BD8(CollisionEggData* pEventData)
+void OnCollisionEggPlayer(CollisionEggData* pEventData)
 {
     cPlayer* pPlayer = pEventData->pPlayer;
     if (pPlayer->m_eClassType == FIELDER)
@@ -2596,7 +2593,7 @@ extern "C" void fn_80022BD8(CollisionEggData* pEventData)
     }
 }
 
-void cCharacter::fn_80022D3C(float fParam0, float fParam1)
+void cCharacter::SetMegaBlend(float fParam0, float fParam1)
 {
     m_fMegaBlendRate = fParam0;
     m_fMegaBlendTarget = fParam1;
@@ -2606,7 +2603,7 @@ void cCharacter::fn_80022D3C(float fParam0, float fParam1)
     }
 }
 
-void cCharacter::fn_80022D58(float fDeltaT)
+void cCharacter::UpdateMegaBlend(float fDeltaT)
 {
     m_fMegaBlend += m_fMegaBlendRate * fDeltaT;
     if (m_fMegaBlendRate > 0.0f && m_fMegaBlend > m_fMegaBlendTarget)
@@ -2619,25 +2616,25 @@ void cCharacter::fn_80022D58(float fDeltaT)
     }
 }
 
-void cCharacter::fn_80022DAC(unsigned long uTextureID)
+void cCharacter::SetNormalTexture(unsigned long uTextureID)
 {
     m_uNormalTextureID = uTextureID;
     m_ResolvedNormalTexture.value = glGetTextureManager()->GetTextureIndex(m_uNormalTextureID);
 }
 
-void cCharacter::fn_80022DE8(unsigned long uTextureID)
+void cCharacter::SetSwapTexture(unsigned long uTextureID)
 {
     m_uSwapTextureID = uTextureID;
     m_ResolvedSwapTexture.value = glGetTextureManager()->GetTextureIndex(m_uSwapTextureID);
 }
 
-void cCharacter::fn_80022E24(unsigned long uTextureID)
+void cCharacter::SetShockTexture(unsigned long uTextureID)
 {
     m_uShockTextureID = uTextureID;
     m_ResolvedShockTexture.value = glGetTextureManager()->GetTextureIndex(m_uShockTextureID);
 }
 
-void cCharacter::fn_80022E60()
+void cCharacter::ResolveTextures()
 {
     int i;
     glModelPacket* packet;

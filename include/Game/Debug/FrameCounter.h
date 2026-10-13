@@ -11,8 +11,8 @@ public:
     void StartTimer(int timerNum);
     void FinishTiming();
     void DisplayFrameRate();
-    void fn_802B7FD4();
-    void fn_802B80C4();
+    void DrawGameplayHistogram();
+    void LogGameplayFrameTimes();
     void DisplayFrameTicker();
     void DisplayFrameSmiler();
 

@@ -38,13 +38,13 @@ DesireUpdate TransDesireUsePowerup(
     unsigned long key = input->GetTimerKey(
         (unsigned long)TransDesireUsePowerup, 1);
 
-    if (UserControlledT(fn_800D6670(pFielder))
-        || (1.0f - fn_800D85F8(pFielder)))
+    if (UserControlledT(TeamOf(pFielder))
+        || (1.0f - AbleToUseAnyPowerup(pFielder)))
     {
         result = 1;
     }
     else if (CheckScriptTimeBudget() && !input->IsTimerRunning(key)
-        && !fn_800E0034())
+        && !IsShotInPlay())
     {
         input->SetTimer(key, 0.4f);
         unsigned int hash = nlStringHash("TransDesireUsePowerup");
@@ -81,7 +81,7 @@ bool DesireUsePowerup::Initialize(void* context)
     if (params->IsSet(15))
     {
         ePowerup = (ePowerUpType)params->Get(15)->mData.i;
-        fn_800D3968(
+        RequestPowerup(
             (cFielder*)params->Get(14)->mData.pPlayer,
             ePowerup,
             false);
@@ -139,7 +139,7 @@ void DesireUsePowerup::Cleanup()
 /**
  * Offset/Address/Size: 0x185C | 0x800D38D0 | size: 0x98
  */
-extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
+void UseCurrentTeamPowerup(DesireUsePowerup* pDesire)
 {
     if (!CanUsePowerup(pDesire->m_pFielder, -1))
     {
@@ -159,7 +159,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 /**
  * Offset/Address/Size: 0x18F4 | 0x800D3968 | size: 0xE8
  */
-void DesireUsePowerup::fn_800D3968(
+void DesireUsePowerup::RequestPowerup(
     cFielder* pTarget, ePowerUpType ePowerup, bool bActivate)
 {
     if (!CanUsePowerup(m_pFielder, -1))

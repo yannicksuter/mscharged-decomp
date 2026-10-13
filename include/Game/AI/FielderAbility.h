@@ -12,7 +12,7 @@ struct ActBowserSuper
     {
     }
 
-    void fn_800504A4();
+    void OnReset();
 
     /* 0x00 */ float nextFireballTime;
     /* 0x04 */ float fireballStageTime;
@@ -27,7 +27,7 @@ struct WaluigiWallState
     {
     }
 
-    void fn_800504A8();
+    void ClearWalls();
 
     /* 0x00 */ float mSegmentTimeRemaining;
     /* 0x04 */ float mMinSegmentTime;

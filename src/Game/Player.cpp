@@ -64,7 +64,6 @@ cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 
-extern "C" void fn_80015B38(cBall*, bool);
 
 float lbl_806DBD80 = 0.75f;
 float lbl_806DBD84 = 0.4f;
@@ -242,12 +241,12 @@ u8 cPlayer::SwapController(bool bParam)
                         {
                             if (fSwapScore < 0.0f)
                             {
-                                fSwapScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
+                                fSwapScore = CallPlayerFuzzyFunction(FuzzyAIGetTeamRuntime(m_pTeam),
                                     "AssignControllerScore",
                                     pSwapPlayer)
                                                  .mData.f;
                             }
-                            float fPotentialScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
+                            float fPotentialScore = CallPlayerFuzzyFunction(FuzzyAIGetTeamRuntime(m_pTeam),
                                 "AssignControllerScore",
                                 pPotentialSwapPlayer)
                                                         .mData.f;
@@ -381,7 +380,7 @@ void cPlayer::UpdateGameplayTimers(float fDeltaT)
                 }
                 if (m_DetPlayer.m_tFireTimer.Countdown(fDeltaT, 0.0f))
                 {
-                    fn_800974B0();
+                    StopFire();
                 }
             }
         }
@@ -425,7 +424,7 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlVector3 v3Up = { 0.0f, 0.0f, 1.0f };
     nlQuaternion qOrient;
     nlQuaternion startInverse;
-    fn_802B5370(qFacing, v3Up, (unsigned short)(int)(10430.378f * AngUnitsToRad_fromUnsignedShort(m_DetChar.m_aActualFacingDirection)));
+    nlMakeQuat(qFacing, v3Up, (unsigned short)(int)(10430.378f * AngUnitsToRad_fromUnsignedShort(m_DetChar.m_aActualFacingDirection)));
     nlMultQuat(qOrient, qFacing, qAnimated);
     if (m_DetPlayer.m_ResetBaseBallOrientation)
     {
@@ -545,7 +544,7 @@ cPlayer* cPlayer::GetClosestOpponentPlayer(nlVector3* pPosition, bool skipIncapa
         this, m_pTeam->GetOtherTeam(), 5, pPosition, skipIncapacitated);
 }
 
-cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
+cPlayer* cPlayer::GetClosestTeamPlayer(nlVector3* pPosition, bool bParam)
 {
     return ::FindClosestTeamPlayer(this, m_pTeam, 5, pPosition, bParam);
 }
@@ -620,7 +619,7 @@ void cPlayer::PickupBall(cBall* pBall)
     if (data.eResult == RECEIVEBALL_PASS_COMPLETE)
     {
         bool bOneTouchShot = false;
-        if (m_eClassType == FIELDER && fn_800DF028((cFielder*)this))
+        if (m_eClassType == FIELDER && OneTouchShooting((cFielder*)this))
             bOneTouchShot = true;
         if (!bOneTouchShot)
         {
@@ -660,7 +659,7 @@ void cPlayer::PlayAttackReactionSounds(float fScale)
 {
 }
 
-void cPlayer::fn_80096CDC(cBall* pBall)
+void cPlayer::SetBall(cBall* pBall)
 {
     if (m_pBall == NULL && pBall != NULL && m_eClassType == FIELDER)
     {
@@ -733,7 +732,7 @@ bool cPlayer::IsOnSameTeam(cPlayer* other)
     return false;
 }
 
-extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
+cPlayer* FindBestPassTarget(cPlayer* pSelf, bool bVolleyPass)
 {
     float fBestScore = 0.0f;
     cPlayer* pBestTarget = NULL;
@@ -807,7 +806,7 @@ DetInput* cPlayer::GetGlobalPad()
     return NULL;
 }
 
-cGlobalPad* cPlayer::fn_800972CC()
+cGlobalPad* cPlayer::GetLocalControllerPad()
 {
     DetInput* pGlobalPad
         = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
@@ -823,14 +822,14 @@ void cPlayer::ReleaseBall(int nParam)
 {
     m_pPhysicsCharacter->ReleaseObject();
     g_pBall->ClearOwner();
-    fn_80015C38(g_pBall, nParam);
+    ChangeBallState(g_pBall, nParam);
     if (!g_pBall->m_bVisible)
     {
         g_pBall->m_bVisible = true;
     }
 }
 
-extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
+void StartPlayerFire(cPlayer* pPlayer, float fDuration)
 {
     float fRemaining = pPlayer->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0
                          ? pPlayer->m_DetPlayer.m_tFireTimer.GetSeconds()
@@ -855,7 +854,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
     {
         EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
-        pPlayer->fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
+        pPlayer->SetDamageTextureType(DAMAGE_TEXTURE_SCORCH);
         ((cFielder*)pPlayer)->EndFrozenOrDazed();
         pPlayer->m_DetPlayer.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
@@ -866,7 +865,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
     }
 }
 
-void cPlayer::fn_800974B0()
+void cPlayer::StopFire()
 {
     if (m_eClassType == GOALIE)
     {
@@ -880,11 +879,11 @@ void cPlayer::fn_800974B0()
     m_DetPlayer.m_tFireTimer.m_uPackedTime = 0;
 }
 
-void cPlayer::fn_8009750C()
+void cPlayer::EndFire()
 {
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
-        fn_800974B0();
+        StopFire();
     }
 }
 
@@ -902,7 +901,7 @@ void cPlayer::SetPowerupAnimState(int nodeIndex, int animID, float blendTime)
     m_DetPlayer.m_nFeatherAnimID = animID;
 }
 
-void cPlayer::fn_80097648(float duration)
+void cPlayer::BlendOutPowerupAnimation(float duration)
 {
     if (m_pPowerupLayer->GetChild(1) != NULL)
     {
@@ -913,7 +912,7 @@ void cPlayer::fn_80097648(float duration)
     }
 }
 
-bool cPlayer::fn_800976C4() const
+bool cPlayer::HasPowerupAnimation() const
 {
     return m_pPowerupLayer->GetChild(1) != NULL;
 }
@@ -1195,7 +1194,7 @@ nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
         v3ReferencePos != NULL ? v3ReferencePos : &m_DetChar.m_v3Position);
 }
 
-extern "C" void fn_80098098(cPlayer* pSelf)
+void HandlePlayerPowerupInput(cPlayer* pSelf)
 {
     if (pSelf->GetGlobalPad() == NULL)
         return;
@@ -1318,7 +1317,7 @@ void OnPlayerPeachCamerasDown(PeachPhotoData*);
 void OnPlayerPeachCamerasAway(PeachPhotoData*);
 void OnPlayerResetEffects(ResetEffectsData*);
 
-extern "C" void fn_80098750()
+void RegisterPlayerEventCallbacks()
 {
     FindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
     FindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
@@ -1407,7 +1406,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             if (gNPCManager->mpBirdoEgg != NULL && gNPCManager->mpBirdoEgg->mVisible)
                 gNPCManager->mpBirdoEgg->Hide(false);
             g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
-            fn_80015B38(g_pBall, true);
+            CancelBallShot(g_pBall, true);
         }
         g_pGame->BlowUpPowerups(region, lbl_806DBD88);
         if (gNPCManager != NULL)
@@ -1450,14 +1449,14 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             }
             for (unsigned int i = 0; i < 3; i++)
             {
-                WindDebris* pNPC = gNPCManager->fn_801A9DE0(i);
+                WindDebris* pNPC = gNPCManager->GetWindDebris(i);
                 if (pNPC != NULL && pNPC->mbIsVisible)
                 {
                     nlVector2 position;
                     position.x = pNPC->mv3Position.x;
                     position.y = pNPC->mv3Position.y;
                     if (region.ContainsPoint2D(position))
-                        pNPC->fn_801B4C14(lbl_806DBD88);
+                        pNPC->Freeze(lbl_806DBD88);
                 }
             }
             for (unsigned int i = 0; i < 8; i++)
@@ -1475,7 +1474,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             }
             for (unsigned int i = 0; i < 60; i++)
             {
-                PhysicsPatch* pPatch = lbl_806E12C8->fn_801745B8(i);
+                PhysicsPatch* pPatch = lbl_806E12C8->GetPatch(i);
                 if (pPatch != NULL && pPatch->m_bVisible)
                 {
                     const nlVector3& v3Position = pPatch->GetPosition();

@@ -25,7 +25,7 @@ public:
     {
     }
     virtual ~OptionsSubMenu() { }
-    int fn_801CAA10() const { return mMenuState; }
+    int GetMenuState() const { return mMenuState; }
 
     /* 0x01C */ int mPadding1C;
     /* 0x020 */ int mMenuState;

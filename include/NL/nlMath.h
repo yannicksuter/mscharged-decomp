@@ -607,13 +607,13 @@ void nlPolarToCartesian(float& x, float& y, unsigned short angle, float radius);
 void nlCartesianToPolar(nlPolar& out, float x, float y);
 
 void nlMakeQuatY(nlQuaternion& out, unsigned short angle);
-void fn_802B549C(nlQuaternion& out, unsigned short angle);
-extern "C" void fn_802B5370(
+void nlMakeQuatZ(nlQuaternion& out, unsigned short angle);
+void nlMakeQuat(
     nlQuaternion& out, const nlVector3& rotationAxis, unsigned short angle);
 
 inline void nlMakeQuat(nlQuaternion& out, const nlVector3& v3RotationAxis, float ang_rad)
 {
-    fn_802B5370(out, v3RotationAxis, (unsigned short)(int)(10430.378f * ang_rad));
+    nlMakeQuat(out, v3RotationAxis, (unsigned short)(int)(10430.378f * ang_rad));
 }
 
 nlVector3* nlVec3Difference(nlVector3*, const nlVector3*, const nlVector3*);
@@ -622,5 +622,7 @@ unsigned short nlATan2Angle(float, float);
 short nlAngleDelta(unsigned short, unsigned short);
 unsigned short nlAbsAngle(short);
 int nlAbsInt(int);
+
+void nlMakeQuatX(nlQuaternion& out, unsigned short angle);
 
 #endif

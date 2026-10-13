@@ -90,7 +90,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
         }
         else if (error == RFLErrcode_Broken)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+            FEPopupMenu* popup = (FEPopupMenu*)GetGameSceneManager()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToWiiMenu), this)));
@@ -98,7 +98,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
     }
     else
     {
-        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+        FEPopupMenu* popup = (FEPopupMenu*)GetGameSceneManager()->Push(
             SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create(POPUP_PROFILE_MII_NOT_FOUND,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToMiiSelect), this)));
@@ -121,7 +121,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
 
     if (!GameInfoManager::Instance()->HasSaveSlot(mCreateID))
     {
-        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+        FEPopupMenu* popup = (FEPopupMenu*)GetGameSceneManager()->Push(
             SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create(POPUP_PROFILE_MII_DELETION_WARNING);
         mButtonInstances[1]->SetVisible(false);

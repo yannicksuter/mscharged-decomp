@@ -717,7 +717,7 @@ void NisPlayer::SetupNisPlayback()
     g_pGame->mpWeatherManager->Stop(true);
     if (mOverlayMode != NIS_OVERLAY_HOLOTRON)
     {
-        WorldDarkening::Instance().fn_801AF550();
+        WorldDarkening::Instance().Reset();
     }
     if (cCameraManager::PeekCamera() != &mCamera[0])
     {
@@ -736,9 +736,9 @@ void NisPlayer::ResetPlayerEffects()
         {
             cFielder* fielder = team->GetFielder(i);
             fielder->ResetEffects();
-            fielder->fn_8001EE74(1.0f, 0.0f, 1.0f);
+            fielder->BlendPlayerScale(1.0f, 0.0f, 1.0f);
             fielder->EndFrozenOrDazed();
-            fielder->fn_800974B0();
+            fielder->StopFire();
         }
     }
 }
@@ -1167,7 +1167,7 @@ void NisPlayer::FadeWorldDarkening(float duration)
 
 void NisPlayer::ResetToPIPOverlay()
 {
-    WorldDarkening::Instance().fn_801AF550();
+    WorldDarkening::Instance().Reset();
     mOverlayMode = NIS_OVERLAY_NONE;
     ClearSecondaryNis();
 }

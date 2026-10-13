@@ -422,7 +422,7 @@ void OnCrowdRiotCollision(void* param)
             && fielder->m_eActionState != ACTION_SHOOT_TO_SCORE
             && fielder->m_eActionState != ACTION_MEGA_STRIKE)
         {
-            fielder->fn_80043ADC();
+            fielder->InitActionCrowdRiot();
         }
         break;
     }
@@ -434,7 +434,7 @@ void OnCrowdRiotCollision(void* param)
         {
             if (player->m_eClassType == FIELDER)
             {
-                ((cFielder*)player)->fn_80043ADC();
+                ((cFielder*)player)->InitActionCrowdRiot();
             }
             else
             {

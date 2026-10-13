@@ -75,12 +75,12 @@ public:
     void Update(float dt);
     void SetWorldPosition(const nlVector3& position);
     void ClearMuckHole(float duration);
-    void fn_80173AF4();
+    void ClearTarget();
     void SetEndRadiusTime(float time);
     void SetStartRadiusTime(float time);
     void SeekTarget();
     void SetPath(nlVector3* points, int pointCount, float speed);
-    nlVector3 fn_80173CCC() const;
+    nlVector3 GetPathDirection() const;
     void UpdatePath(float dt);
 
     static SlotPool<PhysicsPatch> m_PhysicsPatchSlotPool;
@@ -124,7 +124,7 @@ public:
     PhysicsPatch* CreatePatch(int type, cPlayer* owner,
         const nlVector3& position, const nlVector3& velocity,
         float startRadius, float endRadius, float lifetime);
-    PhysicsPatch* fn_801745B8(int index);
+    PhysicsPatch* GetPatch(int index);
     void ResetEffects();
     void Update(float dt);
     void SyncLog(void* context, DebugWriteCache* cache);

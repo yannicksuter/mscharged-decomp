@@ -56,8 +56,8 @@ struct NPCTemplate
 class NPCManager
 {
 public:
-    static NPCManager* fn_801948A0();
-    DiddyBanana* fn_801919A4() const
+    static NPCManager* Instance();
+    DiddyBanana* GetDiddyBanana() const
     {
         return mpDiddyBanana;
     }
@@ -75,8 +75,8 @@ public:
     DaisyFistObject* GetDaisyFist(int nIndex);
     unsigned int GetNumBulletBills() const { return mNumBulletBills; }
     BulletBillObject* GetBulletBill(int nIndex);
-    BulletBillObject* fn_801A9D20();
-    WindDebris* fn_801A9DE0(int nIndex);
+    BulletBillObject* CreateBulletBill();
+    WindDebris* GetWindDebris(int nIndex);
     void CreateWindDebris();
     void CreateDiddyBanana();
     void CreateHammers();
@@ -91,7 +91,7 @@ public:
     void DestroyNPCs();
     NPCTemplate* FindNPCTemplate(const char* pName);
 
-    NPCTemplate* fn_801ABBDC_inline(const char* pName)
+    NPCTemplate* FindNPCTemplate_inline(const char* pName)
     {
         for (int i = 0; i < 2; ++i)
         {

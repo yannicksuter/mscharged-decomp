@@ -170,7 +170,7 @@ void DrawablePowerup::Render(int idx) const
 
     nlQuaternion orientation;
     float angle = 0.0000958738f * (float)mOrientation;
-    fn_802B549C(orientation, (u16)(int)(10430.378f * angle));
+    nlMakeQuatZ(orientation, (u16)(int)(10430.378f * angle));
 
     if (mVisible)
     {

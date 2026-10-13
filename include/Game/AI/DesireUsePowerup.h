@@ -9,12 +9,12 @@ class DesireUsePowerup;
 class AIContext;
 DesireUpdate TransDesireUsePowerup(
     AIContext*);
-extern "C" void fn_800D38D0(DesireUsePowerup*);
+void UseCurrentTeamPowerup(DesireUsePowerup*);
 void ThrowPowerup(DesireUsePowerup*);
 
 class DesireUsePowerup : public Desire
 {
-    friend void fn_800D38D0(DesireUsePowerup*);
+    friend void UseCurrentTeamPowerup(DesireUsePowerup*);
     friend void ThrowPowerup(DesireUsePowerup*);
 public:
     DesireUsePowerup()
@@ -32,7 +32,7 @@ public:
     virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
     ePowerUpType GetPowerupType() const { return mePowerup; }
-    void fn_800D3968(cFielder*, ePowerUpType, bool);
+    void RequestPowerup(cFielder*, ePowerUpType, bool);
 
 private:
     void SetPowerup(ePowerUpType, int, cFielder*);

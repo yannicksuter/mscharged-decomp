@@ -13,7 +13,7 @@ inline bool IsCharacterHammerBro(cCharacter* character)
     return character->m_DetChar.m_eCharacterClass == HAMMERBROS;
 }
 
-extern "C" inline bool fn_80194674(cCharacter* character)
+inline bool IsDiddyKong(cCharacter* character)
 {
     return character->m_DetChar.m_eCharacterClass == DIDDYKONG;
 }

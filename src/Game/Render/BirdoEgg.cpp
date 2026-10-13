@@ -82,7 +82,7 @@ void BirdoEggObject::Update(float deltaTime)
     nlQuaternion rotation;
     nlVector3 axis = { 1.0f, 0.0f, 0.0f };
     unsigned short angle = (unsigned short)(int)(10430.378f * (mSpinSpeed * deltaTime));
-    fn_802B5370(rotation, axis, angle);
+    nlMakeQuat(rotation, axis, angle);
     nlMultQuat(mOrientation, mOrientation, rotation);
 
     if (mRadiusTimer > 0.0f)
@@ -155,7 +155,7 @@ void BirdoEggObject::Show(cFielder* shooter)
     float x = shooter->m_DetChar.m_v3Position.x - net->m_v3NetLocation.x;
     float y = shooter->m_DetChar.m_v3Position.y - net->m_v3NetLocation.y;
     float angle = nlATan2f(y, x);
-    fn_802B549C(mOrientation, (unsigned short)(int)(10430.378f * angle));
+    nlMakeQuatZ(mOrientation, (unsigned short)(int)(10430.378f * angle));
     mSpinSpeed = sSpinSpeed;
     mTargetRadius = sInitialRadius;
     mRadiusTimer = 0.0f;

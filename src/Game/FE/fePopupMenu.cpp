@@ -318,9 +318,9 @@ void FEPopupMenu::SceneCreated()
     pText->SetString(mPopup.pMessage->begin());
     if (mWideMessageBox)
     {
-        nlVector2 boxSize = pText->fn_801CA5E8();
+        nlVector2 boxSize = pText->GetBoxSize();
         boxSize.e[0] = 650.0f;
-        pText->fn_801CA5F0(boxSize);
+        pText->SetBoxSize(boxSize);
     }
 
 #if defined(VERSION_R4QE01)
@@ -465,7 +465,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     {
     case POPUP_NEW_CUP_CONFIRM:
     {
-        WStr cupName(g_pLocalization->GetString(GetLOCModeName(GameInfoManager::Instance()->fn_801CA658())));
+        WStr cupName(g_pLocalization->GetString(GetLOCModeName(GameInfoManager::Instance()->GetCurrentMode())));
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         mPopup.pMessage = new (8, false) WStr(Format<WStr>(message, cupName));
         mPopup.pOptionLabels[0] = new (8, false) WStr(g_pLocalization->GetString(popupEntry->mOptions[0]));
@@ -508,7 +508,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         CupInterface* manager = NetTournManager::Instance();
         manager->GetCurrentMode();
         cupName = g_pLocalization->GetString(gCupPersonaStringIDs[manager->GetCupPersona()]);
-        int winningMachine = NetTournManager::Instance()->fn_801CA9D0();
+        int winningMachine = NetTournManager::Instance()->GetWinningMachine();
         NetworkDraftTeam* team = NetworkDraft::Instance()->FindDraftTeamByPeerIndex(winningMachine);
         mPopup.pMessage = new (8, false) WStr(Format<WStr>(message, team->mPlayers[0].mName, cupName));
         mPopup.numOptions = 1;
@@ -589,8 +589,8 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         WStr optionsName;
         int menu = -1;
-        if (fn_801CA660() != 0)
-            menu = ((OptionsSubMenu*)fn_801CA660()->GetScene(SCENE_OPTIONS))->fn_801CAA10();
+        if (GetGameSceneManager() != 0)
+            menu = ((OptionsSubMenu*)GetGameSceneManager()->GetScene(SCENE_OPTIONS))->GetMenuState();
         else if (GetOverlayManager()->GetScene(SCENE_PAUSE_AUDIO_OPTIONS) != 0)
             menu = 1;
         else if (GetOverlayManager()->GetScene(SCENE_PAUSE_VISUAL_OPTIONS) != 0)
@@ -794,7 +794,7 @@ void FEPopupMenu::SetPositions()
         presentation->GetActiveSlide(), "Layer", "blackbox");
     pText = FEFinder<TLTextInstance, 3>::Find(
         mPresentation, "Slide1", "Layer", "Message");
-    nlVector2 size = fn_801CC48C(pText);
+    nlVector2 size = GetTextDimensions(pText);
     float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
 #if defined(VERSION_R4QE01)
     mBackgroundTargetScaleX = (40.0f + width) / 120.0f;

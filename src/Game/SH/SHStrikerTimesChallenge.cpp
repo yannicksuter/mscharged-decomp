@@ -288,7 +288,7 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
  */
 void SHStrikerTimesChallenge::OnRestartChallenge()
 {
-    WorldDarkening::Instance().fn_801AF550();
+    WorldDarkening::Instance().Reset();
     gpHBMManager->mBlocked = true;
     glxSwapSetBlack(true);
     FEMusic::StopStream();
