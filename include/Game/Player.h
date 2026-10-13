@@ -157,7 +157,7 @@ public:
     cPlayer* fn_8009670C(nlVector3* pPosition, bool bParam);
     cFielder* GetClosestOpponentFielder(
         nlVector3* pPosition, bool bParam);
-    cPlayer* fn_800966AC(nlVector3* pPosition, bool bParam);
+    cPlayer* GetClosestOpponentPlayer(nlVector3* pPosition, bool skipIncapacitated);
     void SetSpaceSearch(SpaceSearch* pSpaceSearch);
     int GetBallJointIndex() const
     {

@@ -539,10 +539,10 @@ cFielder* cPlayer::GetClosestOpponentFielder(
         this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
 }
 
-cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
+cPlayer* cPlayer::GetClosestOpponentPlayer(nlVector3* pPosition, bool skipIncapacitated)
 {
     return ::FindClosestTeamPlayer(
-        this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
+        this, m_pTeam->GetOtherTeam(), 5, pPosition, skipIncapacitated);
 }
 
 cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)

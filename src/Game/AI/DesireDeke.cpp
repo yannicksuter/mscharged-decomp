@@ -54,7 +54,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case SHYGUY:
     {
         avoidSideline = true;
-        cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
+        cPlayer* opponent = m_pFielder->GetClosestOpponentPlayer(0, true);
         if (opponent == 0)
         {
             *update = DESIRE_FINISHED;
@@ -84,7 +84,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case TOAD:
     {
         avoidSideline = true;
-        cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
+        cPlayer* opponent = m_pFielder->GetClosestOpponentPlayer(0, true);
         if (opponent == 0)
         {
             *update = DESIRE_FINISHED;
@@ -159,7 +159,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case HAMMERBROS:
     case MONTYMOLE:
     {
-        cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
+        cPlayer* opponent = m_pFielder->GetClosestOpponentPlayer(0, true);
         if (opponent == 0)
         {
             *update = DESIRE_FINISHED;
