@@ -190,7 +190,7 @@ void UpdateStateMachine(
     }
     if (HasStateMachineTimedOut(machine) && update->fn_800C2BD4() != 1)
     {
-        *update = 2;
+        *update = static_cast<int>(DESIRE_TIMED_OUT);
     }
     if (runUpdate && update->fn_800C2BD4() != 1)
     {

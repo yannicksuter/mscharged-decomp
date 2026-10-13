@@ -18,28 +18,28 @@ struct StrikerChallengeDefinition
 };
 
 const StrikerChallengeDefinition gStrikerChallengeDefinitions[22] = {
-    { "rookie", 1, "ini/strikerchallenges/tutorial1.ini", "CHARACTER_DIFF", "TUTORIAL_TITLE_CHARACTER_DIFF" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial2.ini", "BALL_CHARGE", "TUTORIAL_TITLE_BALL_CHARGE" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial3.ini", "MEGA_SAVES", "TUTORIAL_TITLE_MEGA_SAVES" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial4.ini", "MEGA_STRIKE", "TUTORIAL_TITLE_MEGA_STRIKE" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial5.ini", "SIDEKICK_SKILLSHOT", "TUTORIAL_TITLE_SIDEKICK_SKILLSHOT" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial6.ini", "SKILLSHOT_PART_TWO", "TUTORIAL_TITLE_SKILLSHOT_TWO" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial7.ini", "SUPER_MARIO", "TUTORIAL_TITLE_SUPER_MARIO" },
-    { "rookie", 3, "ini/strikerchallenges/tutorial8.ini", "BRING_THUNDER", "TUTORIAL_TITLE_BRING_THUNDER" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial9.ini", "POWER_UPS", "TUTORIAL_TITLE_POWER_UPS" },
-    { "rookie", 0, "ini/strikerchallenges/tutorial10.ini", "WIN_GAME", "TUTORIAL_TITLE_WIN_GAME" },
-    { "rookie", 0, "ini/strikerchallenges/mario.ini", "MARIO", "CHALLENGE_TITLE_MARIO" },
-    { "rookie", 4, "ini/strikerchallenges/luigi.ini", "LUIGI", "CHALLENGE_TITLE_LUIGI" },
-    { "professional", 3, "ini/strikerchallenges/donkeykong.ini", "DONKEYKONG", "CHALLENGE_TITLE_DONKEY_KONG" },
-    { "professional", 5, "ini/strikerchallenges/peach.ini", "PEACH", "CHALLENGE_TITLE_PEACH" },
-    { "superstar", 2, "ini/strikerchallenges/daisy.ini", "DAISY", "CHALLENGE_TITLE_DAISY" },
-    { "superstar", 7, "ini/strikerchallenges/wario.ini", "WARIO", "CHALLENGE_TITLE_WARIO" },
-    { "superstar", 6, "ini/strikerchallenges/waluigi.ini", "WALUIGI", "CHALLENGE_TITLE_WALUIGI" },
-    { "legend", 8, "ini/strikerchallenges/yoshi.ini", "YOSHI", "CHALLENGE_TITLE_YOSHI" },
-    { "legend", 1, "ini/strikerchallenges/bowser.ini", "BOWSER", "CHALLENGE_TITLE_BOWSER" },
-    { "legend", 11, "ini/strikerchallenges/petey.ini", "PETEY", "CHALLENGE_TITLE_PETEY" },
-    { "megastriker", 9, "ini/strikerchallenges/bowserjr.ini", "BOWSERJR", "CHALLENGE_TITLE_BOWSER_JR" },
-    { "megastriker", 10, "ini/strikerchallenges/diddykong.ini", "DIDDYKONG", "CHALLENGE_TITLE_DIDDY_KONG" },
+    { "rookie", TEAM_BOWSER, "ini/strikerchallenges/tutorial1.ini", "CHARACTER_DIFF", "TUTORIAL_TITLE_CHARACTER_DIFF" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial2.ini", "BALL_CHARGE", "TUTORIAL_TITLE_BALL_CHARGE" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial3.ini", "MEGA_SAVES", "TUTORIAL_TITLE_MEGA_SAVES" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial4.ini", "MEGA_STRIKE", "TUTORIAL_TITLE_MEGA_STRIKE" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial5.ini", "SIDEKICK_SKILLSHOT", "TUTORIAL_TITLE_SIDEKICK_SKILLSHOT" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial6.ini", "SKILLSHOT_PART_TWO", "TUTORIAL_TITLE_SKILLSHOT_TWO" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial7.ini", "SUPER_MARIO", "TUTORIAL_TITLE_SUPER_MARIO" },
+    { "rookie", TEAM_DONKEYKONG, "ini/strikerchallenges/tutorial8.ini", "BRING_THUNDER", "TUTORIAL_TITLE_BRING_THUNDER" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial9.ini", "POWER_UPS", "TUTORIAL_TITLE_POWER_UPS" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial10.ini", "WIN_GAME", "TUTORIAL_TITLE_WIN_GAME" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/mario.ini", "MARIO", "CHALLENGE_TITLE_MARIO" },
+    { "rookie", TEAM_LUIGI, "ini/strikerchallenges/luigi.ini", "LUIGI", "CHALLENGE_TITLE_LUIGI" },
+    { "professional", TEAM_DONKEYKONG, "ini/strikerchallenges/donkeykong.ini", "DONKEYKONG", "CHALLENGE_TITLE_DONKEY_KONG" },
+    { "professional", TEAM_PEACH, "ini/strikerchallenges/peach.ini", "PEACH", "CHALLENGE_TITLE_PEACH" },
+    { "superstar", TEAM_DAISY, "ini/strikerchallenges/daisy.ini", "DAISY", "CHALLENGE_TITLE_DAISY" },
+    { "superstar", TEAM_WARIO, "ini/strikerchallenges/wario.ini", "WARIO", "CHALLENGE_TITLE_WARIO" },
+    { "superstar", TEAM_WALUIGI, "ini/strikerchallenges/waluigi.ini", "WALUIGI", "CHALLENGE_TITLE_WALUIGI" },
+    { "legend", TEAM_YOSHI, "ini/strikerchallenges/yoshi.ini", "YOSHI", "CHALLENGE_TITLE_YOSHI" },
+    { "legend", TEAM_BOWSER, "ini/strikerchallenges/bowser.ini", "BOWSER", "CHALLENGE_TITLE_BOWSER" },
+    { "legend", TEAM_PETEY, "ini/strikerchallenges/petey.ini", "PETEY", "CHALLENGE_TITLE_PETEY" },
+    { "megastriker", TEAM_BOWSERJR, "ini/strikerchallenges/bowserjr.ini", "BOWSERJR", "CHALLENGE_TITLE_BOWSER_JR" },
+    { "megastriker", TEAM_DIDDYKONG, "ini/strikerchallenges/diddykong.ini", "DIDDYKONG", "CHALLENGE_TITLE_DIDDY_KONG" },
 };
 
 StrikerChallenge* g_pStrikerChallenge;
@@ -47,9 +47,9 @@ StrikerChallenge* g_pStrikerChallenge;
 StrikerChallenge::StrikerChallenge()
 {
     mRemainingTime = 0;
-    mAIDifficulty = 1;
+    mAIDifficulty = GameplaySettings::ROOKIE;
     mCondition = CHALLENGE_WIN;
-    mCaptain = 0;
+    mCaptain = TEAM_MARIO;
     mWinParameter = 0;
     mCustomPowerups = POWERUP_CHEAT_NONE;
     mCurrentChallenge = STRIKER_CHALLENGE_NONE;
@@ -105,7 +105,7 @@ void StrikerChallenge::LoadSettings()
     }
 
     mRemainingTime = GetTweakInt("challenge/remainingtime", 180);
-    mAIDifficulty = GetTweakInt("challenge/ai", 1);
+    mAIDifficulty = GetTweakInt("challenge/ai", GameplaySettings::ROOKIE);
     mCondition = static_cast<eChallengeCondition>(GetTweakInt("challenge/condition", CHALLENGE_WIN));
     mWinParameter = GetTweakInt("challenge/winparameter", 0);
     mScore[0] = GetTweakInt("challenge/homescore", 0);
@@ -120,7 +120,7 @@ void StrikerChallenge::LoadSettings()
     mAwaySkillshotDisabled = !GetTweakBool("challenge/awayskillshot", false);
     mStunnedHomeGoalies = GetTweakBool("challenge/stunnedhomegoalies", false);
     mStunnedAwayGoalies = GetTweakBool("challenge/stunnedawaygoalies", false);
-    mCustomPowerups = GetTweakInt("challenge/custompowerups", 0);
+    mCustomPowerups = GetTweakInt("challenge/custompowerups", POWERUP_CHEAT_NONE);
 }
 
 bool StrikerChallenge::IsUnlocked(int challenge) const

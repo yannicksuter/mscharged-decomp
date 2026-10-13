@@ -15,8 +15,8 @@
 #include "Game/SharedStaticStorage.h"
 
 float gInterceptBallMaxPredictionTime = 3.0f;
-static unsigned short sDesireInterceptBallType = 0xFFFF;
-int gInterceptBallSlideAttackState = 16;
+static unsigned short sDesireInterceptBallType = DEBUG_TYPE_NONE;
+int gInterceptBallSlideAttackState = FIELDER_DESIRE_SLIDE_ATTACK;
 
 bool DesireInterceptBall::Initialize(void* context)
 {
@@ -120,14 +120,14 @@ inline void DesireInterceptBall::RegisterDebugFields(void* field, DebugWriteCach
 {
     *(unsigned short*)field = cache->BeginType("DesireInterceptBall");
     Desire::RegisterDebugFields(field, cache);
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meDesireSubState - (u8*)&mvDesiredPosition, "meDesireSubState");
-    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbInterceptPass - (u8*)&mvDesiredPosition, "mbInterceptPass");
+    cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&meDesireSubState - (u8*)&mvDesiredPosition, "meDesireSubState");
+    cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbInterceptPass - (u8*)&mvDesiredPosition, "mbInterceptPass");
     cache->EndType();
 }
 
 inline void DesireInterceptBall::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (sDesireInterceptBallType == 0xFFFF)
+    if (sDesireInterceptBallType == DEBUG_TYPE_NONE)
     {
         RegisterDebugFields(&sDesireInterceptBallType, cache);
     }

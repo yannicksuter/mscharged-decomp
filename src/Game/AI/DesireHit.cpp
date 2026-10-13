@@ -6,7 +6,7 @@
 #include "Game/Team.h"
 #include "Game/DebugWriteCache.h"
 
-static unsigned short sDesireHitType = 0xFFFF;
+static unsigned short sDesireHitType = DEBUG_TYPE_NONE;
 
 bool DesireHit::Initialize(void* context)
 {
@@ -35,7 +35,7 @@ inline void DesireHit::RegisterDebugFields(void* field, DebugWriteCache* cache)
 
 inline void DesireHit::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (sDesireHitType == 0xFFFF)
+    if (sDesireHitType == DEBUG_TYPE_NONE)
     {
         RegisterDebugFields(&sDesireHitType, cache);
     }

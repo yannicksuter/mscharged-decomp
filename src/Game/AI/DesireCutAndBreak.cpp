@@ -7,7 +7,7 @@
 #include "Game/DebugWriteCache.h"
 
 float gCutAndBreakSearchRadius = 8.0f;
-static unsigned short sDesireCutAndBreakType = 0xFFFF;
+static unsigned short sDesireCutAndBreakType = DEBUG_TYPE_NONE;
 bool gCutAndBreakSearchDebug;
 
 bool DesireCutAndBreak::Initialize(void* context)
@@ -36,7 +36,7 @@ void DesireCutAndBreak::Update(DesireUpdate* update, float)
             || m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder)
         && update->mData.i == DESIRE_CONTINUE)
     {
-        *update = 4;
+        *update = static_cast<int>(DESIRE_RESELECT);
     }
 }
 
@@ -62,7 +62,7 @@ inline void DesireCutAndBreak::RegisterDebugFields(void* field, DebugWriteCache*
 
 inline void DesireCutAndBreak::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (sDesireCutAndBreakType == 0xFFFF)
+    if (sDesireCutAndBreakType == DEBUG_TYPE_NONE)
     {
         RegisterDebugFields(&sDesireCutAndBreakType, cache);
     }
