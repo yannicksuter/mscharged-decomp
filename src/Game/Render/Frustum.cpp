@@ -171,6 +171,14 @@ FrustumResult ClassifySphereInFrustum(const nlVector4* pPlanes,
     return result;
 }
 
+static inline void SetPlaneColumn(nlMatrix4& matrix, int column, const nlVector4& plane)
+{
+    matrix.e2[0][column] = plane.x;
+    matrix.e2[1][column] = plane.y;
+    matrix.e2[2][column] = plane.z;
+    matrix.e2[3][column] = plane.w;
+}
+
 void GetFrustumCorners(
     const nlVector4* pPlanes, nlVector4* pCorners)
 {
@@ -192,18 +200,9 @@ void GetFrustumCorners(
             const nlVector4& secondPlane = pPlanes[planeIndices[side][1]];
 
             nlMatrix4 planeMatrix;
-            planeMatrix.m11 = endPlane.x;
-            planeMatrix.m21 = endPlane.y;
-            planeMatrix.m31 = endPlane.z;
-            planeMatrix.m41 = endPlane.w;
-            planeMatrix.m12 = firstPlane.x;
-            planeMatrix.m22 = firstPlane.y;
-            planeMatrix.m32 = firstPlane.z;
-            planeMatrix.m42 = firstPlane.w;
-            planeMatrix.m13 = secondPlane.x;
-            planeMatrix.m23 = secondPlane.y;
-            planeMatrix.m33 = secondPlane.z;
-            planeMatrix.m43 = secondPlane.w;
+            SetPlaneColumn(planeMatrix, 0, endPlane);
+            SetPlaneColumn(planeMatrix, 1, firstPlane);
+            SetPlaneColumn(planeMatrix, 2, secondPlane);
             planeMatrix.m14 = 0.0f;
             planeMatrix.m24 = 0.0f;
             planeMatrix.m34 = 0.0f;
