@@ -11,7 +11,7 @@
 #include "NL/nlMath.inl"
 #include "Game/DebugWriteCache.h"
 
-static unsigned short sDesireDekeType = 0xFFFF;
+static unsigned short sDesireDekeType = DEBUG_TYPE_NONE;
 
 bool DesireDeke::Initialize(void* context)
 {
@@ -208,7 +208,7 @@ inline void DesireDeke::RegisterDebugFields(void* field, DebugWriteCache* cache)
 
 inline void DesireDeke::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (sDesireDekeType == 0xFFFF)
+    if (sDesireDekeType == DEBUG_TYPE_NONE)
     {
         RegisterDebugFields(&sDesireDekeType, cache);
     }

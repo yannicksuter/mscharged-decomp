@@ -246,11 +246,11 @@ void ScriptMachine::Update(float deltaTime)
                 break;
             }
             case DESIRE_FINISHED:
-            case 2:
+            case DESIRE_TIMED_OUT:
                 DeactivateState();
                 selectState = true;
                 break;
-            case 4:
+            case DESIRE_RESELECT:
                 if (mActiveState->mAgeTimer.GetSeconds()
                     >= mActiveState->mMinDuration)
                 {

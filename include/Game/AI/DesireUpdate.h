@@ -7,7 +7,9 @@ enum eDesireUpdateResult
 {
     DESIRE_CONTINUE = 0,
     DESIRE_FINISHED = 1,
+    DESIRE_TIMED_OUT = 2,
     DESIRE_CHANGE = 3,
+    DESIRE_RESELECT = 4,
 };
 
 class IndexedFuzzyVariant : public FuzzyVariant

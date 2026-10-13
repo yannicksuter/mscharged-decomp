@@ -10,7 +10,7 @@
 #include "Game/DebugWriteCache.h"
 
 float gGetOpenSearchRadius = 6.0f;
-static unsigned short sDesireGetOpenType = 0xFFFF;
+static unsigned short sDesireGetOpenType = DEBUG_TYPE_NONE;
 // The default transition result resides in initialized small data.
 #pragma explicit_zero_data on
 int gTransDesireGetOpenContinue = DESIRE_CONTINUE;
@@ -81,7 +81,7 @@ DesireUpdate TransDesireGetOpen(AIContext* input)
     }
     else if (ballCarrier == 0 || fielder->m_pTeam->GetBestBallInterceptor() == fielder)
     {
-        result = 4;
+        result = static_cast<int>(DESIRE_RESELECT);
     }
     return result;
 }
@@ -95,7 +95,7 @@ inline void DesireGetOpen::RegisterDebugFields(void* field, DebugWriteCache* cac
 
 inline void DesireGetOpen::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (sDesireGetOpenType == 0xFFFF)
+    if (sDesireGetOpenType == DEBUG_TYPE_NONE)
     {
         RegisterDebugFields(&sDesireGetOpenType, cache);
     }
