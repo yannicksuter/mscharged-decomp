@@ -96,7 +96,6 @@
 #include "Game/NetworkSync.h"
 #include "Game/DB/StadiumInfo.h"
 
-extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
 struct PlayerDistanceSnapshot
 {
@@ -196,7 +195,7 @@ inline void cGame::ResetGameFields()
     maDesiredTiltDir = 0;
     muTiltFrames = 0;
     float initialTilt = -zero;
-    fn_8005B330(&mTiltDirection, initialTilt, initialTilt);
+    CalculateTiltDirection(&mTiltDirection, initialTilt, initialTilt);
     muCountdownBeepsRemaining = gEndGameCountdownBeeps;
     mbMegaStrikePlayerReadySent = false;
     mbMegaStrikeCleanupPending = false;
@@ -276,7 +275,7 @@ float GetGameTickerMilliseconds()
 {
     return nlTicksToMilliseconds(nlGetTicker());
 }
-void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
+void CreateGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
 {
     ++lbl_806E2130;
 
@@ -322,9 +321,9 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
     FormationManager::LoadFormationSets();
     --lbl_806E2130;
     SetRenderWorldEffects(true);
-    WorldDarkening::Instance().fn_801AF550();
+    WorldDarkening::Instance().Reset();
 }
-void fn_80056EA8()
+void BeginGameUnloading()
 {
     g_pGame->ChangeGameState(GS_UNLOADING);
 }
@@ -699,14 +698,14 @@ float cGame::GetGameTime()
 {
     return m_pGameClock->m_fTimer;
 }
-void cGame::fn_800586C0()
+void cGame::StartGameClock()
 {
     if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         m_pGameClock->Start();
     }
 }
-void cGame::fn_80058704()
+void cGame::StopGameClock()
 {
     if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
@@ -754,7 +753,7 @@ void cGame::ResetForKickOff()
     StopDisplayingElectricFence();
     --lbl_806E2130;
 }
-void cGame::fn_80058A78(float seconds)
+void cGame::StartPostResetClock(float seconds)
 {
     m_pPostResetClock->Reset(0.0f, seconds, 1.0f);
     m_pPostResetClock->Start();
@@ -825,7 +824,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     }
     for (int i = 0; i < 10; i++)
     {
-        g_pCharacters[i]->fn_80022E60();
+        g_pCharacters[i]->ResolveTextures();
         cCharacter* character = g_pCharacters[i];
         character->m_Dirt = 0.0f;
         character->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
@@ -1006,7 +1005,7 @@ void cGame::BlowUpPowerups(
             position.y = g_pPowerups[i]->m_v3Position.y;
             if (region.ContainsPoint2D(position))
             {
-                g_pPowerups[i]->fn_8009D74C(fExplosionRadius, false);
+                g_pPowerups[i]->FreezeMotion(fExplosionRadius, false);
             }
         }
     }
@@ -1399,7 +1398,7 @@ void cGame::SendPlayerVisibility()
             cTeam* pTeam = g_pTeams[i];
             for (int j = 0; j < 5; j++)
             {
-                if (pTeam->GetPlayer(j)->fn_8001E184())
+                if (pTeam->GetPlayer(j)->IsInsideScreenMargin())
                 {
                     flags |= 1 << j;
                 }
@@ -1679,7 +1678,7 @@ void cGame::Update(float fDeltaT)
 
     GameplayCameraEffects::Instance()->FixedUpdate();
 }
-extern "C" void fn_8005B330(
+void CalculateTiltDirection(
     nlVector3* pVector, float fXAxisTilt, float fYAxisTilt)
 {
     float fSin;
@@ -1704,8 +1703,8 @@ int ComparePlayerDistances(
     cPlayer* firstPlayer = *first;
     int firstIndex = GetPlayerIndex(firstPlayer);
     cPlayer* secondPlayer = *second;
-    float firstDistance = g_pGame->fn_8005B748(referenceIndex, firstIndex);
-    float secondDistance = g_pGame->fn_8005B748(
+    float firstDistance = g_pGame->GetCachedPlayerDistance(referenceIndex, firstIndex);
+    float secondDistance = g_pGame->GetCachedPlayerDistance(
         referenceIndex, GetPlayerIndex(secondPlayer));
 
     if (firstDistance == secondDistance)
@@ -1774,7 +1773,7 @@ void cGame::UpdateCachedGameData(float fDeltaT)
     }
     gPlayerDistanceSortReference = 0;
 }
-float cGame::fn_8005B748(int firstIndex, int secondIndex)
+float cGame::GetCachedPlayerDistance(int firstIndex, int secondIndex)
 {
     if (firstIndex > secondIndex)
     {
@@ -2048,7 +2047,7 @@ void cGame::InitGameState(eGameState state)
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
-        fn_80015B38(g_pBall, false);
+        CancelBallShot(g_pBall, false);
         StopSound(GetStadiumSoundID(GameInfoManager::Instance()->GetStadium()), this);
         gpNumberDisplay->mExpanded = true;
         gpNumberDisplay->mHoldUntilKickoff = true;
@@ -2139,7 +2138,7 @@ void cGame::SendResumingGameEvent()
 {
     mEventQueue.mResumingGameEvent.Queue(Function<FnVoidVoid>());
 }
-extern "C" void fn_8005D210(cGame* pGame, LightningStrikeData* pData)
+void QueueLightningStrikeEvent(cGame* pGame, LightningStrikeData* pData)
 {
     pGame->mEventQueue.mLightningStrikeEvent.Queue(
         pData, Function<LightningStrikeData*>(FreeLightningStrikeData));
@@ -2160,7 +2159,7 @@ void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
     }
     pGame->mEventQueue.mGoalieKickEvent.Deliver((GoalieSaveData*)pData);
 }
-extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
+void DeliverGoalieCatchEvent(cGame* pGame, const GoalieSaveData* pData)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2453,7 +2452,7 @@ void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
     }
     pGame->mEventQueue.mPeachCamerasAwayEvent.Deliver(pEventData);
 }
-extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
+void DeliverWaluigiWallStartEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2469,7 +2468,7 @@ void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
     }
     pGame->mEventQueue.mWaluigiWallEndEvent.Deliver(pFielder);
 }
-extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
+void DeliverWaluigiWallAbortEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2477,7 +2476,7 @@ extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
     }
     pGame->mEventQueue.mWaluigiWallAbortEvent.Deliver(pFielder);
 }
-extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
+void DeliverSuperPresentationEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2485,7 +2484,7 @@ extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
     }
     pGame->mEventQueue.mSuperPresentationEvent.Deliver(pFielder);
 }
-void cGame::fn_80060BFC(CollisionBulletBillData& data)
+void cGame::DeliverBulletBillExplodeEvent(CollisionBulletBillData& data)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2501,7 +2500,7 @@ void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventD
     }
     pGame->mEventQueue.mMontyReappearEvent.Deliver((CharacterImpactEvent*)pEventData);
 }
-extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData)
+void DeliverHammerBroHammerEvent(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2509,7 +2508,7 @@ extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData
     }
     pGame->mEventQueue.mHammerBroHammerEvent.Deliver((CharacterImpactEvent*)pEventData);
 }
-extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
+void DeliverWarioGroundPoundEvent(cGame* pGame, const void* pEventData)
 {
     if (g_pGame->m_eGameState == GS_UNLOADING)
     {
@@ -2631,7 +2630,7 @@ void SetFieldTilt(int relative, float xTilt, float yTilt)
         yTilt = yTilt >= -yLimit ? yTilt : -yLimit;
         yTilt = yTilt <= yLimit ? yTilt : yLimit;
 
-        fn_8005B330(&game->mTiltDirection, -xTilt, -yTilt);
+        CalculateTiltDirection(&game->mTiltDirection, -xTilt, -yTilt);
 
         g_pGame->mfXTilt = xTilt;
         g_pGame->mfYTilt = yTilt;

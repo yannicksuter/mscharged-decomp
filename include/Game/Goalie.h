@@ -267,7 +267,7 @@ public:
     void TacklePlayer(cPlayer* pPlayer);
     void HitAttackTarget(cFielder* pFielder, bool bParam);
     void HandleDekeAttackContact(cFielder* pTarget, bool bParam);
-    void fn_80080BFC(float fDeltaT);
+    void UpdateLaunchedDekeTarget(float fDeltaT);
     void StealBall(cPlayer* pPlayer);
     void WhackSTSPlayer(cFielder* pFielder);
     bool IsLooseBallClose(float fDistFromBox);

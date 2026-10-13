@@ -34,9 +34,15 @@ bool SetWorldAnimation(const char* objectName, const char* animationName,
     ePlayMode playMode);
 void UpdateHighRange();
 void RenderWorldNPCs();
-void fn_80278860(BasicStadium* pStadium, int active);
+void SetStadiumEffectsActive(BasicStadium* pStadium, int active);
 void SetStadiumShadowHeight(BasicStadium* pStadium, float fHeight);
-void fn_8027890C(BasicStadium* pStadium, const char* effects, unsigned long uType);
-void fn_802789A8(BasicStadium* pStadium, unsigned long uType);
+void KillStadiumEffects(BasicStadium* pStadium, const char* effects, unsigned long uType);
+void EmitStadiumEffects(BasicStadium* pStadium, unsigned long uType);
+
+DrawableObject* FindStadiumDrawable(BasicStadium* stadium, unsigned long uHashID);
+void GetStadiumFrustumCorners(BasicStadium* stadium, nlVector4* corners);
+float GetStadiumTime(BasicStadium* stadium);
+void UpdateStadiumWorld(BasicStadium* stadium, float fDeltaT);
+void RegisterStadiumDrawable(BasicStadium* stadium, DrawableObject* object);
 
 #endif // GAME_BASIC_STADIUM_H

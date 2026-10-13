@@ -65,7 +65,7 @@ float PhysicsBall::GetBallMaxVelocity()
     return 90.0f;
 }
 
-void PhysicsBall::fn_8013FE00()
+void PhysicsBall::SuspendBallForces()
 {
     mbIgnoreForces = true;
     m_gravity = 0.0f;

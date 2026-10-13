@@ -274,8 +274,6 @@ void RegisterPhysicsEventHandlers()
     FindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(HandleCollisionWaluigiWall), 0, -1);
 }
 
-extern "C" void fn_800156F8(cBall* pBall, cPlayer* pShooter);
-extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 void HandleCollisionFireballPowerup(void* object)
 {
     ((unsigned char*)object)[4] = true;
@@ -300,7 +298,7 @@ void HandleCollisionWaluigiWall(void* object)
 
 void HandleDestroyHammer(void* object)
 {
-    if (&HammerObject::fn_8016A650)
+    if (&HammerObject::IsActive)
     {
         ((HammerObject*)object)->Reset(false);
     }
@@ -333,12 +331,12 @@ void HandleCollisionKoopaShellEnd(void* data)
     unsigned char* bytes = (unsigned char*)data;
     if (bytes[4] != false)
     {
-        fn_800156F8(
+        DeflectSkillshotBall(
             g_pBall, *(cPlayer**)(*(unsigned char**)bytes + 0x2C));
     }
     else
     {
-        fn_80015B38(g_pBall, 0);
+        CancelBallShot(g_pBall, 0);
     }
     (*(KoopaShellObject**)bytes)->Deactivate(false);
 }
@@ -348,12 +346,12 @@ void HandleCollisionBirdoEggEnd(void* data)
     unsigned char* bytes = (unsigned char*)data;
     if (bytes[4] != false)
     {
-        fn_800156F8(
+        DeflectSkillshotBall(
             g_pBall, *(cPlayer**)(*(unsigned char**)bytes + 0x3C));
     }
     else
     {
-        fn_80015B38(g_pBall, 0);
+        CancelBallShot(g_pBall, 0);
     }
     (*(BirdoEggObject**)bytes)->Hide(false);
 }
@@ -461,7 +459,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                 {
                     break;
                 }
-                pFielder->fn_800451B0(pShockwave->mPosition);
+                pFielder->InitActionGroundElectrocution(pShockwave->mPosition);
                 if (GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
@@ -510,7 +508,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             cCharacter* pOwner = (cCharacter*)pShockwave->mOwner;
             if (pOwner != 0 && pOwner->m_eClassType == FIELDER)
             {
-                fn_800156F8(pBall, (cPlayer*)pOwner);
+                DeflectSkillshotBall(pBall, (cPlayer*)pOwner);
             }
             break;
         }
@@ -525,7 +523,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
         else
         {
-            if (fn_800167A8(pBall))
+            if (IsBooSkillshotBall(pBall))
             {
                 break;
             }
@@ -573,13 +571,13 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             v3Velocity.z = 8.0f + nlRandomf(5.0f);
         }
         pBall->ShootRelease(v3Velocity, spinType);
-        fn_80015B38(pBall, false);
+        CancelBallShot(pBall, false);
         break;
     }
     case PHYSOBJ_BANANA:
         if (shockwaveType == SHOCKWAVE_HIT)
         {
-            ((PhysicsBanana*)pObject)->m_pPowerupObject->fn_8009CEBC(
+            ((PhysicsBanana*)pObject)->m_pPowerupObject->ReactToShockwave(
                 pShockwave->mPosition);
             break;
         }
@@ -594,7 +592,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
     case PHYSOBJ_SHELL:
         if (shockwaveType == SHOCKWAVE_HIT)
         {
-            ((PhysicsShell*)pObject)->m_pPowerupObject->fn_8009CEBC(
+            ((PhysicsShell*)pObject)->m_pPowerupObject->ReactToShockwave(
                 pShockwave->mPosition);
             break;
         }

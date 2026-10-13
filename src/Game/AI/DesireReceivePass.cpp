@@ -92,7 +92,6 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" void fn_80015B38(cBall*, bool);
 void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
 static float sfReceivePassMaxDuration = 5.0f;
@@ -189,7 +188,7 @@ bool DesireReceivePass::Initialize(void* context)
 
     FuzzyVariantCollection* params =
         (FuzzyVariantCollection*)context;
-    meReceiveAnimType = params->Get(11)->fn_800C2BD4();
+    meReceiveAnimType = params->Get(11)->AsInt();
     mbValidPassIntercept = params->IsSet(14);
     if (mbValidPassIntercept)
     {
@@ -238,14 +237,14 @@ bool DesireReceivePass::Initialize(void* context)
 
 void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
 {
-    if (update->fn_800C2BD4() == 3)
+    if (update->AsInt() == 3)
     {
         bool bUnhandled = false;
-        switch (update->GetParameter(8)->fn_800C2BD4())
+        switch (update->GetParameter(8)->AsInt())
         {
         case FIELDER_DESIRE_SHOOT:
             *update = 0;
-            RequestOneTouchShot(update->GetParameters()->Get(16)->fn_800C2BF8());
+            RequestOneTouchShot(update->GetParameters()->Get(16)->AsBool());
             SetPassTransitionTimer();
             break;
         case FIELDER_DESIRE_PASS:
@@ -255,7 +254,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             bool bVolleyPass = false;
             if (update->IsParameterSet(16))
             {
-                bVolleyPass = update->GetParameters()->Get(16)->fn_800C2BF8();
+                bVolleyPass = update->GetParameters()->Get(16)->AsBool();
             }
             RequestOneTouchPass(bVolleyPass, pPassTarget);
             SetPassTransitionTimer();
@@ -323,7 +322,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         }
 
         float fArrivalRadius = g_fReceiveArrivalRadius;
-        if (!fn_800C0E74())
+        if (!IsRunningReceive())
         {
             fArrivalRadius = g_fReceiveArrivalRadiusLarge;
         }
@@ -396,7 +395,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         }
         break;
     case RECEIVE_PASS_ANIMATION:
-        if (m_pFielder->fn_800C2F40() != 0)
+        if (m_pFielder->GetBall() != 0)
         {
             if (m_pFielder->GetGlobalPad() != 0)
             {
@@ -477,7 +476,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             }
             else if (!mbOneTouchShot && IsGroundReceive())
             {
-                if (!fn_800C0E74() || m_pFielder->ShouldStartCrossBlend(0x14))
+                if (!IsRunningReceive() || m_pFielder->ShouldStartCrossBlend(0x14))
                 {
                     m_pFielder->InitActionRunningWB(true);
                     *update = 1;
@@ -520,7 +519,7 @@ void DesireReceivePass::ProcessUserInput()
 {
     if (m_pFielder->GetGlobalPad() != 0)
     {
-        fn_80098098(m_pFielder);
+        HandlePlayerPowerupInput(m_pFielder);
         if (m_pFielder->GetGlobalPad()->JustPressed(0x1C, true))
         {
             RequestOneTouchShot(m_pFielder->IsActionModifierPressed());
@@ -630,7 +629,7 @@ void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarg
     mbOneTouchVolley = false;
     if (pPassTarget == 0)
     {
-        pPassTarget = fn_80096F54(
+        pPassTarget = FindBestPassTarget(
             m_pFielder, false);
     }
     if (pPassTarget == 0)
@@ -715,7 +714,7 @@ bool DesireReceivePass::IsVolleyReceive()
     return (meReceiveAnimType & 1) || (meReceiveAnimType & 0x10);
 }
 
-bool DesireReceivePass::fn_800C0E74()
+bool DesireReceivePass::IsRunningReceive()
 {
     bool result = true;
     switch (mEstimated.nReceivePassAnim)
@@ -793,7 +792,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             for (int i = 0; i < 2; ++i)
             {
                 nlVector3 v3BallPosition;
-                fn_800180F4(
+                PredictBallPosition(
                     g_pBall, &v3BallPosition, fInterceptTimes[i]);
                 nlVector2 v2Delta = {
                     v3BallPosition.x - mv3PassIntercept.x,
@@ -813,7 +812,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         else if (nNumIntercepts == 1)
         {
             estimated.fBallContactTime = fInterceptTimes[0];
-            fn_800180F4(g_pBall, &estimated.v3BallContactPos,
+            PredictBallPosition(g_pBall, &estimated.v3BallContactPos,
                 estimated.fBallContactTime);
         }
         else
@@ -855,13 +854,13 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         nNumIntercepts = 2;
 
         nlVector3 v3FirstBallPosition;
-        fn_800180F4(
+        PredictBallPosition(
             g_pBall, &v3FirstBallPosition, fInterceptTimes[0]);
 
         if (mbValidPassIntercept)
         {
             nlVector3 v3SecondBallPosition;
-            fn_800180F4(g_pBall, &v3SecondBallPosition,
+            PredictBallPosition(g_pBall, &v3SecondBallPosition,
                 fInterceptTimes[1]);
             nlVector3 v3ClosestPoint =
                 GetClosestPointOnLineABFromPointC(v3FirstBallPosition,
@@ -957,7 +956,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         estimated.v3BallContactPos.x - m_pFielder->m_DetChar.m_v3Position.x,
         estimated.v3BallContactPos.y - m_pFielder->m_DetChar.m_v3Position.y,
         estimated.v3BallContactPos.z - m_pFielder->m_DetChar.m_v3Position.z);
-    if (!fn_800C0E74())
+    if (!IsRunningReceive())
     {
         nlVec3Sub(v3FacingDirection, g_pBall->m_v3Position,
             m_pFielder->m_DetChar.m_v3Position);
@@ -985,7 +984,7 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     g_pBall->m_pPhysicsBall->mbUseWindForce = false;
 
     bool result;
-    if (fn_800C0E74())
+    if (IsRunningReceive())
     {
         result = m_pFielder->DoLooseBallContactFromRun(
             mEstimated.v3AnimStartPos, mEstimated.fAnimStartTime,
@@ -1041,7 +1040,7 @@ void DesireReceivePass::SelectContactAnimation()
     else
     {
         v3BallPosition = g_pBall->m_v3Position;
-        if (fn_800C0E74())
+        if (IsRunningReceive())
         {
             unsigned short aFacingDirection =
                 m_pFielder->m_DetChar.m_aActualFacingDirection;
@@ -1326,8 +1325,8 @@ void DesireReceivePass::FindPassPosition(cPlayer* pPasser,
     InterpreterCore* pInterpreter =
         (InterpreterCore*)GetFuzzyRuntime();
     eSearchDirection = (eFieldDirection)
-        fn_800C33C8(pInterpreter, "PassDirection", pPasser,
-            pFielder).fn_800C2BD4();
+        CallPlayersFuzzyFunction(pInterpreter, "PassDirection", pPasser,
+            pFielder).AsInt();
 
     m_pSpaceSearch = new (8, false)
         SSearchBestPass(pPasser, pFielder,
@@ -1498,7 +1497,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
             pPassTarget->SetAIPad(pAIPad);
             pPasser->SetAIPad(0);
         }
-        fn_80015B38(g_pBall, false);
+        CancelBallShot(g_pBall, false);
     }
 
     if (g_pGame->GetGameState() == GS_END_GAME
@@ -1507,6 +1506,6 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
-        fn_80015B38(g_pBall, false);
+        CancelBallShot(g_pBall, false);
     }
 }

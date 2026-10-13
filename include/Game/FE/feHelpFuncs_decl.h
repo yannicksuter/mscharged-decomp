@@ -9,7 +9,7 @@ class TLComponentInstance;
 class FEPointerButton;
 class FEModelHandle;
 
-nlVector2 fn_801CC48C(TLTextInstance* instance);
+nlVector2 GetTextDimensions(TLTextInstance* instance);
 
 void ZeroFloat(float* value);
 void HalveFloat(float* value);

@@ -111,7 +111,7 @@ void SHHallOfFameRoom::Update(float fDeltaT)
             mTrophyTimers[i] -= fDeltaT;
             if (mTrophyTimers[i] <= 0.0f)
             {
-                fn_8027890C(BasicStadium::GetCurrentStadium(), "fe_light_cone_trophy", GetHallOfFameTrophyID(mMode, i));
+                KillStadiumEffects(BasicStadium::GetCurrentStadium(), "fe_light_cone_trophy", GetHallOfFameTrophyID(mMode, i));
                 mTrophyTimers[i] = 0.0f;
             }
         }

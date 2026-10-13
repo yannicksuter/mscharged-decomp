@@ -188,11 +188,11 @@ void UpdateStateMachine(
     {
         *update = 0;
     }
-    if (HasStateMachineTimedOut(machine) && update->fn_800C2BD4() != 1)
+    if (HasStateMachineTimedOut(machine) && update->AsInt() != 1)
     {
         *update = static_cast<int>(DESIRE_TIMED_OUT);
     }
-    if (runUpdate && update->fn_800C2BD4() != 1)
+    if (runUpdate && update->AsInt() != 1)
     {
         machine->Update(
             update, deltaTime);

@@ -94,7 +94,7 @@ private:
     static int AddVolleyReceiveFlag(int, bool);
     bool CanRequestOneTouch();
     float GetBallContactHeight(int);
-    bool fn_800C0E74();
+    bool IsRunningReceive();
     const LooseBallContactAnimInfo* GetContactAnimInfoList(
         int, int&);
     const LooseBallContactAnimInfo* FindBestContactAnimInfo(

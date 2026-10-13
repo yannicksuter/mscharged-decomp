@@ -37,7 +37,7 @@ bool DesireWindupShot::Initialize(void*)
     bool result = true;
     if (m_pFielder->m_pBall != NULL)
     {
-        m_pFielder->fn_8004B658();
+        m_pFielder->InitActionShotWindup();
         mMaxDuration = sWindupShotTimeLimitMargin
                          + m_pFielder->m_pShotMeter->GetTotalDuration();
         mbShotMeterActivated = true;
@@ -113,7 +113,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
                 if (0.25f + (fDistance + (pAvoidable->GetRadius()
                         + pGoalie->m_pAvoidableObject->GetRadius())) < fRange)
                 {
-                    float fSkillshotChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
+                    float fSkillshotChance = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetSkillValue(
                         nlStringLowerHash("Windup/Skillshot"), m_pFielder);
                     if (nlRandomf(1.0f) < fSkillshotChance)
                     {

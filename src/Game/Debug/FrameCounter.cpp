@@ -169,7 +169,7 @@ static inline TimeRegion* FindGameplayRegion()
     return 0;
 }
 
-void FrameCounter::fn_802B7FD4()
+void FrameCounter::DrawGameplayHistogram()
 {
     TimeRegion* region = FindGameplayRegion();
     if (region != 0)
@@ -184,7 +184,7 @@ void FrameCounter::fn_802B7FD4()
     }
 }
 
-void FrameCounter::fn_802B80C4()
+void FrameCounter::LogGameplayFrameTimes()
 {
     TimeRegion* region = FindGameplayRegion();
     if (region != 0)

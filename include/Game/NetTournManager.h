@@ -69,7 +69,7 @@ public:
 
     static void CreateInstance();
     static NetTournManager* Instance();
-    int fn_801CA9D0() const { return mWinningMachine; }
+    int GetWinningMachine() const { return mWinningMachine; }
     // Returns the nonnegative countdown, or -1 when games are not waiting to start.
     int GetSecondsToStartGames() const
     {

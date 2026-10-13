@@ -20,7 +20,7 @@ public:
     }
 
     static WorldDarkening& Instance();
-    void fn_801AF550();
+    void Reset();
     void Fade(float rate, float to);
     void Update(float deltaTime);
     void Render();

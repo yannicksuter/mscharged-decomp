@@ -300,7 +300,7 @@ void DrawableCharacter::Render(cCharacter& source)
 
     bool renderShockModel = false;
     if (useShockModel
-        || (g_bForceShockModel != 0 && source.fn_8001C534(1)))
+        || (g_bForceShockModel != 0 && source.HasSkinMesh(1)))
     {
         renderShockModel = true;
     }
@@ -342,7 +342,7 @@ void DrawableCharacter::Render(cCharacter& source)
         }
     }
 
-    source.fn_8001C574();
+    source.InvalidateSkinMeshPoses();
 }
 
 void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)

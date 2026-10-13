@@ -10,12 +10,12 @@ public:
     {
         return mInterval;
     }
-    float fn_801948B0() const
+    float GetNonBlendableAheadOfFrame() const
     {
         return mNonBlendableAheadOfFrame;
     }
     void fn_80191504();
-    bool fn_801919D0() const
+    bool ShouldReplayNonBlendables() const
     {
         return mReplayNonBlendables == REPLAY_NON_BLENDABLES;
     }

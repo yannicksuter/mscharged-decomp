@@ -283,7 +283,7 @@ public:
 };
 
 class DebugWriteCache;
-extern "C" void fn_8000F324(AvoidController* controller,
+void SyncAvoidController(AvoidController* controller,
     void* context, DebugWriteCache* cache);
 
 inline void VectorAverageHistory::Evaluate(
@@ -303,8 +303,8 @@ inline void VectorAverageHistory::Evaluate(
 }
 
 
-extern "C" void fn_8000F178(AvoidController* controller);
-extern "C" float fn_8000F558( AvoidController* controller, eAvoidableThings things);
+void ResetAvoidController(AvoidController* controller);
+float GetAvoidanceStrength( AvoidController* controller, eAvoidableThings things);
 extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject);
 
 #endif // GAME_AI_AVOID_CONTROLLER_H

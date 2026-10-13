@@ -180,9 +180,9 @@ int GetIndicatorControllerIndex(cPlayer* pCharacter, bool* pSameMachine)
     }
 
     int index = -1;
-    if (pCharacter->fn_800972CC() != 0)
+    if (pCharacter->GetLocalControllerPad() != 0)
     {
-        index = pCharacter->fn_800972CC()->m_padIndex;
+        index = pCharacter->GetLocalControllerPad()->m_padIndex;
     }
     *pSameMachine = true;
     return index;
@@ -322,7 +322,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
             continue;
         }
 
-        if (((cPlayer*)g_pCharacters[i])->fn_8001E184() || !g_pGame->IsGameplayOrOvertime())
+        if (((cPlayer*)g_pCharacters[i])->IsInsideScreenMargin() || !g_pGame->IsGameplayOrOvertime())
         {
             indicatorInfo[i].IncrementOnscreenTimer(dt);
         }

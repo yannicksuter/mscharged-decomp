@@ -12,6 +12,7 @@
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/GL/GLInventory.h"
 #include "Game/Render/Frustum.h"
+#include "Game/Render/RenderShadow.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/Render/Warble.h"
 #include "Game/Render/WorldNPC.h"
@@ -29,11 +30,6 @@
 
 #include "Game/SharedStaticStorage.h"
 
-extern "C"
-{
-    float fn_80184AF8(float antiFlimmer);
-    float fn_80184B08();
-}
 
 template <class T>
 static inline DrawableObject* LoadStadiumObject(WorldObjectLoadContext* context,
@@ -57,7 +53,7 @@ BasicStadium::BasicStadium(GLResourcePool* pResource)
     m_fTime = 0.0f;
 
     GetEmissionManager()->SetShadowHeight(0.0f);
-    fn_80184B08();
+    ResetShadowAntiFlimmer();
 
     m_shadowLightPosition.x = 10.0f;
     m_shadowLightPosition.y = -10.0f;
@@ -174,7 +170,7 @@ static inline float GetWorldEffectBaseInterval(const WorldEffect* pEffect)
 /**
  * Address/Size: 0x802785FC | size: 0x170
  */
-void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
+void UpdateStadiumWorld(BasicStadium* pStadium, float fDeltaT)
 {
     pStadium->m_fTime += fDeltaT;
     pStadium->World::UpdateAnimations(fDeltaT);
@@ -232,7 +228,7 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
 /**
  * Address/Size: 0x8027876C | size: 0x40
  */
-void fn_8027876C(BasicStadium* pStadium, DrawableObject* pObject)
+void RegisterStadiumDrawable(BasicStadium* pStadium, DrawableObject* pObject)
 {
     unsigned long uKey = pObject->m_uHashID;
     pStadium->m_registeredDrawables.Add(uKey, pObject);
@@ -241,7 +237,7 @@ void fn_8027876C(BasicStadium* pStadium, DrawableObject* pObject)
 /**
  * Address/Size: 0x802787AC | size: 0x6C
  */
-DrawableObject* fn_802787AC(BasicStadium* pStadium, unsigned long uHashID)
+DrawableObject* FindStadiumDrawable(BasicStadium* pStadium, unsigned long uHashID)
 {
     DrawableObject** ppObject;
     if (!pStadium->m_registeredDrawables.FindGet(uHashID, &ppObject))
@@ -254,7 +250,7 @@ DrawableObject* fn_802787AC(BasicStadium* pStadium, unsigned long uHashID)
 /**
  * Address/Size: 0x80278818 | size: 0x48
  */
-void fn_80278818(BasicStadium* pStadium, nlVector4* corners)
+void GetStadiumFrustumCorners(BasicStadium* pStadium, nlVector4* corners)
 {
     GetFrustumCorners(
         pStadium->m_pOpaqueView->m_Interface->GetShadowMatrix(),
@@ -274,7 +270,7 @@ static inline void SetWorldEffectsActive(
 /**
  * Address/Size: 0x80278860 | size: 0x5C
  */
-void fn_80278860(BasicStadium* pStadium, int active)
+void SetStadiumEffectsActive(BasicStadium* pStadium, int active)
 {
     if (EmissionManager::Instance() == 0)
     {
@@ -290,14 +286,14 @@ void fn_80278860(BasicStadium* pStadium, int active)
 void SetStadiumShadowHeight(BasicStadium* pStadium, float fHeight)
 {
     pStadium->m_shadowHeight = fHeight;
-    fn_80184AF8(pStadium->m_shadowHeight);
+    SetShadowAntiFlimmer(pStadium->m_shadowHeight);
     GetEmissionManager()->SetShadowHeight(pStadium->m_shadowHeight);
 }
 
 /**
  * Address/Size: 0x8027890C | size: 0x94
  */
-void fn_8027890C(BasicStadium* pStadium, const char* effects, unsigned long uType)
+void KillStadiumEffects(BasicStadium* pStadium, const char* effects, unsigned long uType)
 {
     EmissionManager* pManager = EmissionManager::Instance();
     EffectsGroup* pGroup = pManager->GetEffectsGroup(effects);
@@ -316,7 +312,7 @@ void fn_8027890C(BasicStadium* pStadium, const char* effects, unsigned long uTyp
 /**
  * Address/Size: 0x802789A0 | size: 0x8
  */
-float fn_802789A0(BasicStadium* pStadium)
+float GetStadiumTime(BasicStadium* pStadium)
 {
     return pStadium->m_fTime;
 }
@@ -324,7 +320,7 @@ float fn_802789A0(BasicStadium* pStadium)
 /**
  * Address/Size: 0x802789A8 | size: 0x58
  */
-void fn_802789A8(BasicStadium* pStadium, unsigned long uType)
+void EmitStadiumEffects(BasicStadium* pStadium, unsigned long uType)
 {
     for (nlListIterator<WorldEffect*> iterator = pStadium->m_worldEffects.Begin();
          iterator.IsValid(); iterator.Next())

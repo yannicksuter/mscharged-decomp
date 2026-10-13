@@ -3,12 +3,12 @@
 
 #include "Game/AI/Variant.h"
 
-inline int Variant::fn_800C2BD4() const
+inline int Variant::AsInt() const
 {
     return mData.i;
 }
 
-inline bool Variant::fn_800C2BF8() const
+inline bool Variant::AsBool() const
 {
     return mData.b;
 }

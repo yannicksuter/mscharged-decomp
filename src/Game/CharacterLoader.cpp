@@ -298,11 +298,11 @@ bool CharacterLoader::FinalizeLoadingShockTexture()
     unsigned long texture = glGetTexture(sShockTextureName);
     if (glTextureLoad(texture))
     {
-        pChar->fn_80022E24(texture);
+        pChar->SetShockTexture(texture);
     }
     else
     {
-        pChar->fn_80022E24(0);
+        pChar->SetShockTexture(0);
     }
     return true;
 }
@@ -820,15 +820,15 @@ bool CharacterLoader::StartLoadingSidekickSwapTexture()
     if (glTextureLoad(glGetTexture(szPlayerPath)))
     {
         nlSNPrintf(szArtPath, 64, "%s/%s_mario", szName, szTexName);
-        pChar->fn_80022DAC(glGetTexture(szArtPath));
-        pChar->fn_80022DE8(glGetTexture(szPlayerPath));
+        pChar->SetNormalTexture(glGetTexture(szArtPath));
+        pChar->SetSwapTexture(glGetTexture(szPlayerPath));
         return false;
     }
 
     if (!glBeginLoadTextureBundle(szArtPath, SidekickSwapTextureLoaded_cb, mCurrent, glGetCurrentResourcePool()))
     {
-        pChar->fn_80022DAC((unsigned long)-1);
-        pChar->fn_80022DE8((unsigned long)-1);
+        pChar->SetNormalTexture((unsigned long)-1);
+        pChar->SetSwapTexture((unsigned long)-1);
         return false;
     }
     return true;
@@ -899,8 +899,8 @@ bool CharacterLoader::FinalizeLoadingSidekickSwapTexture()
     }
 
     nlSNPrintf(szBundlePath, 64, "%s/%s_mario", szName, szTexName);
-    pChar->fn_80022DAC(glGetTexture(szBundlePath));
-    pChar->fn_80022DE8(glGetTexture(szPlayerPath));
+    pChar->SetNormalTexture(glGetTexture(szBundlePath));
+    pChar->SetSwapTexture(glGetTexture(szPlayerPath));
     return true;
 }
 
@@ -973,8 +973,8 @@ void CharacterLoader::CreateCharacterInstance()
             pTemplate->pPhysicsData, pTemplate->pGoalieTweaks, pAnimRetargetList,
             mCurrent->nCharIdx);
         pGoalie->m_szEffectsName = pInfo->szEffectsName;
-        pGoalie->fn_80022DAC(GetHashFromTextureFile(pInfo->szTextureFilename));
-        pGoalie->fn_80022DE8(GetHashFromTextureFile(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename));
+        pGoalie->SetNormalTexture(GetHashFromTextureFile(pInfo->szTextureFilename));
+        pGoalie->SetSwapTexture(GetHashFromTextureFile(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename));
 
         g_pCharacters[mCurrent->nCharIdx] = pGoalie;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(goaliepos[mCurrent->nTeamID]);
@@ -989,8 +989,8 @@ void CharacterLoader::CreateCharacterInstance()
             const char* szName = GetCharacterInfo(mCurrent->cc).GetName();
             nlSNPrintf(szTexPath, 64, "mariogoalie/mariogoalie");
             nlSNPrintf(szSwapPath, 64, "%s/%s", szName, szName);
-            pChar->fn_80022DAC(glGetTexture(szTexPath));
-            pChar->fn_80022DE8(glGetTexture(szSwapPath));
+            pChar->SetNormalTexture(glGetTexture(szTexPath));
+            pChar->SetSwapTexture(glGetTexture(szSwapPath));
         }
     }
     else
@@ -1110,8 +1110,8 @@ bool CharacterLoader::FinalizeLoadingCaptainOrGoalieAlternateSwapTexture()
     cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
     unsigned long texture = glGetTexture(szTexPath);
     unsigned long swapTexture = glGetTexture(szSwapPath);
-    pChar->fn_80022DAC(texture);
-    pChar->fn_80022DE8(swapTexture);
+    pChar->SetNormalTexture(texture);
+    pChar->SetSwapTexture(swapTexture);
 
     nlFree(mAltTextureData);
     mAltTextureData = 0;

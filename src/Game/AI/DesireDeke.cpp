@@ -187,7 +187,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
             }
         }
     }
-    m_pFielder->fn_800447C0(direction);
+    m_pFielder->InitActionDeke(direction);
 }
 
 void DesireDeke::Cleanup()

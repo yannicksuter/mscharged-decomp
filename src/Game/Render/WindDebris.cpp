@@ -163,7 +163,7 @@ void WindDebris::Reset()
     Deactivate(false);
 }
 
-void WindDebris::fn_801B4C14(float duration)
+void WindDebris::Freeze(float duration)
 {
 }
 

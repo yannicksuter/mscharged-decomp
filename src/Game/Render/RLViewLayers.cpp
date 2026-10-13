@@ -535,12 +535,12 @@ void SetupViews()
     InitializeHighRange(&gHighRange);
 }
 
-float fn_8027313C()
+float GetNearClipDistance()
 {
     return 0.25f;
 }
 
-void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect, float fov, float pipAspect, float pipFov)
+void UpdateLayerCameras(const nlMatrix4& view, const nlMatrix4& pipView, float aspect, float fov, float pipAspect, float pipFov)
 {
     nlMatrix4 projection;
     glMatrixPerspective(projection, fov, aspect, 0.25f, 4096.0f);

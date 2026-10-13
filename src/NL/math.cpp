@@ -30,7 +30,7 @@ nlMatrix4& nlMakeRotationMatrixAxisAngle(
     return out;
 }
 
-extern "C" void fn_802B5370(
+void nlMakeQuat(
     nlQuaternion& out, const nlVector3& v3RotationAxis, unsigned short angle)
 {
     float fSin;
@@ -42,7 +42,7 @@ extern "C" void fn_802B5370(
     out.w = fCos;
 }
 
-extern "C" void fn_802B53EC(nlQuaternion& out, unsigned short angle)
+void nlMakeQuatX(nlQuaternion& out, unsigned short angle)
 {
     float fSin;
     float fCos;
@@ -58,7 +58,7 @@ void nlMakeQuatY(nlQuaternion& out, unsigned short angle)
     nlVec4Set(*(nlVector4*)&out, 0.0f, fSin, 0.0f, fCos);
 }
 
-void fn_802B549C(nlQuaternion& out, unsigned short angle)
+void nlMakeQuatZ(nlQuaternion& out, unsigned short angle)
 {
     float fSin;
     float fCos;

@@ -241,7 +241,7 @@ bool DesireSuperPower::Initialize(void* context)
         break;
     case LUIGI:
         m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
-        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
+        m_pFielder->BlendPlayerScale(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
         m_pFielder->PlayImpactCameraRumble();
@@ -249,7 +249,7 @@ bool DesireSuperPower::Initialize(void* context)
         break;
     case MARIO:
         m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
-        m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
+        m_pFielder->BlendPlayerScale(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
         m_pFielder->PlayImpactCameraRumble();
@@ -305,21 +305,21 @@ bool DesireSuperPower::Initialize(void* context)
         break;
     }
     case YOSHI:
-        result = fn_800D0DB0(this, context);
+        result = ActivateYoshiSuperPower(this, context);
         break;
     }
 
     if (result)
     {
         mScriptMachine->SetTransition("SuperPowerPlayDesire");
-        DeactivateScriptMachine(fn_800A6968(m_pFielder->m_pTeam));
+        DeactivateScriptMachine(GetTeamScriptMachine(m_pFielder->m_pTeam));
         cFielder* fielder = m_pFielder;
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
         {
             gSuperAbilityTeam = (eTeamID)GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
             ((SuperAbilityOverlay*)g_pOverlayManager->GetScene(OVERLAY_SUPER_ABILITY))->Start();
             PlaySound(fielder->m_uSoundSlotId, 0x790F135F, 0, 0);
-            fn_80060A00(g_pGame, fielder);
+            DeliverSuperPresentationEvent(g_pGame, fielder);
         }
 
         unsigned long sound = PowerupBase::GetSoundType(
@@ -400,7 +400,7 @@ void DesireSuperPower::Update(
  */
 void DesireSuperPower::Cleanup()
 {
-    DeactivateScriptMachine(fn_800A6968(m_pFielder->m_pTeam));
+    DeactivateScriptMachine(GetTeamScriptMachine(m_pFielder->m_pTeam));
 
     switch (m_pFielder->m_DetChar.m_eCharacterClass)
     {
@@ -437,13 +437,13 @@ void DesireSuperPower::Cleanup()
     case LUIGI:
         m_pFielder->m_pTweaks
             = m_pFielder->m_pNormalTweaks;
-        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
+        m_pFielder->BlendPlayerScale(1.0f, gSuperShrinkTime, 1.0f);
         EmitSuperShrink(m_pFielder);
         break;
     case MARIO:
         m_pFielder->m_pTweaks
             = m_pFielder->m_pNormalTweaks;
-        m_pFielder->fn_8001EE74(1.0f, gSuperShrinkTime, 1.0f);
+        m_pFielder->BlendPlayerScale(1.0f, gSuperShrinkTime, 1.0f);
         EmitSuperShrink(m_pFielder);
         break;
     case PEACH:
@@ -586,11 +586,11 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
 /**
  * Offset/Address/Size: 0x1678 | 0x800C9D74 | size: 0x40
  */
-extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
+void EndSuperPowerDesire(DesireSuperPower* self, int param)
 {
     if (param != 0)
     {
-        self->m_pFielder->fn_8004FF40();
+        self->m_pFielder->InitActionSuperPowerEndReact();
     }
     RequestStateMachineDeactivation(self);
 }
@@ -846,14 +846,14 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
             return;
         }
     }
-    m_pFielder->fn_8001EF6C(1.0f);
+    m_pFielder->SetMovementScale(1.0f);
     switch (m_pFielder->m_eActionState)
     {
     case ACTION_DEKE:
-        m_pFielder->fn_8001EF6C(lbl_806DC260);
+        m_pFielder->SetMovementScale(lbl_806DC260);
         break;
     case ACTION_HIT:
-        m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
+        m_pFielder->SetMovementScale(gSuperGrowHitMovementScale);
         break;
     case ACTION_MEGA_STRIKE:
         *update = 1;
@@ -890,14 +890,14 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
             return;
         }
     }
-    m_pFielder->fn_8001EF6C(1.0f);
+    m_pFielder->SetMovementScale(1.0f);
     switch (m_pFielder->m_eActionState)
     {
     case ACTION_DEKE:
-        m_pFielder->fn_8001EF6C(lbl_806DC260);
+        m_pFielder->SetMovementScale(lbl_806DC260);
         break;
     case ACTION_HIT:
-        m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
+        m_pFielder->SetMovementScale(gSuperGrowHitMovementScale);
         break;
     case ACTION_MEGA_STRIKE:
         *update = 1;
@@ -1142,7 +1142,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 unsigned short angle = nlATan2Angle(direction.y, direction.x);
                 short delta = m_pFielder->m_DetChar.m_aActualFacingDirection - angle;
                 float sideline = CloseToSideline(m_pFielder);
-                float question = fn_800DD744(m_pFielder);
+                float question = FacingSideline(m_pFielder);
                 int difference = nlAbsAngle(delta);
                 bool near = difference < 0x800
                     && (m_pFielder->m_pBall != 0 || (bool)(NearToBall(m_pFielder) < 0.7f));
@@ -1167,7 +1167,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         && m_pFielder->GetDesireState() != 13
         && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->m_bSuperPowerTankOn)
         && (bool)(1.0f - ReceivingPass(m_pFielder))
-        && (bool)(1.0f - fn_800DEAB4(m_pFielder))
+        && (bool)(1.0f - WindingUpOrShooting(m_pFielder))
         && CanUsePowerup(m_pFielder, -1))
     {
         if ((bool)UserControlledT(m_pFielder->m_pTeam))
@@ -1218,8 +1218,8 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             }
         }
         else if (!(bool)Offensive(m_pFielder->m_pTeam)
-            && NearToBall(fn_800D66C4(m_pFielder)) < 0.35f
-            && NearToBall(fn_800D66A0(m_pFielder)) < 0.35f
+            && NearToBall(TheirGoalie(m_pFielder)) < 0.35f
+            && NearToBall(MyGoalie(m_pFielder)) < 0.35f
             && FarToBall(m_pFielder) < 0.35f)
         {
             FuzzyVariantCollection params;
@@ -1240,8 +1240,8 @@ DesireUpdate DesireSuperPower::FollowPathTransition(
         return DesireUpdate(gFollowPathFinishedResult, -1.0f, -1.0f);
     cFielder* fielder = (cFielder*)value.GetPlayer();
     DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, FIELDER_DESIRE_SUPER_POWER);
-    int index = GetStateMachineParameters(machine)->Get(0)->fn_800C2BD4();
-    int count = GetStateMachineParameters(machine)->Get(1)->fn_800C2BD4();
+    int index = GetStateMachineParameters(machine)->Get(0)->AsInt();
+    int count = GetStateMachineParameters(machine)->Get(1)->AsInt();
     nlVector2& current = desire->mvPathPoints[index];
     nlVector3 oldPos;
     oldPos.Set(current.x, current.y, 0.0f);
@@ -1255,7 +1255,7 @@ DesireUpdate DesireSuperPower::FollowPathTransition(
         {
             if ((bool)UserControlledT(fielder->GetTeam()))
                 result = 1;
-            else if (fn_800DBAB0(fielder) > 0.1f && fielder->fn_800C2F40())
+            else if (Open(fielder) > 0.1f && fielder->GetBall())
             {
                 result = 3;
                 result.SetParameter(8, FuzzyVariant(gFollowPathWindupShotState));
@@ -1315,10 +1315,10 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
     float danger = CallFielderFuzzyFunction(((FuzzyRuntimeContext*)&value)->GetRuntime(),
         fielder.mFielder, "InDangerForMegastrike").mData.f;
-    float question = fn_800DBB0C(fielder.mFielder);
+    float question = WideOpen(fielder.mFielder);
     bool good = ((1.0f - danger) / 2.0f + question / 2.0f) > 0.75f;
     bool ready = good
-        || (CloseToSideline(fielder.mFielder) > 0.9f && fn_800DD744(fielder.mFielder) > 0.7f);
+        || (CloseToSideline(fielder.mFielder) > 0.9f && FacingSideline(fielder.mFielder) > 0.7f);
     bool shoot = true;
     if (!ready)
     {
@@ -1337,17 +1337,17 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     else if (fielder.mFielder->m_bSuperPowerTankOn && distanceTravelled >= 2.0f)
     {
         bool turn = false;
-        cPlayer* bestPlayer = fn_800D674C(fielder.mFielder);
+        cPlayer* bestPlayer = ClosestOpponentOf(fielder.mFielder);
         float q = CloseTo(fielder.mFielder, bestPlayer);
-        float pass = fn_800DDF54(fielder.mFielder, bestPlayer);
+        float pass = Facing(fielder.mFielder, bestPlayer);
         float best = pass / 2.0f + q / 2.0f;
         for (int i = 0; i < 5; i++)
         {
-            cPlayer* player = fn_800D6688(fielder.mFielder)->GetPlayer(i);
+            cPlayer* player = OtherTeamOf(fielder.mFielder)->GetPlayer(i);
             if (player != bestPlayer)
             {
                 float q = CloseTo(fielder.mFielder, bestPlayer);
-                float pass = fn_800DDF54(fielder.mFielder, bestPlayer);
+                float pass = Facing(fielder.mFielder, bestPlayer);
                 float score = pass / 2.0f + q / 2.0f;
                 if (score > best)
                 {
@@ -1356,8 +1356,8 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
                 }
             }
         }
-        float question1 = fn_800DD234(fielder.mFielder);
-        float question2 = fn_800DD744(fielder.mFielder);
+        float question1 = NearToSideline(fielder.mFielder);
+        float question2 = FacingSideline(fielder.mFielder);
         nlVector2 facingDirection;
         nlSinCos(&facingDirection.y, &facingDirection.x,
             fielder.mFielder->m_DetChar.m_aActualFacingDirection);
@@ -1416,8 +1416,8 @@ int ChooseRunDirection(cFielder* fielder, const unsigned short* angles,
     unsigned short desiredAngle = nlATan2Angle(forward->y, forward->x);
     float best = 0.0f;
     int bestIndex = 0;
-    float question1 = fn_800DD234(fielder);
-    float question2 = fn_800DD744(fielder);
+    float question1 = NearToSideline(fielder);
+    float question2 = FacingSideline(fielder);
     nlVector3 farPos;
     nlVector3 nearPos;
     nlVector3 zero = gSuperPowerZeroVector;
@@ -1442,7 +1442,7 @@ int ChooseRunDirection(cFielder* fielder, const unsigned short* angles,
             float lane = LaneOpenness(fielder->m_DetChar.m_v3Position, farPos,
                 fielder, 0, 0.0f, 1.0f, 1.0f, 0.0f);
             float support = FuzzyNot(NearToGoaliePosition(&nearPos,
-                &fn_800D66C4(fielder)->m_DetChar.m_v3Position));
+                &TheirGoalie(fielder)->m_DetChar.m_v3Position));
             float sideline = 1.0f;
             if (question1 > 0.1f
                 || (angle == fielder->m_DetChar.m_aActualFacingDirection && question2 >= 0.9f))
@@ -1618,7 +1618,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
 /**
  * Offset/Address/Size: 0x86B4 | 0x800D0DB0 | size: 0xFC
  */
-extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
+bool ActivateYoshiSuperPower(DesireSuperPower* self, void*)
 {
     gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
@@ -1626,7 +1626,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     self->m_pFielder->EndConfusion();
     if (self->m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
-        self->m_pFielder->fn_8009750C();
+        self->m_pFielder->EndFire();
         self->m_pFielder->EndAction();
     }
     self->m_pFielder->bYoshiInWindup
@@ -1673,7 +1673,7 @@ static inline bool IsClearOfMuckHoles(nlVector3 point)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch != 0 && patch->m_Type == PATCH_MUCK_HOLE)
             {
                 nlVector3 delta;

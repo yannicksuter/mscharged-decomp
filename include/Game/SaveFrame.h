@@ -11,7 +11,7 @@ public:
         return mInterval;
     }
     void fn_80191504();
-    bool fn_801919D0() const
+    bool ShouldReplayNonBlendables() const
     {
         return true;
     }

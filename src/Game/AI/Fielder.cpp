@@ -362,7 +362,7 @@ static inline float GetCollisionHitIntensity(cFielder* hittee,
 {
     float closingSpeed = GetClosingSpeed(contactPosition, velocity,
         hitter->m_DetChar.m_v3Position, v3Zero);
-    float runningSpeed = fn_8002C254(hittee->m_pTweaks);
+    float runningSpeed = GetTurboSpeed(hittee->m_pTweaks);
     float minimumSpeed = -runningSpeed;
     return NormalizeVal(closingSpeed, minimumSpeed, runningSpeed);
 }
@@ -393,7 +393,7 @@ static inline void ClearPhysicsPatchesOfType(int type)
 {
     for (int i = 0; i < 60; ++i)
     {
-        PhysicsPatch* pPatch = lbl_806E12C8->fn_801745B8(i);
+        PhysicsPatch* pPatch = lbl_806E12C8->GetPatch(i);
         if (pPatch != 0 && pPatch->GetType() == type)
         {
             pPatch->Unknown0();
@@ -537,7 +537,7 @@ static inline bool IsInHitAction(const cFielder* fielder)
 
 static inline bool HasHitWindowStarted(const cFielder* fielder, float fAnimTime)
 {
-    return IsInHitAction(fielder) && fAnimTime >= fn_8002D020(fielder->m_pTweaks);
+    return IsInHitAction(fielder) && fAnimTime >= GetHitEffectiveFirstFrame(fielder->m_pTweaks);
 }
 
 static void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
@@ -617,37 +617,37 @@ static inline bool IsShotValueBelowThreshold(float value, const TweakFloatBindin
 
 inline float cFielder::CalculateShotProbability(float fValue)
 {
-    if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1))
+    if (IsShotValueBelowThreshold(fValue, GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue1))
     {
-        float upperValue = fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1.GetValue();
-        float upperChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance1.GetValue();
-        return InterpolateRangeClamped(fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance0,
+        float upperValue = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue1.GetValue();
+        float upperChance = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance1.GetValue();
+        return InterpolateRangeClamped(GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance0,
             upperChance, 0.0f, upperValue, fValue);
     }
-    else if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2))
+    else if (IsShotValueBelowThreshold(fValue, GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue2))
     {
         return InterpolateRangeClamped(
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance1,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance2,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue1,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance1,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance2,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue1,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue2,
             fValue);
     }
-    else if (IsShotValueBelowThreshold(fValue, fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3))
+    else if (IsShotValueBelowThreshold(fValue, GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue3))
     {
         return InterpolateRangeClamped(
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance2,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance3,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue2,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance2,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance3,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue2,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue3,
             fValue);
     }
     else
     {
         return InterpolateRangeClamped(
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance3,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotChance4,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->fShotValue3,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance3,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotChance4,
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->fShotValue3,
             1.0f,
             fValue);
     }
@@ -729,7 +729,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     AnimRetargetList* pAnimRetargetList, int nIndex)
     : cPlayer(nPlayerID, cc, nModelID, pHierarchy, pAnimInventory,
           pCharacterPhysicsData, pCharTweaks->fHeight,
-          fn_8002BFA8(pCharTweaks, 1.0f), pAnimRetargetList, nIndex, FIELDER)
+          GetScaledPlayerWidth(pCharTweaks, 1.0f), pAnimRetargetList, nIndex, FIELDER)
     , mActionCrowdVars(false, -1.0f)
     , m_aDekeDirection(0)
     , m_bDekeReset(false)
@@ -832,7 +832,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 
     if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
-        m_pBulletBill = gNPCManager->fn_801A9D20();
+        m_pBulletBill = gNPCManager->CreateBulletBill();
     }
     else
     {
@@ -926,7 +926,7 @@ float cFielder::GetRunningSpeed()
     }
     else
     {
-        speed = fn_8002C254(m_pTweaks);
+        speed = GetTurboSpeed(m_pTweaks);
     }
     return GetSpeedPowerupAdjusted(speed);
 }
@@ -1007,7 +1007,7 @@ bool cFielder::EndBowserSuperPower(bool value)
     }
     if (active)
     {
-        fn_800C9D74((DesireSuperPower*)GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER), value);
+        EndSuperPowerDesire((DesireSuperPower*)GetFielderDesire(this, FIELDER_DESIRE_SUPER_POWER), value);
         return true;
     }
     return false;
@@ -1238,7 +1238,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
     }
 
     cFielder* pCaptain = pFielder->m_pTeam->GetCaptain();
-    if (pFielder->m_pTeam->fn_800A6764())
+    if (pFielder->m_pTeam->HasCaptainPowerup())
     {
         eCharacterClass eCaptainClass = pCaptain->m_DetChar.m_eCharacterClass;
         if (eCaptainClass == BOWSER || eCaptainClass == PETEY || eCaptainClass == WALUIGI)
@@ -1476,7 +1476,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
             bPassInFlight = true;
         }
 
-        if (!(bPassInFlight && requireBestInterceptor) && !fn_80014E20(g_pBall))
+        if (!(bPassInFlight && requireBestInterceptor) && !IsBallDangerousShot(g_pBall))
         {
             bool bHasGlobalPad = GetGlobalPad() != 0;
             if (bHasGlobalPad && GetDesireState() >= 0x14)
@@ -1492,7 +1492,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
 
             for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
             {
-                fn_800180F4(g_pBall, &v3BallPos, fTime);
+                PredictBallPosition(g_pBall, &v3BallPos, fTime);
                 u16 aMoveDirection = m_DetChar.m_aActualMovementDirection;
                 float fDeltaX = v3BallPos.x - m_DetChar.m_v3Position.x;
                 float fDeltaY = v3BallPos.y - m_DetChar.m_v3Position.y;
@@ -1506,7 +1506,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
                 {
                     if (requireBestInterceptor)
                     {
-                        if (m_pTeam->GetGoalie()->fn_8009670C(&v3BallPos, true) == this)
+                        if (m_pTeam->GetGoalie()->GetClosestTeamPlayer(&v3BallPos, true) == this)
                         {
                             return true;
                         }
@@ -1643,8 +1643,8 @@ float GetFielderHitReach(cFielder* pFielder)
         nlVector3 v3End;
         if (pFielder->m_DetChar.m_eCharacterClass != YOSHI)
         {
-            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D020(pFielder->m_pTweaks)), &v3Start);
-            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D050(pFielder->m_pTweaks)), &v3End);
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, GetHitEffectiveFirstFrame(pFielder->m_pTweaks)), &v3Start);
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, GetHitEffectiveLastFrame(pFielder->m_pTweaks)), &v3End);
         }
         else
         {
@@ -1661,7 +1661,7 @@ float GetFielderHitReach(cFielder* pFielder)
     }
     float fScale = pFielder->m_DetChar.m_fMovementScale;
     float fReach = pFielder->m_fHitDistance * fScale;
-    fReach += fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale());
+    fReach += GetScaledPlayerWidth(pFielder->m_pTweaks, pFielder->GetPlayerScale());
     return fReach;
 }
 
@@ -1705,7 +1705,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 {
                     float fNumKeys = pFielderCollidedWith->m_pCurrentAnimController
                         ->m_pSAnim->m_nNumKeys;
-                    float fHitTime = fn_8002D038(pFielderCollidedWith->GetTweaks())
+                    float fHitTime = GetHitEffectiveMaxFrame(pFielderCollidedWith->GetTweaks())
                         / fNumKeys;
                     float fMyHitTime = fabsf(m_pCurrentAnimController->get_fTime() - fHitTime);
                     float fOtherHitTime = fabsf(pFielderCollidedWith->m_pCurrentAnimController->get_fTime() - fHitTime);
@@ -1768,7 +1768,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 }
             }
 
-            fn_80047240(pFielderCollidedWith,
+            InitActionHitReact(pFielderCollidedWith,
                 pFielderCollidedWith->m_DetChar.m_aActualFacingDirection,
                 nHitReaction, doFrameLock, true);
             PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
@@ -1854,7 +1854,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         && !pFielderCollidedWith->IsSuperGrowActive())
     {
         if (!pFielderCollidedWith->IsInvincibleChars())
-            pFielderCollidedWith->fn_8004D238();
+            pFielderCollidedWith->FinishSlideAttack();
     }
 }
 
@@ -1905,7 +1905,7 @@ void TryFielderQueuedPass(cFielder* pFielder)
         }
         else
         {
-            pPassTarget = fn_80096F54(pFielder,
+            pPassTarget = FindBestPassTarget(pFielder,
                 pFielder->GetGlobalPad() != 0 ? pFielder->GetGlobalPad()->IsPressed(0x17, true) : false);
         }
 
@@ -1957,7 +1957,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
             nlVector3 v3Offset;
             u16 aFacing = pFielder->m_DetChar.m_aActualFacingDirection;
             nlPolarToCartesian(v3Offset.x, v3Offset.y, aFacing,
-                fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale()));
+                GetScaledPlayerWidth(pFielder->m_pTweaks, pFielder->GetPlayerScale()));
             v3Offset.z = 0.18f;
             nlVec3Add(v3WarpPos, v3WarpPos, v3Offset);
             g_pBall->WarpTo(v3WarpPos);
@@ -2036,7 +2036,7 @@ bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius
         if (g_pGame->IsGameplayOrOvertime())
         {
             AddRandomDirt();
-            fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
+            SetDamageTextureType(DAMAGE_TEXTURE_SCORCH);
         }
         InitActionBombReact(position, radius);
         return true;
@@ -2080,7 +2080,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
         if (chain->IsFrozen())
             InitActionShellReact(chain->mv3Position, chain->mv3Velocity);
         else if (chain->meChainChompState != CHAIN_STATE_RECOVER)
-            fn_80047240(chain->mpThrower, direction, HIT_REACTION_HEAVY, false, false);
+            InitActionHitReact(chain->mpThrower, direction, HIT_REACTION_HEAVY, false, false);
         else
             InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
@@ -2109,7 +2109,7 @@ void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
             velocity.y = 0.0f;
             velocity.z = 8.0f;
         }
-        fn_80044148(velocity);
+        InitActionLaunched(velocity);
         PlaySound(11, debris->mImpactSoundCue, 0, 0);
         PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         EmitTackleImpact(this);
@@ -2189,7 +2189,7 @@ void cFielder::CollideWithWallCallback(
 
         if ((u16)absFacingDelta < 0x2000)
         {
-            fn_8004D238();
+            FinishSlideAttack();
         }
     }
 
@@ -2213,10 +2213,10 @@ void cFielder::CollideWithWallCallback(
              && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         float distance = (float)fabs(m_DetChar.m_v3Position.y);
-        distance -= fn_8002BFA8(m_pTweaks, 1.0f);
+        distance -= GetScaledPlayerWidth(m_pTweaks, 1.0f);
         if (distance > cField::GetSidelineY(1) + 0.5f)
         {
-            fn_80046244();
+            InitActionFall();
         }
     }
 }
@@ -2235,7 +2235,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
         {
             if (m_eActionState == ACTION_MONTY_BURROWED)
             {
-                fn_80097358(this, gFirePatchBurnDuration);
+                StartPlayerFire(this, gFirePatchBurnDuration);
                 return;
             }
             if (m_pBall != 0)
@@ -2243,7 +2243,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 ReleaseBall(BALL_STATE_LOOSE);
                 ShootBallDueToContact(eventData->pPatch->m_Velocity);
             }
-            fn_8004E11C(gFirePatchBurnDuration);
+            InitActionBurning(gFirePatchBurnDuration);
             PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         }
     }
@@ -2264,12 +2264,12 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && !IsInFallAction() && GetActionState() != ACTION_MONTY_BURROWED
             && !IsInvincible())
         {
-            fn_80045AEC(eventData->pPatch);
+            InitActionSuckedAway(eventData->pPatch);
         }
         else if (eventData->pPatch->m_pTarget != 0
             && eventData->pPatch->m_pTarget == this)
         {
-            eventData->pPatch->fn_80173AF4();
+            eventData->pPatch->ClearTarget();
         }
     }
     else if (type == PATCH_YOSHI_YOKE || type == PATCH_MUCK_HOLE || type == PATCH_SAND)
@@ -2303,7 +2303,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             if (type == PATCH_MUCK_HOLE)
             {
                 AddRandomDirt();
-                fn_8001F1C0(DAMAGE_TEXTURE_DIRT);
+                SetDamageTextureType(DAMAGE_TEXTURE_DIRT);
             }
             ActivateConcurrentState(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY, &params,
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY));
@@ -2315,7 +2315,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && !IsInFallAction() && !IsInvincible())
         {
             AddRandomDirt();
-            fn_8001F1C0(DAMAGE_TEXTURE_DIRT);
+            SetDamageTextureType(DAMAGE_TEXTURE_DIRT);
             nlVector3 v3PatchDirection = eventData->pPatch->m_Velocity;
             v3PatchDirection.z = 0.0f;
             if (nlVec3LengthSquared(v3PatchDirection) == 0.0f)
@@ -2329,7 +2329,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 nlRecipSqrt(nlVec3LengthSquared(v3PatchDirection), false));
             nlPolar polar;
             nlCartesianToPolar(polar, v3PatchDirection);
-            fn_80047240(eventData->pPatch->m_pOwner,
+            InitActionHitReact(eventData->pPatch->m_pOwner,
                 polar.a, HIT_REACTION_MEDIUM, false, false);
         }
     }
@@ -2343,7 +2343,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             {
                 return;
             }
-            fn_800470B4(this, eventData->pPatch->m_pOwner);
+            ApplyCharacterHitReaction(this, eventData->pPatch->m_pOwner);
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_SHRINK))
             {
                 return;
@@ -2362,20 +2362,20 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             {
                 if (!pOwner->IsInvincibleChars())
                 {
-                    pOwner->fn_80047240(this,
+                    pOwner->InitActionHitReact(this,
                         pOwner->m_DetChar.m_aActualFacingDirection + 0x8000, HIT_REACTION_MEDIUM, false, false);
                     PlaySound(0, 0xECE94BBB, 0, 0);
                 }
                 else
                 {
-                    fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_LIGHT, false, false);
+                    InitActionHitReact(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_LIGHT, false, false);
                     PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                     PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
-                fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_MEDIUM, false, true);
+                InitActionHitReact(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_MEDIUM, false, true);
                 PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                 PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
             }
@@ -2394,8 +2394,8 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
             nlVector3 v3KnockbackVelocity = m_DetChar.m_v3Velocity;
             v3KnockbackVelocity.z = 25.0f;
-            fn_80044148(v3KnockbackVelocity);
-            fn_80097358(this, 5.0f);
+            InitActionLaunched(v3KnockbackVelocity);
+            StartPlayerFire(this, 5.0f);
         }
     }
     else if (type == PATCH_CHAIN_LIGHTNING)
@@ -2407,11 +2407,11 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
             nlVector3 v3Start;
             nlVec3ScaleAdd(v3Start, -100.0f,
-                eventData->pPatch->fn_80173CCC(),
+                eventData->pPatch->GetPathDirection(),
                 eventData->pPatch->GetPosition());
             nlVector3 v3End;
             nlVec3ScaleAdd(v3End, 100.0f,
-                eventData->pPatch->fn_80173CCC(),
+                eventData->pPatch->GetPathDirection(),
                 eventData->pPatch->GetPosition());
             nlVector3 v3KnockbackDirection = GetClosestPointOnLineABFromPointC(
                 v3Start, v3End, m_DetChar.m_v3Position);
@@ -2434,11 +2434,11 @@ void cFielder::ClearPassTargetIfAmThePassTarget()
         {
             if (pBall->m_pOwner != 0)
             {
-                fn_80015C38(pBall, BALL_STATE_POSSESSED);
+                ChangeBallState(pBall, BALL_STATE_POSSESSED);
             }
             else
             {
-                fn_80015C38(pBall, BALL_STATE_LOOSE);
+                ChangeBallState(pBall, BALL_STATE_LOOSE);
             }
         }
     }
@@ -2699,9 +2699,9 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     case ACTION_RUNNING_PASS:
     {
         PlayerTweaks* pTweaks = m_pTweaks;
-        InitMovementRunning(fn_8002C0AC(pTweaks),
-            fn_8002CF10(pTweaks), fn_8002C180(pTweaks),
-            fn_8002CF24(pTweaks));
+        InitMovementRunning(GetRunTurnSpeed(pTweaks),
+            GetRunTurnFalloff(pTweaks), GetRunAccel(pTweaks),
+            GetRunDecel(pTweaks));
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         mActionRunPassVars.fSpeed = 0.0f;
         m_tMoveToTurboTimer.Clear();
@@ -2755,11 +2755,11 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case ACTION_SHOT_WINDUP:
-        fn_8004BF58(actionState);
+        EndActionShotWindup(actionState);
         break;
 
     case ACTION_SKILLSHOT:
-        fn_8004EC40();
+        EndActionSkillshot();
         break;
 
     case ACTION_BOO_SKILLSHOT:
@@ -2780,7 +2780,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     }
 
     case ACTION_MONTY_BURROWED:
-        fn_8004F180();
+        EndActionMontyBurrowed();
         break;
 
     case ACTION_LAUNCHED:
@@ -2902,13 +2902,13 @@ void cFielder::DoClearBall()
     float fAbsPosition = fabsf(m_DetChar.m_v3Position.x);
     float fPositionValue = gClearPositionWeight * InterpolateRangeClamped(0.0f, 1.0f,
         cField::GetGoalLineX(1U), 0.0f, fAbsPosition);
-    float fBallChargeValue = (1.0f - gClearPositionWeight) * fn_800156A8(g_pBall);
+    float fBallChargeValue = (1.0f - gClearPositionWeight) * GetBallChargeBonus(g_pBall);
     float fDesiredTime = Interpolate(gClearMinFlightTime, gClearMaxFlightTime,
         fBallChargeValue + fPositionValue);
     ShotMeter* pShotMeter = m_pShotMeter;
     float fShotMeterSpeed = pShotMeter->m_fSpeedValue;
     float fShotMeterValue = gClearShotMeterWeight * fShotMeterSpeed;
-    float fPlayerValue = (1.0f - gClearShotMeterWeight) * fn_8002BE38(m_pTweaks);
+    float fPlayerValue = (1.0f - gClearShotMeterWeight) * GetDefensiveRating(m_pTweaks);
     float fClearDistance = Interpolate(gClearMinDistance, gClearMaxDistance,
         fShotMeterValue + fPlayerValue);
 
@@ -3006,8 +3006,8 @@ void cFielder::DoClearBall()
     if (gbUseDumpCharging && m_eClassType == FIELDER)
     {
         float fCharge = Interpolate(gDumpChargeMin, gDumpChargeMax,
-            InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(m_pTweaks)));
-        fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
+            InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetDefensiveRating(m_pTweaks)));
+        SetBallCharge(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     }
     g_pBall->ShootAtFast(v3ClearBallVelocity, v3Target, fDesiredTime);
     g_pBall->ShootRelease(v3ClearBallVelocity, SPINTYPE_BACK);
@@ -3187,7 +3187,7 @@ void cFielder::UpdateFacingToLooseBall()
     {
         int count;
         float times[2];
-        CalcInterceptXY(m_DetChar.m_v3Position, fn_8002C254(GetTweaks()), 0.0f,
+        CalcInterceptXY(m_DetChar.m_v3Position, GetTurboSpeed(GetTweaks()), 0.0f,
             ballPosition, ball->m_v3Velocity, count, times);
         if (count != 0)
         {
@@ -3399,9 +3399,9 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         float speedFactor = InterpolateRangeClamped(0.0f, 1.0f, 18.0f, 6.0f, fShotDist);
         float fShotMinSpeed;
         float fShotMaxSpeed;
-        float fCharge = fn_800156A8(g_pBall);
-        fShotMinSpeed = fn_8002C780(m_pTweaks);
-        fShotMaxSpeed = fn_8002C758(m_pTweaks);
+        float fCharge = GetBallChargeBonus(g_pBall);
+        fShotMinSpeed = GetSlowestShotSpeed(m_pTweaks);
+        fShotMaxSpeed = GetFastestShotSpeed(m_pTweaks);
         fShotSpeed = Interpolate(fShotMinSpeed, fShotMaxSpeed, fCharge);
     }
 
@@ -3572,7 +3572,7 @@ void cFielder::DoRegularShooting(bool bParam)
         if (m_DetChar.m_eCharacterClass == KOOPA || m_DetChar.m_eCharacterClass == BIRDO)
         {
             bHideBall = true;
-            g_pBall->m_pPhysicsBall->fn_8013FE00();
+            g_pBall->m_pPhysicsBall->SuspendBallForces();
         }
     }
     else if (bIsModified)
@@ -3581,8 +3581,8 @@ void cFielder::DoRegularShooting(bool bParam)
     }
 
     float fCharge = Interpolate(gShotChargeMin, gShotChargeMax,
-        InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(m_pTweaks)));
-    fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
+        InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetPowerRating(m_pTweaks)));
+    SetBallCharge(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     CalcRegularShot(v3BallVelocity, v3Target, nBallState);
 
     if (nBallState == BALL_STATE_SKILLSHOT)
@@ -3688,7 +3688,7 @@ void cFielder::DoRegularShooting(bool bParam)
                 case 0x3A:
                 case 0x3B:
                 {
-                    float fCharge = fn_800156A8(g_pBall);
+                    float fCharge = GetBallChargeBonus(g_pBall);
                     PhysicsBall* pPhysicsBall = g_pBall->m_pPhysicsBall;
                     pPhysicsBall->mbUseMagnusEffect = true;
                     pPhysicsBall->mfChargeBonus = fCharge;
@@ -3698,7 +3698,7 @@ void cFielder::DoRegularShooting(bool bParam)
             }
             else
             {
-                float fCharge = fn_800156A8(g_pBall);
+                float fCharge = GetBallChargeBonus(g_pBall);
                 PhysicsBall* pPhysicsBall = g_pBall->m_pPhysicsBall;
                 pPhysicsBall->mbUseMagnusEffect = true;
                 pPhysicsBall->mfChargeBonus = fCharge;
@@ -3710,7 +3710,7 @@ void cFielder::DoRegularShooting(bool bParam)
     SetNoPickUpTime(0.2f);
     if (nBallState == BALL_STATE_SKILLSHOT && m_DetChar.m_eCharacterClass == BOO)
     {
-        fn_8004ED64();
+        InitActionBooSkillshot();
     }
     if (g_pGame->IsGameplayOrOvertime())
     {
@@ -3720,7 +3720,7 @@ void cFielder::DoRegularShooting(bool bParam)
         if (nBallState != BALL_STATE_SKILLSHOT)
         {
             ePlayerStats stat = STATS_00;
-            float fCharge = fn_800156A8(g_pBall);
+            float fCharge = GetBallChargeBonus(g_pBall);
             if (fCharge >= 0.8f)
             {
                 stat = STATS_02;
@@ -3965,7 +3965,7 @@ bool cFielder::IsHitting() const
 {
     const float fAnimTime
         = m_pCurrentAnimController->m_fTime * m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
-    return HasHitWindowStarted(this, fAnimTime) && fAnimTime <= fn_8002D050(m_pTweaks);
+    return HasHitWindowStarted(this, fAnimTime) && fAnimTime <= GetHitEffectiveLastFrame(m_pTweaks);
 }
 
 bool cFielder::IsSlideAttacking() const
@@ -4046,7 +4046,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
         nlVector3 interceptVelocity;
         float interceptTime, closestDistance;
         float speed = GetSlideAttackSpeed(direction);
-        if (FakeBallWorld::FindBallIntercept(GetPosition(), fn_8002BFA8(m_pTweaks, GetPlayerScale()), speed,
+        if (FakeBallWorld::FindBallIntercept(GetPosition(), GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()), speed,
                 target, interceptVelocity, interceptTime, closestDistance, maxTime)
             && target.z < 0.5f)
             return interceptTime;
@@ -4085,7 +4085,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
     nlVector3 landingSpot;
     float solutions[2];
     float speed = GetSlideAttackSpeed(direction);
-    CalcInterceptXY(GetPosition(), speed, fn_8002BFA8(m_pTweaks, GetPlayerScale()), position, velocity, count, solutions);
+    CalcInterceptXY(GetPosition(), speed, GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()), position, velocity, count, solutions);
     float time;
     if (count != 0)
     {
@@ -4271,7 +4271,7 @@ void cFielder::BeginDekeIntangibility()
             else if (GetCharacterClass() == DRYBONES)
                 EmitDekeEnter(this, "drybones_deke_enter");
             unsigned short direction = GetActualFacing() + (nlRandomf(2 * spread) - spread);
-            float safeY = cField::GetSidelineY(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 0.25f;
+            float safeY = cField::GetSidelineY(1U) - GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()) - 0.25f;
             bool nearSideline = fabsf(m_DetChar.m_v3Position.y) >= safeY;
             nlVector3 destination;
             nlPolarToCartesian(destination.x, destination.y, direction, 1.0f);
@@ -4283,9 +4283,9 @@ void cFielder::BeginDekeIntangibility()
 #endif
             bool fixed = false;
             if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && m_pPhysicsCharacter->m_CanCollideWithWall)
-                fixed = cField::FixOutOfBoundsPosition(destination, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()), false);
+                fixed = cField::FixOutOfBoundsPosition(destination, 0.9f * GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()), false);
             else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine)
-                fixed = cField::FixOutOfBoundsX(destination, false, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()));
+                fixed = cField::FixOutOfBoundsX(destination, false, 0.9f * GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()));
             bool overGoal = false;
             if (fixed)
             {
@@ -4296,9 +4296,9 @@ void cFielder::BeginDekeIntangibility()
                         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
                     {
                         if (destination.y < 0.0f)
-                            destination.y = -(1.0f + (0.5f * cNet::GetNetWidth() + fn_8002BFA8(m_pTweaks, GetPlayerScale())));
+                            destination.y = -(1.0f + (0.5f * cNet::GetNetWidth() + GetScaledPlayerWidth(m_pTweaks, GetPlayerScale())));
                         else
-                            destination.y = 1.0f + (0.5f * cNet::GetNetWidth() + fn_8002BFA8(m_pTweaks, GetPlayerScale()));
+                            destination.y = 1.0f + (0.5f * cNet::GetNetWidth() + GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()));
                         destination.z = 0.0f;
                     }
                     else
@@ -4307,7 +4307,7 @@ void cFielder::BeginDekeIntangibility()
                         overGoal = true;
                     }
                 }
-                if (nearSideline && fabsf(destination.x) <= cField::GetGoalLineX(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 2.0f
+                if (nearSideline && fabsf(destination.x) <= cField::GetGoalLineX(1U) - GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()) - 2.0f
 #if defined(VERSION_R4QE01)
                     && !beyondSideline
 #endif
@@ -4320,7 +4320,7 @@ void cFielder::BeginDekeIntangibility()
                 ReleaseBall(BALL_STATE_LOOSE);
                 destination.x = AIsgn(destination.x) * (cField::GetGoalLineX(1U) - 0.5f);
                 g_pBall->SetPosition(destination);
-                fn_800156F8(g_pBall, 0);
+                DeflectSkillshotBall(g_pBall, 0);
             }
         }
     }
@@ -4461,7 +4461,7 @@ void cFielder::CleanActionShot(eFielderActionState newAction)
 
 void cFielder::ResetAnimState()
 {
-    fn_80097648(-1.0f);
+    BlendOutPowerupAnimation(-1.0f);
     SetAnimState(0, false, 0.0f, false, false);
     m_pCurrentAnimController->SetTime(0.0f);
     InitMovementNone(0.0f, 0.0f);
@@ -4700,8 +4700,8 @@ void cFielder::SetIdleAnimState()
     m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualFacingDirection;
     m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     PlayerTweaks* tweaks = m_pTweaks;
-    InitMovementRunning(GetJogTurnSpeed(tweaks), fn_8002CF10(tweaks),
-        fn_8002C180(tweaks), fn_8002CF24(tweaks));
+    InitMovementRunning(GetJogTurnSpeed(tweaks), GetRunTurnFalloff(tweaks),
+        GetRunAccel(tweaks), GetRunDecel(tweaks));
 }
 
 void cFielder::SetIdleWBAnimState()
@@ -4751,7 +4751,7 @@ void cFielder::SetRunningAnimState(float blendTime)
     else
         SetRunLeanSAB(runningAnims, 3, 1);
     PlayerTweaks* tweaks = m_pTweaks;
-    InitMovementRunning(fn_8002C0AC(tweaks), fn_8002CF10(tweaks), fn_8002C180(tweaks), fn_8002CF24(tweaks));
+    InitMovementRunning(GetRunTurnSpeed(tweaks), GetRunTurnFalloff(tweaks), GetRunAccel(tweaks), GetRunDecel(tweaks));
 }
 
 void cFielder::SetRunningWBAnimState(float blendTime)
@@ -4883,7 +4883,7 @@ void cFielder::EndMontyDeke()
 
 void cFielder::ShouldIWave()
 {
-    if (IsCaptain() && m_pBall == 0 && IsAvailableToReceivePass() && m_nPowerupAnimID < 0 && !fn_800976C4())
+    if (IsCaptain() && m_pBall == 0 && IsAvailableToReceivePass() && m_nPowerupAnimID < 0 && !HasPowerupAnimation())
     {
         if (g_pBall->GetOwnerFielder() != 0
             && g_pBall->GetOwnerFielder()->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > 0.5f
@@ -4916,7 +4916,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         {
             float fPlayerScale = m_DetChar.m_fPlayerScale;
             float fContactRadius = 0.18f
-                + fn_8002BFA8(GetTweaks(), fPlayerScale);
+                + GetScaledPlayerWidth(GetTweaks(), fPlayerScale);
             fContactRadius += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fContactRadius * fContactRadius)
@@ -4929,7 +4929,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         {
             float fPlayerScale = pOpponent->m_DetChar.m_fPlayerScale;
             float fContactRadius = 0.18f
-                + fn_8002BFA8(pOpponent->GetTweaks(), fPlayerScale);
+                + GetScaledPlayerWidth(pOpponent->GetTweaks(), fPlayerScale);
             fContactRadius += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(pOpponent->m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fContactRadius * fContactRadius)
@@ -5001,7 +5001,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
     if (pReactee->IsFallenDown())
         return;
 
-    fn_800470B4(pReactee, pAttacker);
+    ApplyCharacterHitReaction(pReactee, pAttacker);
     g_pBall->m_tNoPickupTimer.SetSeconds(0.0f);
     if (pAttacker->CanPickupBall(g_pBall, pAttacker->IsSlideAttacking()))
         pAttacker->PickupBall(g_pBall);
@@ -5038,10 +5038,10 @@ bool cFielder::TestQueuedActions()
     else if (m_DetPlayer.m_eLastPadAction == 27)
     {
         bool volley = bIsModified;
-        result = InitActionPass(fn_80096F54(this, volley), volley, 0, false);
+        result = InitActionPass(FindBestPassTarget(this, volley), volley, 0, false);
     }
     else if (m_DetPlayer.m_eLastPadAction == 29)
-        result = fn_800447C0(m_aDekeDirection);
+        result = InitActionDeke(m_aDekeDirection);
     return result;
 }
 
@@ -5056,7 +5056,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
             if (CanContactLooseBall(false) || forceContact)
             {
                 bool volley = IsActionModifierPressed();
-                cFielder* target = static_cast<cFielder*>(fn_80096F54(this, volley));
+                cFielder* target = static_cast<cFielder*>(FindBestPassTarget(this, volley));
                 InitActionLooseBallPass(target, volley);
                 if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
                     && m_pTeam->mfBallInTimes[m_DetPlayer.m_ID] <= gLooseBallContactBufferTime)
@@ -5110,10 +5110,10 @@ void cFielder::TestButtonsWindup()
     if (GetGlobalPad()->JustPressed(27, true))
     {
         bool modified = IsActionModifierPressed();
-        InitActionPass(fn_80096F54(this, modified), modified, 0, false);
+        InitActionPass(FindBestPassTarget(this, modified), modified, 0, false);
     }
     else if (IsDekeRequested(&direction))
-        fn_800447C0(direction);
+        InitActionDeke(direction);
 }
 
 void cFielder::TestButtonsRunningWB(float deltaTime)
@@ -5124,20 +5124,20 @@ void cFielder::TestButtonsRunningWB(float deltaTime)
     if (GetGlobalPad()->JustPressed(27, true))
     {
         bool modified = IsActionModifierPressed();
-        InitActionPass(fn_80096F54(this, modified), modified, 0, false);
+        InitActionPass(FindBestPassTarget(this, modified), modified, 0, false);
     }
     else if (GetGlobalPad()->IsPressed(28, true))
     {
         if (GetCharacterClass() == YOSHI)
         {
             if (!bYoshiInWindup)
-                fn_8004B658();
+                InitActionShotWindup();
         }
         else
-            fn_8004B658();
+            InitActionShotWindup();
     }
     else if (IsDekeRequested(&direction))
-        fn_800447C0(direction);
+        InitActionDeke(direction);
 
     if (GetGlobalPad()->JustPressed(23, true))
         GetGlobalPad()->ResetButtonStateTicks(23, true);
@@ -5148,7 +5148,7 @@ void cFielder::TestButtonsRunningWB(float deltaTime)
         if (GetCurrentAnimID() == 24 || GetCurrentAnimID() == 25)
             mActionRunningWBVars.bCuePitch = true;
         else
-            fn_8004B148();
+            InitActionRunningPass();
     }
 }
 
@@ -5161,8 +5161,8 @@ void cFielder::TestAnimBallContact()
         nlVector3 newBallPosition;
         g_pBall->m_pPhysicsBall->GetPosition(&newBallPosition);
         nlVector3 oldBallPosition = g_pBall->GetPosition();
-        float contactRadius = g_pBall->fn_80014F38(GetPlayerScale());
-        float ballRadius = g_pBall->fn_80014F38(1.0f);
+        float contactRadius = g_pBall->GetScaledContactRadius(GetPlayerScale());
+        float ballRadius = g_pBall->GetScaledContactRadius(1.0f);
         int jointIndex = m_nBallJointIndex;
         if (TestCollision(contactRadius, GetPrevJointPosition(jointIndex), GetJointPosition(jointIndex),
                 ballRadius, oldBallPosition, newBallPosition))
@@ -5410,7 +5410,7 @@ void cFielder::PrePhysicsUpdate()
     if (pGoalie->mGoalieActionState == GOALIEACTION_PURSUE_DEKE
         && pGoalie->mpTarget == this)
     {
-        pGoalie->fn_80080BFC(0.0f);
+        pGoalie->UpdateLaunchedDekeTarget(0.0f);
     }
 }
 
@@ -5435,7 +5435,7 @@ void cFielder::Update(float fDeltaT)
     {
         cCharacter::Update(fDeltaT);
     }
-    else if (m_DetPlayer.m_bForceFeatherUpdate && fn_800976C4())
+    else if (m_DetPlayer.m_bForceFeatherUpdate && HasPowerupAnimation())
     {
         cCharacter::Update(0.0f);
         m_pPowerupLayer->SetChild(
@@ -5460,7 +5460,7 @@ ePowerUpType cFielder::GetPowerupType()
 void cFielder::UseCaptainPowerup()
 {
     if (IsCaptain())
-        fn_800D38D0((DesireUsePowerup*)GetConcurrentState(m_pAIContext->mScriptMachine, 17));
+        UseCurrentTeamPowerup((DesireUsePowerup*)GetConcurrentState(m_pAIContext->mScriptMachine, 17));
     else
         m_pTeam->GetCaptain()->UseCaptainPowerup();
 }
@@ -5468,7 +5468,7 @@ void cFielder::UseCaptainPowerup()
 void cFielder::UseTeamPowerup(cFielder* pTarget)
 {
     ((DesireUsePowerup*)GetConcurrentState(
-        m_pAIContext->mScriptMachine, 0x11))->fn_800D3968(
+        m_pAIContext->mScriptMachine, 0x11))->RequestPowerup(
         pTarget, POWER_UP_NONE, true);
 }
 
@@ -5477,29 +5477,29 @@ void cFielder::UpdateActionState(float dt)
     switch (m_eActionState)
     {
     case ACTION_DEKE:
-        fn_80044BEC(dt);
+        ActionDeke(dt);
         break;
     case ACTION_ELECTROCUTION:
         ActionElectrocution(dt);
         break;
     case ACTION_FALL:
-        fn_8004643C(dt);
+        ActionFall(dt);
         break;
     case ACTION_SUCKED_AWAY:
-        fn_80045C74(dt);
+        ActionSuckedAway(dt);
         break;
     case ACTION_HIT:
         ActionHit(dt);
         break;
     case ACTION_CROWD_RIOT:
-        fn_80043C18(dt);
+        ActionCrowdRiot(dt);
         break;
     case ACTION_LAUNCHED:
-        fn_80044290(dt);
+        ActionLaunched(dt);
         break;
     case ACTION_HIT_REACT:
     case ACTION_BOMB_HIT_REACT:
-        fn_800474FC(dt);
+        ActionHitReact(dt);
         break;
     case ACTION_LATE_ONETIMER_FROM_VOLLEY:
         ActionLateOneTimerFromVolley(dt);
@@ -5508,13 +5508,13 @@ void cFielder::UpdateActionState(float dt)
         ActionIdleTurn(dt);
         break;
     case ACTION_LOOSE_BALL_PASS:
-        fn_80048484(dt);
+        ActionLooseBallPass(dt);
         break;
     case ACTION_LOOSE_BALL_SHOT:
-        fn_800486DC(dt);
+        ActionLooseBallShot(dt);
         break;
     case ACTION_ONETIMER:
-        fn_80049EA0(dt);
+        ActionOneTimer(dt);
         break;
     case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
         ActionOneTouchPassFromVolley(dt);
@@ -5535,13 +5535,13 @@ void cFielder::UpdateActionState(float dt)
         ActionRunningWB(dt);
         break;
     case ACTION_RUNNING_PASS:
-        fn_8004B2E4(dt);
+        ActionRunningPass(dt);
         break;
     case ACTION_REGULAR_SHOT:
-        fn_8004C02C(dt);
+        ActionRegularShot(dt);
         break;
     case ACTION_SLIDE_ATTACK:
-        fn_8004C88C(dt);
+        ActionSlideAttack(dt);
         break;
     case ACTION_SLIDE_ATTACK_REACT:
         ActionSlideAttackReact(dt);
@@ -5568,19 +5568,19 @@ void cFielder::UpdateActionState(float dt)
         ActionWait(dt);
         break;
     case ACTION_SHOT_WINDUP:
-        fn_8004BB80(dt);
+        ActionShotWindup(dt);
         break;
     case ACTION_BURNING:
-        fn_8004E228();
+        ActionBurning();
         break;
     case ACTION_SKILLSHOT:
-        fn_8004EAB4(dt);
+        ActionSkillshot(dt);
         break;
     case ACTION_BOO_SKILLSHOT:
-        fn_8004EE48(dt);
+        ActionBooSkillshot(dt);
         break;
     case ACTION_MONTY_BURROWED:
-        fn_8004F2FC(dt);
+        ActionMontyBurrowed(dt);
         break;
     }
 }
@@ -5599,7 +5599,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
                 if (IsOnSameTeam(pLookTarget)
                     || nlVec3DistanceSquared2D(pLookTarget->m_DetChar.m_v3Position,
                            m_DetChar.m_v3Position) > 36.0f
-                    || fn_800DDF54(this, pLookTarget) < 0.6f)
+                    || Facing(this, pLookTarget) < 0.6f)
                 {
                     pLookTarget = 0;
                 }
@@ -6074,10 +6074,10 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mActionBowserSuper.nextFireballTime = 0.0f;
     mActionBowserSuper.fireballStageTime = 0.0f;
     mActionBowserSuper.fireballStageNum = 0;
-    mActionBowserSuper.fn_800504A4();
+    mActionBowserSuper.OnReset();
     mWaluigiWallState.mSegmentTimeRemaining = 0.0f;
     mWaluigiWallState.mMinSegmentTime = 0.0f;
-    mWaluigiWallState.fn_800504A8();
+    mWaluigiWallState.ClearWalls();
     nlVec3Set(mActionBooSkillshot.v3StartPosition, 0.0f, 0.0f, 0.0f);
     mActionBooSkillshot.bFollowingBall = false;
     m_bMontyDekeFinished = false;
@@ -6570,7 +6570,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     cache->WriteData(sActWarioSuperType, &m_fNextGasTime, sizeof(m_fNextGasTime));
 
     DesireSteering* steering = (DesireSteering*)GetFielderDesire(this, FIELDER_DESIRE_STEERING);
-    fn_8000F324(steering->m_pAvoidance, context, cache);
+    SyncAvoidController(steering->m_pAvoidance, context, cache);
 
     for (int i = 0; i < 36; i++)
     {

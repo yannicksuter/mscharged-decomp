@@ -3,24 +3,24 @@ extern "C" unsigned long FuzzyAIStringHash(const char* value)
     return nlStringHash(value);
 }
 
-extern "C" float fn_800E3FE0()
+float FuzzyAIIsPassInPlay()
 {
-    return fn_800DFF1C();
+    return IsPassInPlay();
 }
 
-extern "C" float fn_800E3FE4()
+float FuzzyAIIsPassInPlayDelayed()
 {
-    return fn_800DFF60();
+    return IsPassInPlayDelayed();
 }
 
-extern "C" float fn_800E3FE8()
+float FuzzyAIHasPassTarget()
 {
-    return fn_800E00F8();
+    return HasPassTargetConfidence();
 }
 
-extern "C" float fn_800E3FEC()
+float FuzzyAIIsShotInPlay()
 {
-    return fn_800E0034();
+    return IsShotInPlay();
 }
 
 void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
@@ -40,7 +40,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 1:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D82C0(arg0);
+        ((float*)m_SP)[-1] = AbleToInterceptBallForSwapController(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -50,7 +50,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 2:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D7AB8(arg0);
+        ((float*)m_SP)[-1] = AbleToContactLooseBall(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -60,7 +60,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 3:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D7B00(arg0);
+        ((float*)m_SP)[-1] = AbleToSlideTackleBall(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -70,7 +70,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 4:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D85F8(arg0);
+        ((float*)m_SP)[-1] = AbleToUseAnyPowerup(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -82,7 +82,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         int arg1 = (int)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D8764(arg0, arg1);
+        ((float*)m_SP)[-1] = AbleToUsePowerup(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -92,7 +92,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 6:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D84F8(arg0);
+        ((float*)m_SP)[-1] = AbleToUseSuperPower(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -104,7 +104,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D7988(arg0, arg1);
+        ((float*)m_SP)[-1] = ActiveDesire(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -134,7 +134,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 10:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA330(arg0);
+        ((float*)m_SP)[-1] = ChipShotScore(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -144,7 +144,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 11:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA310(arg0);
+        ((float*)m_SP)[-1] = RegularShotScore(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -156,7 +156,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DD9C8(arg0, arg1);
+        ((float*)m_SP)[-1] = AtIdealDistanceForTackling(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -176,7 +176,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 14:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DDD70(arg0);
+        ((float*)m_SP)[-1] = AtIdealDistanceForSkillshot(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -186,7 +186,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 15:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D96F4(arg0);
+        ((float*)m_SP)[-1] = Attacked(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -396,7 +396,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 36:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9B0C(arg0);
+        ((float*)m_SP)[-1] = AvoidingFielders(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -406,7 +406,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 37:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9A38(arg0);
+        ((float*)m_SP)[-1] = AvoidingGoalie(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -416,7 +416,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 38:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9B74(arg0);
+        ((float*)m_SP)[-1] = AvoidingPowerups(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -426,7 +426,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 39:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9BDC(arg0);
+        ((float*)m_SP)[-1] = AvoidingSidelines(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -436,7 +436,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 40:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9C24(arg0);
+        ((float*)m_SP)[-1] = AvoidingStuff(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -446,7 +446,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 41:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800E06F4(arg0);
+        ((float*)m_SP)[-1] = BallCrowding(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -456,7 +456,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 42:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF838(arg0);
+        ((float*)m_SP)[-1] = BallPossessionDuration(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -486,7 +486,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 45:
     {
         cTeam* arg0 = (cTeam*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D671C(arg0);
+        m_SP[-1] = (u32)BestBallInterceptorOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -506,7 +506,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 47:
     {
         cTeam* arg0 = (cTeam*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D6708(arg0);
+        m_SP[-1] = (u32)CaptainOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -518,7 +518,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         int arg1 = (int)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D795C(arg0, arg1);
+        ((float*)m_SP)[-1] = CharacterClassIs(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -528,7 +528,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 49:
     {
         cBall* arg0 = (cBall*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF590(arg0);
+        ((float*)m_SP)[-1] = BallCharge(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -538,7 +538,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 50:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DED80(arg0);
+        ((float*)m_SP)[-1] = PursuingBall(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -561,7 +561,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 52:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D674C(arg0);
+        m_SP[-1] = (u32)ClosestOpponentOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -571,7 +571,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 53:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D8A9C(arg0);
+        ((float*)m_SP)[-1] = BallInterceptionRank(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -581,7 +581,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 54:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D8BAC(arg0);
+        ((float*)m_SP)[-1] = TeamBallInterceptionRank(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -613,7 +613,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 57:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD45C(arg0);
+        ((float*)m_SP)[-1] = CloseToDesiredPosition(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -625,7 +625,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DD504(arg0, arg1);
+        ((float*)m_SP)[-1] = CloseToPlayersDesiredPosition(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -665,7 +665,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 62:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D92DC(arg0);
+        ((float*)m_SP)[-1] = CloseToOpponents(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -685,7 +685,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 64:
     {
         cBall* arg0 = (cBall*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD2F4(arg0);
+        ((float*)m_SP)[-1] = BallCloseToSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -695,7 +695,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 65:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D912C(arg0);
+        ((float*)m_SP)[-1] = CloseToTeammates(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -707,7 +707,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cTeam* arg1 = (cTeam*)m_SP[-1];
         cBall* arg0 = (cBall*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE804(arg0, arg1);
+        ((float*)m_SP)[-1] = BallCloseToNet(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -771,7 +771,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 72:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA130(arg0);
+        ((float*)m_SP)[-1] = Confused(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -815,7 +815,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 77:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D7910(arg0);
+        ((float*)m_SP)[-1] = DefensiveRating(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -857,7 +857,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE4B0(arg0, arg1);
+        ((float*)m_SP)[-1] = DownfieldFrom(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -876,7 +876,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE1F0(arg0, arg1);
+        ((float*)m_SP)[-1] = FaceToFace(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -888,7 +888,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DDF54(arg0, arg1);
+        ((float*)m_SP)[-1] = Facing(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -898,7 +898,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 85:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DE0A8(arg0);
+        ((float*)m_SP)[-1] = FacingBall(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -908,7 +908,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 86:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD744(arg0);
+        ((float*)m_SP)[-1] = FacingSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -928,7 +928,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 88:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA050(arg0);
+        ((float*)m_SP)[-1] = FallingOrShattered(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -938,7 +938,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 89:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD4CC(arg0);
+        ((float*)m_SP)[-1] = FarToDesiredPosition(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -950,7 +950,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DD684(arg0, arg1);
+        ((float*)m_SP)[-1] = FarToPlayersDesiredPosition(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -960,7 +960,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 91:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD294(arg0);
+        ((float*)m_SP)[-1] = FarFromSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -969,8 +969,8 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 92:
     {
-        cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD37C(arg0);
+        cBall* arg0 = (cBall*)m_SP[-1];
+        ((float*)m_SP)[-1] = BallFarFromSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1032,7 +1032,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 98:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D93F4(arg0);
+        ((float*)m_SP)[-1] = FarToOpponents(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1042,7 +1042,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 99:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D924C(arg0);
+        ((float*)m_SP)[-1] = FarToTeammates(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1054,7 +1054,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cTeam* arg1 = (cTeam*)m_SP[-1];
         cBall* arg0 = (cBall*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE994(arg0, arg1);
+        ((float*)m_SP)[-1] = BallFarToNet(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1151,7 +1151,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 110:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9FC8(arg0);
+        ((float*)m_SP)[-1] = Stuck(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1667,7 +1667,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 163:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D66A0(arg0);
+        m_SP[-1] = (u32)MyGoalie(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1697,7 +1697,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 166:
     {
         cTeam* arg0 = (cTeam*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF888(arg0);
+        ((float*)m_SP)[-1] = TeamBallControlConfidence(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1707,7 +1707,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 167:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D763C(arg0);
+        ((float*)m_SP)[-1] = PassingSkill(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1717,7 +1717,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 168:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D76B8(arg0);
+        ((float*)m_SP)[-1] = ShootingSkill(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1747,7 +1747,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 171:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D7734(arg0);
+        ((float*)m_SP)[-1] = HittingSkill(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1771,7 +1771,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cBall* arg1 = (cBall*)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DC19C(arg0, arg1);
+        ((float*)m_SP)[-1] = InBetweenMyNetAndBall(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1783,7 +1783,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DBEF4(arg0, arg1);
+        ((float*)m_SP)[-1] = InBetweenTheirNetAnd(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1795,7 +1795,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cBall* arg1 = (cBall*)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DC434(arg0, arg1);
+        ((float*)m_SP)[-1] = InBetweenTheirNetAndBall(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1867,7 +1867,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 182:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA518(arg0);
+        ((float*)m_SP)[-1] = CutAndBreakOpenness(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1877,7 +1877,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 183:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800E0470(arg0);
+        ((float*)m_SP)[-1] = InNeutralZone(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1889,7 +1889,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cBall* arg0 = (cBall*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800E05A4(arg0, arg1);
+        ((float*)m_SP)[-1] = InNeutralZoneOfPlayer(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1931,7 +1931,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 188:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D74D8(arg0);
+        ((float*)m_SP)[-1] = InShotLane(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2007,7 +2007,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 194:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9D04(arg0);
+        ((float*)m_SP)[-1] = InvincibleToCharacters(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2017,7 +2017,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 195:
     {
         ++m_SP;
-        m_SP[-1] = (u32)fn_80314798(this);
+        m_SP[-1] = (u32)FuzzyCheckScriptTimeBudget(this);
         break;
     }
     case 196:
@@ -2033,7 +2033,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 197:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D6AF0(arg0);
+        ((float*)m_SP)[-1] = JoggingSpeed(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2055,7 +2055,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D79F4(arg0, arg1);
+        ((float*)m_SP)[-1] = RecentlyActiveDesire(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2067,7 +2067,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         int arg1 = (int)m_SP[-1];
         cFielder* arg0 = (cFielder*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D8834(arg0, arg1);
+        ((float*)m_SP)[-1] = LikelyToUsePowerup(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2119,7 +2119,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 205:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D6734(arg0);
+        m_SP[-1] = (u32)MarkOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2171,7 +2171,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 210:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD494(arg0);
+        ((float*)m_SP)[-1] = NearToDesiredPosition(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2183,7 +2183,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cFielder* arg1 = (cFielder*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DD5C4(arg0, arg1);
+        ((float*)m_SP)[-1] = NearToPlayersDesiredPosition(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2223,7 +2223,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 215:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9368(arg0);
+        ((float*)m_SP)[-1] = NearToOpponents(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2233,7 +2233,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 216:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD234(arg0);
+        ((float*)m_SP)[-1] = NearToSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2242,8 +2242,8 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 217:
     {
-        cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD31C(arg0);
+        cBall* arg0 = (cBall*)m_SP[-1];
+        ((float*)m_SP)[-1] = BallNearToSideline(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2253,7 +2253,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 218:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D91BC(arg0);
+        ((float*)m_SP)[-1] = NearToTeammates(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2265,7 +2265,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cTeam* arg1 = (cTeam*)m_SP[-1];
         cBall* arg0 = (cBall*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE8CC(arg0, arg1);
+        ((float*)m_SP)[-1] = BallNearToNet(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2318,7 +2318,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 224:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D78C4(arg0);
+        ((float*)m_SP)[-1] = OffensiveRating(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2328,7 +2328,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 225:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DACF4(arg0);
+        ((float*)m_SP)[-1] = OffField(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2338,7 +2338,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 226:
     {
         cBall* arg0 = (cBall*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DAD3C(arg0);
+        ((float*)m_SP)[-1] = BallOffField(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2348,7 +2348,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 227:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA91C(arg0);
+        ((float*)m_SP)[-1] = OnBreakaway(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2358,7 +2358,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 228:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF028(arg0);
+        ((float*)m_SP)[-1] = OneTouchShooting(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2368,7 +2368,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 229:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DED3C(arg0);
+        ((float*)m_SP)[-1] = MushroomActive(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2380,7 +2380,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D6D14(arg0, arg1);
+        ((float*)m_SP)[-1] = OnOpposingTeams(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2390,7 +2390,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 231:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D6D78(arg0);
+        ((float*)m_SP)[-1] = OnScreen(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2402,7 +2402,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800D6CD4(arg0, arg1);
+        ((float*)m_SP)[-1] = OnSameTeam(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2422,7 +2422,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 234:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DBAB0(arg0);
+        ((float*)m_SP)[-1] = Open(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2454,7 +2454,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 237:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DBB88(arg0);
+        ((float*)m_SP)[-1] = OpenToTheirNet(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2464,7 +2464,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 238:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D66C4(arg0);
+        m_SP[-1] = (u32)TheirGoalie(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2484,7 +2484,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 240:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D6688(arg0);
+        m_SP[-1] = (u32)OtherTeamOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2494,7 +2494,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 241:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DE71C(arg0);
+        ((float*)m_SP)[-1] = AwayFromOwnNet(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2514,13 +2514,13 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 243:
     {
         ++m_SP;
-        ((float*)m_SP)[-1] = fn_800E3FE0();
+        ((float*)m_SP)[-1] = FuzzyAIIsPassInPlay();
         break;
     }
     case 244:
     {
         ++m_SP;
-        ((float*)m_SP)[-1] = fn_800E3FE4();
+        ((float*)m_SP)[-1] = FuzzyAIIsPassInPlayDelayed();
         break;
     }
     case 245:
@@ -2536,7 +2536,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 246:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF2C0(arg0);
+        ((float*)m_SP)[-1] = PassCloseToDone(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2546,7 +2546,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 247:
     {
         cBall* arg0 = (cBall*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D6744(arg0);
+        m_SP[-1] = (u32)PassTargetOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2556,13 +2556,13 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 248:
     {
         ++m_SP;
-        ((float*)m_SP)[-1] = fn_800E3FE8();
+        ((float*)m_SP)[-1] = FuzzyAIHasPassTarget();
         break;
     }
     case 249:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D782C(arg0);
+        ((float*)m_SP)[-1] = PlaymakerRating(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2572,7 +2572,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 250:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D7878(arg0);
+        ((float*)m_SP)[-1] = PowerRating(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2582,7 +2582,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 251:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9480(arg0);
+        ((float*)m_SP)[-1] = PressureFromNearbyOpponents(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2592,7 +2592,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 252:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D88B4(arg0);
+        ((float*)m_SP)[-1] = ProjectilePowerupStock(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2632,7 +2632,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 256:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF118(arg0);
+        ((float*)m_SP)[-1] = ReceivingGroundPass(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2642,7 +2642,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 257:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF474(arg0);
+        ((float*)m_SP)[-1] = ReceivingGroundPassDelayed(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2662,7 +2662,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 259:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF1B8(arg0);
+        ((float*)m_SP)[-1] = ReceivingPassDelayed(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2672,7 +2672,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 260:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF0B8(arg0);
+        ((float*)m_SP)[-1] = ReceivingVolleyPass(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2682,7 +2682,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 261:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DF390(arg0);
+        ((float*)m_SP)[-1] = ReceivingVolleyPassDelayed(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2692,7 +2692,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 262:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9D78(arg0);
+        ((float*)m_SP)[-1] = FallRecoveryProgress(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2708,7 +2708,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 264:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D6BD8(arg0);
+        ((float*)m_SP)[-1] = RunningSpeed(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2777,7 +2777,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 271:
     {
         ++m_SP;
-        ((float*)m_SP)[-1] = fn_800E3FEC();
+        ((float*)m_SP)[-1] = FuzzyAIIsShotInPlay();
         break;
     }
     case 272:
@@ -2793,7 +2793,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 273:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D77B0(arg0);
+        ((float*)m_SP)[-1] = SlideTacklingSkill(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2813,7 +2813,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 275:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D6A90(arg0);
+        ((float*)m_SP)[-1] = MovingSlowly(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2823,7 +2823,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 276:
     {
         cTeam* arg0 = (cTeam*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800DF790(arg0);
+        m_SP[-1] = (u32)GetStrategicBallCarrier(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2843,7 +2843,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 278:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D8970(arg0);
+        ((float*)m_SP)[-1] = NonThrowablePowerupSlots(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2863,7 +2863,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 280:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DA0C8(arg0);
+        ((float*)m_SP)[-1] = GooeySpeedScale(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2873,7 +2873,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 281:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD7F4(arg0);
+        ((float*)m_SP)[-1] = StuckOnSidelines(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2883,7 +2883,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 282:
     {
         Goalie* arg0 = (Goalie*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DE7D8(arg0);
+        ((float*)m_SP)[-1] = GoalieDown(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2893,7 +2893,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 283:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD944(arg0);
+        ((float*)m_SP)[-1] = SuperPowerActive(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2903,7 +2903,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 284:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DD99C(arg0);
+        ((float*)m_SP)[-1] = SuperPowerAction(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2923,7 +2923,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 286:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        m_SP[-1] = (u32)fn_800D6670(arg0);
+        m_SP[-1] = (u32)TeamOf(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2983,7 +2983,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 292:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800D9DD8(arg0);
+        ((float*)m_SP)[-1] = Unavailable(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2995,7 +2995,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         cPlayer* arg1 = (cPlayer*)m_SP[-1];
         cPlayer* arg0 = (cPlayer*)m_SP[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800DE40C(arg0, arg1);
+        ((float*)m_SP)[-1] = UpfieldFrom(arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3035,7 +3035,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 297:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DBB0C(arg0);
+        ((float*)m_SP)[-1] = WideOpen(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3045,7 +3045,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 298:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DEB04(arg0);
+        ((float*)m_SP)[-1] = ShotMeterProgress(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3055,7 +3055,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 299:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DEBBC(arg0);
+        ((float*)m_SP)[-1] = DoingSkillshot(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3065,7 +3065,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 300:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DEAB4(arg0);
+        ((float*)m_SP)[-1] = WindingUpOrShooting(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3075,7 +3075,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 301:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DEBF4(arg0);
+        ((float*)m_SP)[-1] = ShotWindupProgress(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -3085,7 +3085,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 302:
     {
         cFielder* arg0 = (cFielder*)m_SP[-1];
-        ((float*)m_SP)[-1] = fn_800DEC88(arg0);
+        ((float*)m_SP)[-1] = SkillshotWindupProgress(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;

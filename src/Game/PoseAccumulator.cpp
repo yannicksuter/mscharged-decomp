@@ -294,7 +294,7 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
         {
             if (m_rot[i].quatAccumulatedWeight == 0.0f)
             {
-                fn_802B549C(*pLocalQuaternion, m_rot[i].rotAroundZ);
+                nlMakeQuatZ(*pLocalQuaternion, m_rot[i].rotAroundZ);
             }
             else
             {
@@ -304,7 +304,7 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 if (fabsf(fTotalWeight) > weightEpsilon)
                 {
                     nlQuaternion quatAroundZ;
-                    fn_802B549C(quatAroundZ, m_rot[i].rotAroundZ);
+                    nlMakeQuatZ(quatAroundZ, m_rot[i].rotAroundZ);
                     nlQuatNLerp(m_rot[i].q, m_rot[i].q, quatAroundZ, m_rot[i].rotAroundZAccumulatedWeight / fTotalWeight);
                 }
                 *pLocalQuaternion = m_rot[i].q;

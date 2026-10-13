@@ -59,7 +59,7 @@ bool DesirePreparePass::Initialize(void* context)
         mThinkTimer.SetSeconds(fDuration);
     }
 
-    SkillTweaks* pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
+    SkillTweaks* pSkillTweaks = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam);
     float fReactionTime = 1.0f - pSkillTweaks->GetReaction(0);
     float fAbortThreshold = sPassAbortThreshold;
     float fReactionTimeRange =

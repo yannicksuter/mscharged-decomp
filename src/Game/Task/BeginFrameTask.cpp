@@ -80,7 +80,7 @@ float GetWidescreenAspectRatio()
     return 1.666f;
 }
 
-glModel* fn_80112E1C(glModel* model)
+glModel* ParticleLightingCallback(glModel* model)
 {
     return NULL;
 }
@@ -141,10 +141,10 @@ void SetupMatrices(cBaseCamera* pCamera, const nlMatrix4* pOverride)
         }
     }
 
-    fn_80273144(cCameraManager::m_matView, view, GetAspectRatio(),
+    UpdateLayerCameras(cCameraManager::m_matView, view, GetAspectRatio(),
         DegreesToRadians(cCameraManager::m_fFOV), fAspect, fFOVRad);
 
-    ParticleSystem::m_LightingCallback = fn_80112E1C;
+    ParticleSystem::m_LightingCallback = ParticleLightingCallback;
     if (cCameraManager::PeekCamera() != NULL)
     {
         cCameraManager::m_BeginFrameCameraType
@@ -439,7 +439,7 @@ void BeginFrameTask::Run(float dt)
     }
     if (g_bFrameStatsOnScreen)
     {
-        g_FrameCounter.fn_802B7FD4();
+        g_FrameCounter.DrawGameplayHistogram();
     }
     if (g_bDisplayFrameRate.GetValue())
     {
@@ -462,7 +462,7 @@ void BeginFrameTask::Run(float dt)
     {
         if (g_pCharacters[i] != NULL)
         {
-            g_pCharacters[i]->fn_80022D58(dt);
+            g_pCharacters[i]->UpdateMegaBlend(dt);
         }
     }
 

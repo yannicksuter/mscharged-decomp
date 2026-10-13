@@ -184,7 +184,7 @@ AvoidController::AvoidController(cFielder* fielder)
 {
     sSidelineMaxDistance = sInitialSidelineMaxDistance;
     sSidelineMaxDistanceWhileAvoiding = sInitialSidelineMaxDistanceWhileAvoiding;
-    fn_8000F178(this);
+    ResetAvoidController(this);
     m_pFielder = fielder;
 }
 
@@ -193,7 +193,7 @@ AvoidController::~AvoidController()
     m_Avoidances.Clear();
 }
 
-extern "C" void fn_8000F178(AvoidController* controller)
+void ResetAvoidController(AvoidController* controller)
 {
     controller->m_ThingsToAvoid = AVOID_NOTHING;
     controller->m_CurrentlyAvoiding = AVOID_NOTHING;
@@ -215,7 +215,7 @@ extern "C" void fn_8000F178(AvoidController* controller)
     controller->m_NumAvoidances = 0;
 }
 
-extern "C" void fn_8000F324(AvoidController* controller,
+void SyncAvoidController(AvoidController* controller,
     void* context, DebugWriteCache* cache)
 {
     if (sAvoidControllerType == 0xFFFF)
@@ -238,7 +238,7 @@ void AvoidController::SetThingsToAvoid(int thingsToAvoid)
     m_ThingsToAvoid = thingsToAvoid;
     if (thingsToAvoid == AVOID_NOTHING)
     {
-        fn_8000F178(this);
+        ResetAvoidController(this);
     }
 }
 
@@ -247,7 +247,7 @@ nlVector3& AvoidController::GetLastRepulsionVector(eAvoidableThings things)
     return m_LastRepulVec[GetAvoidableIndex(things)];
 }
 
-extern "C" float fn_8000F558(
+float GetAvoidanceStrength(
     AvoidController* controller, eAvoidableThings things)
 {
     return controller->m_LastRepulWeight[GetAvoidableIndex(things)];
@@ -691,7 +691,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
                 bTurboAllowed = false;
             aDesiredMovementDir = nlVector3ToAngle(
                 *(const nlVector3*)&vNewDesiredVelDir);
-            m_pFielder->fn_8001DCE0(aDesiredMovementDir);
+            m_pFielder->SetDesiredMovementDirection(aDesiredMovementDir);
             m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
         }
     }
@@ -700,7 +700,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->m_DetChar.m_fDesiredSpeed, m_pFielder->GetTweaks()->GetRunningSpeed());
         aDesiredMovementDir = m_pFielder->m_DetChar.m_aDesiredMovementDirection;
         m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
-        m_pFielder->fn_8001DCE0(aDesiredMovementDir);
+        m_pFielder->SetDesiredMovementDirection(aDesiredMovementDir);
         m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
     }
     v3OutRepulsion = m_SidelineRepulsion;
@@ -765,7 +765,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     {
         fDesiredSpeed = fDesiredSpeed >= fJogSpeed ? fDesiredSpeed : fJogSpeed;
         m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
-        m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
+        m_pFielder->SetDesiredMovementDirection(nlVector3ToAngle(v3Repulsion));
         m_pFielder->SetDesiredFacingDirection(nlVector3ToAngle(v3Repulsion), false);
     }
     else

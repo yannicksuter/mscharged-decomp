@@ -132,7 +132,7 @@ bool DesireMushroom::Initialize(void* context)
     m_pFielder->EndShrink();
     if (!m_pFielder->IsSuperGrowActive())
     {
-        m_pFielder->fn_8001EE74(sMushroomPlayerScale, 0.2f, -1.0f);
+        m_pFielder->BlendPlayerScale(sMushroomPlayerScale, 0.2f, -1.0f);
     }
     EmitMushroom(m_pFielder, false);
     return result;
@@ -189,7 +189,7 @@ void DesireMushroom::Cleanup()
     if (!m_pFielder->IsSuperGrowActive()
         && !m_pFielder->IsShrunk())
     {
-        m_pFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
+        m_pFielder->BlendPlayerScale(1.0f, 0.2f, -1.0f);
     }
 }
 
@@ -310,13 +310,13 @@ void DesireGooey::Update(
             1.0f, mf_NotRunning_SpeedScale, 0.02f, 2.0f, mfGooPercentage);
         float movementScale = InterpolateRangeClamped(
             1.0f, mf_NotRunning_MovementScale, 0.02f, 2.0f, mfGooPercentage);
-        m_pFielder->fn_8001EF6C(movementScale);
+        m_pFielder->SetMovementScale(movementScale);
     }
     else
     {
         float movementScale = InterpolateRangeClamped(
             1.0f, mfMaxGooEffect, 0.0f, 1.0f, mfGooPercentage);
-        m_pFielder->fn_8001EF6C(movementScale);
+        m_pFielder->SetMovementScale(movementScale);
     }
 
     if (!g_pGame->IsGameplayOrOvertime())
@@ -331,7 +331,7 @@ void DesireGooey::Update(
 void DesireGooey::Cleanup()
 {
     mfMaxGooEffect = 1.0f;
-    m_pFielder->fn_8001EF6C(1.0f);
+    m_pFielder->SetMovementScale(1.0f);
     m_pFielder->m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
 }
 
@@ -353,8 +353,8 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->EndWaluigiSuperPower();
     m_pFielder->EndLuigiSuperPower();
     m_pFielder->EndFrozenOrDazed();
-    m_pFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
-    m_pFielder->fn_8001EE74(
+    m_pFielder->BlendPlayerScale(1.0f, 0.0f, -1.0f);
+    m_pFielder->BlendPlayerScale(
         sShrinkPlayerScale, sShrinkScaleDuration, sShrinkMovementScale);
 
     FuzzyVariantCollection* params
@@ -364,7 +364,7 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->m_pTweaks->fHeight
         = m_pFielder->m_pNormalTweaks->fHeight.GetValue();
     m_pFielder->m_pTweaks->fWidth
-        = fn_8002BFA8(m_pFielder->m_pNormalTweaks, 1.0f);
+        = GetScaledPlayerWidth(m_pFielder->m_pNormalTweaks, 1.0f);
     CreateMushroomEffect(m_pFielder);
 
     if (m_pFielder->m_pBall != 0)
@@ -412,7 +412,7 @@ void DesireShrink::Update(DesireUpdate* update, float)
 {
     if (!(m_pFielder->m_DetChar.m_fPlayerScale < 0.99f))
     {
-        m_pFielder->fn_8001EE74(
+        m_pFielder->BlendPlayerScale(
             sShrinkPlayerScale, 0.0f, sShrinkMovementScale);
     }
 
@@ -429,7 +429,7 @@ void DesireShrink::Cleanup()
 {
     CreateMushroomEffect(m_pFielder);
     m_pFielder->m_pTweaks = m_pFielder->m_pNormalTweaks;
-    m_pFielder->fn_8001EE74(1.0f, sShrinkScaleDuration, 1.0f);
+    m_pFielder->BlendPlayerScale(1.0f, sShrinkScaleDuration, 1.0f);
     if (g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != GS_UNLOADING)
     {
         cFielder* captain = m_pFielder->m_pTeam->GetOtherTeam()->GetCaptain();
@@ -486,7 +486,7 @@ bool DesireFrozen::Initialize(void* context)
 
     if (m_pFielder->IsSlideAttacking())
     {
-        m_pFielder->fn_8004D238();
+        m_pFielder->FinishSlideAttack();
     }
 
     mePrevActionState = m_pFielder->m_eActionState;
@@ -626,7 +626,7 @@ void DesireFrozen::Cleanup()
         m_pFielder->EndConfusion();
         if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
         {
-            m_pFielder->fn_8009750C();
+            m_pFielder->EndFire();
             m_pFielder->EndAction();
         }
         m_pFielder->EndMarioSuperPower();
@@ -694,9 +694,9 @@ void DesireFrozen::SetFrozenState(int state)
     case FROZEN_NONE:
         break;
     case FROZEN_ICE:
-        m_pFielder->fn_8009750C();
+        m_pFielder->EndFire();
         EmitFreeze(m_pFielder);
-        m_pFielder->fn_8001F1D8();
+        m_pFielder->IncreaseDirt();
         if (mePrevFrozenState != FROZEN_ICE)
         {
             PlaySound(16, 0x1DFB6861, 0, 0);

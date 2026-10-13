@@ -60,7 +60,7 @@ float RandomChance(float fChance)
     return FGREATER(fChance, GenerateFilteredRandom());
 }
 
-extern "C" cTeam* fn_800D6670(cFielder* pFielder)
+cTeam* TeamOf(cFielder* pFielder)
 {
     if (pFielder != NULL)
     {
@@ -69,7 +69,7 @@ extern "C" cTeam* fn_800D6670(cFielder* pFielder)
     return NULL;
 }
 
-extern "C" cTeam* fn_800D6688(cFielder* pFielder)
+cTeam* OtherTeamOf(cFielder* pFielder)
 {
     if (pFielder != NULL)
     {
@@ -78,25 +78,25 @@ extern "C" cTeam* fn_800D6688(cFielder* pFielder)
     return NULL;
 }
 
-extern "C" Goalie* fn_800D66A0(cFielder* pFielder)
+Goalie* MyGoalie(cFielder* pFielder)
 {
     if (pFielder != NULL)
     {
-        return fn_800D6670(pFielder)->GetGoalie();
+        return TeamOf(pFielder)->GetGoalie();
     }
     return NULL;
 }
 
-extern "C" Goalie* fn_800D66C4(cFielder* pFielder)
+Goalie* TheirGoalie(cFielder* pFielder)
 {
     if (pFielder != NULL)
     {
-        return fn_800D6688(pFielder)->GetGoalie();
+        return OtherTeamOf(pFielder)->GetGoalie();
     }
     return NULL;
 }
 
-extern "C" cFielder* fn_800D6708(cTeam* team)
+cFielder* CaptainOf(cTeam* team)
 {
     if (team != NULL)
     {
@@ -105,7 +105,7 @@ extern "C" cFielder* fn_800D6708(cTeam* team)
     return NULL;
 }
 
-extern "C" cFielder* fn_800D671C(cTeam* team)
+cFielder* BestBallInterceptorOf(cTeam* team)
 {
     if (team != NULL)
     {
@@ -114,7 +114,7 @@ extern "C" cFielder* fn_800D671C(cTeam* team)
     return NULL;
 }
 
-extern "C" cFielder* fn_800D6734(cFielder* pFielder)
+cFielder* MarkOf(cFielder* pFielder)
 {
     return NULL;
 }
@@ -124,12 +124,12 @@ extern "C" void* fn_800D673C(void*)
     return NULL;
 }
 
-extern "C" cPlayer* fn_800D6744(cBall* ball)
+cPlayer* PassTargetOf(cBall* ball)
 {
     return ball->m_pPassTarget;
 }
 
-extern "C" cFielder* fn_800D674C(cPlayer* player)
+cFielder* ClosestOpponentOf(cPlayer* player)
 {
     return player->GetClosestOpponentFielder(NULL, true);
 }
@@ -330,7 +330,7 @@ float Marking(cFielder* pMarking, cPlayer* pMarked)
     return 0.0f;
 }
 
-extern "C" float fn_800D6A90(cFielder* pFielder)
+float MovingSlowly(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -342,7 +342,7 @@ extern "C" float fn_800D6A90(cFielder* pFielder)
     return NormalizeVal(fSpeed, 0.7f * fAttribute, 2.0f);
 }
 
-extern "C" float fn_800D6AF0(cFielder* pFielder)
+float JoggingSpeed(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -372,7 +372,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
         fInterpolated);
 }
 
-extern "C" float fn_800D6BD8(cFielder* pFielder)
+float RunningSpeed(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -391,13 +391,13 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
         fAttribute = GetRunSpeed(pFielder->GetTweaks());
     }
 
-    float fSecondary = fn_8002C254(pFielder->GetTweaks());
+    float fSecondary = GetTurboSpeed(pFielder->GetTweaks());
     float fFirst = Interpolate(fBaseSpeed, fAttribute, 0.45f);
     float fSecond = Interpolate(fAttribute, fSecondary, 0.45f);
     return NormalizeVal(fSpeed, fFirst, fSecond);
 }
 
-extern "C" float fn_800D6CD4(cPlayer* pPlayer1, cPlayer* pPlayer2)
+float OnSameTeam(cPlayer* pPlayer1, cPlayer* pPlayer2)
 {
     if (pPlayer1 == NULL)
     {
@@ -417,7 +417,7 @@ extern "C" float fn_800D6CD4(cPlayer* pPlayer1, cPlayer* pPlayer2)
     return 0.0f;
 }
 
-extern "C" float fn_800D6D14(cPlayer* pPlayer1, cPlayer* pPlayer2)
+float OnOpposingTeams(cPlayer* pPlayer1, cPlayer* pPlayer2)
 {
     if (pPlayer1 == NULL)
     {
@@ -438,14 +438,14 @@ extern "C" float fn_800D6D14(cPlayer* pPlayer1, cPlayer* pPlayer2)
     return 0.0f;
 }
 
-extern "C" float fn_800D6D78(cPlayer* pPlayer)
+float OnScreen(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
         return 0.0f;
     }
 
-    if (pPlayer->fn_8001E160())
+    if (pPlayer->IsOnScreen())
     {
         return 1.0f;
     }
@@ -608,7 +608,7 @@ float InPassingLane(cFielder* pFielder)
     return InPassingLane(pFielder, g_pBall->m_pPassTarget, 0.0f);
 }
 
-extern "C" float fn_800D74D8(cFielder* pFielder)
+float InShotLane(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -623,14 +623,14 @@ extern "C" float fn_800D74D8(cFielder* pFielder)
     nlPolar pBallSpeedPolar;
     nlCartesianToPolar(pBallSpeedPolar, g_pBall->m_v3Velocity.x, g_pBall->m_v3Velocity.y);
     float fPossibleFielderDistance = fBallDistance / pBallSpeedPolar.r;
-    fPossibleFielderDistance *= fn_8002C254(pFielder->GetTweaks());
+    fPossibleFielderDistance *= GetTurboSpeed(pFielder->GetTweaks());
     float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position,
         v3BetweenIntercept), true);
     return NormalizeVal(fDistance, fPossibleFielderDistance + g_pGame->m_pFuzzyTweaks->fShotLaneDistance,
         fPossibleFielderDistance);
 }
 
-extern "C" float fn_800D763C(cFielder* pFielder)
+float PassingSkill(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -646,7 +646,7 @@ extern "C" float fn_800D763C(cFielder* pFielder)
     return 1.0f;
 }
 
-extern "C" float fn_800D76B8(cFielder* pFielder)
+float ShootingSkill(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -662,7 +662,7 @@ extern "C" float fn_800D76B8(cFielder* pFielder)
     return 1.0f;
 }
 
-extern "C" float fn_800D7734(cFielder* pFielder)
+float HittingSkill(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -678,7 +678,7 @@ extern "C" float fn_800D7734(cFielder* pFielder)
     return 1.0f;
 }
 
-extern "C" float fn_800D77B0(cFielder* pFielder)
+float SlideTacklingSkill(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -694,7 +694,7 @@ extern "C" float fn_800D77B0(cFielder* pFielder)
     return 1.0f;
 }
 
-extern "C" float fn_800D782C(cFielder* fielder)
+float PlaymakerRating(cFielder* fielder)
 {
     if (fielder == NULL)
     {
@@ -705,7 +705,7 @@ extern "C" float fn_800D782C(cFielder* fielder)
     return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetPlaymakerRating(pTweaks));
 }
 
-extern "C" float fn_800D7878(cFielder* fielder)
+float PowerRating(cFielder* fielder)
 {
     if (fielder == NULL)
     {
@@ -713,10 +713,10 @@ extern "C" float fn_800D7878(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetPowerRating(pTweaks));
 }
 
-extern "C" float fn_800D78C4(cFielder* fielder)
+float OffensiveRating(cFielder* fielder)
 {
     if (fielder == NULL)
     {
@@ -727,7 +727,7 @@ extern "C" float fn_800D78C4(cFielder* fielder)
     return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetOffensiveRating(pTweaks));
 }
 
-extern "C" float fn_800D7910(cFielder* fielder)
+float DefensiveRating(cFielder* fielder)
 {
     if (fielder == NULL)
     {
@@ -735,10 +735,10 @@ extern "C" float fn_800D7910(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetDefensiveRating(pTweaks));
 }
 
-extern "C" float fn_800D795C(cFielder* pFielder, int unidentified)
+float CharacterClassIs(cFielder* pFielder, int unidentified)
 {
     if (pFielder == NULL)
     {
@@ -753,7 +753,7 @@ extern "C" float fn_800D795C(cFielder* pFielder, int unidentified)
     return 0.0f;
 }
 
-extern "C" float fn_800D7988(int nAction, cFielder* pFielder)
+float ActiveDesire(int nAction, cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -778,7 +778,7 @@ extern "C" float fn_800D7988(int nAction, cFielder* pFielder)
 static const nlVector2 lbl_806E41E0 = { 3000.0f, 0.0f };
 
 
-extern "C" float fn_800D79F4(int nAction, cFielder* pFielder)
+float RecentlyActiveDesire(int nAction, cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -810,7 +810,7 @@ extern "C" float fn_800D7A70(cFielder* pFielder)
     return 1.0f;
 }
 
-extern "C" float fn_800D7AB8(cFielder* pFielder)
+float AbleToContactLooseBall(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -828,10 +828,10 @@ extern "C" float fn_800D7AB8(cFielder* pFielder)
 static float FacingAdjustedConfidence(float fScore, cPlayer* pFielder, cPlayer* pOwner)
 {
     return InterpolateRangeClamped(fScore, 0.33f * fScore, 1.0f, 0.0f,
-        fn_800DDF54(pFielder, pOwner));
+        Facing(pFielder, pOwner));
 }
 
-extern "C" float fn_800D7B00(cFielder* pFielder)
+float AbleToSlideTackleBall(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -862,7 +862,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
 
 static float BallApproachConfidence(float fClosingScore, cPlayer* pPlayer)
 {
-    float fFacingScore = fn_800DE0A8(pPlayer);
+    float fFacingScore = FacingBall(pPlayer);
     return fClosingScore / 2.0f + fFacingScore / 2.0f;
 }
 
@@ -907,7 +907,7 @@ float AbleToInterceptBall(cPlayer* pPlayer)
     return fScore;
 }
 
-extern "C" float fn_800D82C0(cFielder* pFielder)
+float AbleToInterceptBallForSwapController(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -937,7 +937,7 @@ extern "C" float fn_800D82C0(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800D84F8(cFielder* pFielder)
+float AbleToUseSuperPower(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -947,7 +947,7 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
         if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
             fScore = 1.0f;
-        else if (pFielder->m_pTeam->fn_800A6560())
+        else if (pFielder->m_pTeam->CanTogglePowerup())
         {
             powerup = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
             if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
@@ -957,7 +957,7 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800D85F8(cFielder* pFielder)
+float AbleToUseAnyPowerup(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -965,29 +965,29 @@ extern "C" float fn_800D85F8(cFielder* pFielder)
     int second = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
     if (pFielder->IsCaptain())
     {
-        if (first != -1 || (pFielder->m_pTeam->fn_800A6560() && second != -1))
+        if (first != -1 || (pFielder->m_pTeam->CanTogglePowerup() && second != -1))
             return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
         return 0.0f;
     }
     if ((first >= 0 && first < 9)
-        || (pFielder->m_pTeam->fn_800A6560() && second >= 0 && second < 9))
+        || (pFielder->m_pTeam->CanTogglePowerup() && second >= 0 && second < 9))
         return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
     return 0.0f;
 }
 
-extern "C" float fn_800D8764(cFielder* pFielder, int powerup)
+float AbleToUsePowerup(cFielder* pFielder, int powerup)
 {
     if (pFielder == NULL)
         return 0.0f;
     float fScore = 0.0f;
     int first = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
     int second = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-    if (first == powerup || (pFielder->m_pTeam->fn_800A6560() && second == powerup))
+    if (first == powerup || (pFielder->m_pTeam->CanTogglePowerup() && second == powerup))
         fScore = CanUsePowerup(pFielder, powerup);
     return fScore;
 }
 
-extern "C" float fn_800D8834(cFielder* pFielder, int ePowerup)
+float LikelyToUsePowerup(cFielder* pFielder, int ePowerup)
 {
     if (pFielder == NULL)
     {
@@ -998,11 +998,11 @@ extern "C" float fn_800D8834(cFielder* pFielder, int ePowerup)
     {
         powerup = 9;
     }
-    SkillTweaks* pSkillTweaks = fn_800A636C(pFielder->m_pTeam);
+    SkillTweaks* pSkillTweaks = GetTeamSkillTweaks(pFielder->m_pTeam);
     return pSkillTweaks->PowerupUsageChance[pFielder->m_pTeam->mpCurrentSituation][powerup]->GetValue();
 }
 
-extern "C" float fn_800D88B4(cFielder* pFielder)
+float ProjectilePowerupStock(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1025,7 +1025,7 @@ extern "C" float fn_800D88B4(cFielder* pFielder)
     return NormalizeVal((float)nPowerups, 0.0f, 2.0f);
 }
 
-extern "C" float fn_800D8970(cFielder* pFielder)
+float NonThrowablePowerupSlots(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1075,7 +1075,7 @@ float CloseToBall(cPlayer* pPlayer)
         g_pGame->m_pFuzzyTweaks->fCloseBallConfidenceDistanceMax);
 }
 
-extern "C" float fn_800D8A9C(cFielder* pFielder)
+float BallInterceptionRank(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1106,7 +1106,7 @@ extern "C" float fn_800D8A9C(cFielder* pFielder)
     return (float)(7 - index) / 7.0f;
 }
 
-extern "C" float fn_800D8BAC(cFielder* pFielder)
+float TeamBallInterceptionRank(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1256,7 +1256,7 @@ float FarToTheirNet(cPlayer* pPlayer)
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
-extern "C" float fn_800D912C(cFielder* pFielder)
+float CloseToTeammates(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1276,7 +1276,7 @@ extern "C" float fn_800D912C(cFielder* pFielder)
     return fSum / 3.0f;
 }
 
-extern "C" float fn_800D91BC(cFielder* pFielder)
+float NearToTeammates(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1296,7 +1296,7 @@ extern "C" float fn_800D91BC(cFielder* pFielder)
     return fSum / 3.0f;
 }
 
-extern "C" float fn_800D924C(cFielder* pFielder)
+float FarToTeammates(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1316,7 +1316,7 @@ extern "C" float fn_800D924C(cFielder* pFielder)
     return fSum / 3.0f;
 }
 
-extern "C" float fn_800D92DC(cFielder* pFielder)
+float CloseToOpponents(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1333,7 +1333,7 @@ extern "C" float fn_800D92DC(cFielder* pFielder)
     return fSum / 4.0f;
 }
 
-extern "C" float fn_800D9368(cFielder* pFielder)
+float NearToOpponents(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1350,7 +1350,7 @@ extern "C" float fn_800D9368(cFielder* pFielder)
     return fSum / 4.0f;
 }
 
-extern "C" float fn_800D93F4(cFielder* pFielder)
+float FarToOpponents(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1367,7 +1367,7 @@ extern "C" float fn_800D93F4(cFielder* pFielder)
     return fSum / 4.0f;
 }
 
-extern "C" float fn_800D9480(cFielder* pFielder)
+float PressureFromNearbyOpponents(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1390,14 +1390,14 @@ extern "C" float fn_800D9480(cFielder* pFielder)
 static float OpponentAttackConfidence(cFielder* pFielder, cPlayer* pOpponent,
     float fAngleWeight, float fClosingWeight)
 {
-    float fFacing = fn_800DDF54(pOpponent, pFielder);
+    float fFacing = Facing(pOpponent, pFielder);
     float fClosing = ClosingTo(pFielder, pOpponent);
     fClosing = FMIN(NearTo(pFielder, pOpponent), fClosing);
     fClosing = FMAX(CloseTo(pFielder, pOpponent), fClosing);
     return fFacing * fAngleWeight + fClosing * fClosingWeight;
 }
 
-extern "C" float fn_800D96F4(cFielder* pFielder)
+float Attacked(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1426,7 +1426,7 @@ extern "C" float fn_800D96F4(cFielder* pFielder)
     return FMIN(FMAX(fScore, 0.0f), 1.0f);
 }
 
-extern "C" float fn_800D9A38(cFielder* pFielder)
+float AvoidingGoalie(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1439,29 +1439,29 @@ extern "C" float fn_800D9A38(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800D9B0C(cFielder* pFielder)
+float AvoidingFielders(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_FIELDERS);
+    float fAvoid = GetAvoidanceStrength(pFielder->GetAvoidController(), AVOID_FIELDERS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
-extern "C" float fn_800D9B74(cFielder* pFielder)
+float AvoidingPowerups(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_POWERUPS);
+    float fAvoid = GetAvoidanceStrength(pFielder->GetAvoidController(), AVOID_POWERUPS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
-extern "C" float fn_800D9BDC(cFielder* pFielder)
+float AvoidingSidelines(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1476,14 +1476,14 @@ extern "C" float fn_800D9BDC(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800D9C24(cFielder* pFielder)
+float AvoidingStuff(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_EVERYTHING);
+    float fAvoid = GetAvoidanceStrength(pFielder->GetAvoidController(), AVOID_EVERYTHING);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1502,7 +1502,7 @@ float Invincible(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800D9D04(cFielder* pFielder)
+float InvincibleToCharacters(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1517,7 +1517,7 @@ extern "C" float fn_800D9D04(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800D9D78(cPlayer* pPlayer)
+float FallRecoveryProgress(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -1530,7 +1530,7 @@ extern "C" float fn_800D9D78(cPlayer* pPlayer)
     return 1.0f;
 }
 
-extern "C" float fn_800D9DD8(cPlayer* pPlayer)
+float Unavailable(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -1576,7 +1576,7 @@ float Incapacitated(cPlayer* pPlayer)
     return fScore;
 }
 
-extern "C" float fn_800D9FC8(cFielder* pFielder)
+float Stuck(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1606,7 +1606,7 @@ float FallenDown(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DA050(cFielder* pFielder)
+float FallingOrShattered(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1622,7 +1622,7 @@ extern "C" float fn_800DA050(cFielder* pFielder)
     return (bFlag != 0) ? 1.0f : 0.0f;
 }
 
-extern "C" float fn_800DA0C8(cFielder* pFielder)
+float GooeySpeedScale(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1638,7 +1638,7 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DA130(cFielder* pFielder)
+float Confused(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1698,7 +1698,7 @@ float GoalieOutOfPosition(cFielder* pFielder)
         g_pGame->m_pFuzzyTweaks->fGoalieOutOfPositionDistanceMax);
 }
 
-extern "C" float fn_800DA310(cFielder* pFielder)
+float RegularShotScore(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1708,7 +1708,7 @@ extern "C" float fn_800DA310(cFielder* pFielder)
     return CalcShotScoreValue(pFielder, false, false);
 }
 
-extern "C" float fn_800DA330(cFielder* pFielder)
+float ChipShotScore(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -1779,7 +1779,7 @@ float InFrontOfMyNet(cFielder* pFielder)
     return PositionIsInFrontOfNet(pFielder->m_DetChar.m_v3Position, pFielder->m_pTeam->m_pNet);
 }
 
-extern "C" float fn_800DA518(cFielder* pFielder)
+float CutAndBreakOpenness(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1868,7 +1868,7 @@ float FarToFormationPosition(cFielder* pFielder)
     return FarToFormationPosition(pFielder, pFielder->GetPosition());
 }
 
-extern "C" float fn_800DA91C(cFielder* pFielder)
+float OnBreakaway(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -1876,7 +1876,7 @@ extern "C" float fn_800DA91C(cFielder* pFielder)
     for (int i = 0; i < 4; i++)
     {
         cFielder* pOpponent = pFielder->m_pTeam->GetOtherTeam()->GetFielder(i);
-        float fUpfieldScore = fn_800DE40C(pFielder, pOpponent);
+        float fUpfieldScore = UpfieldFrom(pFielder, pOpponent);
         float fInterceptScore = InBetweenMyNetAnd(pOpponent, pFielder);
         float fProximityScore = NearTo(pFielder, pOpponent);
         float fMaxScore = FMAX(fProximityScore, fInterceptScore);
@@ -1887,7 +1887,7 @@ extern "C" float fn_800DA91C(cFielder* pFielder)
     return NormalizeVal(fScore, 0.0f, 4.0f);
 }
 
-extern "C" float fn_800DACF4(cPlayer* pPlayer)
+float OffField(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -1902,7 +1902,7 @@ extern "C" float fn_800DACF4(cPlayer* pPlayer)
     return 0.0f;
 }
 
-extern "C" float fn_800DAD3C(cBall* ball)
+float BallOffField(cBall* ball)
 {
     if (ball == NULL)
     {
@@ -2133,7 +2133,7 @@ float WidePositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
         bIgnoreIncapacitated, fPredictionTime);
 }
 
-extern "C" float fn_800DBAB0(cFielder* pFielder)
+float Open(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2141,7 +2141,7 @@ extern "C" float fn_800DBAB0(cFielder* pFielder)
         pFielder->m_pTeam->GetOtherTeam(), pFielder, NULL, true, 0.0f);
 }
 
-extern "C" float fn_800DBB0C(cFielder* pFielder)
+float WideOpen(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2149,7 +2149,7 @@ extern "C" float fn_800DBB0C(cFielder* pFielder)
         pFielder->m_pTeam->GetOtherTeam(), pFielder, true, 0.0f);
 }
 
-extern "C" float fn_800DBB88(cFielder* pFielder)
+float OpenToTheirNet(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2179,7 +2179,7 @@ float InBetweenMyNetAnd(cFielder* pFielder, cFielder* pOtherFielder)
         pOtherFielder->GetPosition(), pFielder->m_pTeam->m_pNet->m_v3NetLocation);
 }
 
-extern "C" float fn_800DBEF4(cFielder* pFielder, cFielder* pOtherFielder)
+float InBetweenTheirNetAnd(cFielder* pFielder, cFielder* pOtherFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2189,7 +2189,7 @@ extern "C" float fn_800DBEF4(cFielder* pFielder, cFielder* pOtherFielder)
         pOtherFielder->GetPosition(), pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation);
 }
 
-extern "C" float fn_800DC19C(cFielder* pFielder, cBall* pBall)
+float InBetweenMyNetAndBall(cFielder* pFielder, cBall* pBall)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2199,7 +2199,7 @@ extern "C" float fn_800DC19C(cFielder* pFielder, cBall* pBall)
         pBall->GetPosition(), pFielder->m_pTeam->m_pNet->m_v3NetLocation);
 }
 
-extern "C" float fn_800DC434(cFielder* pFielder, cBall* pBall)
+float InBetweenTheirNetAndBall(cFielder* pFielder, cBall* pBall)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2246,13 +2246,13 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else
@@ -2270,7 +2270,7 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2292,13 +2292,13 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else
@@ -2316,7 +2316,7 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2338,13 +2338,13 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else
@@ -2362,7 +2362,7 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
+            g_pGame->GetCachedPlayerDistance(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2515,7 +2515,7 @@ float CloseToSideline(cFielder* pFielder)
     return CloseToSideline(pFielder->m_DetChar.m_v3Position, NULL, false, NULL);
 }
 
-extern "C" float fn_800DD234(cFielder* pFielder)
+float NearToSideline(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2530,7 +2530,7 @@ extern "C" float fn_800DD234(cFielder* pFielder)
     return CloseToSideline(pFielder->m_DetChar.m_v3Position, &v2Range, false, NULL);
 }
 
-extern "C" float fn_800DD294(cFielder* pFielder)
+float FarFromSideline(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2545,7 +2545,7 @@ extern "C" float fn_800DD294(cFielder* pFielder)
     return CloseToSideline(pFielder->m_DetChar.m_v3Position, &v2Range, true, NULL);
 }
 
-extern "C" float fn_800DD2F4(cBall* ball)
+float BallCloseToSideline(cBall* ball)
 {
     if (ball == NULL)
     {
@@ -2555,9 +2555,9 @@ extern "C" float fn_800DD2F4(cBall* ball)
     return CloseToSideline(ball->m_v3Position, NULL, false, NULL);
 }
 
-extern "C" float fn_800DD31C(cFielder* pFielder)
+float BallNearToSideline(cBall* ball)
 {
-    if (pFielder == NULL)
+    if (ball == NULL)
     {
         return 0.0f;
     }
@@ -2567,12 +2567,12 @@ extern "C" float fn_800DD31C(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->m_DetChar.m_v3PrevVelocity, &v2Range, false, NULL);
+    return CloseToSideline(ball->m_v3Position, &v2Range, false, NULL);
 }
 
-extern "C" float fn_800DD37C(cFielder* pFielder)
+float BallFarFromSideline(cBall* ball)
 {
-    if (pFielder == NULL)
+    if (ball == NULL)
     {
         return 0.0f;
     }
@@ -2582,7 +2582,7 @@ extern "C" float fn_800DD37C(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->m_DetChar.m_v3PrevVelocity, &v2Range, true, NULL);
+    return CloseToSideline(ball->m_v3Position, &v2Range, true, NULL);
 }
 
 float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
@@ -2597,7 +2597,7 @@ float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
 static const nlVector2 lbl_806E4270 = { 2.5f, 0.4f };
 
 
-extern "C" float fn_800DD45C(cFielder* pFielder)
+float CloseToDesiredPosition(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2610,7 +2610,7 @@ extern "C" float fn_800DD45C(cFielder* pFielder)
 static const nlVector2 lbl_806E4278 = { 10.0f, 1.0f };
 
 
-extern "C" float fn_800DD494(cFielder* pFielder)
+float NearToDesiredPosition(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2623,7 +2623,7 @@ extern "C" float fn_800DD494(cFielder* pFielder)
 static const nlVector2 lbl_806E4280 = { 4.0f, 10.0f };
 
 
-extern "C" float fn_800DD4CC(cFielder* pFielder)
+float FarToDesiredPosition(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2633,7 +2633,7 @@ extern "C" float fn_800DD4CC(cFielder* pFielder)
     return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4280);
 }
 
-extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
+float CloseToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
 {
     if (pPlayer == NULL)
     {
@@ -2651,7 +2651,7 @@ extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
     return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4270);
 }
 
-extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
+float NearToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
 {
     if (pPlayer == NULL)
     {
@@ -2669,7 +2669,7 @@ extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
     return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4278);
 }
 
-extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
+float FarToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
 {
     if (pPlayer == NULL)
     {
@@ -2687,7 +2687,7 @@ extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
     return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4280);
 }
 
-extern "C" float fn_800DD744(cFielder* pFielder)
+float FacingSideline(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2704,14 +2704,14 @@ extern "C" float fn_800DD744(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DD7F4(cFielder* pFielder)
+float StuckOnSidelines(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return FMIN(fn_800D9BDC(pFielder), FMAX(fn_800D9B74(pFielder), fn_800D9B0C(pFielder)));
+    return FMIN(AvoidingSidelines(pFielder), FMAX(AvoidingPowerups(pFielder), AvoidingFielders(pFielder)));
 }
 
-extern "C" float fn_800DD944(cPlayer* pPlayer)
+float SuperPowerActive(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -2729,7 +2729,7 @@ extern "C" float fn_800DD944(cPlayer* pPlayer)
     return 0.0f;
 }
 
-extern "C" float fn_800DD99C(cFielder* pFielder)
+float SuperPowerAction(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -2744,7 +2744,7 @@ extern "C" float fn_800DD99C(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
+float AtIdealDistanceForTackling(cFielder* pFielder, cPlayer* pTarget)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2777,7 +2777,7 @@ float PlayerShotDistance(cFielder* pFielder)
     nlVector3 v3Position = pFielder->m_DetChar.m_v3Position;
     if (pFielder->m_pBall != NULL)
         v3Position = pFielder->m_DetChar.m_v3Position;
-    else if (ReceivingPass(pFielder) || fn_800DED80(pFielder) >= 0.2f)
+    else if (ReceivingPass(pFielder) || PursuingBall(pFielder) >= 0.2f)
         v3Position = pFielder->m_pTeam->GetBallInterceptPosition(pFielder->m_DetPlayer.m_ID);
     float fScore = 0.0f;
     if (v3Position.x * pFielder->m_pTeam->GetOtherNet()->m_fDirection > 0.0f)
@@ -2789,7 +2789,7 @@ float PlayerShotDistance(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DDD70(cFielder* pFielder)
+float AtIdealDistanceForSkillshot(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
@@ -2799,7 +2799,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
     float fScore = 0.0f;
     if (!pFielder->IsCaptain() && aiPos.x > 0.0f)
     {
-        Goalie* pGoalie = fn_800D66C4(pFielder);
+        Goalie* pGoalie = TheirGoalie(pFielder);
         nlVector2 diff;
         nlVec2Sub(diff, *(const nlVector2*)&pGoalie->GetPosition(),
             *(const nlVector2*)&pFielder->GetPosition());
@@ -2854,7 +2854,7 @@ static float Facing(unsigned short facingAngle, const nlVector3& direction)
     return 1.0f - fOffset / (float)(nNoConfidence - nFullConfidence);
 }
 
-extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder)
+float Facing(cPlayer* pCandidateFielder, cPlayer* pTargetFielder)
 {
     if (pCandidateFielder == NULL)
         return 0.0f;
@@ -2870,7 +2870,7 @@ extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     return Facing(facingAngle, v3Direction);
 }
 
-extern "C" float fn_800DE0A8(cPlayer* pPlayer)
+float FacingBall(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
         return 0.0f;
@@ -2882,7 +2882,7 @@ extern "C" float fn_800DE0A8(cPlayer* pPlayer)
     return Facing(facingAngle, v3Direction);
 }
 
-extern "C" float fn_800DE1F0(cPlayer* pCandidateFielder, cPlayer* pTargetFielder)
+float FaceToFace(cPlayer* pCandidateFielder, cPlayer* pTargetFielder)
 {
     if (pCandidateFielder == NULL)
         return 0.0f;
@@ -2899,7 +2899,7 @@ extern "C" float fn_800DE1F0(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     return fScore;
 }
 
-extern "C" float fn_800DE40C(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer)
+float UpfieldFrom(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer)
 {
     if (pUpfieldPlayer == NULL)
     {
@@ -2917,7 +2917,7 @@ extern "C" float fn_800DE40C(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer)
         g_pGame->m_pFuzzyTweaks->fUpfieldMaxDistance);
 }
 
-extern "C" float fn_800DE4B0(cPlayer* pDownfieldPlayer, cPlayer* pFromPlayer)
+float DownfieldFrom(cPlayer* pDownfieldPlayer, cPlayer* pFromPlayer)
 {
     if (pDownfieldPlayer == NULL)
     {
@@ -3015,7 +3015,7 @@ float SeparatingFrom(cPlayer* pPlayer, cBall* pBall)
     return NormalizeVal(fClosingSpeed, 0.0f, -g_pGame->m_pFuzzyTweaks->fSeparatingSpeedMax);
 }
 
-extern "C" float fn_800DE71C(cPlayer* pPlayer)
+float AwayFromOwnNet(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -3033,7 +3033,7 @@ extern "C" float fn_800DE71C(cPlayer* pPlayer)
         fMinDist, fMaxDist);
 }
 
-extern "C" float fn_800DE7D8(Goalie* pGoalie)
+float GoalieDown(Goalie* pGoalie)
 {
     if (pGoalie == NULL)
     {
@@ -3048,7 +3048,7 @@ extern "C" float fn_800DE7D8(Goalie* pGoalie)
     return 0.0f;
 }
 
-extern "C" float fn_800DE804(cBall* ball, cTeam* team)
+float BallCloseToNet(cBall* ball, cTeam* team)
 {
     if (ball == NULL)
     {
@@ -3070,7 +3070,7 @@ extern "C" float fn_800DE804(cBall* ball, cTeam* team)
         fMinDist, fMaxDist);
 }
 
-extern "C" float fn_800DE8CC(cBall* ball, cTeam* team)
+float BallNearToNet(cBall* ball, cTeam* team)
 {
     if (ball == NULL)
     {
@@ -3092,7 +3092,7 @@ extern "C" float fn_800DE8CC(cBall* ball, cTeam* team)
         fMinDist, fMaxDist);
 }
 
-extern "C" float fn_800DE994(cBall* ball, cTeam* team)
+float BallFarToNet(cBall* ball, cTeam* team)
 {
     if (ball == NULL)
     {
@@ -3131,7 +3131,7 @@ float InControlOfBall(cFielder* fielder)
         g_pGame->m_pFuzzyTweaks->fControlConfidenceDistanceMax);
 }
 
-extern "C" float fn_800DEAB4(cFielder* pFielder)
+float WindingUpOrShooting(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3152,7 +3152,7 @@ extern "C" float fn_800DEAB4(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DEB04(cFielder* pFielder)
+float ShotMeterProgress(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3177,7 +3177,7 @@ extern "C" float fn_800DEB04(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DEBBC(cPlayer* pPlayer)
+float DoingSkillshot(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -3192,7 +3192,7 @@ extern "C" float fn_800DEBBC(cPlayer* pPlayer)
     return 0.0f;
 }
 
-extern "C" float fn_800DEBF4(cFielder* pFielder)
+float ShotWindupProgress(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3214,7 +3214,7 @@ extern "C" float fn_800DEBF4(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DEC88(cFielder* pFielder)
+float SkillshotWindupProgress(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3242,7 +3242,7 @@ extern "C" float fn_800DEC88(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DED3C(cFielder* pFielder)
+float MushroomActive(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3257,7 +3257,7 @@ extern "C" float fn_800DED3C(cFielder* pFielder)
     return 0.0f;
 }
 
-extern "C" float fn_800DED80(cPlayer* pPlayer)
+float PursuingBall(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
         return 0.0f;
@@ -3315,7 +3315,7 @@ float ReceivingPass(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DF028(cFielder* pFielder)
+float OneTouchShooting(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3333,7 +3333,7 @@ extern "C" float fn_800DF028(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DF0B8(cFielder* pFielder)
+float ReceivingVolleyPass(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3349,7 +3349,7 @@ extern "C" float fn_800DF0B8(cFielder* pFielder)
     return fResult;
 }
 
-extern "C" float fn_800DF118(cFielder* pFielder)
+float ReceivingGroundPass(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3364,7 +3364,7 @@ extern "C" float fn_800DF118(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DF1B8(cFielder* pFielder)
+float ReceivingPassDelayed(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3374,7 +3374,7 @@ extern "C" float fn_800DF1B8(cFielder* pFielder)
     float fScore = 0.0f;
     if (ReceivingPass(pFielder))
     {
-        float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
+        float fReaction = 1.0f - GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
         float fDeadZone = fReaction * fPassDeadZone;
         float fMaxValue = FMAX(0.1f, fDeadZone);
@@ -3386,7 +3386,7 @@ extern "C" float fn_800DF1B8(cFielder* pFielder)
 static const nlVector2 g_vPassCloseToDoneConfidence = { 0.0f, 0.5f };
 
 
-extern "C" float fn_800DF2C0(cFielder* pFielder)
+float PassCloseToDone(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3405,7 +3405,7 @@ extern "C" float fn_800DF2C0(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DF390(cPlayer* pPlayer)
+float ReceivingVolleyPassDelayed(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -3415,7 +3415,7 @@ extern "C" float fn_800DF390(cPlayer* pPlayer)
     float fScore = 0.0f;
     if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->IsReceivingVolleyPass())
     {
-        float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
+        float fReaction = 1.0f - GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
         float fDeadZone = fReaction * fPassDeadZone;
         float fMaxValue = FMAX(0.1f, fDeadZone);
@@ -3424,7 +3424,7 @@ extern "C" float fn_800DF390(cPlayer* pPlayer)
     return fScore;
 }
 
-extern "C" float fn_800DF474(cFielder* pFielder)
+float ReceivingGroundPassDelayed(cFielder* pFielder)
 {
     if (pFielder == NULL)
     {
@@ -3434,7 +3434,7 @@ extern "C" float fn_800DF474(cFielder* pFielder)
     float fScore = 0.0f;
     if (ReceivingPass(pFielder) && !pFielder->IsReceivingVolleyPass())
     {
-        float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
+        float fReaction = 1.0f - GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
         float fDeadZone = fReaction * fPassDeadZone;
         float fMaxValue = FMAX(0.1f, fDeadZone);
@@ -3443,14 +3443,14 @@ extern "C" float fn_800DF474(cFielder* pFielder)
     return fScore;
 }
 
-extern "C" float fn_800DF590(cBall* pBall)
+float BallCharge(cBall* pBall)
 {
     if (pBall == NULL)
     {
         return 0.0f;
     }
 
-    float fScore = fn_800156A8(pBall);
+    float fScore = GetBallChargeBonus(pBall);
     if (fScore < 0.0f || fScore > 1.0f)
     {
         fScore = FMIN(FMAX(fScore, 0.0f), 1.0f);
@@ -3558,7 +3558,7 @@ float UserControlledT(cTeam* team)
     return 0.0f;
 }
 
-extern "C" cFielder* fn_800DF790(cTeam* pTeam)
+cFielder* GetStrategicBallCarrier(cTeam* pTeam)
 {
     float fBestScore = 0.0f;
     cFielder* pBestFielder = NULL;
@@ -3574,7 +3574,7 @@ extern "C" cFielder* fn_800DF790(cTeam* pTeam)
     return pBestFielder;
 }
 
-extern "C" float fn_800DF838(cPlayer* pPlayer)
+float BallPossessionDuration(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -3594,7 +3594,7 @@ static float ConfidenceAverage(float fClosing, float fNear, float fAble)
     return (fNear + (fAble + fClosing)) / 3.0f;
 }
 
-extern "C" float fn_800DF888(cTeam* team)
+float TeamBallControlConfidence(cTeam* team)
 {
     if (team == NULL)
         return 0.0f;
@@ -3606,12 +3606,12 @@ extern "C" float fn_800DF888(cTeam* team)
 
     fOwner = BallOwner(players[0]);
     score[0] = FMAX(fOwner, FMAX(ReceivingPass(players[0]),
-        FMIN(fn_800DED80(players[0]), ConfidenceAverage(
+        FMIN(PursuingBall(players[0]), ConfidenceAverage(
             ClosingTo(players[0], g_pBall), NearToBall(players[0]), AbleToInterceptBall(players[0])))));
 
     fOwner = BallOwner(players[1]);
     score[1] = FMAX(fOwner, FMAX(ReceivingPass(players[1]),
-        FMIN(fn_800DED80(players[1]), ConfidenceAverage(
+        FMIN(PursuingBall(players[1]), ConfidenceAverage(
             ClosingTo(players[1], g_pBall), NearToBall(players[1]), AbleToInterceptBall(players[1])))));
     return score[0] / FMAX(0.1f, score[0] + score[1]);
 }
@@ -3716,7 +3716,7 @@ float Stalling(cTeam* pTeam)
     return NormalizeVal(pTeam->mtDefensiveZoneTimer.GetSeconds(), fMinTime, fMaxTime);
 }
 
-extern "C" float fn_800DFF1C()
+float IsPassInPlay()
 {
     if (!g_pBall->HasActivePassTarget())
     {
@@ -3726,20 +3726,20 @@ extern "C" float fn_800DFF1C()
     return 1.0f;
 }
 
-extern "C" float fn_800DFF60()
+float IsPassInPlayDelayed()
 {
     if (!g_pBall->HasActivePassTarget())
     {
         return 0.0f;
     }
 
-    float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
+    float fReaction = 1.0f - GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
     float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
     float fMaxValue = fReaction * fPassDeadZone;
     return NormalizeVal(IsPassInPlay(g_pBall), 0.0f, fMaxValue);
 }
 
-extern "C" float fn_800E0034()
+float IsShotInPlay()
 {
     // Retail evaluates the shot distance without assigning it to the result.
     float fScore = 0.0f;
@@ -3757,7 +3757,7 @@ extern "C" float fn_800E0034()
     return fScore;
 }
 
-extern "C" float fn_800E00F8()
+float HasPassTargetConfidence()
 {
     float fInitialScore;
     if (g_pBall->HasPassTarget())
@@ -3876,7 +3876,7 @@ static float InDefensiveZone(const nlVector3& v3Position, eTeamSide teamside)
         g_pGame->m_pFuzzyTweaks->fDefensiveConfidenceDistancesMax);
 }
 
-extern "C" float fn_800E0470(cPlayer* pPlayer)
+float InNeutralZone(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
     {
@@ -3902,7 +3902,7 @@ float InDefensiveZoneOfPlayer(cBall* pBall, cPlayer* pPlayer)
         g_pGame->m_pFuzzyTweaks->fDefensiveConfidenceDistancesMax);
 }
 
-extern "C" float fn_800E05A4(cBall* pBall, cPlayer* pPlayer)
+float InNeutralZoneOfPlayer(cBall* pBall, cPlayer* pPlayer)
 {
     if (pBall == NULL && pPlayer != NULL)
     {
@@ -3930,7 +3930,7 @@ float InOffensiveZoneOfPlayer(cBall* pBall, cPlayer* pPlayer)
 static const nlVector2 lbl_806E42B0 = { 5.0f, 1.0f };
 
 
-extern "C" float fn_800E06F4(cPlayer* pPlayer)
+float BallCrowding(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
         return 0.0f;

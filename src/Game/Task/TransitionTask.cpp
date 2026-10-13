@@ -116,7 +116,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             {
                 NisPlayer::Instance()->Reset();
                 Wiper::Instance().Reset();
-                WorldDarkening::Instance().fn_801AF550();
+                WorldDarkening::Instance().Reset();
             }
         }
         else

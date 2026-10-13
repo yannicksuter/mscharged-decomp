@@ -69,7 +69,7 @@ void ShotMeter::Update(float fDeltaT)
                 fDelta * gShotMeterChargeGainMax,
                 fRange);
             fValue += GetBallChargeValue(g_pBall, 0);
-            fn_800154FC(g_pBall, fValue);
+            SetBallCharge(g_pBall, fValue);
         }
 
         if (m_fTime >= m_fShotDuration
@@ -97,7 +97,7 @@ void ShotMeter::Update(float fDeltaT)
                 else if (g_pBall->GetOwnerFielder()->CanDoSidekickShootToScore())
                 {
                     m_eShotMeterState = SHOT_METER_STS_RELEASED;
-                    fn_80060A00(g_pGame,
+                    DeliverSuperPresentationEvent(g_pGame,
                         g_pBall->GetOwnerFielder());
                 }
             }
@@ -319,7 +319,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
 
     if (pFielder->CanDoSidekickShootToScore())
     {
-        m_fSTSValue = fn_800156A8(g_pBall);
+        m_fSTSValue = GetBallChargeBonus(g_pBall);
     }
     m_fScoreValue = CalcShotScoreValue(pFielder,
         pFielder->bIsModified,

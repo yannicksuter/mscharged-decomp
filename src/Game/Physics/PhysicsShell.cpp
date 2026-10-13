@@ -201,7 +201,7 @@ ContactType PhysicsShell::Contact(
         }
 
         if (ball->m_tShotTimer.m_uPackedTime != 0
-            && fn_800167A8(ball))
+            && IsBooSkillshotBall(ball))
         {
             return NO_CONTACT;
         }

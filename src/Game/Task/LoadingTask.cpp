@@ -13,7 +13,7 @@
 void LoadingTask::Start()
 {
     mElapsed = 0.0f;
-    fn_80118B50(AsyncLoadingManager::Instance());
+    LoadAsyncLoadingByteCode(AsyncLoadingManager::Instance());
 }
 
 void LoadingTask::Run(float dt)
@@ -25,7 +25,7 @@ void LoadingTask::Run(float dt)
     g_pPadManager->Update(dt);
     FlickDetection::Update();
 
-    switch (fn_80118B7C(AsyncLoadingManager::Instance()))
+    switch (UpdateAsyncLoadingSequence(AsyncLoadingManager::Instance()))
     {
     case ASYNC_LOADING_FE_READY:
         nlTaskManager::SetNextState(TASK_CLEAN_BOOT);
@@ -49,39 +49,39 @@ void LoadingTask::StateTransition(unsigned int from, unsigned int to)
 {
     if (to == TASK_BOOT_TO_FE && from == TASK_BOOT)
     {
-        fn_80119054(AsyncLoadingManager::Instance());
+        BeginBootToFrontEndLoading(AsyncLoadingManager::Instance());
     }
 
     if (to == TASK_CLEAN_BOOT)
     {
-        fn_801190A0(AsyncLoadingManager::Instance());
+        BeginCleanBootShutdown(AsyncLoadingManager::Instance());
     }
 
     if (to == TASK_FE_TO_GAME && from == TASK_FRONTEND)
     {
-        fn_801190EC(AsyncLoadingManager::Instance());
+        BeginFrontEndToGameLoading(AsyncLoadingManager::Instance());
     }
 
     if (to == TASK_BOOT_TO_GAME && from == TASK_BOOT)
     {
-        fn_801191D4(AsyncLoadingManager::Instance());
+        BeginBootToGameLoading(AsyncLoadingManager::Instance());
     }
 
     if (to == TASK_GAME_TO_FE && from != TASK_HOME_BUTTON_MENU)
     {
         if (g_e3_Build && g_bE3IdleReset)
         {
-            fn_80119184(AsyncLoadingManager::Instance());
+            BeginGameToTitleLoading(AsyncLoadingManager::Instance());
         }
         else
         {
-            fn_80119138(AsyncLoadingManager::Instance());
+            BeginGameToFrontEndLoading(AsyncLoadingManager::Instance());
         }
     }
 
     if (to == TASK_STADIUM_VIEWER && from == TASK_BOOT)
     {
-        fn_80119220(AsyncLoadingManager::Instance());
+        BeginStadiumViewerLoading(AsyncLoadingManager::Instance());
     }
 }
 

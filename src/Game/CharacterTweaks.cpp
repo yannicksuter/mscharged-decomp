@@ -171,7 +171,7 @@ float GetOffensiveRating(PlayerTweaks* tweaks)
          / 2.0f;
 }
 
-extern "C" float fn_8002BE38(PlayerTweaks* tweaks)
+float GetDefensiveRating(PlayerTweaks* tweaks)
 {
     float result = tweaks->fDefenseSlideTackle.GetValue()
                  + tweaks->fMovementSpeed.GetValue();
@@ -185,7 +185,7 @@ float GetPlaymakerRating(PlayerTweaks* tweaks)
          / 2.0f;
 }
 
-extern "C" float fn_8002BE84(const PlayerTweaks* tweaks)
+float GetPowerRating(const PlayerTweaks* tweaks)
 {
     float result = tweaks->fDefenseHittingDistance.GetValue()
                  + tweaks->fDefenseSlideTackle.GetValue();
@@ -237,7 +237,7 @@ float PlayerTweaks::GetSkillRating(unsigned int index)
     return result;
 }
 
-extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value)
+float GetScaledPlayerWidth(PlayerTweaks* tweaks, float value)
 {
     return value * tweaks->fWidth;
 }
@@ -264,7 +264,7 @@ float GetJogTurnSpeed(PlayerTweaks* tweaks)
         playerValue);
 }
 
-extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
+float GetRunTurnSpeed(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementTurningRadius;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -277,7 +277,7 @@ extern "C" float fn_8002C0AC(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C180(PlayerTweaks* tweaks)
+float GetRunAccel(PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementAcceleration;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -290,7 +290,7 @@ extern "C" float fn_8002C180(PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C254(const PlayerTweaks* tweaks)
+float GetTurboSpeed(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -379,14 +379,14 @@ float GetFastestVolleyPassSpeed(PlayerTweaks* tweaks)
         tweaks->fPassing);
 }
 
-extern "C" float fn_8002C758(PlayerTweaks* tweaks)
+float GetFastestShotSpeed(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fFastestShotSpeedMin,
         gGameTweaks.mFielderTweaks->fFastestShotSpeedMax,
         tweaks->fShooting);
 }
 
-extern "C" float fn_8002C780(PlayerTweaks* tweaks)
+float GetSlowestShotSpeed(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fSlowestShotSpeedMin,
         gGameTweaks.mFielderTweaks->fSlowestShotSpeedMax,
@@ -443,11 +443,11 @@ float GetSlideDecelTime(PlayerTweaks* tweaks)
 
 float GetSlideSpeed(const PlayerTweaks* tweaks)
 {
-    float result = fn_8002C254(tweaks);
+    float result = GetTurboSpeed(tweaks);
     result *= Interpolate(gGameTweaks.mFielderTweaks->fSlideSpeedMin,
         gGameTweaks.mFielderTweaks->fSlideSpeedMax,
         tweaks->fDefenseSlideTackle);
-    if (fn_8002BE84(tweaks) > 0.9f)
+    if (GetPowerRating(tweaks) > 0.9f)
     {
         result *= 1.175f;
     }
@@ -474,7 +474,7 @@ float GetStarSpeedBoost(PlayerTweaks*)
     return terrainScale * (float)gGameTweaks.mFielderTweaks->fStarSpeedBoost;
 }
 
-extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
+float GetStrafeSpeed(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -488,7 +488,7 @@ extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
          * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
+float GetRunBackwardsSpeed(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
@@ -525,12 +525,12 @@ float GetStrafeTurnSpeed(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fStrafeTurnSpeed;
 }
 
-extern "C" float fn_8002CF10(PlayerTweaks*)
+float GetRunTurnFalloff(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fRunTurnFalloff;
 }
 
-extern "C" float fn_8002CF24(PlayerTweaks*)
+float GetRunDecel(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fRunDecel;
 }
@@ -590,17 +590,17 @@ float GetSuperSlideSpeedBonus(PlayerTweaks*)
     return gGameTweaks.mFielderTweaks->fSuperSlideSpeedBonus;
 }
 
-extern "C" float fn_8002D020(PlayerTweaks*)
+float GetHitEffectiveFirstFrame(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fHitEffectiveFirstFrame;
 }
 
-extern "C" float fn_8002D038(PlayerTweaks*)
+float GetHitEffectiveMaxFrame(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->fHitEffectiveMaxFrame;
 }
 
-extern "C" float fn_8002D050(PlayerTweaks* tweaks)
+float GetHitEffectiveLastFrame(PlayerTweaks* tweaks)
 {
     return Interpolate(gGameTweaks.mFielderTweaks->fHitEffectiveLastFrameMin,
         gGameTweaks.mFielderTweaks->fHitEffectiveLastFrameMax,

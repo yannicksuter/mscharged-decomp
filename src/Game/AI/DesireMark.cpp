@@ -18,7 +18,7 @@
 
 #include "Game/SharedStaticStorage.h"
 
-extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
+DesireUpdate EvaluateFielderFuzzyFunction(void*, cFielder*, const char*);
 
 static float sMarkLookAheadTime = 0.1f;
 float gMarkUrgency = 0.8f;
@@ -78,7 +78,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
     }
     if (pMark->m_pBall != 0)
     {
-        if (fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_SlideAttackChance->GetValue() > 0.0f
+        if (GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_SlideAttackChance->GetValue() > 0.0f
             && Difficult(m_pFielder->m_pTeam) > 0.7f
             && pMark->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > gMarkSlideAttackPossessionTime)
         {
@@ -94,7 +94,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
     {
         float fTimeDelay = Interpolate(g_vMarkFollowTimeDelay.x,
             g_vMarkFollowTimeDelay.y,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
         float fTimeDelayRange = fTimeDelay * gMarkFollowTimeDelayRangeScale;
         mThinkTimer.SetSeconds(fTimeDelay
                                + (nlRandomf(fTimeDelayRange) - (0.5f * fTimeDelayRange)));
@@ -110,23 +110,23 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 
         float fMarkingNetPassBalance = Interpolate(g_vMarkingNetPassBalance.x,
             g_vMarkingNetPassBalance.y,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
-        float fMarkingDistance = Interpolate(g_vMarkDistance.x, g_vMarkDistance.y, fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+        float fMarkingDistance = Interpolate(g_vMarkDistance.x, g_vMarkDistance.y, GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
         float fMarkFormationBalance = Interpolate(g_vMarkFormationBalance.x,
             g_vMarkFormationBalance.y,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
-        float fMarkBallOwnerBalance = Interpolate(g_vMarkBallOwner.x, g_vMarkBallOwner.y, fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+        float fMarkBallOwnerBalance = Interpolate(g_vMarkBallOwner.x, g_vMarkBallOwner.y, GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
         float fMarkThreatCoeff = Interpolate(g_vMarkImmediateThreatCoeff.x,
             g_vMarkImmediateThreatCoeff.y,
-            fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
+            GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->Def_Marking->GetValue());
         fMarkingDistance *= Interpolate(gMarkDistanceMinMultiplier, 1.0f, FarToTheirNet(pMark));
-        if ((bool)ReceivingPass(pMark) || (bool)fn_800DEAB4(pMark))
+        if ((bool)ReceivingPass(pMark) || (bool)WindingUpOrShooting(pMark))
         {
             fMarkingDistance *= fMarkThreatCoeff;
         }
         if (pMark->m_pBall == 0)
         {
-            cPlayer* pSBC = fn_800DF790(m_pFielder->m_pTeam->GetOtherTeam());
+            cPlayer* pSBC = GetStrategicBallCarrier(m_pFielder->m_pTeam->GetOtherTeam());
             if (pSBC != 0 && pSBC != pMark)
             {
                 nlVector3 v3SBCDir;
@@ -146,7 +146,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
                 nlVec3Sub(vThreatTarget, v3NetPosition, v3SBCPosition);
                 nlVec3Normalize(vThreatTarget, vThreatTarget);
                 nlVec3Set(vThreatTarget, fMarkingDistance * vThreatTarget.x + v3SBCPosition.x, fMarkingDistance * vThreatTarget.y + v3SBCPosition.y, fMarkingDistance * vThreatTarget.z + v3SBCPosition.z);
-                float fMarkBallOwner = fn_800B9020(GetFuzzyRuntime(),
+                float fMarkBallOwner = EvaluateFielderFuzzyFunction(GetFuzzyRuntime(),
                     m_pFielder,
                     "MarkBallOwner")
                                            .mData.f;
@@ -176,13 +176,13 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
     DesireUpdate result(FT_INT, gTransDesireDefendPosContinue);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
     unsigned long key = input->GetTimerKey((unsigned long)TransDesireDefendPos, 1);
-    if (pFielder->m_pBall != 0 || (bool)fn_800DA050(pFielder))
+    if (pFielder->m_pBall != 0 || (bool)FallingOrShattered(pFielder))
     {
         result = 1;
     }
     else if (CheckScriptTimeBudget() && !input->IsTimerRunning(key))
     {
-        input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
+        input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(TeamOf(pFielder))));
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");
         result = CallFielderFuzzyFunction(input->mRuntime, hash, pFielder);
     }
@@ -213,7 +213,7 @@ void DesireDefendPos::Update(
         return;
     }
 
-    SkillTweaks* pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
+    SkillTweaks* pSkillTweaks = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam);
     float fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
     float fTimeDelay = Interpolate(g_vMarkFollowTimeDelay.x,
         g_vMarkFollowTimeDelay.y,
@@ -222,7 +222,7 @@ void DesireDefendPos::Update(
     mThinkTimer.SetSeconds(fTimeDelay
                            + (nlRandomf(fTimeDelayRange) - (0.5f * fTimeDelayRange)));
 
-    pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
+    pSkillTweaks = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam);
     fMarkingSkill = pSkillTweaks->Def_Marking->GetValue();
 
     float fMarkingNetPassBalance = Interpolate(
@@ -263,7 +263,7 @@ void DesireDefendPos::Update(
         if ((unsigned int)(difficulty - 5) <= 2
             && (pMark->m_pBall != 0
                 || (bool)ReceivingPass(pMark)
-                || (bool)fn_800DEAB4(pMark)))
+                || (bool)WindingUpOrShooting(pMark)))
         {
             v3MarkPosition = pMark->m_DetChar.m_v3Position;
             fMarkingDistance *= fMarkThreatCoeff;
@@ -284,7 +284,7 @@ void DesireDefendPos::Update(
 
         if (pMark->m_pBall == 0)
         {
-            cPlayer* pSBC = fn_800DF790(m_pFielder->m_pTeam->GetOtherTeam());
+            cPlayer* pSBC = GetStrategicBallCarrier(m_pFielder->m_pTeam->GetOtherTeam());
             if (pSBC != 0 && pSBC != pMark)
             {
                 nlVector3 v3SBCDir;
@@ -348,7 +348,7 @@ void DesireDefendPos::Cleanup()
 /**
  * Offset/Address/Size: 0x2260 | 0x800B9020 | size: 0x4
  */
-extern "C" DesireUpdate fn_800B9020(
+DesireUpdate EvaluateFielderFuzzyFunction(
     void* runtime, cFielder* fielder, const char* name)
 {
     return CallFielderFuzzyFunction(runtime, fielder, name);

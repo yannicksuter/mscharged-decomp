@@ -22,10 +22,10 @@ bool DesireInterceptBall::Initialize(void* context)
 {
     bool initialized = Desire::Initialize(context);
     float blockPassChance = 0.0f;
-    fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
+    GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)->GetSkillValue(
         nlStringHash("Def/Block Pass Chance"), &blockPassChance, m_pFielder);
     meDesireSubState = 0;
-    mbInterceptPass = fn_800DFF1C() && nlRandomf(1.0f) < blockPassChance;
+    mbInterceptPass = IsPassInPlay() && nlRandomf(1.0f) < blockPassChance;
     return initialized;
 }
 
@@ -49,8 +49,8 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         }
     }
 
-    if (Offensive(fn_800D6670(m_pFielder))
-        || fn_800DAD3C(g_pBall) || BallOwner(m_pFielder))
+    if (Offensive(TeamOf(m_pFielder))
+        || BallOffField(g_pBall) || BallOwner(m_pFielder))
     {
         *update = DESIRE_FINISHED;
         return;
@@ -61,13 +61,13 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     if (passTarget != NULL && passTarget->m_eClassType == FIELDER)
     {
         cFielder* target = static_cast<cFielder*>(passTarget);
-        if (fn_800DF0B8(target))
+        if (ReceivingVolleyPass(target))
         {
             if (g_pBall->GetPosition().z > m_pFielder->GetAirInterceptHeight(AIR_INTERCEPT_GROUND))
             {
                 float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->m_DetPlayer.m_ID];
                 float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
-                fn_800180F4(g_pBall, &position, predictionTime);
+                PredictBallPosition(g_pBall, &position, predictionTime);
             }
             else
             {
@@ -78,7 +78,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         {
             position = GetClosestPointOnLineABFromPointC(g_pBall->m_v3Position,
                 g_pBall->m_v3PassIntercept, m_pFielder->m_DetChar.m_v3Position);
-            if (mbInterceptPass && fn_800D7B00(m_pFielder) >= 0.5f)
+            if (mbInterceptPass && AbleToSlideTackleBall(m_pFielder) >= 0.5f)
             {
                 *update = DESIRE_CHANGE;
                 update->SetParameter(8, FuzzyVariant(FT_INT, gInterceptBallSlideAttackState));
@@ -94,7 +94,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     {
         float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->m_DetPlayer.m_ID];
         float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
-        fn_800180F4(g_pBall, &position, predictionTime);
+        PredictBallPosition(g_pBall, &position, predictionTime);
     }
 
     position.z = 0.0f;

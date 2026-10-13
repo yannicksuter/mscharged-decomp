@@ -23,7 +23,7 @@ WorldDarkening& WorldDarkening::Instance()
     return instance;
 }
 
-void WorldDarkening::fn_801AF550()
+void WorldDarkening::Reset()
 {
     mRate = 0.0f;
     mTo = 0.0f;

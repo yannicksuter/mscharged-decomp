@@ -833,7 +833,7 @@ void Goalie::ActionLooseBallPursueRolling(float deltaTime)
 
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
-        || (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
+        || (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
@@ -849,7 +849,7 @@ void Goalie::ActionLooseBallSetup(float fDeltaT)
 {
     bool bWallBlocked = mfWallBlock > 0.0f;
     if (bWallBlocked || (mnOffplayPending)
-        || (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
+        || (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
         || ((g_pBall->m_pOwner != 0)
             && (g_pBall->m_pOwner != this)))
@@ -871,7 +871,7 @@ void Goalie::ActionElectrocution(float)
                          && pController->m_fTime == 1.0f)))
     {
         EndElectrocution(this);
-        fn_80097648(0.06f);
+        BlendOutPowerupAnimation(0.06f);
         m_DetPlayer.m_bForceFeatherUpdate = false;
         m_DetPlayer.m_bSkipAnimUpdate = false;
         m_DetPlayer.m_fSkipTimer = 0.0f;
@@ -1001,7 +1001,7 @@ void Goalie::ActionGrabMonty(float)
                     g_pBall->m_bVisible = 0;
                 }
 
-                mpMonty->fn_8004F204();
+                mpMonty->InitActionMontyBurrowed();
                 PlaySound(m_uSoundSlotId, 0x76520305, 0, 0);
 
                 nlVector3 v3Position
@@ -2086,10 +2086,10 @@ void Goalie::ActionMove(float deltaTime)
     {
         if (m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
         {
-            fn_80097648(0.1f);
+            BlendOutPowerupAnimation(0.1f);
         }
     }
-    else if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4())
+    else if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0 && !HasPowerupAnimation())
     {
         StartFireAnim();
     }
@@ -2123,7 +2123,7 @@ void Goalie::ActionMove(float deltaTime)
         targetPos = g_pBall->m_v3PassIntercept;
         FindDesiredGoaliePosition(mv3TargetPosition, desiredDir, desiredOffset, desiredFacing, &targetPos);
 
-        if (fn_800DF028(pPassTarget))
+        if (OneTouchShooting(pPassTarget))
         {
             float crouchDuration = GoalieSave::mfCrouchDuration;
             if (g_pBall->m_tPassTargetTimer.GetSeconds()
@@ -2386,7 +2386,7 @@ void Goalie::ActionMove(float deltaTime)
     }
 
     if (!isPassThreat && !CheckForLobSave(true)
-        && IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
+        && IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionLooseBallSetup();
@@ -2478,7 +2478,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
         {
             FumbleBall();
         }
-        if (!fn_800976C4())
+        if (!HasPowerupAnimation())
         {
             StartFireAnim();
         }
@@ -2739,7 +2739,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
             }
         }
 
-        fn_80098098(this);
+        HandlePlayerPowerupInput(this);
 
         if (GetGlobalPad()->JustPressed(0x1C, true))
         {
@@ -4372,7 +4372,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
             SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
             mbGrabMonty = true;
             mpMonty = mpTarget;
-            mpTarget->fn_8004F204();
+            mpTarget->InitActionMontyBurrowed();
             g_pBall->m_bVisible = 0;
             m_DetChar.m_fDesiredSpeed = 0.0f;
             m_DetChar.m_fActualSpeed = 0.0f;
@@ -4946,7 +4946,7 @@ void Goalie::InitActionPursueDeke(
 
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
-        fn_80097648(0.1f);
+        BlendOutPowerupAnimation(0.1f);
     }
 
     mUrgency = URGENCY_HIGH;
@@ -5015,7 +5015,7 @@ void Goalie::InitActionLooseBallSetup()
         return;
     }
 
-    if (!IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
+    if (!IsLooseBallClose(*GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
     {
         InitActionMove(true);
@@ -6141,7 +6141,7 @@ void Goalie::LaunchSaveDeflection(float fParam)
     }
     else if (g_pBall->meBallState != BALL_STATE_GOALIE_DEFLECTION)
     {
-        fn_80015C38(g_pBall, BALL_STATE_GOALIE_DEFLECTION);
+        ChangeBallState(g_pBall, BALL_STATE_GOALIE_DEFLECTION);
     }
 
     unsigned short aActualFacingDirection = GetActualFacing();
@@ -6218,7 +6218,7 @@ void Goalie::InitActionElectrocution()
 
         cCharacter* pPreviousCharacter = g_pCurrentlyUpdatingCharacter;
         g_pCurrentlyUpdatingCharacter = this;
-        fn_8001EF78(0.0f);
+        UpdatePoseTree(0.0f);
         g_pCurrentlyUpdatingCharacter = pPreviousCharacter;
 
         SetVelocity(v3Zero);
@@ -6317,7 +6317,7 @@ void Goalie::InitActionSTSAttack()
     bool bInRange = false;
     if (mpShooter->m_DetChar.m_eCharacterClass != HAMMERBROS
         || mpShooter->m_eActionState != ACTION_SKILLSHOT
-        || fn_800DEB04(mpShooter) > 0.8f)
+        || ShotMeterProgress(mpShooter) > 0.8f)
     {
         mpLooseBallInfo = &LooseBallAnims::mLooseBallKickInfo[2];
         float fPickupDist
@@ -6522,7 +6522,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
             return;
         }
 
-        float fShotMeter = fn_800DEB04(mpShooter);
+        float fShotMeter = ShotMeterProgress(mpShooter);
         if (!(fShotMeter > 0.0f && fShotMeter <= 1.0f)
             && g_pBall->m_tShotTimer.m_uPackedTime != 0)
         {
@@ -6561,7 +6561,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
             if (fDistanceSq < fTargetDistSq)
             {
                 HitAttackTarget(mpShooter, false);
-                fn_80080BFC(0.0f);
+                UpdateLaunchedDekeTarget(0.0f);
 
                 PlayerAttackData data;
                 data.pAttacker = this;
@@ -6868,7 +6868,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     SetMegaBallTimerCount(g_pGame->m_uMegastrikeNumShots);
     gMegaBallTimerVisible = false;
     if (BasicStadium::GetCurrentStadium() != 0)
-        fn_80278860(BasicStadium::GetCurrentStadium(), 0);
+        SetStadiumEffectsActive(BasicStadium::GetCurrentStadium(), 0);
 }
 
 void Goalie::InitActionMove(bool bParam)
@@ -7035,7 +7035,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
 
     float fTimeToContact = CalcTimeToPlane(GetSavePlaneOffset());
     float fEnergyLevel = mFatigue.mfEnergyLevel;
-    fEnergyLevel -= gfGoalieShotChargeEnergyPenalty * fn_800156A8(g_pBall);
+    fEnergyLevel -= gfGoalieShotChargeEnergyPenalty * GetBallChargeBonus(g_pBall);
     if (fEnergyLevel < gfGoalieSaveEnergyThreshold)
     {
         PlaySound(9, 0x90A88490, 0, 0);
@@ -7216,7 +7216,7 @@ void Goalie::InitActionSave()
 
             if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
             {
-                fn_80097648(0.1f);
+                BlendOutPowerupAnimation(0.1f);
             }
         }
         else
@@ -7335,7 +7335,7 @@ void Goalie::InitActionDiveRecover()
     }
     else if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
-        fn_80097358(this, -1.0f);
+        StartPlayerFire(this, -1.0f);
         if (mnOffplayPending == GOALIE_OFFPLAY_NONE)
         {
             StartFireAnim();
@@ -7476,7 +7476,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
                 1.0f,
                 4.0f,
                 mfBallCharge);
-            fn_80097358(this, fParam);
+            StartPlayerFire(this, fParam);
             if (bParam)
             {
                 StartFireAnim();
@@ -7538,7 +7538,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
         KoopaShellObject* pPowerup = gNPCManager->mpKoopaShell;
         if (pPowerup != 0 && pPowerup->mVisible)
         {
-            fn_800156F8(g_pBall, mpSkillShooter);
+            DeflectSkillshotBall(g_pBall, mpSkillShooter);
         }
         SetNoPickUpTime(0.2f);
 
@@ -7583,7 +7583,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
             }
 
             InitActionElectrocution();
-            fn_800156F8(g_pBall, mpSkillShooter);
+            DeflectSkillshotBall(g_pBall, mpSkillShooter);
             SetNoPickUpTime(0.2f);
         }
     }

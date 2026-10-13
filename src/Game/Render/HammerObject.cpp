@@ -213,7 +213,7 @@ void HammerObject::OnLanding()
             (u16)(int)(sHammerRadiansToAngleUnits
                 * ToRadians(sHammerHalf * (gHammerMaxLandingAngle + gHammerMinLandingAngle))));
 
-        fn_802B549C(facing,
+        nlMakeQuatZ(facing,
             mOwner->m_DetChar.m_aActualFacingDirection);
 
         nlMultQuat(target, facing, tilt);
@@ -224,7 +224,7 @@ void HammerObject::OnLanding()
 #else
         nlQuaternion lowOrientation;
         nlQuaternion highOrientation;
-        fn_802B549C(facing,
+        nlMakeQuatZ(facing,
             mOwner->m_DetChar.m_aActualFacingDirection);
         nlMakeQuatY(target, DegreesToAngle(125.0f));
         nlMultQuat(target, facing, target);

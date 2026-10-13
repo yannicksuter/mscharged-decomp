@@ -112,6 +112,6 @@ extern DispatchEventsTask* gDispatchEventsTask;
 
 
 void InitializeDispatchEventsTask();
-void fn_80115FB4();
+void ClearDeferredEvents();
 
 #endif // GAME_TASK_DISPATCH_EVENTS_TASK_H

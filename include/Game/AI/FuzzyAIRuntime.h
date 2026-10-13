@@ -193,10 +193,10 @@ extern "C" cFielder* FuzzyAIAutoCastIteratorToFielder(void*, FuzzyFielderIterato
 extern "C" cFielder* FuzzyAIAutoCastIteratorToPlayer(void*, FuzzyFielderIterator*);
 extern "C" AIContext* FuzzyAIGetIteratorAIContext(void*, FuzzyFielderIterator*);
 extern "C" unsigned long FuzzyAIStringHash(const char*);
-extern "C" float fn_800E3FE0();
-extern "C" float fn_800E3FE4();
-extern "C" float fn_800E3FE8();
-extern "C" float fn_800E3FEC();
+float FuzzyAIIsPassInPlay();
+float FuzzyAIIsPassInPlayDelayed();
+float FuzzyAIHasPassTarget();
+float FuzzyAIIsShotInPlay();
 extern "C" bool FuzzyAIIsUndoingCall(InterpreterCore*);
 extern "C" float FuzzyAIAutoCastParameterToFloat(void*, Variant*);
 extern "C" unsigned long FuzzyAIAutoCastParameterToInt(void*, Variant*);
@@ -255,7 +255,7 @@ extern "C" float FuzzyInterpolateRangeClamped(float first, float second, float m
 extern "C" void FuzzyTransitionHook(void*, bool);
 extern "C" void FuzzySetActionSelection( FuzzyRuntimeBase* runtime, int selection);
 extern "C" void FuzzySetContextTransition(void*, AIContext* context, const char* name);
-extern "C" bool fn_80314798(void*);
+extern "C" bool FuzzyCheckScriptTimeBudget(void*);
 extern "C" AIContext* FuzzyGetScriptMachineContext(void*, ScriptMachine* machine);
 extern "C" int FuzzyGetCurrentContextType(FuzzyRuntimeBase* runtime);
 extern "C" void FuzzyPrintFloat(float value);

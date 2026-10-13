@@ -41,7 +41,7 @@ bool DesireMegaStrike::Initialize(void* context)
     else
     {
         mfFirstPressDelay = InterpolateClamped(sMegaStrikeFirstPressDelayMin, sMegaStrikeFirstPressDelayMax,
-            1.0f - Difficult(fn_800D6670(m_pFielder)));
+            1.0f - Difficult(TeamOf(m_pFielder)));
         float fDelay = mfFirstPressDelay;
 
         float fRange = fDelay * sMegaStrikeFirstPressDelayJitter;
@@ -53,7 +53,7 @@ bool DesireMegaStrike::Initialize(void* context)
         int i;
         for (i = 0; i < 4; ++i)
         {
-            probabilities[i] = fn_800A636C(g_pCurrentlyUpdatingTeam)
+            probabilities[i] = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                                    ->MegaGoalChance[i]
                                    ->GetValue();
         }
@@ -84,7 +84,7 @@ bool DesireMegaStrike::Initialize(void* context)
         mnRequestedBalls = nRequestedBalls;
 
         mnRequestedBalls = (int)(
-            (float)mnRequestedBalls + m_pFielder->fn_800489C4());
+            (float)mnRequestedBalls + m_pFielder->GetMegaStrikeMinBalls());
 
         if (g_pGame->GetNormalizedGameTime() > 0.75f)
         {
@@ -97,7 +97,7 @@ bool DesireMegaStrike::Initialize(void* context)
                 if ((unsigned int)mnRequestedBalls
                         < (unsigned int)_abs(nScoreDifference)
                     && (float)(unsigned int)_abs(nScoreDifference)
-                        < m_pFielder->fn_80048A08())
+                        < m_pFielder->GetMegaStrikeMaxBalls())
                 {
                     mnRequestedBalls = _abs(nScoreDifference);
                     if (nlRandomf(1.0f) < 0.33f)
@@ -110,12 +110,12 @@ bool DesireMegaStrike::Initialize(void* context)
 
         float fAccuracyRange = InterpolateRangeClamped(
             0.49f, 0.98f, 1.0f, 0.2f,
-            Difficult(fn_800D6670(m_pFielder)));
+            Difficult(TeamOf(m_pFielder)));
         mfAccuracyScore = nlRandomf(1.0f);
 
-        float fAccuracy = fn_800A636C(g_pCurrentlyUpdatingTeam)
+        float fAccuracy = GetTeamSkillTweaks(g_pCurrentlyUpdatingTeam)
                               ->MegaGoalAccuracy[(int)((float)mnRequestedBalls
-                                  - m_pFielder->fn_800489C4())]
+                                  - m_pFielder->GetMegaStrikeMinBalls())]
                               ->GetValue();
         if (mfAccuracyScore < fAccuracy)
         {
@@ -205,14 +205,14 @@ void DesireMegaStrike::Update(
             nParam = 1;
             bButtonPressed = UpdateAIButtonPress(update, fDeltaT);
         }
-        m_pFielder->fn_8004923C(
+        m_pFielder->UpdateMegaStrikeMeter(
             fDeltaT, bButtonPressed, nParam);
-        fn_80098098(m_pFielder);
+        HandlePlayerPowerupInput(m_pFielder);
     }
     else if (m_pFielder->m_eActionState == ACTION_MEGA_STRIKE)
     {
         m_pFielder->EndStar();
-        m_pFielder->fn_800489C0(fDeltaT);
+        m_pFielder->ActionMegaStrike(fDeltaT);
     }
 }
 
@@ -253,7 +253,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
         bool bAtRequestedValue = false;
         if (Difficult(m_pFielder->m_pTeam) < 0.25f
             && (float)mnRequestedBalls
-                == m_pFielder->fn_800489C4())
+                == m_pFielder->GetMegaStrikeMinBalls())
         {
             bAtRequestedValue = true;
         }

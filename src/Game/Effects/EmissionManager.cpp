@@ -1179,7 +1179,7 @@ inline void EmissionController::Replay(LoadFrame& frame)
 
     float age = 0.0f;
     ::Replayable<0>(frame, age);
-    age += frame.fn_801948B0();
+    age += frame.GetNonBlendableAheadOfFrame();
     m_ReplayDeltaTime = age - m_Age;
     m_Age = age;
 

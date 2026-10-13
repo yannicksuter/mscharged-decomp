@@ -86,7 +86,7 @@ public:
     }
     nlVector3* GetAIVelocity() const;
     nlVector3* GetDrawablePosition() const;
-    float fn_80014F38(float fScale) const;
+    float GetScaledContactRadius(float fScale) const;
     cFielder* GetOwnerFielder();
     cPlayer* GetOwnerGoalie();
     cFielder* GetPassTargetFielder() const;
@@ -184,7 +184,7 @@ public:
     /* 0xF0 */ unsigned long m_uGlowSoundCue;
 }; // total size: 0xF4
 
-extern "C" void fn_80015C38(cBall* pBall, int nBallState);
+void ChangeBallState(cBall* pBall, int nBallState);
 
 struct LiveBallTrail;
 float GetBallChargeValue(cBall* pBall, int nParam);
@@ -197,17 +197,17 @@ extern float gHeaderTargetPredictionHeight;
 
 
 // Shared functions and data from Game/Ball.cpp.
-extern "C" void fn_80014494(cBall*);
+void HandleBallGroundContact(cBall*);
 void SetBallFallState(cBall* pBall);
-extern "C" void fn_800145A4(cBall*);
-extern "C" bool fn_80014D38(cBall*);
-extern "C" bool fn_80014E20(cBall* pBall);
+void HandleBallWallContact(cBall*);
+bool UpdateBallPassLock(cBall*);
+bool IsBallDangerousShot(cBall* pBall);
 bool IsBallEffectPlaying(cBall* pBall, const EffectsGroup* pGroup);
 void EmitBallChargeTransition(cBall* pBall);
 void UpdateBallStateAndTimers(cBall*, float);
 void DecayBallCharge(cBall*);
-extern "C" void fn_800189C4(cBall* pBall);
-extern "C" void fn_80018A00();
+void StopBallGlowSound(cBall* pBall);
+void RegisterBallEventCallbacks();
 void OnBallGameOver();
 void OnBallResetEffects(void*);
 void OnBallGetReadyForKickoff(void*);
@@ -223,14 +223,16 @@ void OnBallStateChange(int, int);
 void InitializeBallTrails(unsigned int nNumTrails);
 
 
-extern "C" void fn_800154FC(cBall* pBall, float fParam);
-extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
-extern "C" float fn_800156A8(cBall* pBall);
+void SetBallCharge(cBall* pBall, float fParam);
+void DeflectSkillshotBall(cBall* pBall, cPlayer* pPlayer);
+float GetBallChargeBonus(cBall* pBall);
 bool IsDryBonesSkillshot(cBall* pBall);
-extern "C" bool fn_800167A8(cBall* pBall);
+bool IsBooSkillshotBall(cBall* pBall);
 bool IsBallShotActive(cBall* pBall);
-extern "C" void fn_800180F4( cBall* pBall, nlVector3* pPosition, float fTime);
+void PredictBallPosition( cBall* pBall, nlVector3* pPosition, float fTime);
 void ResetBall(cBall* pBall, bool bParam);
 void SetBallTrailVisible(LiveBallTrail* pBallTrail, bool bParam);
+
+void CancelBallShot(cBall* pBall, bool force);
 
 #endif // GAME_BALL_H

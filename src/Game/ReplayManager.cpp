@@ -127,7 +127,7 @@ void RenderSnapshot::Replay(T& frame)
     Replayable<0>(frame, mChainChomp);
     if ((mFlags.raw >> 24) & 1)
     {
-        if (NPCManager::fn_801948A0()->fn_801919A4() != 0)
+        if (NPCManager::Instance()->GetDiddyBanana() != 0)
             Replayable<0>(frame, mDiddyBanana);
     }
     if ((mFlags.raw >> 25) & 1)
@@ -151,7 +151,7 @@ void RenderSnapshot::Replay(T& frame)
     {
         for (int i = 0; i < 3; i++)
         {
-            if (NPCManager::fn_801948A0()->fn_801A9DE0(i) != 0)
+            if (NPCManager::Instance()->GetWindDebris(i) != 0)
                 Replayable<0>(frame, mWindDebris[i]);
         }
         frame.fn_80191504();
@@ -179,15 +179,15 @@ void RenderSnapshot::Replay(T& frame)
                 mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
                 mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
             }
-            if (((LoadFrame&)frame).fn_801948B0() > 0.0f)
+            if (((LoadFrame&)frame).GetNonBlendableAheadOfFrame() > 0.0f)
             {
-                if (((LoadFrame&)frame).fn_801948B0() < gfLastAheadOfFrameTime)
+                if (((LoadFrame&)frame).GetNonBlendableAheadOfFrame() < gfLastAheadOfFrameTime)
                 {
                     mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
                     mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
                     gbNetMeshReplayResync = true;
                 }
-                gfLastAheadOfFrameTime = ((LoadFrame&)frame).fn_801948B0();
+                gfLastAheadOfFrameTime = ((LoadFrame&)frame).GetNonBlendableAheadOfFrame();
             }
         }
         Replayable<1>(frame, *mpNetMeshPositiveX);
@@ -195,7 +195,7 @@ void RenderSnapshot::Replay(T& frame)
     }
     Replayable<1>(frame, mSimulationTime);
     frame.fn_80191504();
-    if (frame.fn_801919D0())
+    if (frame.ShouldReplayNonBlendables())
     {
         Replayable<3>(frame, EmissionManager::Instance()->InstanceForReplayOnly());
     }

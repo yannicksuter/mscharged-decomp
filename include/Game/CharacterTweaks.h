@@ -204,24 +204,24 @@ private:
 
 
 // Shared functions and data from Game/CharacterTweaks.cpp.
-extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002CD2C(const PlayerTweaks* pTweaks);
+float GetFastestShotSpeed(PlayerTweaks* pTweaks);
+float GetSlowestShotSpeed(PlayerTweaks* pTweaks);
+float GetStrafeSpeed(const PlayerTweaks* pTweaks);
+float GetRunBackwardsSpeed(const PlayerTweaks* pTweaks);
 float GetJogSpeed(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
-extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
-extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
+float GetHitEffectiveFirstFrame(PlayerTweaks* pTweaks);
+float GetHitEffectiveMaxFrame(PlayerTweaks* pTweaks);
+float GetHitEffectiveLastFrame(PlayerTweaks* pTweaks);
 
 
-extern "C" float fn_8002BE38(PlayerTweaks* tweaks);
-extern "C" float fn_8002BE84(const PlayerTweaks* tweaks);
-extern "C" float fn_8002BFA8(PlayerTweaks* tweaks, float value);
-extern "C" float fn_8002C0AC(PlayerTweaks* tweaks);
-extern "C" float fn_8002C180(PlayerTweaks* tweaks);
-extern "C" float fn_8002C254(const PlayerTweaks* tweaks);
-extern "C" float fn_8002CF10(PlayerTweaks*);
-extern "C" float fn_8002CF24(PlayerTweaks*);
+float GetDefensiveRating(PlayerTweaks* tweaks);
+float GetPowerRating(const PlayerTweaks* tweaks);
+float GetScaledPlayerWidth(PlayerTweaks* tweaks, float value);
+float GetRunTurnSpeed(PlayerTweaks* tweaks);
+float GetRunAccel(PlayerTweaks* tweaks);
+float GetTurboSpeed(const PlayerTweaks* tweaks);
+float GetRunTurnFalloff(PlayerTweaks*);
+float GetRunDecel(PlayerTweaks*);
 
 // C++ accessors from Game/CharacterTweaks.cpp.
 void InitPlayerTweaks(PlayerTweaks*, const char*, const char*, bool);

@@ -468,7 +468,7 @@ void Lightning::Update(float value)
             g_LightningStrikeDataPool.Allocate(data);
             data->position = position;
             data->radius = gWeakLightningRadius;
-            fn_8005D210(g_pGame, data);
+            QueueLightningStrikeEvent(g_pGame, data);
             if (nlRandomf(1.0f) < 0.5f)
             {
                 EmitLightning("weather_lightning_weak", position, false);
@@ -487,7 +487,7 @@ void Lightning::Update(float value)
             data->position.z = 0.0f;
             cField::FixOutOfBoundsPosition(data->position, 0.5f, true);
             data->radius = gLightningStrikeRadius;
-            fn_8005D210(g_pGame, data);
+            QueueLightningStrikeEvent(g_pGame, data);
             if (nlRandomf(1.0f) < 0.5f)
             {
                 EmitLightning("weather_lightning", data->position, true);
@@ -507,7 +507,7 @@ void Lightning::Stop(bool value)
 {
     if (value)
     {
-        WorldDarkening::Instance().fn_801AF550();
+        WorldDarkening::Instance().Reset();
     }
     else
     {
@@ -530,7 +530,7 @@ void Windy::OnGetReadyForKickoff()
 {
     for (int i = 0; i < 3; i++)
     {
-        gNPCManager->fn_801A9DE0(i)->Deactivate(false);
+        gNPCManager->GetWindDebris(i)->Deactivate(false);
     }
 }
 
@@ -645,12 +645,12 @@ void Windy::Start()
             float index = 2.0f * nlRandomf(1.0f);
             index += index < 0.0f ? -0.5f : 0.5f;
             eDebrisType = (int)index;
-            WindDebris* npc = gNPCManager->fn_801A9DE0(eDebrisType);
+            WindDebris* npc = gNPCManager->GetWindDebris(eDebrisType);
             int i = 0;
             while ((npc->mbIsVisible == 1 || eDebrisType == eLastDebrisType) && i < 3 && i > -1)
             {
                 eDebrisType = (eDebrisType + 1) % 3;
-                npc = gNPCManager->fn_801A9DE0(eDebrisType);
+                npc = gNPCManager->GetWindDebris(eDebrisType);
                 i++;
             }
             WindDebrisConfig* config = GetWindDebrisConfig(eDebrisType);
@@ -828,7 +828,7 @@ void SolarFlare::OnGetReadyForKickoff()
                 fielder->m_pPhysicsCharacter->m_CanCollideWithBall = false;
             }
         }
-        g_pGame->fn_80058A78(duration);
+        g_pGame->StartPostResetClock(duration);
         GameplayCamera* camera = cCameraManager::GetCamera<GameplayCamera>(eCameraType_Gameplay);
         if (camera)
         {
@@ -940,7 +940,7 @@ void SolarFlare::Update(float value)
         PlaySound(11, 0xE853C469, 0, 0);
         if (m_NextFlare == 0)
             PlaySound(13, 0xF68B3F0F, 0, 0);
-        fn_80097358(fielder, 10.0f);
+        StartPlayerFire(fielder, 10.0f);
         fielder->EndAction();
         if (fielder->m_pBall != 0)
         {
@@ -973,7 +973,7 @@ int SolarFlare::SelectVaporizeTargets()
             value += value < 0.0f ? -0.5f : 0.5f;
             count = (int)value + 1;
         }
-        bool allowCaptain = !g_pTeams[0]->fn_800A6764() && !g_pTeams[1]->fn_800A6764();
+        bool allowCaptain = !g_pTeams[0]->HasCaptainPowerup() && !g_pTeams[1]->HasCaptainPowerup();
         if (GameInfoManager::Instance()->GetRule0x0() == 9)
         {
             allowCaptain = false;
@@ -1060,7 +1060,7 @@ float BubblingLava::GetStartChance()
         int count = 0;
         for (i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch)
             {
                 if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
@@ -1255,7 +1255,7 @@ void BubblingLava::Stop(bool initialize)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch)
             {
                 if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
@@ -1403,7 +1403,7 @@ void StormShipWeather::Update(float value)
                 if (nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3Zero) < radiusSquared
                     && g_pBall->m_pOwner == 0 && g_pBall->meBallState != BALL_STATE_FALLING && g_pBall->meBallState != BALL_STATE_LIGHTNING)
                 {
-                    fn_80015C38(g_pBall, BALL_STATE_LIGHTNING);
+                    ChangeBallState(g_pBall, BALL_STATE_LIGHTNING);
                 }
             }
         }
@@ -1467,7 +1467,7 @@ void StormShipWeather::Stop(bool value)
     StopSound(0xF8D24195, this);
     if (value)
     {
-        WorldDarkening::Instance().fn_801AF550();
+        WorldDarkening::Instance().Reset();
     }
     else
     {
@@ -1496,7 +1496,7 @@ void StormShipWeather::ResetLightning(bool initialize)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch && patch->m_Type == PATCH_CHAIN_LIGHTNING)
             {
                 patch->Unknown0();
@@ -1633,7 +1633,7 @@ void SandTombWeather::CreateSandPatches()
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
             if (patch && patch->m_Type == PATCH_SAND)
                 patch->Unknown0();
         }

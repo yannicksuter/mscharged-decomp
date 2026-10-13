@@ -131,7 +131,7 @@ bool NPCManager::SelectNextNPCTemplate()
 void NPCManager::CreateChainChomp()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline("ChainChomp");
+        = FindNPCTemplate_inline("ChainChomp");
 
     PhysicsNPC* chainPhysics = new (nlMalloc(
         sizeof(PhysicsNPC), 8, false)) PhysicsNPC(
@@ -197,7 +197,7 @@ BulletBillObject* NPCManager::GetBulletBill(int nIndex)
     return mBulletBills[nIndex];
 }
 
-BulletBillObject* NPCManager::fn_801A9D20()
+BulletBillObject* NPCManager::CreateBulletBill()
 {
     BulletBillObject* pObject = 0;
     for (unsigned int i = 0; i < 6; ++i)
@@ -214,7 +214,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
     return pObject;
 }
 
-WindDebris* NPCManager::fn_801A9DE0(int nIndex)
+WindDebris* NPCManager::GetWindDebris(int nIndex)
 {
     return mWindDebris[nIndex];
 }
@@ -225,7 +225,7 @@ void NPCManager::CreateWindDebris()
     {
         WindDebrisConfig* pConfig = GetWindDebrisConfig(i);
         NPCTemplate* pTemplate
-            = fn_801ABBDC_inline(pConfig->mName);
+            = FindNPCTemplate_inline(pConfig->mName);
 
         PhysicsNPC* pPhysics = new (8, false) PhysicsNPC(
             pConfig->mRadius);
@@ -242,7 +242,7 @@ void NPCManager::CreateWindDebris()
 void NPCManager::CreateDiddyBanana()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline("DiddyBanana");
+        = FindNPCTemplate_inline("DiddyBanana");
     DiddyBanana* pObject
         = (DiddyBanana*)nlMalloc(sizeof(DiddyBanana), 8, false);
     pObject = new (pObject) DiddyBanana(

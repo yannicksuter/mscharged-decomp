@@ -239,7 +239,7 @@ void DrawableCharacter::Replay(T& frame)
                 }
                 Replayable<1>(frame, leftPropAnimated);
             }
-            else if (fn_80194674(current))
+            else if (IsDiddyKong(current))
             {
                 Replayable<1>(frame, packetAVisible);
                 Replayable<1>(frame, packetBVisible);

@@ -440,7 +440,7 @@ void PhysicsPatch::ClearMuckHole(float)
     }
 }
 
-void PhysicsPatch::fn_80173AF4()
+void PhysicsPatch::ClearTarget()
 {
     m_pTarget = 0;
     m_TargetSeekSpeed = -1.0f;
@@ -497,7 +497,7 @@ void PhysicsPatch::SetPath(
     }
 }
 
-nlVector3 PhysicsPatch::fn_80173CCC() const
+nlVector3 PhysicsPatch::GetPathDirection() const
 {
     nlVector3 direction = { 0.0f, 0.0f, 0.0f };
     if (m_PathPoints != 0 && m_CurrentPathPoint > 0)
@@ -631,7 +631,7 @@ PhysicsPatch* PhysicsPatchManager::CreatePatch(
     return patch;
 }
 
-PhysicsPatch* PhysicsPatchManager::fn_801745B8(int index)
+PhysicsPatch* PhysicsPatchManager::GetPatch(int index)
 {
     if (index >= 0 && index < 60)
     {
@@ -675,7 +675,7 @@ void HandleResetEffects(void*)
 {
     for (int i = 0; i < 60; ++i)
     {
-        PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
+        PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
         if (patch != 0)
         {
             patch->KillEffect();

@@ -24,7 +24,7 @@ extern bool gForceSidelineAvoidance;
 void ResetSteeringHistory(DesireSteering*);
 void ResetSteeringAvoidance(DesireSteering*);
 void ResetSteeringTargets(DesireSteering*);
-extern "C" void fn_800C5DBC(DesireSteering*, float);
+void UpdateSteeringAvoidance(DesireSteering*, float);
 void AddSteeringTarget(
     DesireSteering*, const nlVector3&, float, float);
 void SetTimedSteeringTarget(
@@ -34,7 +34,7 @@ void SeekTimedSteeringTarget(
     DesireSteering*, const nlVector3&, float, float);
 void SeekSteeringTarget(
     DesireSteering*, const nlVector3&, eTurboRequest, float, float);
-extern "C" void fn_800C6FDC(DesireSteering*, float);
+void UpdateSteeringFacing(DesireSteering*, float);
 eStrafeDirection GetSteeringStrafeDirection(
     DesireSteering*, unsigned short, unsigned short);
 
@@ -58,7 +58,7 @@ private:
     friend void ResetSteeringHistory(DesireSteering*);
     friend void ResetSteeringAvoidance(DesireSteering*);
     friend void ResetSteeringTargets(DesireSteering*);
-    friend void fn_800C5DBC(DesireSteering*, float);
+    friend void UpdateSteeringAvoidance(DesireSteering*, float);
     friend void AddSteeringTarget(
         DesireSteering*, const nlVector3&, float, float);
     friend void SetTimedSteeringTarget(DesireSteering*, const nlVector3&,
@@ -68,7 +68,7 @@ private:
         DesireSteering*, const nlVector3&, float, float);
     friend void SeekSteeringTarget(DesireSteering*, const nlVector3&,
         eTurboRequest, float, float);
-    friend void fn_800C6FDC(DesireSteering*, float);
+    friend void UpdateSteeringFacing(DesireSteering*, float);
     friend eStrafeDirection GetSteeringStrafeDirection(
         DesireSteering*, unsigned short, unsigned short);
 

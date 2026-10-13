@@ -41,7 +41,7 @@ class cPlayer;
 void DestroyPowerups();
 void DestroyGame();
 void FreeCollisionPlayerWallData(CollisionPlayerWallData* node);
-extern "C" void fn_8005B330(nlVector3*, float, float);
+void CalculateTiltDirection(nlVector3*, float, float);
 
 void SetFieldTilt(int relative, float xTilt, float yTilt);
 
@@ -80,10 +80,10 @@ public:
     float GetNormalizedGameTime();
     float GetGameTime();
     float GetGameDuration() const { return m_fGameDuration; }
-    void fn_800586C0();
-    void fn_80058704();
+    void StartGameClock();
+    void StopGameClock();
     void ResetForKickOff();
-    void fn_80058A78(float seconds);
+    void StartPostResetClock(float seconds);
     void BlowUpPowerups(
         const nlPolygonRegion& region,
         float fExplosionRadius);
@@ -101,7 +101,7 @@ public:
     void ResetCharacters();
     void SendPlayerVisibility();
     void UpdateCachedGameData(float fDeltaT);
-    float fn_8005B748(int firstIndex, int secondIndex);
+    float GetCachedPlayerDistance(int firstIndex, int secondIndex);
     cPlayer* GetClosestPlayer(int playerIndex, int side, int rank);
     void SetPotentialScorer(cPlayer* pPlayer);
     void ChecksumState(RunningChecksum* runningChecksum);
@@ -228,7 +228,7 @@ public:
     /* 0x474 */ float m_fCachedBallPlayerDistances[10];
 
     void QueueChainNisEnd(ShotAtGoalData* data);
-    void fn_80060BFC(CollisionBulletBillData& data);
+    void DeliverBulletBillExplodeEvent(CollisionBulletBillData& data);
 
     /* 0x49C */ GameEventQueue mEventQueue;
 
@@ -240,10 +240,10 @@ public:
 
 extern cGame* g_pGame;
 
-extern "C" void fn_8006040C(cGame*, cFielder*);
-extern "C" void fn_80060804(cGame*, cFielder*);
+void DeliverWaluigiWallStartEvent(cGame*, cFielder*);
+void DeliverWaluigiWallAbortEvent(cGame*, cFielder*);
 
-extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
+void QueueLightningStrikeEvent(cGame*, LightningStrikeData*);
 void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData);
 void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData);
 void DeliverGoalieExertEvent(cGame* pGame, const GoalieSaveData* pData);
@@ -252,17 +252,17 @@ void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* p
 void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData);
 void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData);
 
-extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
+void DeliverGoalieCatchEvent(cGame* game, const GoalieSaveData* pSaveData);
 
 void DeliverMegaStrikeMeterEndEvent(cGame* pGame);
 void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData);
 void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData);
 void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData);
 void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData);
-extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder);
-extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData);
+void DeliverSuperPresentationEvent(cGame* pGame, cFielder* pFielder);
+void DeliverHammerBroHammerEvent(cGame* pGame, const CharacterImpactEvent* pEventData);
 
-extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
+void DeliverWarioGroundPoundEvent(cGame* pGame, const void* pEventData);
 
 void DeliverShotPresentationEvent(cGame* pGame);
 void DeliverShotPresentationEndEvent(cGame* pGame);
@@ -280,5 +280,8 @@ void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData);
 void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData);
 void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder);
 void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventData);
+
+void CreateGame(void* terrainIndex, int weatherType, bool startCrowdRiot);
+void BeginGameUnloading();
 
 #endif // GAME_GAME_H

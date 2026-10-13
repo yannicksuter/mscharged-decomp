@@ -12,7 +12,7 @@ void InitializeDispatchEventsTask()
         new (nlMalloc(sizeof(DispatchEventsTask), 8, false)) DispatchEventsTask;
 }
 
-void fn_80115FB4()
+void ClearDeferredEvents()
 {
     gDispatchEventsTask->dispatcher.Clear();
 

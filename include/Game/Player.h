@@ -146,15 +146,15 @@ public:
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();
-    cBall* fn_800C2F40() const { return m_pBall; }
+    cBall* GetBall() const { return m_pBall; }
     bool HasBall() const { return m_pBall != 0; }
     u8 SwapController(bool bParam);
-    cGlobalPad* fn_800972CC();
+    cGlobalPad* GetLocalControllerPad();
     void SetAIPad(cAIPad* pPad);
-    void fn_80096CDC(cBall* pBall);
+    void SetBall(cBall* pBall);
     void PlayAttackReactionSounds(float fScale);
     void ClearPowerupAnimState(bool bIsEndGame);
-    cPlayer* fn_8009670C(nlVector3* pPosition, bool bParam);
+    cPlayer* GetClosestTeamPlayer(nlVector3* pPosition, bool bParam);
     cFielder* GetClosestOpponentFielder(
         nlVector3* pPosition, bool bParam);
     cPlayer* GetClosestOpponentPlayer(nlVector3* pPosition, bool skipIncapacitated);
@@ -173,10 +173,10 @@ public:
         float fIgnoreObjectFartherThanThis);
     nlVector3 GetAIDefNetLocation(const nlVector3* v3ReferencePos);
     nlVector3 GetAIOffNetLocation(const nlVector3* v3ReferencePos);
-    void fn_800974B0();
-    void fn_8009750C();
-    void fn_80097648(float fParam);
-    bool fn_800976C4() const;
+    void StopFire();
+    void EndFire();
+    void BlendOutPowerupAnimation(float fParam);
+    bool HasPowerupAnimation() const;
     void SetPowerupAnimState(int nodeIndex, int animID, float blendTime);
     void SetPowerupAnimState(int animID);
     static void PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
@@ -220,12 +220,12 @@ public:
 
 }; // total size: 0x324
 
-extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration);
-extern "C" void fn_80098098(cPlayer* pSelf);
+void StartPlayerFire(cPlayer* pPlayer, float fDuration);
+void HandlePlayerPowerupInput(cPlayer* pSelf);
 void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam);
 void SetDesiredFacingDirection(cPlayer* pPlayer);
-extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass);
+cPlayer* FindBestPassTarget(cPlayer* pSelf, bool bVolleyPass);
 bool IsPlayerBelowHeight(const cPlayer* pPlayer, float fParam);
-extern "C" void fn_80098750();
+void RegisterPlayerEventCallbacks();
 
 #endif // GAME_PLAYER_H

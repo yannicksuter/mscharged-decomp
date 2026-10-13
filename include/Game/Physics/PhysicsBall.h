@@ -22,7 +22,7 @@ public:
 
     void CalcAngularFromLinearVelocity(nlVector3& v3AngularVel);
     void CalcSurfaceVelocity(nlVector3& v3VelocityOut);
-    void fn_8013FE00();
+    void SuspendBallForces();
     void RestoreBallForces();
     void ResetBallAirResistance();
     float GetDefaultBallAirResistance();

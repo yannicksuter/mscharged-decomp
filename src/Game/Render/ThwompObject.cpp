@@ -291,7 +291,7 @@ void ThwompObject::SetState(eThwompState state)
         float angleRadians = nlRandomf(0.04f) - 0.02f;
         unsigned short angle
             = (unsigned short)(int)(10430.378f * angleRadians);
-        fn_802B5370(orientation, axis, angle);
+        nlMakeQuat(orientation, axis, angle);
         dQuaternion bodyOrientation;
         bodyOrientation[0] = orientation.x;
         bodyOrientation[1] = orientation.y;
