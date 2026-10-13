@@ -5814,9 +5814,6 @@ RVL_SDK/vi/vi3in1.c:
 	.sdata      start:0x806DE968 end:0x806DE979
 	.sbss       start:0x806E17A0 end:0x806E17B4
 
-RVL_SDK/wpad/WPADMem.c:
-	.bss        start:0x805D8480 end:0x805D84D0
-
 RVL_SDK/wenc/wenc.c:
 	.text       start:0x803C7F38 end:0x803C8210
 	.rodata     start:0x804EBAA0 end:0x804EBAE0
@@ -5832,7 +5829,12 @@ RVL_SDK/wpad/WPAD.c:
 RVL_SDK/wpad/WPADHIDParser.c:
 	.text       start:0x803CF8D0 end:0x803D4134
 	.data       start:0x8054A558 end:0x8054A9B8
+	.bss        start:0x805D8468 end:0x805D8480
+	.sbss       start:0x806E17E0 end:0x806E17F0
 	.sdata2     start:0x806E6120 end:0x806E6148
+
+RVL_SDK/wpad/WPADMem.c:
+	.bss        start:0x805D8480 end:0x805D84D0
 
 RVL_SDK/wpad/WPADEncrypt.c:
 	.text       start:0x803D4134 end:0x803D50C4

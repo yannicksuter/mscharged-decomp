@@ -6,7 +6,9 @@
 
 static u8 _devType[WPAD_MAX_CONTROLLERS];
 static u8 _devMode[WPAD_MAX_CONTROLLERS];
+#if defined(VERSION_R4QE01)
 static u8 _retryCnt[WPAD_MAX_CONTROLLERS];
+#endif
 
 void __a1_20_status_report(u8 chan, u8* data);
 void __a1_21_user_data(u8 chan, u8* data);
@@ -35,6 +37,16 @@ void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len);
 #define HID_LED_MASK          (u8)(0xF0)
 #define HID_FW_MASK           (u8)(0xF0)
 #define HID_PRT_MASK          (u8)(0xF)
+
+#if defined(VERSION_R4QE01)
+#define HID_CLASSIC_STICK_MIN (-0x200)
+#define HID_CLASSIC_STICK_MAX 0x1FF
+#define HID_REPORT32_CHECK_SIZE 8
+#else
+#define HID_CLASSIC_STICK_MIN (-0x400)
+#define HID_CLASSIC_STICK_MAX 0x3FF
+#define HID_REPORT32_CHECK_SIZE 7
+#endif
 
 #define HID_IDX_BYTE7  1
 #define HID_IDX_BYTE8  2
@@ -87,7 +99,9 @@ static u8 checkInvalidData[21] = {
 };
 static u8 checkBuffer[21];
 
+#if defined(VERSION_R4QE01)
 static inline void initExtension(s32 chan);
+#endif
 
 void abortInitExtension(WPADChannel chan, WPADResult result)
 {
@@ -104,17 +118,23 @@ void abortInitExtension(WPADChannel chan, WPADResult result)
         }
         else if (p_wpd->info.attach)
         {
+#if defined(VERSION_R4QE01)
             if (_retryCnt[chan]++ < 32)
             {
                 initExtension(chan);
                 return;
             }
+#endif
             type = WPAD_DEV_NOT_SUPPORTED;
         }
         else
         {
+#if defined(VERSION_R4QE01)
             WPADiSendSetReportType(&p_wpd->extCmdQueue, p_wpd->dataFormat, NULL);
             return;
+#else
+            type = WPAD_DEV_CORE;
+#endif
         }
 
         p_wpd->devType = (u8)type;
@@ -471,6 +491,7 @@ void getGameInfo(s32 chan, s32 result, u8 index)
     }
 }
 
+#if defined(VERSION_R4QE01)
 static inline void initExtension(s32 chan)
 {
     WPADControlBlock* p_wpd = _wpdcb[chan];
@@ -482,6 +503,7 @@ static inline void initExtension(s32 chan)
     WPADiSendWriteDataCmd(&p_wpd->extCmdQueue, extcmd, WM_REG_EXTENSION_FB, abortInitExtension);
     WPADiSendReadData(&p_wpd->extCmdQueue, p_wpd->wmReadDataBuf, 2, WM_REG_EXTENSION_DEV_MODE, abortInitExtension);
 }
+#endif
 
 s32 WPADiHIDParser(u8 chan, u8* data)
 {
@@ -573,8 +595,20 @@ void __a1_20_status_report(u8 chan, u8* data)
             DEBUGPrint("initialize attachment\n");
 
             extcb = p_wpd->extensionCallback;
+#if defined(VERSION_R4QE01)
             _retryCnt[chan] = 0;
             initExtension(chan);
+#else
+            {
+                u32 format = p_wpd->dataFormat;
+                WPADCommandQueue* cmdq = &p_wpd->extCmdQueue;
+
+                p_wpd->dataFormat = -1;
+                WPADSetDataFormat(chan, format);
+                WPADiSendWriteDataCmd(cmdq, 0x55, WM_REG_EXTENSION_F0, abortInitExtension);
+                WPADiSendReadData(cmdq, p_wpd->wmReadDataBuf, 2, WM_REG_EXTENSION_DEV_MODE, abortInitExtension);
+            }
+#endif
 
             p_wpd->calibrated = 0;
             p_wpd->devType = WPAD_DEV_INITIALIZING;
@@ -595,11 +629,21 @@ void __a1_20_status_report(u8 chan, u8* data)
         p_wpd->devType = WPAD_DEV_CORE;
         p_wpd->devMode = 0;
 
+#if defined(VERSION_R4QE01)
         WPADiClearQueue(&p_wpd->extCmdQueue);
         WPADiSendSetReportType(&p_wpd->extCmdQueue, p_wpd->dataFormat, NULL);
+#endif
 
         if (attach)
         {
+#if !defined(VERSION_R4QE01)
+            u32 format;
+
+            WPADiClearQueue(&p_wpd->extCmdQueue);
+            format = p_wpd->dataFormat;
+            p_wpd->dataFormat = -1;
+            WPADSetDataFormat(chan, format);
+#endif
             if (p_wpd->extensionCallback)
             {
                 p_wpd->extensionCallback(chan, WPAD_DEV_CORE);
@@ -668,8 +712,10 @@ void __a1_21_user_data(u8 chan, u8* data)
 
         if (p_wpd->cmdBlkCallback)
         {
+#if defined(VERSION_R4QE01)
             if (p_wpd->extensionCallback == NULL ||
                 (WPADCallback)p_wpd->extensionCallback != p_wpd->cmdBlkCallback)
+#endif
             {
                 p_wpd->cmdBlkCallback(chan, WPAD_ERR_TRANSFER);
             }
@@ -862,6 +908,15 @@ void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len)
     }
 }
 
+static inline s8 getDataFormatError(const WPADControlBlock* p_cb)
+{
+#if defined(VERSION_R4QE01)
+    return WPAD_ERR_INVALID;
+#else
+    return p_cb->status == WPAD_ERR_OK ? WPAD_ERR_INVALID : (s8)p_cb->status;
+#endif
+}
+
 void __a1_30_data_type(u8 chan, u8* data)
 {
     WPADControlBlock* p_cb;
@@ -888,7 +943,7 @@ void __a1_30_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -921,7 +976,7 @@ void __a1_31_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -961,7 +1016,7 @@ void __a1_32_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -1079,26 +1134,26 @@ void __a1_32_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickX = -0x200;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickX = 0x1FF;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickY = -0x200;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickY = 0x1FF;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1108,26 +1163,26 @@ void __a1_32_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickX = -0x200;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickX = 0x1FF;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickY = -0x200;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickY = 0x1FF;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1156,7 +1211,7 @@ void __a1_32_data_type(u8 chan, u8* data)
             }
         }
 
-        if (!memcmp(checkBuffer, checkInvalidData, 8))
+        if (!memcmp(checkBuffer, checkInvalidData, HID_REPORT32_CHECK_SIZE))
         {
             if (p_status->err == WPAD_ERR_OK)
             {
@@ -1193,7 +1248,7 @@ void __a1_33_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -1239,7 +1294,7 @@ void __a1_35_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -1359,26 +1414,26 @@ void __a1_35_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickX = -0x200;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickX = 0x1FF;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickY = -0x200;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickY = 0x1FF;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1388,26 +1443,26 @@ void __a1_35_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickX = -0x200;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickX = 0x1FF;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickY = -0x200;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickY = 0x1FF;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1452,6 +1507,7 @@ void __a1_35_data_type(u8 chan, u8* data)
 
 void __a1_36_data_type(u8 chan, u8* data)
 {
+#if defined(VERSION_R4QE01)
     WPADControlBlock* p_cb;
     WPADStatus* p_status;
     u8* p_clear;
@@ -1489,6 +1545,7 @@ void __a1_36_data_type(u8 chan, u8* data)
 
     p_cb->rxBufIndex = (u8)((p_cb->rxBufIndex) ? 0 : 1);
     OSRestoreInterrupts(old);
+#endif
 }
 
 void __a1_37_data_type(u8 chan, u8* data)
@@ -1518,7 +1575,7 @@ void __a1_37_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
 
     p_status->dev = p_cb->devType;
@@ -1640,26 +1697,26 @@ void __a1_37_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clLStickX - p_cb->extConf.cl.lstk.x);
             y = (s16)(p_clStat->clLStickY - p_cb->extConf.cl.lstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickX = -0x200;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickX = 0x1FF;
+                p_clStat->clLStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clLStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clLStickY = -0x200;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clLStickY = 0x1FF;
+                p_clStat->clLStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1669,26 +1726,26 @@ void __a1_37_data_type(u8 chan, u8* data)
             x = (s16)(p_clStat->clRStickX - p_cb->extConf.cl.rstk.x);
             y = (s16)(p_clStat->clRStickY - p_cb->extConf.cl.rstk.y);
 
-            if (x < -0x200)
+            if (x < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickX = -0x200;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MIN;
             }
-            else if (x > 0x1FF)
+            else if (x > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickX = 0x1FF;
+                p_clStat->clRStickX = HID_CLASSIC_STICK_MAX;
             }
             else
             {
                 p_clStat->clRStickX = x;
             }
 
-            if (y < -0x200)
+            if (y < HID_CLASSIC_STICK_MIN)
             {
-                p_clStat->clRStickY = -0x200;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MIN;
             }
-            else if (y > 0x1FF)
+            else if (y > HID_CLASSIC_STICK_MAX)
             {
-                p_clStat->clRStickY = 0x1FF;
+                p_clStat->clRStickY = HID_CLASSIC_STICK_MAX;
             }
             else
             {
@@ -1763,7 +1820,7 @@ void __a1_3e_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
     p_status->dev = p_cb->devType;
     p_cb->info.nearempty = 0;
@@ -1853,7 +1910,7 @@ void __a1_3f_data_type(u8 chan, u8* data)
     }
     else
     {
-        p_status->err = WPAD_ERR_INVALID;
+        p_status->err = getDataFormatError(p_cb);
     }
     p_status->dev = p_cb->devType;
     p_cb->info.nearempty = 0;
