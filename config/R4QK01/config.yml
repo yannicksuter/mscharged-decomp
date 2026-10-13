@@ -1,0 +1,59 @@
+# Mario Power Soccer (Korea), disc revision 0.
+object_base: orig/R4QK01
+object: sys/main.dol
+hash: c2f893aa71911c4ad4dcead1474e517e8e598fcb
+extract_objects: true
+symbols: config/R4QK01/symbols.txt
+splits: config/R4QK01/splits.txt
+mw_comment_version: 14
+block_relocations:
+  - { source: 0x805FF118 }
+  - { source: 0x804C4770 }
+  - { source: 0x802CFDA8 }
+  - { source: 0x802CFE5C }
+  - { source: 0x802CFE6C }
+  - { source: 0x802D538C }
+  - { source: 0x802D5394 }
+  - { source: 0x802D53B4 }
+  - { source: 0x803460B0 }
+  - { source: 0x803460B8 }
+  - { source: 0x803460C0 }
+  - { source: 0x803460FC }
+  - { source: 0x8034610C }
+  - { source: 0x8034611C }
+  - { source: 0x8034613C }
+  - { source: 0x802F2114 }
+  - { source: 0x802F2134 }
+  - { source: 0x802F2144 }
+  - { source: 0x802F2154 }
+  - { source: 0x802F2B54 }
+  - { source: 0x802F2B5C }
+  - { source: 0x802F2B7C }
+  - { source: 0x802F2B8C }
+  - { source: 0x802F2B9C }
+  - { source: 0x802F45CC }
+  - { source: 0x802F45D0 }
+  - { source: 0x802F48DC }
+  - { source: 0x802F48E4 }
+  - { source: 0x803BBFE8 }
+  - { source: 0x803BC05C }
+  - { source: 0x804F5954 }
+  - { source: 0x804FB9AC }
+  - { source: 0x8051733C }
+  - { source: 0x805177B0 }
+  - { source: 0x80517930 }
+  - { source: 0x804BCDF8 }
+  - { source: 0x804BCDFC }
+  - { source: 0x804BCE00 }
+  - { source: 0x804F7C00 }
+  - { source: 0x804F7C04 }
+  - { source: 0x804F7C78 }
+  - { source: 0x804F7EBC }
+  - { source: 0x804F8650 }
+  - { source: 0x804F8654 }
+  - { source: 0x804F86B0 }
+  - { source: 0x804F88A0 }
+force_active:
+  - __init_cpp_exceptions_reference
+  - __destroy_global_chain_reference
+  - __fini_cpp_exceptions_reference

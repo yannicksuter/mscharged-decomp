@@ -22,7 +22,7 @@ Replace with your Discord server's ID and invite URL.
 [discord]: https://discord.gg/hKx3FJJgrV
 
 > [!IMPORTANT]
-> This repository does **not** provide a new way to play *Mario Strikers Charged*. It is not a modern recompilation ("recomp") or a port. Its 100% code and linking status refers to a high-fidelity reconstruction of what the original source code may have looked like—one that compiles into an executable byte-for-byte identical to the original retail Nintendo Wii release.
+> This repository does **not** provide a new way to play *Mario Strikers Charged*. It is not a modern recompilation ("recomp") or a port. For completed versions, 100% code and linking means the reconstructed source compiles into an executable byte-for-byte identical to the original retail Nintendo Wii release.
 >
 > Recompilations and ports based on this work are maintained separately and are outside the scope of this repository. Please do not ask for recompilations or ports in the decompilation Discord, as producing and supporting them is not the focus of this community.
 
@@ -37,16 +37,24 @@ your own legally obtained copy of the game.
 
 ## Supported versions
 
-| Version | Region and title | Revision | Status | `main.dol` SHA-1 |
-| --- | --- | --- | --- | --- |
-| `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code and linking** | `e96d2298067b70652752145b4e63644e6e1b1560` |
-| `R4QP01_rev1` | Europe - *Mario Strikers Charged Football* | Rev 1 | **In progress** | `0a066b755b469648a371d1cfc2d1bcad315b2b4a` |
-| `R4QP01_rev2` | Europe - *Mario Strikers Charged Football* | Rev 2 | **In progress** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
+| Regional Wii release | Version | Region and title | Revision | Status | `main.dol` SHA-1 |
+| --- | --- | --- | --- | --- | --- |
+| [2007-05-25](https://www.nintendo.com/en-gb/Games/Wii/Mario-Strikers-Charged-Football-281892.html) | `R4QP01_rev1` | Europe - *Mario Strikers Charged Football* | Rev 1 | **Complete: 100% code / 100% linked** | `0a066b755b469648a371d1cfc2d1bcad315b2b4a` |
+| [2007-05-25](https://www.nintendo.com/en-gb/Games/Wii/Mario-Strikers-Charged-Football-281892.html) | `R4QP01_rev2` | Europe - *Mario Strikers Charged Football* | Rev 2 | **Complete: 100% code / 100% linked** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
+| [2007-07-30](https://www.nintendo.co.jp/ir/pdf/2008/080125e.pdf#page=8) | `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code / 100% linked** | `e96d2298067b70652752145b4e63644e6e1b1560` |
+| [2007-09-20](https://www.nintendo.co.jp/wii/softlist/n2007_2006.html) | `R4QJ01` | Japan - *Mario Strikers Charged* | Rev 0 | **In progress: 94.52% code / 68.65% linked** | `74be723403329158b1645d9961a3cd6be755cdb8` |
+| [2010-03-18](https://www.inven.co.kr/webzine/news/?news=26630) | `R4QK01` | Korea - *Mario Power Soccer* | Rev 0 | **In progress: 74.10% code / 45.63% linked** | `c2f893aa71911c4ad4dcead1474e517e8e598fcb` |
 
-`R4QE01` remains the default. Its build links entirely from reconstructed
-source. Both EU revisions reuse verified source units from USA; regional and
-revision differences still use extracted objects. Each version has its own
-symbols, splits, progress report and retail DOL hash.
+Dates are the original regional Wii releases, sorted chronologically. Separate
+release dates for the EU disc revisions have not been verified; both EU rows
+show the regional launch date. The linked Nintendo release information and
+Nintendo Korea announcement provide the date sources.
+
+`R4QE01` remains the default. USA and both EU revisions link entirely from
+reconstructed source. Japan and Korea reuse verified source units; unresolved
+regional differences still use extracted objects. Each version has its own
+symbols, splits, progress report and retail DOL hash. The revision numbers
+above are the revision bytes recorded in the disc headers.
 
 The former `R4QP01` configuration is now named `R4QP01_rev2`. For an existing
 checkout, move the local files from `orig/R4QP01` into `orig/R4QP01_rev2` and
@@ -80,7 +88,8 @@ objdiff-cli, and wibo when needed.
 ## Building
 
 Place a supported disc image in `orig/<version>`: `orig/R4QE01` for USA,
-`orig/R4QP01_rev1` for EU revision 1, or `orig/R4QP01_rev2` for EU revision 2.
+`orig/R4QP01_rev1` for EU revision 1, `orig/R4QP01_rev2` for EU revision 2,
+`orig/R4QJ01` for Japan, or `orig/R4QK01` for Korea.
 ISO, RVZ, WIA, WBFS, CISO, NFS, GCZ, and TGC images
 are supported. Use the disc revision listed above.
 
@@ -91,13 +100,19 @@ python3 configure.py
 ninja
 ```
 
-To select either EU revision:
+To select another version:
 
 ```sh
 python3 configure.py --version R4QP01_rev1
 ninja
 
 python3 configure.py --version R4QP01_rev2
+ninja
+
+python3 configure.py --version R4QJ01
+ninja
+
+python3 configure.py --version R4QK01
 ninja
 ```
 
@@ -109,9 +124,11 @@ On the first build, decomp-toolkit extracts `sys/main.dol` from the disc image
 and performs the initial analysis. Once extraction succeeds, the disc image can
 be removed from `orig/<version>` to save space.
 
-Ninja also generates the disc-message image include from that version's
-`main.dol`. The generated `DiscMessageImages.inc` stays in the build directory
-and is ignored by Git, including when using `--build-dir`.
+For USA, Europe and Japan, Ninja also generates the disc-message image include
+from that version's `main.dol`. The generated `DiscMessageImages.inc` stays in
+the build directory and is ignored by Git, including when using `--build-dir`.
+Korea has a different
+disc-message implementation, which currently uses extracted objects.
 
 The reconstructed `config/<version>/symbols.txt` and
 `config/<version>/splits.txt` are checked into the repository. Disc images,
@@ -122,7 +139,7 @@ A successful USA build ends with:
 build/R4QE01/main.dol: OK
 ```
 
-Each EU build checks its own `build/<version>/main.dol` in the same way.
+Each version checks its own `build/<version>/main.dol` in the same way.
 The build prints code matching and source-linking percentages and writes
 `build/<version>/report.json`. A verified DOL can still contain extracted
 objects; the linking percentage counts only code linked from source.

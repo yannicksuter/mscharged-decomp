@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [R4QE01, R4QP01_rev1, R4QP01_rev2]
+        version: [R4QE01, R4QP01_rev1, R4QP01_rev2, R4QJ01, R4QK01]
 
     steps:
     # Checkout the repository
@@ -45,7 +45,7 @@ jobs:
             echo "::error::The private build container is missing the USA original."
             exit 1
           fi
-          echo "::notice::Add orig/$VERSION/sys/main.dol to the private build container to enable this revision."
+          echo "::notice::Add orig/$VERSION/sys/main.dol to the private build container to enable this version."
           echo "available=false" >> "$GITHUB_OUTPUT"
           exit 0
         fi
