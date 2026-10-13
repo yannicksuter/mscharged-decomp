@@ -5812,7 +5812,7 @@ RVL_SDK/vi/vi3in1.c:
 	.data       start:0x80549D70 end:0x8054A2FA
 	.bss        start:0x805D5020 end:0x805D5040
 	.sdata      start:0x806DE968 end:0x806DE979
-	.sbss       start:0x806E17A0 end:0x806E17B4
+	.sbss       start:0x806E17A0 end:0x806E17B8
 
 RVL_SDK/wenc/wenc.c:
 	.text       start:0x803C7F38 end:0x803C8210
@@ -5823,7 +5823,9 @@ RVL_SDK/wpad/WPAD.c:
 	.text       start:0x803C8210 end:0x803CF8D0
 	.rodata     start:0x804EBAE0 end:0x804EBB1A
 	.data       start:0x8054A300 end:0x8054A558
+	.bss        start:0x805D5040 end:0x805D8468
 	.sdata      start:0x806DE980 end:0x806DE990
+	.sbss       start:0x806E17B8 end:0x806E17E0
 	.sdata2     start:0x806E6118 end:0x806E611F
 
 RVL_SDK/wpad/WPADHIDParser.c:
