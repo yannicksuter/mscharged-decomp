@@ -446,7 +446,7 @@ void cCameraManager::UpdateGameCameraType()
             g_eCurrentCameraType = eCameraType_Gameplay;
         }
 
-        fn_80277BB0();
+        OnStadiumCameraChange();
         pBaseCamera->m_pFilter[0] = NULL;
         nlDLRingRemoveEnd(&cCameraManager::m_cameraStack);
         delete pBaseCamera;

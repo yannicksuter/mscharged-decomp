@@ -13,7 +13,12 @@ enum eGameRegion
     GAME_REGION_US = 0,
     GAME_REGION_EU = 1,
     GAME_REGION_JAPAN = 2,
+#if defined(VERSION_R4QK01)
+    GAME_REGION_KOREA = 3,
+    GAME_REGION_DEFAULT = 4,
+#else
     GAME_REGION_DEFAULT = 3,
+#endif
 };
 
 int GetRegion();

@@ -179,7 +179,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             QueueCollisionCrackEgg(crackData);
         }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         nlVector3 normal;
         normal.x = contact->geom.normal[0];
         normal.y = contact->geom.normal[1];

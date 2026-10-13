@@ -109,7 +109,7 @@ void ControllerSpeaker::ApplyToSound(void*)
 
 void ControllerSpeaker::OnSoundStopped(void*)
 {
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
     if (sControllerSpeakerEnabled)
     {
         if (--m_ActiveSoundCount < 0)
@@ -124,7 +124,7 @@ void ControllerSpeaker::OnSoundStarted(void* handle)
 {
     if (sControllerSpeakerEnabled)
     {
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
         if (m_ActiveSoundCount == 0)
             WPADControlSpeaker(m_Channel, WPAD_SPEAKER_UNMUTE, 0);
         ++m_ActiveSoundCount;

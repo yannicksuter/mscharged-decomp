@@ -27,13 +27,16 @@
 
 BootLoadingScene::BootLoadingScene()
     : mElapsedTime(0.0f)
+#if defined(VERSION_R4QK01)
+    , mUnknown20(0.0f)
+#endif
     , mStrapAlpha(255.0f)
     , mStrapDismissed(false)
     , mHomeButtonWarning(0)
     , mHomeButtonWarningActive(false)
     , mWidescreen(false)
 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     mPhase = PhaseStrap;
 #else
     if (GetRegion() == GAME_REGION_US)
@@ -49,6 +52,14 @@ BootLoadingScene::~BootLoadingScene()
 
 void BootLoadingScene::SceneCreated()
 {
+#if defined(VERSION_R4QK01)
+    FEPresentation* const& presentation = GetPresentation();
+    mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+        InlineHasher("Layer"), InlineHasher("strapA"));
+    mAlternateStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+        InlineHasher("Layer"), InlineHasher("strapB"));
+    mAlternateStrapImage->SetVisible(false);
+#else
     FEPresentation* presentation = mPresentation;
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
@@ -91,7 +102,7 @@ void BootLoadingScene::SceneCreated()
     switch (g_Language)
     {
     case nlLocalization::LangFrench:
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     case nlLocalization::LangNAFrench:
 #endif
         if (IsWidescreen())
@@ -110,7 +121,7 @@ void BootLoadingScene::SceneCreated()
                 InlineHasher("Layer"), InlineHasher("strap_German"));
         break;
     case nlLocalization::LangSpanish:
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     case nlLocalization::LangNASpanish:
 #endif
         if (IsWidescreen())
@@ -140,6 +151,7 @@ void BootLoadingScene::SceneCreated()
     }
     if (image != 0)
         mStrapImage->SetTextureResource(image->GetTextureResource());
+#endif
     SetPhaseSlide();
     mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide,
         nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
@@ -174,7 +186,7 @@ void BootLoadingScene::Update(float fDeltaT)
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             mPhase = PhaseDeveloperLogo;
 #else
             mPhase = PhaseStrap;
@@ -194,6 +206,9 @@ void BootLoadingScene::Update(float fDeltaT)
             nlColour colour = { 255, 255, 255, 0 };
             colour.c[3] = (unsigned char)mStrapAlpha;
             mStrapImage->SetAssetColour(colour);
+#if defined(VERSION_R4QK01)
+            mAlternateStrapImage->SetAssetColour(colour);
+#endif
             if (mStrapAlpha <= 0.0f)
             {
                 mElapsedTime = 0.0f;
@@ -206,6 +221,11 @@ void BootLoadingScene::Update(float fDeltaT)
             mElapsedTime += fDeltaT;
             if (mElapsedTime >= 1.5f)
             {
+#if defined(VERSION_R4QK01)
+                if (mElapsedTime >= 20.5f)
+                    mStrapDismissed = true;
+                else
+#endif
                 if (g_pFEInput->JustPressed(FE_ALL_PADS, 0x20, true, 0)
                     || g_pFEInput->JustPressed(FE_ALL_PADS, 0x08, true, 0)
                     || g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0)
@@ -215,8 +235,17 @@ void BootLoadingScene::Update(float fDeltaT)
                     || g_pFEInput->JustPressed(FE_ALL_PADS, 0x28, true, 0)
                     || g_pFEInput->JustPressed(FE_ALL_PADS, 0x29, true, 0))
                     mStrapDismissed = true;
+#if defined(VERSION_R4QK01)
+                else if (mElapsedTime > 0.5f)
+                {
+                    bool showFirstStrap = ((int)(mElapsedTime - 0.5f) / 5) % 2 == 0;
+                    mStrapImage->SetVisible(showFirstStrap);
+                    mAlternateStrapImage->SetVisible(!showFirstStrap);
+                }
+#else
                 if (mElapsedTime >= 15.5f)
                     mStrapDismissed = true;
+#endif
             }
         }
     }
@@ -225,8 +254,13 @@ void BootLoadingScene::Update(float fDeltaT)
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             mElapsedTime = 0.0f;
+#if defined(VERSION_R4QK01)
+            if (GetRegion() == GAME_REGION_KOREA)
+                mPhase = PhaseFinished;
+            else
+#endif
             if (GetRegion() == GAME_REGION_US)
                 mPhase = PhaseRatings;
             else
@@ -294,7 +328,7 @@ void BootLoadingScene::SetPhaseSlide()
     }
     if (mHomeButtonWarning != 0)
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         float time = mHomeButtonWarning->GetActiveSlide()->m_time;
 #else
         TLSlide* previousSlide = mHomeButtonWarning->GetActiveSlide();
@@ -305,7 +339,7 @@ void BootLoadingScene::SetPhaseSlide()
             mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
         else
             mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         if (mHomeButtonWarningActive)
         {
             TLSlide* slide = mHomeButtonWarning->GetActiveSlide();
@@ -327,7 +361,7 @@ void BootLoadingScene::ShowHomeButtonWarning()
         return;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (mPhase != PhaseStrap || !(mElapsedTime <= 2.0f))
 #endif
     {
@@ -340,7 +374,7 @@ void BootLoadingScene::ShowHomeButtonWarning()
     }
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 bool BootLoadingScene::IsBootScreenPending()
 {
     FEPresentation* presentation = GetPresentation();
@@ -360,7 +394,11 @@ bool BootLoadingScene::IsBootScreenPending()
     case PhaseNunchuk:
     {
         nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "nunchuk",
+#if defined(VERSION_R4QK01)
+            "Layer", "nunchukArt")->GetAssetColour();
+#else
             "Layer", "nunchuk")->GetAssetColour();
+#endif
         alpha = colour.c[3];
         break;
     }

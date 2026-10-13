@@ -1780,6 +1780,7 @@ Game/FE/feHelpFuncs.cpp:
 	.sdata2     start:0x80608BE0 end:0x80608C20
 
 Game/SH/SHLoading.cpp:
+	.text       start:0x801CDD50 end:0x801D1124
 	.data       start:0x804E34A0 end:0x804E3784
 	.sdata      start:0x80600AA8 end:0x80600AFC
 
@@ -1978,11 +1979,14 @@ Game/Render/FrontEndPresentation.cpp:
 	.data       start:0x804E5BA0 end:0x804E5CC8
 	.bss        start:0x8053D528 end:0x8053D5E8
 	.sbss       start:0x80604F50 end:0x80604F58
-	.sdata2     start:0x80608E68 end:0x80608E88
+	.sdata2     start:0x80608E68 end:0x80608E80
 
 Game/Font/FontLoading.cpp:
+	.text       start:0x80203A38 end:0x80203E1C
 	.data       start:0x804E5CC8 end:0x804E5E80
+	.sdata      start:0x80601288 end:0x806012A0
 	.sbss       start:0x80604F58 end:0x80604F60
+	.sdata2     start:0x80608E80 end:0x80608E88
 
 Game/SH/SHCupHub.cpp:
 	.data       start:0x804E5E80 end:0x804E6020
@@ -2080,13 +2084,13 @@ Game/SH/SHChooseSides.cpp:
 	.text       start:0x80220260 end:0x80224168
 	.data       start:0x804E73F8 end:0x804E7650
 	.sdata      start:0x806017B0 end:0x80601850
-	.sdata2     start:0x80608F74 end:0x80608F88 align:4
+	.sdata2     start:0x80608F74 end:0x80608F80 align:4
 
 Game/SH/SHMainMenu.cpp:
 	.text       start:0x80224168 end:0x802271FC
 	.data       start:0x804E7650 end:0x804E7930
 	.sdata      start:0x80601850 end:0x806018B0
-	.sdata2     start:0x80608F88 end:0x80608F90
+	.sdata2     start:0x80608F80 end:0x80608F90
 
 Game/SH/SHChooseCaptains.cpp:
 	.text       start:0x802271FC end:0x8022D61C
@@ -2280,14 +2284,15 @@ Game/SH/SHOnlineInviteResponse.cpp:
 
 Game/SH/SHOnlineInviteStatus.cpp:
 	.text       start:0x80267CDC end:0x80268B4C
-	.sdata      start:0x80602328 end:0x80602360
+	.sdata      start:0x80602328 end:0x80602358
 	.sdata2     start:0x806091E8 end:0x806091F8
 
 Game/SH/SHBootLoading.cpp:
 	.text       start:0x80268B4C end:0x802699F4
 	.ctors      start:0x804B0ABC end:0x804B0AC0
+	.data       start:0x804EB1A0 end:0x804EB1F8
 	.bss        start:0x8053D808 end:0x8053D820
-	.sdata      start:0x80602360 end:0x806023A8
+	.sdata      start:0x80602358 end:0x806023A8
 	.sdata2     start:0x806091F8 end:0x80609228
 
 Game/SH/SHOnlineMiiSelect.cpp:
@@ -3931,7 +3936,7 @@ Game/FE/tlDefault.cpp:
 	.sbss       start:0x8060572C end:0x80605740 align:4
 
 NL/nlLocalization.cpp:
-	.text       start:0x80307C1C end:0x80307E5C
+	.text       start:0x80307C1C end:0x80307F28
 	.rodata     start:0x804B81D8 end:0x804B8270
 	.data       start:0x804FA848 end:0x804FA8D0
 	.sdata      start:0x80602CA0 end:0x80602CDC
@@ -4614,6 +4619,7 @@ NL/plat/WiiRemotePad.cpp:
 	.text       start:0x80369950 end:0x80369EB8
 	.ctors      start:0x804B0E30 end:0x804B0E34
 	.data       start:0x804FFB18 end:0x804FFB70
+	.bss        start:0x8054B2A0 end:0x8054C470
 	.sbss       start:0x80605928 end:0x80605938
 	.sdata2     start:0x8060A328 end:0x8060A330
 
@@ -4621,6 +4627,7 @@ NL/plat/WiiFreestylePad.cpp:
 	.text       start:0x80369EB8 end:0x8036A4DC
 	.ctors      start:0x804B0E34 end:0x804B0E38
 	.data       start:0x804FFB70 end:0x804FFBC8
+	.bss        start:0x8054C470 end:0x8054D740
 	.sbss       start:0x80605938 end:0x80605948
 	.sdata2     start:0x8060A330 end:0x8060A348
 
@@ -4628,6 +4635,7 @@ NL/plat/WiiClassicPad.cpp:
 	.text       start:0x8036A4DC end:0x8036ADDC
 	.ctors      start:0x804B0E38 end:0x804B0E3C
 	.data       start:0x804FFBC8 end:0x804FFC60
+	.bss        start:0x8054D740 end:0x8054EA90
 	.sbss       start:0x80605948 end:0x80605958
 	.sdata2     start:0x8060A348 end:0x8060A360
 
@@ -5512,6 +5520,7 @@ RVL_SDK/os/OSAlloc.c:
 RVL_SDK/os/OSArena.c:
 	.text       start:0x803BD550 end:0x803BD684
 	.sdata      start:0x806034C0 end:0x806034C8
+	.sbss       start:0x80605FE8 end:0x80605FF0
 
 RVL_SDK/os/OSFatal.c:
 	.bss        start:0x8058A3A0 end:0x8058A674
@@ -5601,6 +5610,7 @@ RVL_SDK/os/OSPlayRecord.c:
 RVL_SDK/os/OSStateFlags.c:
 	.text       start:0x803C78F0 end:0x803C7B08
 	.data       start:0x805159F8 end:0x80515A20
+	.bss        start:0x8058B3A0 end:0x8058B3C0 align:32
 
 RVL_SDK/os/OSNet.c:
 	.text       start:0x803C7B10 end:0x803C7BC4
@@ -6045,6 +6055,20 @@ RVL_SDK/nwc24/NWC24System.c:
 	.sdata      start:0x80603810 end:0x80603818
 	.sbss       start:0x80606468 end:0x80606478
 
+RVL_SDK/so/soCommon.c:
+	.text       start:0x8041E2A4 end:0x8041F308
+	.data       start:0x805200F8 end:0x805202D4
+	.bss        start:0x805CE6E0 end:0x805CE6F8
+	.sdata      start:0x80603818 end:0x80603820
+	.sbss       start:0x80606478 end:0x80606488
+
+RVL_SDK/so/soBasic.c:
+	.text       start:0x8041F308 end:0x80420270
+	.data       start:0x805202D8 end:0x80520330
+	.bss        start:0x805CE6F8 end:0x805CE720
+	.sdata      start:0x80603820 end:0x80603828
+	.sbss       start:0x80606488 end:0x80606490
+
 RVL_SDK/vf/pf_filelock.c:
 	.sbss       start:0x806064A8 end:0x806064AC
 
@@ -6054,23 +6078,17 @@ RVL_SDK/vf/d_vf.c:
 RVL_SDK/vf/d_vf_sys.c:
 	.sbss       start:0x806064B8 end:0x806064D0
 
-RVL_SDK/so/soCommon.c:
-	.text       start:0x8041E2A4 end:0x8041F308
-	.data       start:0x805200F8 end:0x805202D4
-	.bss        start:0x805CE6E0 end:0x805CE6F8
-	.sdata      start:0x80603818 end:0x80603828
-
 RVL_SDK/nhttp/d_nhttp_common.c:
 	.bss        start:0x805CE760 end:0x805CF400
 
 RVL_SDK/ssl/ssl_api.c:
 	.bss        start:0x805CF400 end:0x805D2420
 
-RVL_SDK/so/soBasic.c:
-	.text       start:0x8041F308 end:0x80420270
-
 RVL_SDK/so/SOInformation.c:
 	.text       start:0x80420270 end:0x80420770
+
+RVL_SDK/so/SOOption.c:
+	.text       start:0x80420770 end:0x80420A50
 
 RVL_SDK/nhttp/NHTTP_bgnend.c:
 	.text       start:0x80420A50 end:0x80420DB8

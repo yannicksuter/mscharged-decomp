@@ -54,6 +54,12 @@ static inline void CallHomeButtonWarning(BaseLoadingScene* scene)
 
 static HBMHideEvent sHBMHideEvent;
 
+#if defined(VERSION_R4QK01)
+static const unsigned int HBM_SOUND_WORK_SIZE = 0x18700;
+#else
+static const unsigned int HBM_SOUND_WORK_SIZE = 0x19000;
+#endif
+
 static inline void OnHBMHidden()
 {
     HomeButtonFade::Instance()->FadeIn();
@@ -89,7 +95,7 @@ void HBMManager::OnFileLoaded(
 
         CurrentAllocator = &VirtualAllocator;
         AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
-        manager->mSoundWork = nlMalloc(0x19000, 8, false);
+        manager->mSoundWork = nlMalloc(HBM_SOUND_WORK_SIZE, 8, false);
         --AllocatorStackDepth;
         AllocatorStack[AllocatorStackDepth] = 0;
         CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
@@ -148,6 +154,11 @@ void HBMManager::LoadResources()
     case SC_LANG_NL:
         archiveName = "/homeBtn_NED.arc";
         break;
+#if defined(VERSION_R4QK01)
+    case SC_LANG_KR:
+        archiveName = "/homeBtn_KOR.arc";
+        break;
+#endif
     default:
         mDataInfo.region = SC_LANG_JP;
         archiveName = "/homeBtn.arc";
@@ -201,12 +212,19 @@ void HBMManager::LoadResources()
     memset(configBuffer, 0, configSize);
     nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.configBuf, 32,
         AllocateStart, configBuffer, configBufferSize, 0);
+#if defined(VERSION_R4QK01)
+    mDataInfo.configBufSize = configBufferSize;
+#endif
 
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/homeBtnIcon.tpl");
     nlLoadEntireFileAsync(path, OnFileLoaded, &mIconPalette, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 
+#if defined(VERSION_R4QK01)
+    nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/HomeButtonSe.arc");
+#else
     nlSNPrintf(path, sizeof(path), "%s%s", "HomeButton2", "/HomeButtonSe.brsar");
+#endif
     nlLoadEntireFileAsync(path, OnFileLoaded, &mSoundData, 32,
         AllocateStart, 0, 0, &VirtualAllocator);
 }
@@ -266,7 +284,7 @@ void HBMManager::Show()
     HBMSetAdjustFlag(IsWidescreen());
     mActive = true;
     g_pAudioBackend->SuspendControllerSpeakers();
-    HBMCreateSound((const char*)mSoundData, mSoundWork, 0x19000);
+    HBMCreateSound((const char*)mSoundData, mSoundWork, HBM_SOUND_WORK_SIZE);
     HBMInit();
 
     mPreviousTaskState = nlTaskManager::m_pInstance->mCurrentState;

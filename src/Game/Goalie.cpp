@@ -85,7 +85,11 @@ float gfMontyGrabRange = 6.0f;
 float gfSavePlaneOffset = 0.5f;
 float gfDazeShotSpeed = 35.0f;
 float gfDazeEnergyLevel = 70.0f;
+#if defined(VERSION_R4QK01)
+float gfLooseBallNetRange = 15.0f;
+#else
 float gfLooseBallNetRange = 13.0f;
+#endif
 float gfPassThreatNetRange = 9.5f;
 float gfLobSaveNetRange = 6.0f;
 float lbl_806DBB34 = 0.5f;
@@ -118,7 +122,11 @@ float lbl_806DBB9C = 8.0f;
 float lbl_806DBBA0 = 12.0f;
 float gfRepositionLeadDist = 0.6f;
 float gfLobRepositionDist = 0.2f;
+#if defined(VERSION_R4QK01)
+float gfLobSaveDescentAngle = 60.0f;
+#else
 float gfLobSaveDescentAngle = 40.0f;
+#endif
 float gfLobSaveMinTime = 0.2f;
 float gfHandCatchDist = 0.5f;
 float gfIdleSeekSpeed = 90.0f;
@@ -318,7 +326,7 @@ void Goalie::Update(float dt)
     }
     if (mGoalieActionState != GOALIEACTION_MEGA_STRIKE && mbDefensivePlayOverlayPushed)
         CleanupMegaStrikeOverlay();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (m_DetChar.m_v3Position.x < 1.0f && m_pTeam->m_nSide == 1)
     {
         nlVector3 v3Position = m_DetChar.m_v3Position;
@@ -544,7 +552,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             if (mpSaveData->muSaveType & 0x80003)
             {
                 TacklePlayer(pBall->GetOwnerFielder());
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
                 StealBall(g_pBall->GetOwnerFielder());
 #endif
                 MakeSaveEvent(false);
@@ -613,7 +621,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                     || (float)fabsf(g_pBall->m_v3Position.x) < cField::GetGoalLineX(1U))
                 {
                     TacklePlayer(pBall->GetOwnerFielder());
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
                     StealBall(g_pBall->GetOwnerFielder());
 #endif
                     MakeSaveEvent(false);
@@ -628,7 +636,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             {
                 MakeSaveEvent(false);
                 TacklePlayer(pBall->GetOwnerFielder());
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
                 StealBall(g_pBall->GetOwnerFielder());
 #endif
             }
@@ -928,7 +936,7 @@ void Goalie::ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance)
     if (bDoHit)
     {
         TacklePlayer(pPlayer);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
         if (bGetBall && pPlayer->m_pBall != NULL)
             StealBall(pPlayer);
 #endif
@@ -1851,7 +1859,7 @@ bool Goalie::InitiatePickup()
                     return false;
                 }
                 TacklePlayer(pFldr);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
                 StealBall(pFldr);
 #endif
             }
@@ -1915,7 +1923,7 @@ void Goalie::InitiatePanicGrab(cPlayer* pPlayer)
     }
     if (m_pBall == NULL)
     {
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01) || defined(VERSION_R4QP01_REV2)
         StealBall(g_pBall->m_pOwner);
 #endif
         PickupBall(g_pBall);
@@ -2181,10 +2189,15 @@ bool Goalie::CheckForLobSave(bool bParam)
             if (fabsf(fY) < 0.5f * cNet::GetNetWidth() + 0.18f)
             {
                 nlVector4 v4Plane;
+#if defined(VERSION_R4QK01)
+                const float fPlaneOffset = 0.2f;
+#else
+                const float fPlaneOffset = 0.1f;
+#endif
                 if (fGoalLine < 0.0f)
-                    nlVec4Set(v4Plane, 1.0f, 0.0f, 0.0f, 0.1f + fGoalLine);
+                    nlVec4Set(v4Plane, 1.0f, 0.0f, 0.0f, fPlaneOffset + fGoalLine);
                 else
-                    nlVec4Set(v4Plane, -1.0f, 0.0f, 0.0f, 0.1f + -fGoalLine);
+                    nlVec4Set(v4Plane, -1.0f, 0.0f, 0.0f, fPlaneOffset + -fGoalLine);
                 nlVector3 v3Position;
                 nlVector3 v3Velocity;
                 EnablePredictedGoaliePlanes();
@@ -2213,6 +2226,10 @@ bool Goalie::CheckForLobSave(bool bParam)
                         return false;
                     }
                     DisablePredictedGoaliePlanes();
+#if defined(VERSION_R4QK01)
+                    mbTryLobSave = false;
+                    InitActionSaveSetup(true, false);
+#endif
                     return false;
                 }
                 DisablePredictedGoaliePlanes();
@@ -2511,17 +2528,26 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
     const nlVector3& v3NetPos = m_pTeam->m_pNet->m_v3NetLocation;
     if (v3NetPos.x * v3BallPos.x < 0.0f)
         return false;
+#if defined(VERSION_R4QK01)
+    if (!IsCloseToNet(v3BallPos, gfLooseBallNetRange + fDistFromBox))
+#else
     if (!IsCloseToNet(v3BallPos, gfLooseBallNetRange))
+#endif
         return false;
     bool bBallIsLoose = true;
     if (g_pBall->HasActivePassTarget())
     {
         cBall* pBall = g_pBall;
         cPlayer* pPassTarget = pBall->GetPassTarget();
-        if (!IsLooseBallTowardNet()
-            || nlVec3DistanceSquared2D(m_DetChar.m_v3Position, pBall->m_v3PassIntercept)
-                > nlVec3DistanceSquared2D(pPassTarget->m_DetChar.m_v3Position, pBall->m_v3PassIntercept))
-            bBallIsLoose = false;
+#if defined(VERSION_R4QK01)
+        if (static_cast<cFielder*>(pPassTarget)->GetDesireState() == FIELDER_DESIRE_RECEIVE_PASS)
+#endif
+        {
+            if (!IsLooseBallTowardNet()
+                || nlVec3DistanceSquared2D(m_DetChar.m_v3Position, pBall->m_v3PassIntercept)
+                    > nlVec3DistanceSquared2D(pPassTarget->m_DetChar.m_v3Position, pBall->m_v3PassIntercept))
+                bBallIsLoose = false;
+        }
     }
     if (g_pBall->m_pOwner == NULL && bBallIsLoose)
     {
@@ -2557,7 +2583,11 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         float netSideSign = m_pTeam->m_pNet->m_fDirection;
         if (v3ProjectedPosition.x * netSideSign > cField::GetGoalLineX(1U))
             return true;
+#if defined(VERSION_R4QK01)
+        if (IsCloseToNet(v3ProjectedPosition, gfLooseBallNetRange + fDistFromBox))
+#else
         if (IsCloseToNet(v3ProjectedPosition, gfLooseBallNetRange))
+#endif
             return true;
     }
     return false;
@@ -2580,12 +2610,20 @@ bool Goalie::IsLooseBallTowardNet()
     // bound to a float variable before the comparison. What held it is not
     // recoverable from a stripped executable.
     float fMinSpeedSq = 0.01f;
+#if defined(VERSION_R4QK01)
+    if (v3BallVel.GetLengthSq2D() < fMinSpeedSq)
+#else
     if (nlVec3LengthSquared(v3BallVel) < fMinSpeedSq)
+#endif
     {
         return false;
     }
 
     m_pTeam->m_pNet->GetPostLocation(v3Post1, 0, 0.0f);
+#if defined(VERSION_R4QK01)
+    if (v3BallVel.x * v3Post1.x <= 0.0f)
+        return false;
+#endif
     m_pTeam->m_pNet->GetPostLocation(v3Post2, 1, 0.0f);
     nlVec3Add(v3BallVel, v3BallVel, g_pBall->m_v3Position);
     return IsPointInCone(v3BallVel, g_pBall->m_v3Position, v3Post1, v3Post2);
@@ -3617,12 +3655,12 @@ int Goalie::ChooseRunAnim(
 
 void Goalie::EndFreeze()
 {
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
     mGoalieActionState = mPrevGoalieActionState;
 #endif
     m_DetPlayer.m_bSkipAnimUpdate = false;
     m_DetPlayer.m_fSkipTimer = 0.0f;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     g_pBall->mbBallFrozen = false;
 #else
     EmitUnFreeze(this);
@@ -4087,7 +4125,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
         {
             nlVector3 v3Velocity;
             nlVec3Set(v3Velocity, m_m4WorldMatrix.m11, m_m4WorldMatrix.m12, m_m4WorldMatrix.m13);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             float fScale = 1.0f;
 #else
             // EU leaves the impact scale unset for the skipped deke types.
@@ -4099,7 +4137,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
                 pFielder->ReleaseBall(BALL_STATE_LOOSE);
                 bReleased = true;
             }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             if (mGoalieActionState != GOALIEACTION_PURSUE_DEKE)
                 mPursueDekeType = 0;
 #endif

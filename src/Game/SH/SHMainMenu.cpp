@@ -1,4 +1,5 @@
 #include <RVLFaceLib/RFL_Database.h>
+#include <revolution/sc_fwd.h>
 
 #include "Game/SH/SHMainMenu.h"
 
@@ -77,9 +78,13 @@ void EmitMainMenuCallbackTemplates(SHMainMenu* menu)
 void SHMainMenu::SceneCreated()
 {
     GetPresentation()->SetActiveSlide("MAIN", true);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     TLComponentInstance* hiddenItem;
-    if (g_pLocalization->GetCurrentLanguage() == nlLocalization::LangJapanese)
+    if (g_pLocalization->GetCurrentLanguage() == nlLocalization::LangJapanese
+#if defined(VERSION_R4QK01)
+        || g_pLocalization->GetCurrentLanguage() == nlLocalization::LangKorean
+#endif
+    )
     {
         hiddenItem = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item");
         mMenuItemInstances[4] = FEFinder<TLComponentInstance, 4>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "101_Menu_Item_jp");
@@ -151,9 +156,15 @@ void SHMainMenu::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
     FEMusic::StartStreamIfDifferent(1);
+#if defined(VERSION_R4QK01)
+    mUnknownAC = 0.0f;
+#endif
     if (SaveEnabled && !NormalSaveLoaded && !nlFlashCallbackPending())
     {
         SaveLoad::StartLoad(false);
+#if defined(VERSION_R4QK01)
+        mUnknownAC = 0.5f;
+#endif
     }
 }
 
@@ -167,6 +178,16 @@ void SHMainMenu::Update(float fDeltaT)
     {
         return;
     }
+#if defined(VERSION_R4QK01)
+    if (SaveEnabled && nlFlashCallbackPending())
+    {
+        return;
+    }
+    if (SaveEnabled && !SaveError && SaveLoad::CardBusy())
+    {
+        return;
+    }
+#endif
 
     if (mWaitingForLoad)
     {
@@ -333,6 +354,12 @@ void SHMainMenu::OpenItem(unsigned int index, void* context)
  */
 void SHMainMenu::SelectItem(unsigned int index, void* context)
 {
+#if defined(VERSION_R4QK01)
+    if (mWaitingForLoad)
+    {
+        return;
+    }
+#endif
     unsigned int item = (unsigned int)context;
     if (GetTweakBool("/user/media_build", false) && (item == MAIN_MENU_CHALLENGE || item == MAIN_MENU_HALL_OF_FAME || item == MAIN_MENU_OPTIONS))
     {
@@ -343,6 +370,14 @@ void SHMainMenu::SelectItem(unsigned int index, void* context)
     FEAudio::PlayAnimAudioEvent(0x0A93E9A0, 0, 0, true);
     if (item == MAIN_MENU_ONLINE)
     {
+#if defined(VERSION_R4QK01)
+        if (SCCheckPCMessageRestriction())
+        {
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+            popup->Create(POPUP_ONLINE_RESTRICTED_RVLDWC_MESSAGE_0003);
+        }
+        else
+#endif
         if (!SaveEnabled)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);

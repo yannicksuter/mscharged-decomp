@@ -1,6 +1,7 @@
 #include <revolution/so.h>
 
 #include <revolution/ipc.h>
+#include <revolution/net/NETMem.h>
 #include <revolution/os.h>
 
 #include <string.h>
@@ -94,11 +95,19 @@ int SOSetSockOpt(int s, int level, int optname, const void* optval, int optlen)
                 args->length = optlen;
                 if (optval != NULL)
                 {
+#if defined(VERSION_R4QK01)
+                    NETMemCpy(args->value, optval, optlen);
+#else
                     memcpy(args->value, optval, optlen);
+#endif
                 }
                 else
                 {
+#if defined(VERSION_R4QK01)
+                    NETMemSet(args->value, 0, optlen);
+#else
                     memset(args->value, 0, optlen);
+#endif
                 }
                 result = IOS_Ioctl(rmId, 9, args, 36, NULL, 0);
                 SOiFree(12, args, 64);
@@ -166,7 +175,11 @@ int SOGetInterfaceOpt(IPInterface* interface, int level, int optname,
                     {
                         if (optval != NULL)
                         {
+#if defined(VERSION_R4QK01)
+                            NETMemCpy(optval, value, *returnedLength);
+#else
                             memcpy(optval, value, *returnedLength);
+#endif
                         }
                         *optlen = *returnedLength;
                     }

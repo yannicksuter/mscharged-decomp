@@ -401,7 +401,7 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
 
     m_pFuzzyTweaks = new (nlMalloc(sizeof(FuzzyTweaks), 8, false))
         FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
-    gGameTweaks.m_pGameTweaks->fn_800756B4();
+    gGameTweaks.m_pGameTweaks->OnGameCreated();
 
     ResetGameFields();
     mReceivedMegaStrikeMeter.mHead = 0;

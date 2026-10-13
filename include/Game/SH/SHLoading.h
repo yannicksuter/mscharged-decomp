@@ -58,11 +58,11 @@ public:
 
     /* 0x024 */ TLTextInstance* mTextInstances[6];
     /* 0x03C */ unsigned short mTitleBuffer[128];
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     /* 0x13C */ unsigned short mStatsBuffers[4][128];
 #else
     /* 0x13C */ unsigned short mStatsBuffers[4][32];
 #endif
-}; // size 0x53C (USA), 0x23C (Europe)
+}; // size 0x53C (USA, Japan, Korea), 0x23C (Europe)
 
 #endif // GAME_SH_SH_LOADING_H

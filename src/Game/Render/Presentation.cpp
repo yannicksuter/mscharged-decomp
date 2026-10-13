@@ -649,7 +649,7 @@ void Presentation::Update(float deltaT)
 /**
  * Address/Size: 0x80285E1C | size: 0x4
  */
-void Presentation::fn_80285E1C()
+void Presentation::OnGameCreated()
 {
 }
 

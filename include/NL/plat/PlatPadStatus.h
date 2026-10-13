@@ -8,19 +8,19 @@ struct WiiRemotePadStatus
 {
     WPADStatus wpad;
     KPADStatus kpad;
-}; // size 0xB0
+}; // size 0xB0, 0xE0 in Korea
 
 struct WiiFreestylePadStatus
 {
     WPADFSStatus wpad;
     KPADStatus kpad;
-}; // size 0xB8
+}; // size 0xB8, 0xE8 in Korea
 
 struct WiiClassicPadStatus
 {
     WPADCLStatus wpad;
     KPADStatus kpad;
-}; // size 0xBC
+}; // size 0xBC, 0xE8 in Korea
 
 union PlatPadStatus
 {

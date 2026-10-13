@@ -8,6 +8,7 @@
 template <typename StringType>
 class FormatImpl
 {
+protected:
     StringType mString;
     int mCurrentPos;
 

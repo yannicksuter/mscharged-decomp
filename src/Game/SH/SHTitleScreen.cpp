@@ -303,7 +303,11 @@ void TitleScene::Update(float dt)
             if (sequenceReady && !GetUnlockAll())
             {
                 SetUnlockAll(true);
+#if defined(VERSION_R4QK01)
+                FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
+#else
                 FEAudio::PlayAnimAudioEvent(0xCF37DAC7, 0, 0, true);
+#endif
                 for (int input = 0; input < 9; ++input)
                 {
                     mUnlockInputEntered[input] = false;

@@ -72,6 +72,9 @@ add_relocations:
   - { source: .text:0x802ACFC4, type: l, target: "lbl_8052B6F8" }
   - { source: .text:0x802ACFD4, type: l, target: "lbl_8052B718" }
 block_relocations:
+  # Receive-pass animation tables pack u16 angles 0x8000 and 0xE000.
+  - { source: 0x804DC65C }
+  - { source: 0x804DC758 }
   # gHitReactFacingOffsets begins with the u16 angles 0x8000 and 0x4000.
   - { source: 0x806DBDF8 }
   # cField::mCorners[2] packs angles 0x8000 and 0xC000, not a code pointer.

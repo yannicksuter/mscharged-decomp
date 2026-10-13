@@ -20,8 +20,13 @@ struct StrikerChallengeDefinition
 const StrikerChallengeDefinition gStrikerChallengeDefinitions[22] = {
     { "rookie", TEAM_BOWSER, "ini/strikerchallenges/tutorial1.ini", "CHARACTER_DIFF", "TUTORIAL_TITLE_CHARACTER_DIFF" },
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial2.ini", "BALL_CHARGE", "TUTORIAL_TITLE_BALL_CHARGE" },
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial4.ini", "MEGA_STRIKE", "TUTORIAL_TITLE_MEGA_STRIKE" },
+    { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial3.ini", "MEGA_SAVES", "TUTORIAL_TITLE_MEGA_SAVES" },
+#else
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial3.ini", "MEGA_SAVES", "TUTORIAL_TITLE_MEGA_SAVES" },
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial4.ini", "MEGA_STRIKE", "TUTORIAL_TITLE_MEGA_STRIKE" },
+#endif
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial5.ini", "SIDEKICK_SKILLSHOT", "TUTORIAL_TITLE_SIDEKICK_SKILLSHOT" },
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial6.ini", "SKILLSHOT_PART_TWO", "TUTORIAL_TITLE_SKILLSHOT_TWO" },
     { "rookie", TEAM_MARIO, "ini/strikerchallenges/tutorial7.ini", "SUPER_MARIO", "TUTORIAL_TITLE_SUPER_MARIO" },

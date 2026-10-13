@@ -254,11 +254,6 @@ template <typename charT> f32 TextWriterBase<charT>::PrintImpl(const charT* str,
     return textWidth;
 }
 
-static void ut_TextWriterBase_dummy(void* buffer, int size) {
-    NW4HBMAssertPointerValid_Line(buffer, 0);
-    NW4HBMAssertHeaderMinimumValue_Line(size, 0, 0);
-}
-
 template <typename charT> void TextWriterBase<charT>::CalcStringRectImpl(Rect* pRect, const charT* str, int length) {
     NW4HBMAssertPointerValid_Line(this, 1010);
     NW4HBMAssertPointerValid_Line(pRect, 1011);
@@ -286,19 +281,6 @@ template <typename charT> void TextWriterBase<charT>::CalcStringRectImpl(Rect* p
         pRect->right = Max(pRect->right, rect.right);
         pRect->bottom = Max(pRect->bottom, rect.bottom);
     } while (remain > 0);
-}
-
-template <typename charT>
-void TextWriterBase<charT>::ut_TextWriterBase_unused1(Rect* pRect, const charT* str, int length) {
-    void* buffer = 0;
-    int size = 0;
-
-    NW4HBMAssertPointerValid(this);
-    NW4HBMAssertPointerValid(pRect);
-    NW4HBMAssertPointerValid(str);
-    NW4HBMAssertHeaderMinimumValue(length, 0);
-    NW4HBMAssertPointerValid(buffer);
-    NW4HBMAssertHeaderMinimumValue(size, 1);
 }
 
 template <typename charT> int TextWriterBase<charT>::CalcLineRectImpl(Rect* pRect, const charT* str, int length) {
@@ -393,6 +375,7 @@ template <typename charT> charT* TextWriterBase<charT>::GetBuffer() { return mFo
 template <typename charT> u32 TextWriterBase<charT>::GetBufferSize() { return mFormatBufferSize; }
 
 template <typename charT> charT* TextWriterBase<charT>::SetBuffer(u32 size) {
+    NW4HBMAssertHeaderMinimumValue(size, 1);
     charT* oldBuffer = mFormatBuffer;
 
     mFormatBuffer = NULL;
@@ -402,6 +385,8 @@ template <typename charT> charT* TextWriterBase<charT>::SetBuffer(u32 size) {
 }
 
 template <typename charT> charT* TextWriterBase<charT>::SetBuffer(charT* buffer, u32 size) {
+    NW4HBMAssertPointerValid(buffer);
+    NW4HBMAssertHeaderMinimumValue(size, 1);
     charT* oldBuffer = mFormatBuffer;
 
     mFormatBuffer = buffer;
@@ -432,7 +417,6 @@ template <typename charT> f32 TextWriterBase<charT>::VPrintf(const charT* format
     NW4HBMAssertPointerValid_Line(this, 678);
     NW4HBMAssertPointerValid_Line(format, 679);
 
-    // i did not know about alloca before this TU so thank you kiwi
     charT* buffer = mFormatBuffer ? mFormatBuffer : static_cast<charT*>(__alloca(mFormatBufferSize));
 
     int length = VSNPrintf(buffer, mFormatBufferSize, format, args);
@@ -447,7 +431,7 @@ template <typename charT> f32 TextWriterBase<charT>::Printf(const charT* format,
 
     va_start(vargs, format);
     f32 width = VPrintf(format, vargs);
-    va_end(vlist);
+    va_end(vargs);
 
     return width;
 }

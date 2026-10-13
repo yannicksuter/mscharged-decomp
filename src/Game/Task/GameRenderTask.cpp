@@ -345,7 +345,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         }
     }
 
-    NisPlayer::Instance()->fn_8027E5D0();
+    NisPlayer::Instance()->OnRenderFrame();
 
     if (g_bShowEmissionLights)
     {

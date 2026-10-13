@@ -1,4 +1,8 @@
 #include "NL/nlLocalization.h"
+#if defined(VERSION_R4QK01)
+#include "NL/nlKoreanParticle.h"
+#include "NL/nlString.h"
+#endif
 
 #include <string.h>
 
@@ -16,6 +20,9 @@ const unsigned long nlLocalization::LanguageId[] = {
     0xB482A4B5,
     0xBC0FCCA1,
     0x95F1D726,
+#if defined(VERSION_R4QK01)
+    0xB4B69C3F,
+#endif
     0x5F2F5E69,
     0x30D469C4,
     0x2F242024,
@@ -30,6 +37,9 @@ char* nlLocalization::LanguageName[] = {
     "Spanish",
     "Italian",
     "Japanese",
+#if defined(VERSION_R4QK01)
+    "Korean",
+#endif
     "UKEnglish",
     "NAFrench",
     "NASpanish",
@@ -102,3 +112,33 @@ unsigned char nlLocalization::Load(nlLanguage Language, bool ingameloc, void* al
 
     return result != 0;
 }
+
+#if defined(VERSION_R4QK01)
+KoreanParticle GetKoreanParticle(const unsigned short* string)
+{
+    int length = nlStrLen(string);
+    unsigned short syllable = string[length - 1] - 0xAC00;
+    unsigned short finalConsonant = syllable % 28;
+    return finalConsonant == 0 ? KOREAN_PARTICLE_WITHOUT : KOREAN_PARTICLE_WITH;
+}
+
+KoreanParticle GetKoreanParticle(int number)
+{
+    switch (number % 10)
+    {
+    case 0:
+    case 3:
+    case 6:
+        return KOREAN_PARTICLE_WITH;
+    case 1:
+    case 2:
+    case 4:
+    case 5:
+    case 7:
+    case 8:
+    case 9:
+    default:
+        return KOREAN_PARTICLE_WITHOUT;
+    }
+}
+#endif

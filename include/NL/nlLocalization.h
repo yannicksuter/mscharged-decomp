@@ -25,7 +25,7 @@ public:
     };
 
     // Charged inserts the two North American variants between UKEnglish and
-    // the debug entries; the seven shared identifier hashes are unchanged.
+    // the debug entries. The Korean release also inserts Korean after Japanese.
     enum nlLanguage
     {
         LangEnglish = 0,
@@ -34,12 +34,15 @@ public:
         LangSpanish = 3,
         LangItalian = 4,
         LangJapanese = 5,
-        LangUKEnglish = 6,
-        LangNAFrench = 7,
-        LangNASpanish = 8,
-        LangLongestStrings = 9,
-        LangBob = 10,
-        LangEnd = 11,
+#if defined(VERSION_R4QK01)
+        LangKorean,
+#endif
+        LangUKEnglish,
+        LangNAFrench,
+        LangNASpanish,
+        LangLongestStrings,
+        LangBob,
+        LangEnd,
     };
 
     unsigned char Load(nlLanguage Language, bool ingameloc, void* allocator);

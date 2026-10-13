@@ -701,7 +701,7 @@ void LoadStadium(const char* name, bool)
     char path[255];
 
     gSkipGameplayModels = false;
-    fn_80182164();
+    OnStadiumLightingLoad();
     CreateAttackSideIndicators();
     lbl_806E1968 = 1;
 
@@ -821,7 +821,7 @@ void StadiumScreenToWorldPosition(nlVector3& result, float screenX, float screen
     nlVec3Add(result, offset, cameraPosition);
 }
 
-void fn_80277BB0()
+void OnStadiumCameraChange()
 {
 }
 

@@ -63,7 +63,7 @@ DWCRnkError DWC_RnkInitialize(const char* initdata, const DWCUserData* userdata)
         return DWC_RNK_ERROR_INIT_INVALID_USERDATA;
 
     g_rankinginfo.pid = userdata->gs_profile_id;
-    if (fn_8049EDC0() == DWC_SVR_RELEASE)
+    if (DWCi_Auth_GetServer() == DWC_SVR_RELEASE)
         DWCi_RankingSessionInitialize(TRUE, initdata);
     else
         DWCi_RankingSessionInitialize(FALSE, initdata);

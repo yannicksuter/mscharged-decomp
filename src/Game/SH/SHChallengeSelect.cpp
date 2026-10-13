@@ -127,17 +127,17 @@ void ChallengeSelectScene::UpdateRow(int index)
 
     char name[24];
     char textureName[24];
-    if (challenge == 2)
+    if (challenge == TUTORIAL_MEGA_SAVES)
     {
         nlSNPrintf(name, sizeof(name), "kritter");
         nlSNPrintf(textureName, sizeof(textureName), "captain_0_kritter_S");
     }
-    else if (challenge == 4)
+    else if (challenge == TUTORIAL_SIDEKICK_SKILLSHOT)
     {
         nlSNPrintf(name, sizeof(name), "hammerbros");
         nlSNPrintf(textureName, sizeof(textureName), "sidekick_5_hammer_S");
     }
-    else if (challenge == 5)
+    else if (challenge == TUTORIAL_SKILLSHOT_PART_TWO)
     {
         nlSNPrintf(name, sizeof(name), "boo");
         nlSNPrintf(textureName, sizeof(textureName), "sidekick_3_boo_S");

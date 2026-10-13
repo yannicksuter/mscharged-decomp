@@ -1245,7 +1245,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         {
             switch (pFielder->m_eActionState)
             {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             case ACTION_HIT:
                 return false;
 #endif
@@ -2228,7 +2228,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
     {
         if (eventData->pPatch->m_pOwner != this
             && m_DetPlayer.m_tFireTimer.m_uPackedTime == 0
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             && m_eActionState != ACTION_ELECTROCUTION
 #endif
             && !IsStuck() && !IsInvincible())
@@ -4278,7 +4278,7 @@ void cFielder::BeginDekeIntangibility()
             destination.z = 0.0f;
             nlVec3Scale(destination, destination, distance);
             nlVec3Add(destination, destination, m_DetChar.m_v3Position);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             bool beyondSideline = fabsf(destination.y) > cField::GetSidelineY(1U);
 #endif
             bool fixed = false;
@@ -4308,7 +4308,7 @@ void cFielder::BeginDekeIntangibility()
                     }
                 }
                 if (nearSideline && fabsf(destination.x) <= cField::GetGoalLineX(1U) - GetScaledPlayerWidth(m_pTweaks, GetPlayerScale()) - 2.0f
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
                     && !beyondSideline
 #endif
                 )

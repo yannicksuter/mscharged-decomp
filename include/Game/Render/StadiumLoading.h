@@ -67,7 +67,7 @@ void BeginLoadStadiumEffects();
 bool FinishLoadStadiumEffects();
 void DestroyStadium();
 void UpdateStadium(float fDeltaT);
-void fn_80277BB0();
+void OnStadiumCameraChange();
 bool IsStadiumWorldLoaded();
 float GetStadiumTime();
 

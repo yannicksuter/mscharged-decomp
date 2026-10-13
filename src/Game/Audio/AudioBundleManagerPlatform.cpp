@@ -21,21 +21,21 @@ bool AudioRpcBundleManager::Initialize()
 
 void AudioRpcBundleManager::Shutdown()
 {
-    fn_802B467C(&sSoundCueHandlePool);
+    OnSlotPoolStateRelease(&sSoundCueHandlePool);
     SlotPoolBase::BaseFreeBlocks(&sSoundCueHandlePool, 0x40);
-    fn_802B467C(&sSoundInstancePool);
+    OnSlotPoolStateRelease(&sSoundInstancePool);
     SlotPoolBase::BaseFreeBlocks(&sSoundInstancePool, 0x7C);
     sAudioSequenceInstancePool.FreeBlocks();
-    fn_802B467C(&sSoundPlaybackEventPool);
+    OnSlotPoolStateRelease(&sSoundPlaybackEventPool);
     SlotPoolBase::BaseFreeBlocks(&sSoundPlaybackEventPool, 0x34);
-    fn_802B467C(&sHitMarkerEventPool);
+    OnSlotPoolStateRelease(&sHitMarkerEventPool);
     SlotPoolBase::BaseFreeBlocks(&sHitMarkerEventPool, 0x18);
-    fn_802B467C(&sParameterChangeEventPool);
+    OnSlotPoolStateRelease(&sParameterChangeEventPool);
     SlotPoolBase::BaseFreeBlocks(&sParameterChangeEventPool, 0x18);
-    fn_802B467C(&sAudioRpcListEntryPool);
+    OnSlotPoolStateRelease(&sAudioRpcListEntryPool);
     SlotPoolBase::BaseFreeBlocks(
         &sAudioRpcListEntryPool, sizeof(AudioRpcListEntry));
-    fn_802B467C(&sAudioRpcRuntimeNodePool);
+    OnSlotPoolStateRelease(&sAudioRpcRuntimeNodePool);
     SlotPoolBase::BaseFreeBlocks(
         &sAudioRpcRuntimeNodePool, sizeof(AudioRpcRuntimeNode));
     ShutdownAudioResourceRuntime(&m_Runtime);

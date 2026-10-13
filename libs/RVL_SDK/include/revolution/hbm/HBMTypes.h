@@ -27,11 +27,15 @@ typedef struct HBMDataInfo {
     /* 0x1C */ int region;
     /* 0x20 */ int cursor;
     /* 0x24 */ int messageFlag;
+#if defined(VERSION_R4QK01)
+    /* 0x28 */ unsigned long configBufSize;
+#endif
+    // The remaining fields are four bytes later in the Korean SDK.
     /* 0x28 */ unsigned long memSize;
     /* 0x2C */ float frameDelta;
     /* 0x30 */ Vec2 adjust;
     /* 0x38 */ MEMAllocator* pAllocator;
-} HBMDataInfo; // size = 0x3C
+} HBMDataInfo; // size 0x3C, 0x40 in Korea
 
 typedef struct HBMKPadData {
     /* 0x00 */ KPADStatus* kpad;

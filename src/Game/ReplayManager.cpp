@@ -93,26 +93,26 @@ void RenderSnapshot::Replay(T& frame)
 {
     for (int i = 0; i < 10; i++)
         Replayable<0>(frame, mCharacters[i]);
-    frame.fn_80191504();
+    frame.OnSectionBoundary();
     for (int i = 0; i < 150; i++)
         Replayable<0>(frame, mPowerups[i]);
-    frame.fn_80191504();
-    frame.fn_80191504();
-    frame.fn_80191504();
+    frame.OnSectionBoundary();
+    frame.OnSectionBoundary();
+    frame.OnSectionBoundary();
     if ((mFlags.raw >> 30) & 1)
     {
         Replayable<0>(frame, mNumFlyingCameras);
         for (unsigned int i = 0; i < mNumFlyingCameras; i++)
             Replayable<0>(frame, _2298[i]);
     }
-    frame.fn_80191504();
+    frame.OnSectionBoundary();
     if ((mFlags.raw >> 29) & 1)
     {
         Replayable<0>(frame, mHasHammers);
         if (mHasHammers)
             for (unsigned int i = 0; i < 15; i++)
                 Replayable<0>(frame, mHammers[i]);
-        frame.fn_80191504();
+        frame.OnSectionBoundary();
     }
     if ((mFlags.raw >> 22) & 1)
         for (unsigned int i = 0; i < 8; i++)
@@ -122,7 +122,7 @@ void RenderSnapshot::Replay(T& frame)
         Replayable<0>(frame, mNumBulletBills);
         for (unsigned int i = 0; i < mNumBulletBills; i++)
             Replayable<0>(frame, mBulletBills[i]);
-        frame.fn_80191504();
+        frame.OnSectionBoundary();
     }
     Replayable<0>(frame, mChainChomp);
     if ((mFlags.raw >> 24) & 1)
@@ -154,9 +154,9 @@ void RenderSnapshot::Replay(T& frame)
             if (NPCManager::Instance()->GetWindDebris(i) != 0)
                 Replayable<0>(frame, mWindDebris[i]);
         }
-        frame.fn_80191504();
+        frame.OnSectionBoundary();
     }
-    frame.fn_80191504();
+    frame.OnSectionBoundary();
     if (NetMesh::IsAnimatedNetMeshEnabled())
     {
         if (ReplayFrameTraits<T>::IsLoadFrame
@@ -194,7 +194,7 @@ void RenderSnapshot::Replay(T& frame)
         Replayable<1>(frame, *mpNetMeshNegativeX);
     }
     Replayable<1>(frame, mSimulationTime);
-    frame.fn_80191504();
+    frame.OnSectionBoundary();
     if (frame.ShouldReplayNonBlendables())
     {
         Replayable<3>(frame, EmissionManager::Instance()->InstanceForReplayOnly());

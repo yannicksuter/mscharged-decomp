@@ -145,7 +145,7 @@ void SHStrikerTimesBase::SceneCreated()
     }
 
     mPresentation->SetActiveSlide("in", true);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     mPresentation->Update(0.0f);
 #endif
 }

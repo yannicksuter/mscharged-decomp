@@ -11,7 +11,7 @@ extern "C"
 #endif
 
     void DWCi_Auth_InitInterface(DWC_AuthServer);
-    DWC_AuthServer fn_8049EDC0(void);
+    DWC_AuthServer DWCi_Auth_GetServer(void);
     int DWCi_Auth_StartAuthentication(const u16* ingamesn, const char* gsbrcd,
         u64 userid, DWCAllocFunc allocator, DWCFreeFunc deallocator);
     void DWCi_Auth_AbortAuthentication(void);

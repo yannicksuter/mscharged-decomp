@@ -291,7 +291,7 @@ void NisPlayer::ParseDictionary(char* data)
     }
 }
 
-void NisPlayer::fn_8027BD60()
+void NisPlayer::OnSceneLoad()
 {
 }
 
@@ -1048,7 +1048,7 @@ void NisPlayer::SetExtraNameFilter(const char* filter)
     nlStrNCpy(mExtraNameFilter, filter, 128);
 }
 
-void NisPlayer::fn_8027E5D0()
+void NisPlayer::OnRenderFrame()
 {
 }
 

@@ -144,7 +144,7 @@ void DWCi_Auth_InitInterface(DWC_AuthServer authServer)
     s_auth_result.ingamesn_check_result = DWC_INGAMESN_NOT_CHECKED;
 }
 
-DWC_AuthServer fn_8049EDC0(void)
+DWC_AuthServer DWCi_Auth_GetServer(void)
 {
     return s_authserver;
 }

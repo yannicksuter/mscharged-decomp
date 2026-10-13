@@ -10,7 +10,7 @@ public:
     {
         return mInterval;
     }
-    void fn_80191504();
+    void OnSectionBoundary();
     bool ShouldReplayNonBlendables() const
     {
         return true;

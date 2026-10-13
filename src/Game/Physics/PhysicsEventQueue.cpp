@@ -159,7 +159,7 @@ void DestroyPhysicsEventQueue()
 
         BasicSlotPool<DLListEntry<EventCallback> >* pool =
             &dispatcher.callbacks.m_Allocator;
-        fn_802B467C(pool);
+        OnSlotPoolStateRelease(pool);
         SlotPoolBase::BaseFreeBlocks(
             pool, sizeof(DLListEntry<EventCallback>));
 

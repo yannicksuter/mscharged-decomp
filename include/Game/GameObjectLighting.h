@@ -58,7 +58,7 @@ void ApplyGameObjectShadowLighting(int skinned, unsigned long shadowLevel);
 void RestoreGameObjectShadowLighting();
 void SetGameObjectShadowModelMatrix(unsigned long matrix);
 void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix);
-void fn_80182164();
+void OnStadiumLightingLoad();
 void LoadShadowLightingLookup(unsigned long texture);
 
 #endif // _GAMEOBJECTLIGHTING_H_

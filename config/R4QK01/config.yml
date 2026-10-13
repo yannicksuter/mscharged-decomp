@@ -6,7 +6,20 @@ extract_objects: true
 symbols: config/R4QK01/symbols.txt
 splits: config/R4QK01/splits.txt
 mw_comment_version: 14
+add_relocations:
+  # PowerupCreateAndThrow hoists vtable addresses through r0 and stack slots.
+  - { source: .text:0x8009A994, type: ha, target: __vt__6Bobomb }
+  - { source: .text:0x8009A9A0, type: ha, target: __vt__10GreenShell }
+  - { source: .text:0x8009A9B8, type: ha, target: __vt__11FreezeShell }
+  - { source: .text:0x8009A9BC, type: l, target: __vt__6Bobomb }
+  - { source: .text:0x8009A9D8, type: ha, target: __vt__8RedShell }
+  - { source: .text:0x8009A9DC, type: l, target: __vt__10GreenShell }
+  - { source: .text:0x8009A9FC, type: l, target: __vt__11FreezeShell }
+  - { source: .text:0x8009AA1C, type: l, target: __vt__8RedShell }
 block_relocations:
+  # Receive-pass animation tables pack u16 angles 0x8000 and 0xE000.
+  - { source: 0x804B14DC }
+  - { source: 0x804B15D8 }
   - { source: 0x805FF118 }
   - { source: 0x804C4770 }
   - { source: 0x802CFDA8 }

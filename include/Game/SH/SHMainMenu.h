@@ -44,12 +44,16 @@ public:
     /* 0x070 */ TLInstance* mMenuGroups[NUM_ITEMS];
     /* 0x08C */ TLImageInstance* mMenuHitImages[NUM_ITEMS];
     /* 0x0A8 */ TLTextInstance* mItemDescription;
+#if defined(VERSION_R4QK01)
+    /* 0x0AC */ float mUnknownAC;
+#endif
+    // The following offsets increase by four in Korea.
     /* 0x0AC */ FEPointerButton mMenuItems[NUM_ITEMS];
     /* 0x598 */ FEBackButton mBackButton;
     /* 0x670 */ bool mMenuInitialized;
     /* 0x671 */ bool mItemSelected;
     /* 0x674 */ int mHighlightedItemCounts[4];
     /* 0x684 */ bool mWaitingForLoad;
-}; // size 0x688
+}; // size 0x688, 0x68C in Korea
 
 #endif // GAME_SH_SH_MAIN_MENU_H

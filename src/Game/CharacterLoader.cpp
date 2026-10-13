@@ -1009,7 +1009,7 @@ void CharacterLoader::CreateCharacterInstance()
     }
 }
 
-void CharacterLoader::fn_8000BD70()
+void CharacterLoader::OnCharactersLoaded()
 {
 }
 

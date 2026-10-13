@@ -33,7 +33,7 @@ WorldAnimManager::~WorldAnimManager()
 {
 }
 
-void WorldAnimManager::fn_80342324()
+void WorldAnimManager::OnBeforeWorldUnload()
 {
 }
 

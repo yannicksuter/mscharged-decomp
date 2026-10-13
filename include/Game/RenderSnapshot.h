@@ -92,7 +92,7 @@ public:
     bool mPositiveGoalieNetCheck;
     bool mNegativeGoalieNetCheck;
     nlVector3 mCameraUp;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     nlVector3 mPatchPositions[60];
 #endif
     float mFrameBlendPercent;
@@ -102,11 +102,11 @@ public:
 
 DrawableBulletBill& GetSnapshotBulletBill(RenderSnapshot* snapshot, unsigned int index);
 
-inline void SaveFrame::fn_80191504()
+inline void SaveFrame::OnSectionBoundary()
 {
 }
 
-inline void LoadFrame::fn_80191504()
+inline void LoadFrame::OnSectionBoundary()
 {
 }
 

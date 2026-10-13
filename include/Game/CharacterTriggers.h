@@ -147,6 +147,6 @@ void EmitPowerupIcon(cCharacter* pCharacter, int nIcon);
 void EmitSuperGrow(cCharacter* pCharacter);
 void EmitSuperShrink(cCharacter* pCharacter);
 void EmitHammerDestroy(const nlVector3& v3Position);
-extern "C" void fn_801BDF08(cCharacter* pCharacter);
+void OnBallLightningEnd(cCharacter* pCharacter);
 
 #endif // GAME_CHARACTERTRIGGERS_H

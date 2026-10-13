@@ -21,8 +21,6 @@
 #include "ode/ext/dRoundedCorner.h"
 #include "ode/memory.h"
 
-extern "C" bool fn_8013E2E4();
-
 static bool sbDisableCollisionDetection;
 static bool sbNonMovingAABBsInitialized;
 PhysicsMesh* g_TerrainMesh;
@@ -72,7 +70,7 @@ void RegisterUserGeomClasses()
 
 void CreatePhysicsWorld()
 {
-    fn_8013E2E4();
+    OnBeforeCreatePhysicsWorld();
 
     g_PhysicsWorld = new (nlMalloc(sizeof(PhysicsWorld), 8, false)) PhysicsWorld();
     g_CollisionSpace = new (nlMalloc(sizeof(SimpleCollisionSpace), 8, false))

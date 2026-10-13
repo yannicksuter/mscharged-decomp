@@ -168,7 +168,11 @@ public:
     void InitActionPursueDeke(cFielder* pTarget, int nPursueDekeType);
     void StartLooseBallPickup(float fDistance);
     void InitActionLooseBallPickup(float fDistance, bool bStartPickup);
+#if defined(VERSION_R4QK01)
+    void InitActionSaveSetup(bool bCanReposition, bool bCheckLobSave = true);
+#else
     void InitActionSaveSetup(bool bCanReposition);
+#endif
     void InitActionSave();
     void InitActionHeadImpact(float fParam);
     void InitActionSnapBall();

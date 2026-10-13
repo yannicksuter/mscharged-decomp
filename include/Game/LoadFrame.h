@@ -14,7 +14,7 @@ public:
     {
         return mNonBlendableAheadOfFrame;
     }
-    void fn_80191504();
+    void OnSectionBoundary();
     bool ShouldReplayNonBlendables() const
     {
         return mReplayNonBlendables == REPLAY_NON_BLENDABLES;

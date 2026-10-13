@@ -211,7 +211,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
         mImages[2]->mImageInstance->m_bVisible = true;
         mImages[3]->mImageInstance->m_bVisible = true;
     }
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if !defined(VERSION_R4QP01_REV1)
     else
     {
         return;
