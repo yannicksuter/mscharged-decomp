@@ -1435,6 +1435,7 @@ WPADResult WPADGetInfo(WPADChannel chan, WPADInfo* pInfo) {
     return __wpadSync(chan);
 }
 
+#if defined(VERSION_R4QE01)
 static void __infoCallback(WPADChannel chan, WPADResult result) {
     WPADCB* p = _wpdcb[chan];
 
@@ -1498,6 +1499,39 @@ _end:
 
     return status;
 }
+#else
+s32 WPADGetInfoAsync(s32 chan, WPADInfo* pInfo, WPADCallback pCallback) {
+    BOOL handshake;
+    s32 status;
+    WPADCB* p = _wpdcb[chan];
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+
+    handshake = p->handshakeFinished;
+    status = p->status;
+
+    OSRestoreInterrupts(enabled);
+
+    if (status == WPAD_ERR_NO_CONTROLLER) {
+        goto _end;
+    }
+
+    if (!handshake) {
+        status = WPAD_ERR_COMMUNICATION_ERROR;
+        goto _end;
+    }
+
+    if (WPADiSendGetContStat(&p->stdCmdQueue, pInfo, pCallback)) {
+        status = WPAD_ERR_OK;
+    } else {
+        status = WPAD_ERR_COMMUNICATION_ERROR;
+    }
+
+_end:
+    return status;
+}
+#endif
 
 void WPADControlMotor(s32 chan, u32 command) {
     WPADCB* p = _wpdcb[chan];

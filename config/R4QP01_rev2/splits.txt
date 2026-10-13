@@ -5823,12 +5823,14 @@ RVL_SDK/wenc/wenc.c:
 	.sdata2     start:0x806E6688 end:0x806E6690
 
 RVL_SDK/wpad/WPAD.c:
+	.text       start:0x803C87A0 end:0x803CFE60
 	.rodata     start:0x804EC060 end:0x804EC09A
 	.data       start:0x8054A840 end:0x8054AA98
 	.sdata      start:0x806DEF08 end:0x806DEF18
 	.sdata2     start:0x806E6690 end:0x806E6697
 
 RVL_SDK/wpad/WPADHIDParser.c:
+	.text       start:0x803CFE60 end:0x803D46C4
 	.data       start:0x8054AA98 end:0x8054AEF8
 	.sdata2     start:0x806E6698 end:0x806E66C0
 
