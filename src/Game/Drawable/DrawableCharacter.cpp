@@ -740,7 +740,7 @@ void DrawableCharacter::EvaluateFrom(const cPoseNode& poseNode, const nlVector3&
     damage1 = character->GetDirt();
     damage2 = character->GetMinDirt();
     damageType = character->m_nDamageType;
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     shadowLevel = 1.0f;
 #endif
 
