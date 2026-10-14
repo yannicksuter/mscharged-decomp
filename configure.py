@@ -925,7 +925,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/SolarFlareEffect.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/NisPlayerOverlay.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/Warble.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Render/Wiper.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
+            Object(Matching, "Game/Render/Wiper.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/Frustum.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/WorldNPC.cpp"),
             Object(Matching, "Game/Render/YoshiEggObject.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
