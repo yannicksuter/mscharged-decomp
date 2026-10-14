@@ -16,6 +16,9 @@ add_relocations:
   - { source: .text:0x8009A9DC, type: l, target: __vt__10GreenShell }
   - { source: .text:0x8009A9FC, type: l, target: __vt__11FreezeShell }
   - { source: .text:0x8009AA1C, type: l, target: __vt__8RedShell }
+  # The HUD power-up name table is hoisted through r0 and a stack slot.
+  - { source: .text:0x801EB924, type: ha, target: POWER_UP_IMAGE_NAMES }
+  - { source: .text:0x801EB96C, type: l, target: POWER_UP_IMAGE_NAMES }
 block_relocations:
   # Receive-pass animation tables pack u16 angles 0x8000 and 0xE000.
   - { source: 0x804B14DC }
