@@ -17,7 +17,7 @@ float gHammerGrowScale = 1.4f;
 float gHammerGrowDuration = 0.15f;
 float gHammerSpinSpeed = 25.0f;
 float gHammerLandedDuration = 5.0f;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 float gHammerMinLandingAngle = 105.0f;
 float gHammerMaxLandingAngle = 165.0f;
 #endif
@@ -30,7 +30,7 @@ extern const float sHammerHalf;
 extern const float sHammerDegreesPerHalfTurn;
 extern const float sHammerRadiansToAngleUnits;
 extern const float sHammerQuarter;
-#if !defined(VERSION_R4QE01)
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
 extern const float sHammerLandingDotThreshold;
 #endif
 
@@ -207,7 +207,7 @@ void HammerObject::OnLanding()
         nlQuaternion orientation = mOrientation;
         nlQuaternion facing;
         nlQuaternion target;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         nlQuaternion tilt;
         nlMakeQuatY(tilt,
             (u16)(int)(sHammerRadiansToAngleUnits
@@ -238,7 +238,7 @@ void HammerObject::OnLanding()
         float dot = nlQuatDot(orientation, target);
         if (dot < sHammerZero)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             orientation.x = -orientation.x;
             orientation.y = -orientation.y;
             orientation.z = -orientation.z;
@@ -251,7 +251,7 @@ void HammerObject::OnLanding()
 
         if (dot < maximumDot)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             nlQuaternion lowTilt;
             nlQuaternion highTilt;
             float lowDegrees;
@@ -505,7 +505,7 @@ void HammerObject::Deactivate(bool emitEffect)
 extern const float sHammerOne = 1.0f;
 extern const float sHammerZero = 0.0f;
 extern const float sHammerLengthEpsilon = 0.001f;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 extern const float sHammerPi = 3.1415927f;
 extern const float sHammerHalf = 0.5f;
 extern const float sHammerDegreesPerHalfTurn = 180.0f;

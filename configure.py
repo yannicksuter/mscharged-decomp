@@ -881,7 +881,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/FlareHandler.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/FlyingCamera.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/Render/FrontEndPresentation.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Render/HammerObject.cpp", cflags=cflags_game),
+            Object(Matching, "Game/Render/HammerObject.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/HighRange.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/HomeButtonFade.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/Impostor.cpp"),
