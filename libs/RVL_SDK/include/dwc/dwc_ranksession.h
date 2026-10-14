@@ -45,6 +45,9 @@ extern "C"
 #define DWCi_RANKING_SESSION_ERROR_INVALID_KEY DWCi_ENC_SESSION_ERROR_INVALID_KEY
 
     void DWCi_RankingSessionInitialize(BOOL releaseserver, const char* initdata);
+#if defined(VERSION_R4QK01)
+    void DWCi_RankingSessionCancel(void);
+#endif
     void DWCi_RankingSessionShutdown(void);
     DWCiRankingSessionResult DWCi_RankingSessionPutAsync(u32 category, s32 pid, DWCRnkRegion region, s32 score, void* data, u32 size);
     DWCiRankingSessionResult DWCi_RankingSessionGetAsync(DWCRnkGetMode mode, u32 category, s32 pid, DWCRnkRegion region, DWCRnkGetParam* param);

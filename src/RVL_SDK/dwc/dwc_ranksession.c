@@ -37,6 +37,13 @@ DWCiRankingSessionState DWCi_RankingSessionProcess(void)
     return DWCi_EncSessionProcess();
 }
 
+#if defined(VERSION_R4QK01)
+void DWCi_RankingSessionCancel(void)
+{
+    DWCi_EncSessionCancel();
+}
+#endif
+
 void DWCi_RankingSessionShutdown(void)
 {
     DWCi_EncSessionShutdown();
@@ -139,6 +146,10 @@ static BOOL DWCi_RankingSessionVaridateResponse(u32* buf, int len)
         case DWC_RNK_GET_MODE_TOPLIST:
         case DWC_RNK_GET_MODE_NEAR:
         case DWC_RNK_GET_MODE_FRIENDS:
+#if defined(VERSION_R4QK01)
+        case DWC_RNK_GET_MODE_NEAR_HI:
+        case DWC_RNK_GET_MODE_NEAR_LOW:
+#endif
             ptr[1] = DWCi_RankingByteSwap32(ptr[1]);
             ptr[2] = DWCi_RankingByteSwap32(ptr[2]);
             offset = 3;
