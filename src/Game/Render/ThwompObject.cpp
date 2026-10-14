@@ -273,7 +273,7 @@ void ThwompObject::SetState(eThwompState state)
         axis.x = nlRandomf(2.0f) - 1.0f;
         axis.y = nlRandomf(2.0f) - 1.0f;
         axis.z = 0.0f;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         float lengthSquared = axis.GetLengthSq3D();
         if (lengthSquared > 0.01f)
         {

@@ -913,7 +913,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/SkinAnimatedNPC.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/StadiumLoading.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/StadiumTweaks.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/Render/ThwompObject.cpp", cflags=cflags_game),
+            Object(Matching, "Game/Render/ThwompObject.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/TimedObject.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/WarbleOwner.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/WindDebris.cpp", extra_cflags=["-ipa file", "-sym on"]),
