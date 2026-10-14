@@ -6234,6 +6234,9 @@ RVL_SDK/dwc/dwc_auth_interface.c:
 RVL_SDK/dwc/dwc_encsession.c:
 	.data       start:0x8052A4C0 end:0x8052A6C0
 
+RVL_SDK/dwc/dwc_nastime.c:
+	.text       start:0x80478380 end:0x80478470
+
 RVL_SDK/dwc/dwc_ranksession.c:
 	.text       start:0x80478CA0 end:0x80479188
 	.data       start:0x8052A6C0 end:0x8052A720

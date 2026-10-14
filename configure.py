@@ -1485,7 +1485,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_memfunc.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_nastime.c", cflags=cflags_rvl_dwc),
+            Object(Matching, "RVL_SDK/dwc/dwc_nastime.c", cflags=cflags_rvl_dwc, extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_nonport.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_ranking.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_ranksession.c", cflags=cflags_rvl_dwc),
