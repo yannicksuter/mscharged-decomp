@@ -54,7 +54,8 @@ typedef struct DWCstMatchControl
     u32 _028;
     int _02C;
     u8 _030;
-    u8 _031[0x1B];
+    u8 _031[0x17];
+    u32 _048;
     u32 _04C;
     u8 qr2ShutdownFlag;
     u8 _051[7];
@@ -129,7 +130,8 @@ typedef struct DWCstMatchControl
     u8 _8C4;
     u8 _8C5[3];
     u32 _8C8;
-    u8 _8CC[0xC];
+    u8 _8CC[4];
+    OSTime _8D0;
     u8 searchServerNext;
     u8 _8D9[3];
     u32 _8DC;
