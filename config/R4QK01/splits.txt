@@ -1752,6 +1752,7 @@ Game/FE/feManager.cpp:
 
 Game/FE/BaseGameSceneManager.cpp:
 	.text       start:0x801C4C20 end:0x801C61D0
+	.rodata     start:0x804B4160 end:0x804B4190
 	.data       start:0x804E0B70 end:0x804E1A68
 	.sbss       start:0x80604EE0 end:0x80604EEC
 
@@ -1935,6 +1936,8 @@ Game/FE/Overlay/OverlayHandlerChallengePreview.cpp:
 	.sdata2     start:0x80608DE8 end:0x80608DF8
 
 Game/FE/Overlay/OverlayHandlerControllerMap.cpp:
+	.text       start:0x801FDD7C end:0x801FE5D4
+	.data       start:0x804E5740 end:0x804E57A8
 	.sdata      start:0x80601178 end:0x806011A0
 	.sdata2     start:0x80608DF8 end:0x80608E00
 

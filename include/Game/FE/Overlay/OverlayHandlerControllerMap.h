@@ -2,7 +2,9 @@
 #define GAME_FE_OVERLAY_HANDLER_CONTROLLER_MAP_H
 
 #include "Game/FE/BaseOverlayHandler.h"
+#if !defined(VERSION_R4QK01)
 #include "Game/FE/feAsyncImage.h"
+#endif
 #include "Game/FE/fePointerButton.h"
 
 class TLComponentInstance;
@@ -28,7 +30,9 @@ public:
     /* 0x0E5 */ bool mDonePressed;
     /* 0x0E6 */ bool mImageLoaded;
     /* 0x0E7 */ u8 mPadding0E7;
+#if !defined(VERSION_R4QK01)
     /* 0x0E8 */ AsyncImage mAsyncImage;
-}; // size 0x188
+#endif
+}; // size 0x0E8 (Korea), 0x188 (other versions)
 
 #endif // GAME_FE_OVERLAY_HANDLER_CONTROLLER_MAP_H

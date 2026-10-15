@@ -83,12 +83,18 @@ unsigned long gFEResourceMarker;
 
 void CreateFEResourcePool()
 {
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+    if (g_Language == nlLocalization::LangJapanese)
+#else
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+#endif
     {
         GLMemoryRequirement requirements[2] = {
             { GLM_Header, 0x5000 },
 #if defined(VERSION_R4QE01)
             { GLM_TextureData, 0x2CCCCC },
+#elif defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+            { GLM_TextureData, 0x259999 },
 #else
             { GLM_TextureData, 0x380000 },
 #endif
@@ -100,7 +106,11 @@ void CreateFEResourcePool()
     {
         GLMemoryRequirement requirements[2] = {
             { GLM_Header, 0x5000 },
+#if defined(VERSION_R4QK01)
+            { GLM_TextureData, 0x266666 },
+#else
             { GLM_TextureData, 0x200000 },
+#endif
         };
         gFEResourcePool
             = glCreateResourcePool(requirements, 2, "FEResourceManagerPool");
@@ -114,7 +124,9 @@ void CreateLargeFEResourcePool()
 {
     GLMemoryRequirement requirements[2] = {
         { GLM_Header, 0xC800 },
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QK01)
+        { GLM_TextureData, 0xB00000 },
+#elif defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         { GLM_TextureData, 0xA00000 },
 #else
         { GLM_TextureData, 0x900000 },
@@ -153,6 +165,12 @@ GLResourcePool* GetFEResourcePool()
     return gFEResourcePool;
 }
 
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+#define STRIKER_TIMES_SCENE_FILE "art/fe/striker_times_jp.fen"
+#else
+#define STRIKER_TIMES_SCENE_FILE "art/fe/striker_times_2.fen"
+#endif
+
 SceneEntry SceneEntryTable[] = {
     { SCENE_TITLE, "art/fe/sms2_start.fen" },
     { SCENE_MAIN_MENU, "art/fe/main_menu_v3.fen" },
@@ -187,13 +205,13 @@ SceneEntry SceneEntryTable[] = {
     { SCENE_WII_CURSOR, "art/fe/wiicursor.fen" },
     { SCENE_ROAD_TO_STRIKERS_CUP, "art/fe/roadtostrikerscup_hub.fen" },
     { SCENE_CUP_SCHEDULE, "art/fe/cup_schedule.fen" },
-    { SCENE_GAME_RESULTS, "art/fe/striker_times_2.fen" },
+    { SCENE_GAME_RESULTS, STRIKER_TIMES_SCENE_FILE },
     { SCENE_CUP_KNOCKOUT, "art/fe/cup_knockout.fen" },
     { SCENE_CUP_FINAL_ROUNDS, "art/fe/cup_final_rounds.fen" },
     { SCENE_CUP_STANDINGS, "art/fe/striker_cup_standings.fen" },
     { SCENE_CUP_GOLDEN_BOOT, "art/fe/striker_cup_awards_golden_boot.fen" },
     { SCENE_CUP_BRICK_WALL, "art/fe/striker_cup_awards_brick_wall.fen" },
-    { SCENE_CUP_NEWS, "art/fe/striker_times_2.fen" },
+    { SCENE_CUP_NEWS, STRIKER_TIMES_SCENE_FILE },
     { SCENE_ONLINE_MENU, "art/fe/online_menu.fen" },
     { SCENE_ONLINE_RANKED, "art/fe/online_ranked_menu.fen" },
     { SCENE_ONLINE_UNRANKED, "art/fe/online_unranked_menu.fen" },
@@ -231,7 +249,7 @@ SceneEntry SceneEntryTable[] = {
     { SCENE_HOF_CRYSTAL_BRICK_WALL_HISTORY, "art/fe/hof_award_history.fen" },
     { SCENE_CHALLENGE_SELECT, "art/fe/striker_challenge_hub.fen" },
     { SCENE_STRIKERS_101_SELECT, "art/fe/striker_challenge_hub.fen" },
-    { SCENE_CHALLENGE_NEWS, "art/fe/striker_times_2.fen" },
+    { SCENE_CHALLENGE_NEWS, STRIKER_TIMES_SCENE_FILE },
     { SCENE_CHOOSE_SIDES_TOURNAMENT, "art/fe/domination_choose_sides.fen" },
     { SCENE_HEALTH_WARNING, "art/fe/e3howtoholdcontroller.fen" },
     { SCENE_PAUSE, "art/fe/pausemenu_v3.fen" },
@@ -245,10 +263,10 @@ SceneEntry SceneEntryTable[] = {
     { (SceneList)88, 0 },
     { OVERLAY_HUD, "art/fe/hud_2.fen" },
     { OVERLAY_IN_GAME_TEXT, "art/fe/ingame_text.fen" },
-    { OVERLAY_POST_GAME_RESULTS, "art/fe/striker_times_2.fen" },
-    { OVERLAY_POST_GAME_STATISTICS, "art/fe/striker_times_2.fen" },
+    { OVERLAY_POST_GAME_RESULTS, STRIKER_TIMES_SCENE_FILE },
+    { OVERLAY_POST_GAME_STATISTICS, STRIKER_TIMES_SCENE_FILE },
     { OVERLAY_ONLINE_RANKING, "art/fe/online_ranking.fen" },
-    { OVERLAY_STRIKER_TIMES, "art/fe/striker_times_2.fen" },
+    { OVERLAY_STRIKER_TIMES, STRIKER_TIMES_SCENE_FILE },
     { OVERLAY_GOAL, "art/fe/goal_overlay.fen" },
     { OVERLAY_DEMO, "art/fe/demo_overlay.fen" },
     { OVERLAY_TICKER, "art/fe/igticker.fen" },
@@ -262,6 +280,8 @@ SceneEntry SceneEntryTable[] = {
     { OVERLAY_DEFENSIVE_PLAY, "art/fe/defensive_play.fen" },
     { (SceneList)106, 0 },
 };
+
+#undef STRIKER_TIMES_SCENE_FILE
 
 BaseGameSceneManager::BaseGameSceneManager()
 {
@@ -296,14 +316,17 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         filename = "art/fe/sms2_start.fen";
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
+#if defined(VERSION_R4QE01)
         if (newscene == SCENE_CUP_NEWS || newscene == SCENE_CHALLENGE_NEWS || newscene == OVERLAY_POST_GAME_RESULTS)
         {
             filename = "art/fe/striker_times_jp.fen";
         }
-        else if (newscene == OVERLAY_CONTROLLER_MAP)
+        else
+#endif
+        if (newscene == OVERLAY_CONTROLLER_MAP)
         {
             filename = "art/fe/controller_config_jp.fen";
         }

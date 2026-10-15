@@ -14,6 +14,17 @@
 #include "NL/nlFunction.inl"
 #include "NL/nlLocalization.h"
 
+#if defined(VERSION_R4QK01)
+ControllerMapOverlay::ControllerMapOverlay()
+    : BaseOverlayHandler(1, POSITION_ALL)
+    , mDoneButton()
+    , mButtonInitialized(false)
+    , mDonePressed(false)
+    , mImageLoaded(true)
+{
+}
+#endif
+
 ControllerMapOverlay::~ControllerMapOverlay()
 {
     SHNavigation* scene = GetNavigationScene();
@@ -24,6 +35,7 @@ ControllerMapOverlay::~ControllerMapOverlay()
     }
 }
 
+#if !defined(VERSION_R4QK01)
 ControllerMapOverlay::ControllerMapOverlay()
     : BaseOverlayHandler(1, POSITION_ALL)
     , mDoneButton()
@@ -31,7 +43,7 @@ ControllerMapOverlay::ControllerMapOverlay()
     , mDonePressed(false)
     , mAsyncImage("art/fe/controllermapui.res", 0)
 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if ((GetRegion() == GAME_REGION_US
             && g_pLocalization->m_CurrentLanguage == nlLocalization::LangEnglish)
         || g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
@@ -47,6 +59,7 @@ ControllerMapOverlay::ControllerMapOverlay()
         mImageLoaded = false;
     }
 }
+#endif
 
 inline void ControllerMapOverlay::InitializeDoneButton()
 {
@@ -61,8 +74,22 @@ inline void ControllerMapOverlay::InitializeDoneButton()
     mDoneButton.SetPointerPressCallback(down);
 }
 
+#if defined(VERSION_R4QK01)
+void ControllerMapOverlay::SceneCreated()
+{
+    SHNavigation* scene = GetNavigationScene();
+    if (scene != 0)
+    {
+        scene->SetButtons(NAVIGATION_BUTTON_DONE, true);
+        mDoneButtonInstance = scene->GetButton(NAVIGATION_BUTTON_DONE);
+        mDoneButtonInstance->m_bVisible = false;
+    }
+}
+#endif
+
 void ControllerMapOverlay::Update(float fDeltaT)
 {
+#if !defined(VERSION_R4QK01)
     if (!mImageLoaded)
     {
         mImageLoaded = mAsyncImage.Update(true);
@@ -70,6 +97,7 @@ void ControllerMapOverlay::Update(float fDeltaT)
     }
 
     mMapImage->m_bVisible = true;
+#endif
     BaseSceneHandler::Update(fDeltaT);
 
     if (!mButtonInitialized)
@@ -103,6 +131,7 @@ void ControllerMapOverlay::Update(float fDeltaT)
     }
 }
 
+#if !defined(VERSION_R4QK01)
 void ControllerMapOverlay::SceneCreated()
 {
     SHNavigation* scene = GetNavigationScene();
@@ -113,7 +142,7 @@ void ControllerMapOverlay::SceneCreated()
         mDoneButtonInstance->m_bVisible = false;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
         mMapImage = FEFinder<TLImageInstance, TLAT_IMAGE>::Find<>(mPresentation->m_currentSlide, "Layer", "CONTROLLER_CONFIG_jp");
@@ -150,6 +179,7 @@ void ControllerMapOverlay::SceneCreated()
     }
     mMapImage->m_bVisible = false;
 }
+#endif
 
 
 void ControllerMapOverlay::OnDonePointerEnter(int index, void*)
