@@ -250,11 +250,17 @@ extern "C"
     void DWC_ClearMOSCConnectBlock(void);
     DWCMatchState DWC_GetMatchingState(void);
     qr2_error_t DWCi_QR2Startup(int profileID);
-    void DWCi_ConnectToFriendsAsync(const u8 friendIdxList[],
-        int friendIdxListLen, u8 numEntry, BOOL distantFriend,
-        DWCMatchedSCCallback matchedCallback, void* matchedParam,
-        DWCEvalPlayerCallback evalCallback, void* evalParam);
 #if defined(VERSION_R4QK01)
+    void DWCi_ConnectToFriendsAsync(int topology, const u8 friendIdxList[],
+        int friendIdxListLen, u8 maxEntry,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCEvalPlayerCallback evalCallback, void* evalParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    void DWCi_ConnectToGameServerByGroupID(int topology, u32 groupID,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
     void DWCi_ConnectToAnybodyAsync(int topology, u8 numEntry, const char* addFilter,
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCNewClientCallback newClientCallback, void* newClientParam,
@@ -269,6 +275,10 @@ extern "C"
         DWCNewClientCallback newClientCallback, void* newClientParam,
         DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
 #else
+    void DWCi_ConnectToFriendsAsync(const u8 friendIdxList[],
+        int friendIdxListLen, u8 numEntry, BOOL distantFriend,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCEvalPlayerCallback evalCallback, void* evalParam);
     void DWCi_ConnectToGameServerAsync(int serverPid,
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCNewClientCallback newClientCallback, void* newClientParam);

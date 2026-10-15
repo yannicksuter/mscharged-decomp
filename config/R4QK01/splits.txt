@@ -6217,7 +6217,7 @@ RVL_SDK/dwc/dwc_main.c:
 	.sbss       start:0x80606518 end:0x80606520
 
 RVL_SDK/dwc/dwc_match.c:
-	.text       start:0x80456960 end:0x8046F9B0
+	.text       start:0x80456960 end:0x8046F9B0 align:16
 	.rodata     start:0x804BE570 end:0x804BE588
 	.data       start:0x80526918 end:0x805295C0
 	.bss        start:0x805FC1C8 end:0x805FC900
