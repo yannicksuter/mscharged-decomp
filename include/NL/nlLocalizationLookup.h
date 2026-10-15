@@ -162,6 +162,28 @@ BasicString<unsigned short, Detail::TempStringAllocator> FormatKorean(
         % t6);
 }
 
+template <typename T0, typename T1>
+BasicString<unsigned short, Detail::TempStringAllocator> FormatKorean(
+    const char* key, const T0& t0, const T1& t1)
+{
+    typedef BasicString<unsigned short, Detail::TempStringAllocator> StringType;
+    typedef KoreanFormatImpl<StringType> Formatter;
+    return static_cast<Formatter&>(
+        static_cast<Formatter&>(Formatter(StringType(g_pLocalization->GetString(key)), key) % t0) % t1);
+}
+
+template <typename T0, typename T1, typename T2>
+BasicString<unsigned short, Detail::TempStringAllocator> FormatKorean(
+    const char* key, const T0& t0, const T1& t1, const T2& t2)
+{
+    typedef BasicString<unsigned short, Detail::TempStringAllocator> StringType;
+    typedef KoreanFormatImpl<StringType> Formatter;
+    return static_cast<Formatter&>(
+        static_cast<Formatter&>(
+            static_cast<Formatter&>(Formatter(StringType(g_pLocalization->GetString(key)), key) % t0) % t1)
+        % t2);
+}
+
 #endif
 
 #endif // NL_LOCALIZATION_LOOKUP_H

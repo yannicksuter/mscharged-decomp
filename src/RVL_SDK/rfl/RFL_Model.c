@@ -13,7 +13,9 @@
 #define NUM_VTX_TXC(size) ((size) / VTX_TXC_SIZE)
 #define SIZE_VTX_TXC(count) ((count) * VTX_TXC_SIZE)
 
+#if !defined(VERSION_R4QK01)
 RFLiCoordinateData coordinateData = {1, 2, 0, FALSE, FALSE, FALSE};
+#endif
 
 const RFLDrawCoreSetting cDefaultDrawCoreSetting2Tev = {
     1,          GX_TEXCOORD0, GX_TEXMAP0, 2,    GX_TEV_SWAP0,
@@ -91,6 +93,9 @@ static const GXColor cFavoriteColor[RFLFavoriteColor_Max] = {
 static const GXColor cWhite = {255, 255, 255, 255};
 
 void RFLSetCoordinate(RFLCoordinateType u, RFLCoordinateType f) {
+#if defined(VERSION_R4QK01)
+    RFLiCoordinateData coordinateData = *RFLiGetCoordinateData();
+#endif
     RFLCoordinateType r;
 
     union {
@@ -142,6 +147,9 @@ void RFLSetCoordinate(RFLCoordinateType u, RFLCoordinateType f) {
     coordinateData.uRev = (u & RFLCoordinateType_RevMask) != 0;
     coordinateData.fRev = (f & RFLCoordinateType_RevMask) != 0;
     coordinateData.rRev = (r & RFLCoordinateType_RevMask) != 0;
+#if defined(VERSION_R4QK01)
+    RFLiSetCoordinateData(&coordinateData);
+#endif
 }
 
 u32 RFLiGetExpressionNum(u32 exprFlags) {
@@ -297,7 +305,15 @@ GXColor RFLGetFavoriteColor(RFLFavoriteColor color) {
 }
 
 GXColor RFLiGetFacelineColor(const RFLiCharInfo* info) {
+#if defined(VERSION_R4QK01)
+    int color = 0;
+    if (info->faceline.color < RFLi_MAX_FACELINE_COLOR + 1) {
+        color = info->faceline.color;
+    }
+    return cFacelineColor[color];
+#else
     return cFacelineColor[info->faceline.color];
+#endif
 }
 
 void RFLLoadDrawSetting(const RFLDrawSetting* setting) {
@@ -358,6 +374,10 @@ void RFLLoadVertexSetting(const RFLDrawCoreSetting* setting) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, 14);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 13);
     GXSetNumTexGens(setting->txcGenNum);
+#if defined(VERSION_R4QK01)
+    GXSetTexCoordScaleManually(setting->txcID, FALSE, 1, 1);
+    GXSetTexCoordCylWrap(setting->txcID, FALSE, FALSE);
+#endif
 }
 
 void RFLLoadMaterialSetting(const RFLDrawCoreSetting* setting) {
@@ -529,6 +549,11 @@ void RFLiInitCharModelRes(RFLiCharModelRes* res, const RFLiCharInfo* info) {
     Vec noseTrans;
     Vec beardTrans;
     Vec hairTrans;
+
+#if defined(VERSION_R4QK01)
+    GXSetMisc(GX_MT_XF_FLUSH, FALSE);
+    GXSetMisc(GX_MT_DL_SAVE_CONTEXT, TRUE);
+#endif
 
 
     /**
@@ -847,7 +872,11 @@ void RFLiInitShapeRes(RFLiShapeRes* shape) {
                    shape->part == RFLiPartsShp_Nose;
 
     u32 fileSize = RFLiGetShapeSize(shape->part, shape->file);
+#if defined(VERSION_R4QK01)
+    res = RFLiAlloc(fileSize);
+#else
     res = RFLiAlloc32(fileSize);
+#endif
     RFLiLoadShape(shape->part, shape->file, res);
 
     ptr8 = (u8*)res;
@@ -882,9 +911,9 @@ void RFLiInitShapeRes(RFLiShapeRes* shape) {
     {
         u32 byteSize = SIZE_VTX_POS(shape->numVtxPos);
         s16* ptr16 = (s16*)ptr8;
-        int i;
 
         if (shape->transform) {
+            int i;
             s32 s = 256.0f * shape->posScale;
             s32 tx = 256.0f * shape->posTrans->x;
             s32 ty = 256.0f * shape->posTrans->y;
@@ -908,6 +937,7 @@ void RFLiInitShapeRes(RFLiShapeRes* shape) {
             }
 
         } else if (shape->flipX != 0) {
+            int i;
             for (i = 0; i < shape->numVtxPos; i++) {
                 s16 temp[3];
 
@@ -920,6 +950,7 @@ void RFLiInitShapeRes(RFLiShapeRes* shape) {
                 ptr16 += VTX_COORDS_IN_POS;
             }
         } else {
+            int i;
             for (i = 0; i < shape->numVtxPos; i++) {
                 RFLiTransformCoordinate(
                     &shape->vtxPosBuf[i * VTX_COORDS_IN_POS], ptr16);
@@ -938,8 +969,8 @@ void RFLiInitShapeRes(RFLiShapeRes* shape) {
     ptr8 += sizeof(u16);
 
     {
-        s16* ptr16 = (s16*)ptr8;
         u32 byteSize = SIZE_VTX_NRM(shape->numVtxNrm);
+        s16* ptr16 = (s16*)ptr8;
 
         if (shape->flipX != 0) {
             int i;
@@ -1025,7 +1056,11 @@ void RFLiInitTexRes(GXTexObj* texObj, RFLiPartsShpTex part, u16 file,
     u32 texSize;
     RFLiTexture* tex;
 
+#if defined(VERSION_R4QK01)
+    tex = (RFLiTexture*)RFLiAlloc(RFLiGetShpTexSize(part, file));
+#else
     tex = (RFLiTexture*)RFLiAlloc32(RFLiGetShpTexSize(part, file));
+#endif
     RFLiLoadShpTexture(part, file, tex);
 
     switch (part) {
@@ -1059,9 +1094,16 @@ void RFLiInitTexRes(GXTexObj* texObj, RFLiPartsShpTex part, u16 file,
 }
 
 void RFLiTransformCoordinate(s16* to, const s16* from) {
+#if defined(VERSION_R4QK01)
+    RFLiCoordinateData* coord = RFLiGetCoordinateData();
+    to[coord->rOff] = coord->rRev ? -from[0] : from[0];
+    to[coord->uOff] = coord->uRev ? -from[1] : from[1];
+    to[coord->fOff] = coord->fRev ? -from[2] : from[2];
+#else
     to[coordinateData.rOff] = coordinateData.rRev ? -from[0] : from[0];
     to[coordinateData.uOff] = coordinateData.uRev ? -from[1] : from[1];
     to[coordinateData.fOff] = coordinateData.fRev ? -from[2] : from[2];
+#endif
 }
 
 void RFLDrawShape(const RFLCharModel* model) {
@@ -1155,3 +1197,17 @@ void RFLDrawShape(const RFLCharModel* model) {
     GXSetArray(GX_VA_TEX0, res->faceVtxTxc, 4);
     GXCallDisplayList(res->faceDl, res->faceDlSize);
 }
+
+#if defined(VERSION_R4QK01)
+void RFLSetModelDrawDoneCallback(RFLCallback callback) {
+    RFLiGetManager()->modelDrawCb = callback;
+}
+
+void RFLiSetCoordinateData(const RFLiCoordinateData* data) {
+    RFLiGetManager()->coordinateData = *data;
+}
+
+RFLiCoordinateData* RFLiGetCoordinateData(void) {
+    return &RFLiGetManager()->coordinateData;
+}
+#endif

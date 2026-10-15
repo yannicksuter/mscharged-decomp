@@ -2,7 +2,7 @@
 #include <revolution/wpad.h>
 #include <revolution/wpad/WPADEncrypt.h>
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 #define WPAD_ENCRYPT_REPORT DEBUGPrint
 #else
 #define WPAD_ENCRYPT_REPORT OSReport
@@ -384,7 +384,7 @@ void WPADiCreateKey(s32 chan)
         tblRnd[i] = tb[random()];
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     DEBUGPrint("ans : %d %d %d %d %d %d\n", base[baseIdx], base[baseIdx + 1], base[baseIdx + 2], base[baseIdx + 3], base[baseIdx + 4], base[baseIdx + 5]);
 
     DEBUGPrint("rand: %d %d %d %d %d %d %d %d %d %d\n", tblRnd[0], tblRnd[1], tblRnd[2], tblRnd[3], tblRnd[4], tblRnd[5], tblRnd[6], tblRnd[7], tblRnd[8], tblRnd[9]);
@@ -400,7 +400,7 @@ void WPADiCreateKey(s32 chan)
     key[4] = (u8)((ror((u8)(base[baseIdx + 4] ^ tb[tblRnd[1]]), tb[tblRnd[6]]) - tb[tblRnd[3]]) ^ tb[tblRnd[4]]);
     key[5] = (u8)((ror((u8)(base[baseIdx + 5] ^ tb[tblRnd[7]]), tb[tblRnd[8]]) - tb[tblRnd[5]]) ^ tb[tblRnd[9]]);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     DEBUGPrint("key : %d %d %d %d %d %d \n", key[0], key[1], key[2], key[3], key[4], key[5]);
 #endif
 
@@ -421,7 +421,7 @@ void WPADiCreateKey(s32 chan)
     sb[6] = (u8)(tb[(idx + 1) * 256 + tblRnd[3]] ^ tb[(idx + 2) * 256 + tblRnd[5]]);
     sb[7] = (u8)(tb[(idx + 1) * 256 + tblRnd[2]] ^ tb[(idx + 2) * 256 + tblRnd[6]]);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     DEBUGPrint("ft  : %d %d %d %d %d %d %d %d\n", ft[0], ft[1], ft[2], ft[3], ft[4], ft[5], ft[6], ft[7]);
     DEBUGPrint("sb  : %d %d %d %d %d %d %d %d\n", sb[0], sb[1], sb[2], sb[3], sb[4], sb[5], sb[6], sb[7]);
 #endif

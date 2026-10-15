@@ -22,6 +22,7 @@
 #include "NL/nlFormat.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlLocalizationLookup.h"
+#include "NL/nlMath.h"
 #include "NL/nlstring_tmpl.h"
 
 #include <string.h>
@@ -447,9 +448,14 @@ bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
                 40);
             break;
         case LEADERBOARD_DISPLAY_SCORE:
-            nlSNPrintf(mRowText[row][stat], 40, (const u16*)L"%d",
-                metadata->mScore);
+        {
+            int score = metadata->mScore;
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+            score = nlMin(score, 99999);
+#endif
+            nlSNPrintf(mRowText[row][stat], 40, (const u16*)L"%d", score);
             break;
+        }
         }
 
         if (stat == LEADERBOARD_DISPLAY_RECORD || stat == LEADERBOARD_DISPLAY_TROPHY)

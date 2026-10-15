@@ -17,7 +17,7 @@
 #define DPD_CONFIG2_SIZE 2
 #define SPK_CONFIG_SIZE 7
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 RVL_LIB_VERSION(WPAD, "May 17 2007", "01:52:03", "0x4199_60831");
 #else
 RVL_LIB_VERSION(WPAD, "Jan  9 2007", "01:54:36", "0x4199_60831");
@@ -47,15 +47,15 @@ static u8 _scSetting;
 static u8 _shutdown;
 static s8 _afhChannel;
 static s8 _wpadInfoResult[WPAD_MAX_CONTROLLERS];
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static BOOL _initialized;
 #endif
 static u8 _rumbleCnt[WPAD_MAX_CONTROLLERS];
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static u8 _extCnt[WPAD_MAX_CONTROLLERS];
 #endif
 static u16 _afhCnt;
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
 static u8 _extCnt;
 #endif
 static u8 _checkCnt;
@@ -110,7 +110,7 @@ static BOOL OnShutdown(BOOL final, u32 event) {
         if (status == WUD_LIB_STATUS_3) {
             switch (event) {
             case OS_SD_EVENT_FATAL: {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                 DEBUGPrint("Deregister allocators because of fatal error.\n");
                 WPADRegisterAllocator(&noAlloc, &noFree);
 
@@ -173,7 +173,7 @@ static inline WPADCB* __GetControlBlock(s32 chan) {
 }
 
 static s32 WPADiSendData(s32 chan, WPADCommand command) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     WPADCB* p = _wpdcb[chan];
 #else
     WPADCB* p = __GetControlBlock(chan);
@@ -197,7 +197,7 @@ static s32 WPADiSendData(s32 chan, WPADCommand command) {
             __SendData(chan, command);
         }
     }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     else if (status != WPAD_ERR_COMMUNICATION_ERROR &&
              status == WPAD_ERR_TRANSFER) {
         enabled = OSDisableInterrupts();
@@ -491,7 +491,7 @@ static BOOL IsControllerDataChanged(WPADCB* p, void* pLhs, void* pRhs) {
 #undef CALC_ANALOG_NOISE_DPD
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static void CheckButtonCombination(s32 chan) {
     WPADCB* p = _wpdcb[chan];
 
@@ -633,13 +633,13 @@ static BOOL WPADiProcessExtCommand(s32 chan) {
     WPADCB* p = _wpdcb[chan];
     WPADCommand command;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if (p->used) {
 #else
     if (p->used && p->info.attach) {
 #endif
         if (WPADiGetCommand(&p->extCmdQueue, &command)) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             if (command.reportID == RPTID_SET_DATA_REPORT_MODE ||
                 p->info.attach)
 #endif
@@ -710,7 +710,7 @@ static void WPADiAfh(void) {
     pWifiChannel = OSPhysicalToCached(OS_PHYS_WIFI_AFH_CHANNEL);
     DCInvalidateRange(pWifiChannel, sizeof *pWifiChannel);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     DEBUGPrint("Check the update of WiFi using channel\n");
 #else
     DEBUGPrint("WiFi uses channel = %d\n", *pWifiChannel);
@@ -721,7 +721,7 @@ static void WPADiAfh(void) {
         _afhChannel = *pWifiChannel;
         OSRestoreInterrupts(enabled);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         DEBUGPrint("WiFi uses channel = %d\n", *pWifiChannel);
 #endif
         WUDSetDisableChannel(_afhChannel);
@@ -754,7 +754,7 @@ static void WPADiManageHandler(OSAlarm* pAlarm, OSContext* pContext) {
     BOOL success;
 
     if (status != WPAD_LIB_STATUS_3) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (status == WPAD_LIB_STATUS_2 && !_initialized) {
             _initialized = TRUE;
 
@@ -769,21 +769,21 @@ static void WPADiManageHandler(OSAlarm* pAlarm, OSContext* pContext) {
     for (chan = WPAD_CHAN0; chan < WPAD_MAX_CONTROLLERS; chan++) {
         success = FALSE;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (_extCnt[chan] == 5) {
 #else
         if (_extCnt == 5) {
 #endif
             success |= WPADiProcessExtCommand(chan);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             if (success) {
                 _extCnt[chan] = 0;
             }
 #endif
         }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (!success)
 #endif
         {
@@ -802,7 +802,7 @@ static void WPADiManageHandler(OSAlarm* pAlarm, OSContext* pContext) {
             WPADiRadioSensitivity(chan);
         }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         _extCnt[chan] = _extCnt[chan] == 5 ? _extCnt[chan] : _extCnt[chan] + 1;
 #endif
     }
@@ -811,7 +811,7 @@ static void WPADiManageHandler(OSAlarm* pAlarm, OSContext* pContext) {
 
     _senseCnt = _senseCnt == 10 ? 0 : _senseCnt + 1;
     _checkCnt = _checkCnt == 5 ? 0 : _checkCnt + 1;
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     _extCnt = _extCnt == 5 ? 0 : _extCnt + 1;
 #endif
     _afhCnt = _afhCnt == 60000 ? 0 : _afhCnt + 1;
@@ -886,7 +886,7 @@ static void __ClearControlBlock(s32 chan) {
     p->radioSensitivity = 0;
     p->copyOutCount = 0;
     p->sleeping = TRUE;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     p->getInfoBusy = FALSE;
     p->getInfoCB = NULL;
 #endif
@@ -915,7 +915,7 @@ static void __ClearControlBlock(s32 chan) {
     WPADiClearQueue(&p->stdCmdQueue);
     WPADiClearQueue(&p->extCmdQueue);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     _extCnt[chan] = 0;
 #endif
 
@@ -925,12 +925,12 @@ static void __ClearControlBlock(s32 chan) {
     _wmb[chan].at_0x0c = 0;
     _wmb[chan].callback = NULL;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     _rumbleCnt[chan] = 0;
 #endif
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 void WPADiInitSub(void) {
 #else
 void WPADInit(void) {
@@ -939,7 +939,7 @@ void WPADInit(void) {
     s32 chan;
     int i;
 
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     if (!_regShutdown) {
         OSRegisterShutdownFunction(&ShutdownFunctionInfo);
         _regShutdown = TRUE;
@@ -965,7 +965,7 @@ void WPADInit(void) {
         __ClearControlBlock(chan);
         OSInitThreadQueue(&_wpd[chan].threadQueue);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         _extCnt[chan] = 0;
         _rumbleCnt[chan] = 0;
 #endif
@@ -978,17 +978,17 @@ void WPADInit(void) {
     _sensorBarPos = __GetSensorBarPosition();
     _rumble = __GetMotorMode();
     _speakerVolume = __GetSpeakerVolume();
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     WUDSetHidConnCallback(WPADiConnCallback);
     WUDSetHidRecvCallback(WPADiRecvCallback);
 #endif
     _senseCnt = 0;
     _checkCnt = 0;
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     _extCnt = 0;
 #endif
     _afhCnt = 0;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     _shutdown = FALSE;
     _scFlush = FALSE;
     _scSetting = TRUE;
@@ -1003,7 +1003,7 @@ void WPADInit(void) {
     OSSetPeriodicAlarm(&_managerAlarm, OSGetTime(), OS_MSEC_TO_TICKS(1),
                        WPADiManageHandler0);
 
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     _shutdown = FALSE;
     _scFlush = FALSE;
     _scSetting = TRUE;
@@ -1012,7 +1012,7 @@ void WPADInit(void) {
     OSRegisterVersion(__WPADVersion);
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 void WPADInit(void) {
     if (!_regShutdown) {
         OSRegisterShutdownFunction(&ShutdownFunctionInfo);
@@ -1163,7 +1163,7 @@ static void setupCallback(WPADChannel chan, WPADResult status) {
             p->connectCB(chan, status);
         }
     } else {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         WPADiDisconnect(chan, FALSE);
 #else
         u16 size = p->oldFw ? 20 : 42;
@@ -1175,7 +1175,7 @@ static void setupCallback(WPADChannel chan, WPADResult status) {
     }
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static void abortConnCallback(WPADChannel chan, WPADResult status) {
     WPADCB* p = _wpdcb[chan];
 
@@ -1233,7 +1233,7 @@ static void firmwareCheckCallback(WPADChannel chan, WPADResult status) {
     DEBUGPrint(" ==>this error means that the firmware is for NDEV %s\n",
                p->oldFw != 0 ? "2.0" : "2.1 or later");
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     WPADiSendSetReportType(&p->stdCmdQueue, WPAD_FMT_CORE_BTN,
                            &abortConnCallback);
 
@@ -1441,7 +1441,7 @@ static void WPADiDisconnect(s32 chan, BOOL sleep) {
         return;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if (sleep) {
 #else
     {
@@ -1456,13 +1456,13 @@ static void WPADiDisconnect(s32 chan, BOOL sleep) {
         p->sleeping = TRUE;
 
         OSRestoreInterrupts(enabled);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         WPADControlLed(chan, 0, DisconnectCallback);
 #else
         BTA_HhClose(p->devHandle);
 #endif
     }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     else {
         BD_ADDR addr;
         WPADGetAddress(chan, addr);
@@ -1627,7 +1627,7 @@ WPADResult WPADGetInfo(WPADChannel chan, WPADInfo* pInfo) {
     return __wpadSync(chan);
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static void __infoCallback(WPADChannel chan, WPADResult result) {
     WPADCB* p = _wpdcb[chan];
 
@@ -2122,7 +2122,7 @@ WPADResult WPADControlSpeaker(WPADChannel chan, u32 command, WPADCallback pCallb
 
                 WPADiSendWriteDataCmd(&p->stdCmdQueue, 0x01, WM_REG_SPEAKER_09,
                                       NULL);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                 WPADiSendWriteDataCmd(&p->stdCmdQueue, 0x80, WM_REG_SPEAKER_01,
                                       NULL);
 #else
@@ -2334,7 +2334,7 @@ static void __dpdCb(WPADChannel chan, WPADResult result) {
     WPADCB* p = _wpdcb[chan];
 
     p->currentDpdCommand = p->pendingDpdCommand;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     p->info.dpd = p->pendingDpdCommand == WPAD_DPD_DISABLE ? 0 : 1;
 #endif
 }
@@ -2538,7 +2538,7 @@ static void __SendData(s32 chan, WPADCommand command) {
 
         p->cmdBlkCallback = command.cmdCB;
         p->lastReportId = reportID;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         p->lastReportSendTime = __OSGetSystemTime() + OS_SEC_TO_TICKS(2);
 #else
         p->lastReportSendTime = __OSGetSystemTime() + OS_SEC_TO_TICKS(_sleepTime * 60);

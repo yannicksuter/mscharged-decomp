@@ -67,8 +67,8 @@ static void bootloadDBopencallback_(void) {
     case RFLErrcode_Success:
         switch (RFLiReadAsync(RFLiFileType_Database, mgr->database,
                               sizeof(RFLiDatabase), bootloadDBcallback_, 0)) {
-        case RFLErrcode_Busy:
         case RFLErrcode_Success:
+        case RFLErrcode_Busy:
             break;
         default:
             if (mgr->bootloadCb != NULL) {
@@ -89,8 +89,8 @@ static void bootloadDBopencallback_(void) {
         case NAND_RESULT_CORRUPT:
             RFLiSetFileBroken(RFLiFileBrokenType_Corrupt);
             break;
-        case NAND_RESULT_AUTHENTICATION:
         case NAND_RESULT_ECC_CRIT:
+        case NAND_RESULT_AUTHENTICATION:
             RFLiSetFileBroken(RFLiFileBrokenType_DBBroken);
             if (mgr->bootloadCb != NULL) {
                 mgr->bootloadCb();
@@ -225,6 +225,7 @@ RFLErrcode RFLiSaveDatabaseAsync(RFLiCallback callback) {
 
 RFLiCharData* RFLiGetCharData(u16 index) {
     RFLiDBManager* mgr;
+    RFLiDatabase* database;
     RFLiCharData* data;
     RFLiCharInfo info;
 
@@ -241,7 +242,8 @@ RFLiCharData* RFLiGetCharData(u16 index) {
         return NULL;
     }
 
-    data = &mgr->database->rawData[index];
+    database = mgr->database;
+    data = &database->rawData[index];
 
     if (!RFLiIsValidID(&data->createID)) {
         return NULL;
@@ -251,6 +253,12 @@ RFLiCharData* RFLiGetCharData(u16 index) {
     if (!RFLiCheckValidInfo(&info)) {
         return NULL;
     }
+
+#if defined(VERSION_R4QK01)
+    if (!RFLiIsValidOnNAND(&info)) {
+        return NULL;
+    }
+#endif
 
     return data;
 }
@@ -463,11 +471,18 @@ RFLErrcode RFLiGetCharInfo(RFLiCharInfo* out, u16 index) {
 }
 
 BOOL RFLIsAvailableOfficialData(u16 index) {
+    const RFLiCharData* data;
+
     if (index >= RFL_DB_CHAR_MAX) {
         return FALSE;
     }
 
-    return RFLiGetCharData(index) != NULL;
+    data = RFLiGetCharData(index);
+    if (data == NULL) {
+        return FALSE;
+    } else {
+        return TRUE;
+    }
 }
 
 u16 RFLGetAvailableOfficialDataNum(void) {

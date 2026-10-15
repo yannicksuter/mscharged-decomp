@@ -4,7 +4,9 @@
 
 void RFLiSetupCopyTex(GXTexFmt fmt, u16 width, u16 height, void* buffer,
                       GXColor clearColor) {
-    GXSetFog(GX_FOG_NONE, (GXColor){0, 0, 0, 0}, 1.0f, 1.0f, 0.0f, 0.0f);
+    GXColor fogColor = {0, 0, 0, 0};
+
+    GXSetFog(GX_FOG_NONE, fogColor, 1.0f, 1.0f, 0.0f, 0.0f);
     GXSetColorUpdate(TRUE);
     GXSetAlphaUpdate(TRUE);
     GXSetDstAlpha(FALSE, 0);
@@ -272,23 +274,43 @@ void RFLiMakeTexture(const RFLiCharInfo* info, u8** buffers,
         }
 
         if (*eyeBuf[i] == NULL) {
+#if defined(VERSION_R4QK01)
+            *eyeBuf[i] = RFLiAlloc(eyeSize);
+#else
             *eyeBuf[i] = RFLiAlloc32(eyeSize);
+#endif
         }
 
         if (*mouthBuf[i] == NULL) {
+#if defined(VERSION_R4QK01)
+            *mouthBuf[i] = RFLiAlloc(mouthSize);
+#else
             *mouthBuf[i] = RFLiAlloc32(mouthSize);
+#endif
         }
 
         if (eyebrowNormal == NULL) {
+#if defined(VERSION_R4QK01)
+            eyebrowNormal = RFLiAlloc(eyebrowSize);
+#else
             eyebrowNormal = RFLiAlloc32(eyebrowSize);
+#endif
         }
 
         if (mustacheNormal == NULL) {
+#if defined(VERSION_R4QK01)
+            mustacheNormal = RFLiAlloc(mustacheSize);
+#else
             mustacheNormal = RFLiAlloc32(mustacheSize);
+#endif
         }
 
         if (moleNormal == NULL) {
+#if defined(VERSION_R4QK01)
+            moleNormal = RFLiAlloc(moleSize);
+#else
             moleNormal = RFLiAlloc32(moleSize);
+#endif
         }
 
         if (*eyeTex[i] == NULL) {
@@ -496,6 +518,10 @@ void RFLiSetup2DCameraAndParam(void) {
     GXSetChanCtrl(GX_COLOR0A0, FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL,
                   GX_DF_NONE, GX_AF_NONE);
     GXSetNumTexGens(1);
+#if defined(VERSION_R4QK01)
+    GXSetTexCoordScaleManually(GX_TEXCOORD0, FALSE, 1, 1);
+    GXSetTexCoordCylWrap(GX_TEXCOORD0, FALSE, FALSE);
+#endif
     GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
     GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE,
                           GX_CH_ALPHA);
@@ -795,7 +821,15 @@ void RFLiCapture(u8* buffer, const RFLiCharInfo* info, RFLiFaceParts* face,
     RFLiDrawFaceParts(&face->mole);
 
     GXSetColorUpdate(TRUE);
+#if defined(VERSION_R4QK01)
+    if (RFLiGetManager()->modelDrawCb == NULL) {
+        GXDrawDone();
+    } else {
+        RFLiGetManager()->modelDrawCb();
+    }
+#else
     GXDrawDone();
+#endif
     DCInvalidateRange(buffer, RFLiGetMaskSize(resolution));
     GXCopyTex(buffer, 1);
     GXPixModeSync();

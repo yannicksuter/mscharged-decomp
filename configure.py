@@ -225,10 +225,6 @@ config.custom_build_steps = {
     ],
 }
 
-# Korea uses a different disc-message implementation and has no image table.
-if config.version == "R4QK01":
-    config.custom_build_steps = {}
-
 # Optional numeric ID for decomp.me preset
 # Can be overridden in libraries or objects
 config.scratch_preset_id = None
@@ -771,14 +767,14 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feScene.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feSceneManager.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feSceneResource.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/feScrollBar.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/feScrollText.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feScrollBar.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feScrollText.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feSlideMenu.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feText.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feTextureResource.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feTimer.cpp", extra_cflags=["-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/GameSceneManager.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/LidOpenMessage.cpp", cflags=cflags_game, source=False if config.version == "R4QK01" else "Game/FE/LidOpenMessage.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/GameSceneManager.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/LidOpenMessage.cpp", cflags=cflags_game, extra_cflags=["-ipa file"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/MatchSummary.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/OnlineRanking.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlComponent.cpp", extra_cflags=["-ipa file"]),
@@ -786,7 +782,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlInstance.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlSlide.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlTextInstance.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/tlTextInstance_runtime.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlTextInstance_runtime.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/tlDefault.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/Overlay/OverlayHandlerChallengePreview.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/Overlay/OverlayHandlerControllerMap.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
@@ -950,7 +946,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHCupFinalRounds.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHCupHub.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHCupKnockout.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHCupNews.cpp", cflags=cflags_game_deferred),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHCupNews.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHGameplayOptions.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHGameResults.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHHallOfFame.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
@@ -978,7 +974,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMiiSelect.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMiiSelectOverlay.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlinePlayerCount.cpp", extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineRanking.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineRanking.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOptions.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOptionsCheatsList.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHPause.cpp", extra_cflags=["-ipa file"]),
@@ -1060,7 +1056,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlEvent.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFile.cpp", extra_cflags=["-i src/zlib"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/nlFileGC.cpp", extra_cflags=["-inline nobottomup", "-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFunctionMemory.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlInit.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlIntersection.cpp"),
@@ -1077,8 +1073,8 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlString.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlStringSupport.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTask.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "NL/nlTextBox.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "NL/nlTextEscape.cpp", cflags=[*cflags_game_deferred, "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTextBox.cpp"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTextEscape.cpp", cflags=[*cflags_game_deferred, "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTicker.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTime.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlTimer.cpp"),
@@ -1572,7 +1568,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXPixel.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXTev.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXTexture.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXTransform.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXTransform.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
 
             # RVL_SDK/hbm
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/HBMAnmController.cpp", cflags=cflags_rvl_hbm),
@@ -1676,7 +1672,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ipc/memory.c"),
 
             # RVL_SDK/kpad
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/kpad/KPAD.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/kpad/KPAD.c"),
 
             # RVL_SDK/mem
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mem/mem_allocator.c"),
@@ -1804,43 +1800,42 @@ config.libs = [
 
             # RVL_SDK/wpad
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wpad/debug_msg.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/WPADEncrypt.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wpad/WPADHIDParser.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADEncrypt.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADHIDParser.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADMem.c"),
 
             # RVL_SDK/wud
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wud/debug_msg.c", cflags=cflags_rvl_wud),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wud/WUDHidHost.c", cflags=cflags_rvl_wud),
         ],
     },
     {
-        # RVLFaceLib ships as its own package and registers no banner. Its one
-        # compiler signature is data: RFLiInitShapeRes keeps a static const
-        # header table that only debug assertions read, GC/3.0a5 drops the
-        # unreferenced table as retail does, and GC/3.0a5.2 emits it into
-        # .rodata, moving every later section of the DOL by 0x20.
+        # Earlier RVLFaceLib builds register no banner. GC/3.0a5 drops the
+        # assertion-only header table in RFLiInitShapeRes, matching those builds.
+        # Korea retains the table and uses the Wii/1.0 model code generation.
         "lib": "RVLFaceLib",
         "mw_version": "GC/3.0a5",
         "cflags": cflags_rvl_sdk,
         "progress_category": "sdk",
         "objects": [
             # RVL_SDK/rfl
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_Controller.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_Database.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_DataUtility.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/rfl/RFL_DefaultDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_Format.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_HiddenDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/rfl/RFL_Icon.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_MakeRandomFace.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_MakeTex.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_Controller.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_Database.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_DataUtility.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_DefaultDatabase.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            # Wii/1.0 reproduces the Korean database initializer's scheduling.
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_Format.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_HiddenDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_Icon.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/rfl/RFL_MakeRandomFace.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_MakeTex.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/rfl/RFL_MiddleDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_Model.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_NANDAccess.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/rfl/RFL_NANDLoader.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "RVL_SDK/rfl/RFL_System.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_Model.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_NANDAccess.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_NANDLoader.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/rfl/RFL_System.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-Cpp_exceptions on"]),
         ],
     },
     {

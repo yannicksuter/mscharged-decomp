@@ -103,7 +103,7 @@ void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont
 #endif
             CurrentRowWidth = 0;
         }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         else
 #endif
         {
@@ -138,7 +138,13 @@ void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont
 
     if (DrawOptions & 0x30)
     {
+#if defined(VERSION_R4QK01)
+        // Include the extra spacing between rows, but not after the final row.
+        int TotalHeight = (int)((int)DrawInfo.RowCount * (int)pFont->m_Metrics.Height
+                               + (DrawInfo.RowCount - 1) * pFont->m_Metrics.LineHeight);
+#else
         int TotalHeight = (int)DrawInfo.RowCount * (int)pFont->m_Metrics.Height;
+#endif
         if ((float)TotalHeight > BoxSize.y)
         {
             DrawInfo.YOffset = 0;
@@ -224,6 +230,10 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
 
         pIter++;
         row++;
+#if defined(VERSION_R4QK01)
+        CurrentPos.y += yDir * (pFont->m_Metrics.Height + pFont->m_Metrics.LineHeight);
+#else
         CurrentPos.y += (float)(yDir * pFont->m_Metrics.Height);
+#endif
     }
 }

@@ -195,7 +195,11 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             pCurrentLine = nlStrChr(pToken, ' ');
             pCurrentLine++;
             pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
+#if defined(VERSION_R4QK01)
+            m_Metrics.LineHeight = (float)atoi(pCurrentLine);
+#else
             m_Metrics.LineHeight = (float)atoi(pCurrentLine) / 100.0f;
+#endif
             break;
         }
 
@@ -786,7 +790,11 @@ unsigned long nlFont::GetStringWidth(const FontCharString& Text, bool SingleLine
 unsigned long nlFont::GetStringHeight(const FontCharString& Text, unsigned long Width, bool WordWrap) const
 {
     unsigned long LineCount = GetStringLineCount(Text, Width, WordWrap);
+#if defined(VERSION_R4QK01)
+    return (unsigned long)(LineCount * m_Metrics.Height + (LineCount - 1) * m_Metrics.LineHeight);
+#else
     return (unsigned long)(m_Metrics.Spacing * (m_Metrics.Height * LineCount));
+#endif
 }
 
 unsigned long nlFont::GetStringLineCount(const FontCharString& Text, unsigned long Width, bool WordWrap) const

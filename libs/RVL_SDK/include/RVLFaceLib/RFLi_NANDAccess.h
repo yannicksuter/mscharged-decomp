@@ -21,9 +21,9 @@ typedef struct RFLiAccessInfo {
     union {
         struct {
             char path[FS_MAX_PATH + 1]; // at 0x4
-            u8 openMode;                // at 0x46
-            u8 perm;                    // at 0x47
-            u8 attr;                    // at 0x48
+            u8 openMode;                // at 0x45
+            u8 perm;                    // at 0x46
+            u8 attr;                    // at 0x47
         } openInfo;
 
         struct {
@@ -48,7 +48,7 @@ typedef struct RFLiAccessInfo {
     };
     NANDFileInfo file;            // at 0x48
     NANDCommandBlock block;       // at 0xD4
-    RFLiCallbackTag tag;          // at 0x190
+    RFLiCallbackTag tag;          // at 0x18C (0x190 in R4QK01)
     OSAlarm alarm;                // at 0x198
     RFLiFileType alarmData;       // at 0x1C8
     RFLiExCallback retryCallback; // at 0x1CC

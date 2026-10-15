@@ -29,7 +29,7 @@ void WUDStoredLinkKeyCallback(void* p1);
 void WUDPowerManagerCallback(BD_ADDR addr, tBTM_PM_STATUS status, UINT16 value,
                              UINT8 hciStatus);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static void InitCore(void);
 #endif
 
@@ -1045,7 +1045,7 @@ static void EnableStackHandler0(OSAlarm* pAlarm, OSContext* pContext) {
 }
 
 static WUDInitState WUDiWaitSCSetup(void) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     s32 diff = 0;
     WUDInitState nextState = WUD_STATE_INIT_WAIT_FOR_INITIALIZATION;
     s64 time = __OSGetSystemTime();
@@ -1181,7 +1181,7 @@ static void ShutdownHandler0(OSAlarm* pAlarm, OSContext* pContext) {
                     __WUDHandlerStack + sizeof(__WUDHandlerStack));
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static void InitCore(void) {
     WUDCB* p = &_wcb;
     int i;
@@ -1244,7 +1244,7 @@ static void InitCore(void) {
 
 BOOL WUDInit(void) {
     WUDCB* p = &_wcb;
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     int i;
     BOOL enabled;
 #endif
@@ -1253,7 +1253,7 @@ BOOL WUDInit(void) {
         return FALSE;
     }
 
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < WUD_MAX_DEV_ENTRY; i++) {
@@ -1328,7 +1328,7 @@ BOOL WUDInit(void) {
 
     DEBUGPrint("BTA_Init() is done\n");
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     p->syncStdCB = NULL;
     p->syncSmpCB = NULL;
     p->clearDevCB = NULL;
@@ -1755,7 +1755,7 @@ void reset_again(void) {
 
 static u8 patch_binary[] = {
     0x70, 0x99, 0x08, 0x00, // address (little-endian)
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     0xB4, 0x00, 0x00, 0x00, // size (little-endian)
 #else
     0x38, 0x00, 0x00, 0x00, // size (little-endian)
@@ -1776,7 +1776,7 @@ static u8 patch_binary[] = {
     0x01, 0x49, 0x0B, 0x60,
     0x90, 0xF7, 0x96, 0xFB,
     0xD8, 0x1D, 0x08, 0x00,
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     0x00, 0xF0, 0x04, 0xF8,
     0x00, 0x23, 0x79, 0xF7,
     0xE3, 0xFA, 0x00, 0x00,
@@ -1814,7 +1814,7 @@ static u8 patch_binary[] = {
 
 
 static WUDPatchList patch_install = {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     7,
 #else
     6,
@@ -1826,7 +1826,7 @@ static WUDPatchList patch_install = {
         {0x23, 0xCC, 0x9F, 0x01, 0x00, 0x6F, 0xF0, 0xE4, 0xFC, 0x03, 0x28, 0x7D, 0xD1},
         {0x24, 0x3C, 0x62, 0x01, 0x00, 0x28, 0x20, 0x00, 0xE0, 0x60, 0x8D, 0x23, 0x68},
         {0x25, 0x04, 0x12, 0x01, 0x00, 0x20, 0x1C, 0x20, 0x1C, 0x24, 0xE0, 0xB0, 0x21},
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         {0x26, 0x74, 0x2F, 0x00, 0x00, 0x86, 0xF0, 0x18, 0xFD, 0x21, 0x4F, 0x3B, 0x60}
 #endif
     }
@@ -1844,7 +1844,7 @@ static u32 size = 0;
 
 static void remove_patch_cb(tBTM_VSC_CMPL* p1) {
     if (p1 == NULL) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         reset_again();
 #else
         WUDiInitSub();
@@ -1871,7 +1871,7 @@ static void write_patch_cb(tBTM_VSC_CMPL* p1) {
             WUDiWritePatch();
         }
     } else {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         reset_again();
 #else
         WUDiInitSub();
@@ -1903,7 +1903,7 @@ static void WUDiWritePatch(void) {
 static void install_patch_cb(tBTM_VSC_CMPL* p1) {
     if (p1 != NULL) {
         if (patch_num == install_num) {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             reset_again();
 #else
             WUDiInitSub();
@@ -1912,7 +1912,7 @@ static void install_patch_cb(tBTM_VSC_CMPL* p1) {
             WUDiInstallPatch();
         }
     } else {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         reset_again();
 #else
         WUDiInitSub();
@@ -2002,7 +2002,7 @@ void WUDiInitSub(void) {
     BTM_WritePageTimeout(32768);
     BTM_SetDefaultLinkPolicy(HCI_ENABLE_MASTER_SLAVE_SWITCH |
                              HCI_ENABLE_SNIFF_MODE);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     BTM_SetDefaultLinkSuperTout(1600);
 #else
     BTM_SetDefaultLinkSuperTout(3200);
@@ -2886,7 +2886,7 @@ void WUDVendorSpecificCallback(UINT8 len, UINT8* pData) {
         DEBUGPrint("VSE:- WATCH_DOG_RESET  HW error = %d\n", pData[1]);
 
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         OSPanic(__FILE__, 3877, "MODULE FATAL ERROR\n");
 #else
         OSPanic(__FILE__, 3792, "MODULE FATAL ERROR\n");
@@ -3022,7 +3022,7 @@ void WUDStoredLinkKeyCallback(void* p1) {
 
     default: {
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         OSPanic(__FILE__, 4029, "Unknown event\n");
 #else
         OSPanic(__FILE__, 3944, "Unknown event\n");

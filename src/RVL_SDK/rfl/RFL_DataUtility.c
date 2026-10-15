@@ -139,7 +139,35 @@ BOOL RFLiCheckValidInfo(const RFLiCharInfo* info) {
         return FALSE;
     }
 
+#if defined(VERSION_R4QK01)
+    if (info->mole.y > RFLi_MAX_MOLE_Y) {
+        return FALSE;
+    }
+    if (!RFLiIsValidName2(info)) {
+        return FALSE;
+    }
+    if (info->body.height > RFLi_MAX_BODY_HEIGHT) {
+        return FALSE;
+    }
+    if (info->body.build > RFLi_MAX_BODY_BUILD) {
+        return FALSE;
+    }
+    if (info->personal.sex > RFLSex_Female) {
+        return FALSE;
+    }
+    if (!RFLiCheckBirthday(info->personal.bmonth, info->personal.bday)) {
+        return FALSE;
+    }
+    if (info->personal.color >= RFLFavoriteColor_Max) {
+        return FALSE;
+    }
+    if (RFLiIsSpecialID(&info->createID) && !info->personal.localOnly) {
+        return FALSE;
+    }
+    return TRUE;
+#else
     return info->mole.y <= RFLi_MAX_MOLE_Y;
+#endif
 }
 
 BOOL RFLiIsValidOnNAND(const RFLiCharInfo* info) {
@@ -196,6 +224,50 @@ BOOL RFLiIsSameFaceCore(const RFLiCharInfo* lhs, const RFLiCharInfo* rhs) {
 
     return TRUE;
 }
+
+#if defined(VERSION_R4QK01)
+static void copyChar2Additional_(RFLAdditionalInfo* dst,
+                                 const RFLiCharInfo* src) {
+    u8 height;
+    u8 build;
+
+    memcpy(dst->name, src->personal.name, sizeof(wchar_t) * RFL_NAME_LEN);
+    dst->name[RFL_NAME_LEN] = '\0';
+
+    memcpy(dst->creator, src->personal.creator,
+           sizeof(wchar_t) * RFL_CREATOR_LEN);
+    dst->creator[RFL_CREATOR_LEN] = '\0';
+
+    dst->sex = src->personal.sex;
+    if (RFLiCheckBirthday(src->personal.bmonth, src->personal.bday)) {
+        dst->bmonth = src->personal.bmonth;
+        dst->bday = src->personal.bday;
+    } else {
+        dst->bmonth = 0;
+        dst->bday = 0;
+    }
+    dst->color = src->personal.color;
+    dst->favorite = src->personal.favorite;
+
+    height = src->body.height;
+    build = src->body.build;
+
+    // @bug Max height is 128, not 127
+    if (height > RFLi_MAX_BODY_HEIGHT - 1) {
+        height = RFLi_MAX_BODY_HEIGHT - 1;
+    }
+    // @bug Max build is 128, not 127
+    if (build > RFLi_MAX_BODY_BUILD - 1) {
+        build = RFLi_MAX_BODY_BUILD - 1;
+    }
+
+    dst->height = height;
+    dst->build = build;
+    memcpy(&dst->createID, &src->createID, sizeof(RFLCreateID));
+    dst->reserved = 0;
+    dst->skinColor = RFLiGetFacelineColor(src);
+}
+#endif
 
 RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source,
                               RFLMiddleDB* db, u16 index) {
@@ -255,6 +327,7 @@ RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source,
     return err;
 }
 
+#if !defined(VERSION_R4QK01)
 static void copyChar2Additional_(RFLAdditionalInfo* dst,
                                  const RFLiCharInfo* src) {
     u8 height;
@@ -292,9 +365,15 @@ static void copyChar2Additional_(RFLAdditionalInfo* dst,
     dst->reserved = 0;
     dst->skinColor = RFLiGetFacelineColor(src);
 }
+#endif
 
+#if defined(VERSION_R4QK01)
+static RFLErrcode getAdditionalInfo_(RFLAdditionalInfo* addi, RFLDataSource source,
+                                    RFLMiddleDB* db, u16 index, BOOL filterNames) {
+#else
 RFLErrcode RFLGetAdditionalInfo(RFLAdditionalInfo* addi, RFLDataSource source,
                                 RFLMiddleDB* db, u16 index) {
+#endif
     RFLiCharInfo info;
     RFLErrcode err;
 
@@ -303,8 +382,31 @@ RFLErrcode RFLGetAdditionalInfo(RFLAdditionalInfo* addi, RFLDataSource source,
         copyChar2Additional_(addi, &info);
     }
 
+#if defined(VERSION_R4QK01)
+    if (filterNames) {
+        int i;
+        for (i = 0; i < RFL_NAME_LEN; i++) {
+            if ((addi->name[i] != L'\0' && addi->name[i] < L' ') ||
+                addi->name[i] == 0x7F) {
+                addi->name[i] = L'?';
+            }
+            if ((addi->creator[i] != L'\0' && addi->creator[i] < L' ') ||
+                addi->creator[i] == 0x7F) {
+                addi->creator[i] = L'?';
+            }
+        }
+    }
+#endif
+
     return err;
 }
+
+#if defined(VERSION_R4QK01)
+RFLErrcode RFLGetAdditionalInfo(RFLAdditionalInfo* addi, RFLDataSource source,
+                                RFLMiddleDB* db, u16 index) {
+    return getAdditionalInfo_(addi, source, db, index, TRUE);
+}
+#endif
 
 BOOL RFLiCheckBirthday(u8 month, u8 day) {
     // (One-indexed)

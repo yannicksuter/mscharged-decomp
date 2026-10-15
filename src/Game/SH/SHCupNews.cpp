@@ -12,6 +12,10 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlPrint.h"
+#if defined(VERSION_R4QK01)
+#include "Game/DB/CharacterInfo.inl"
+#include "NL/nlLocalizationLookup.h"
+#endif
 
 static const int sCupRankRanges[4][3][2] = {
     { { 0, 0 }, { 1, 2 }, { 3, 3 } },
@@ -20,66 +24,23 @@ static const int sCupRankRanges[4][3][2] = {
     { { 0, 0 }, { 0, 0 }, { 0, 0 } },
 };
 
-int GetCupState(CupManager* cupManager)
+int GetCupState(CupManager* cupManager);
+
+CupNewsScene::CupNewsScene()
+    : mShowAwardsOnClose(false)
+    , mShowWinnerRewardsOnClose(false)
 {
-    return cupManager->mState;
 }
 
-void CupNewsScene::OnDoneTransitionComplete()
+CupNewsScene::~CupNewsScene()
 {
-    SHStrikerTimesBase::OnDoneTransitionComplete();
-
-    for (int i = 0; i < 4; ++i)
-    {
-        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-    }
-
-    if (mDisplayMode == NEWS_NEXT_CUP)
-    {
-        GameSceneManager::Instance()->Pop();
-        FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
-        FrontEndPresentation::GetInstance()->Call("TransitionToStrikerCupHub");
-    }
-    else if (mDisplayMode == NEWS_CUP_START)
-    {
-        GameSceneManager::Instance()->Pop();
-        FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
-        FrontEndPresentation::GetInstance()->Call("TransitionToInitialStrikerCupHub");
-    }
-    else if (mDisplayMode == NEWS_BRICK_WALL)
-    {
-        GameSceneManager::Instance()->Pop();
-        AdvanceCupAwardPresentation();
-    }
-    else if (mDisplayMode == NEWS_GOLDEN_BOOT)
-    {
-        GameSceneManager::Instance()->Pop();
-        FinishCupAwardPresentation();
-    }
-    else if (mShowAwardsOnClose)
-    {
-        GameSceneManager::Instance()->Pop();
-        BeginCupAwardPresentation();
-        mShowAwardsOnClose = false;
-    }
-    else if (mShowWinnerRewardsOnClose)
-    {
-        GameSceneManager::Instance()->Pop();
-        ShowCupTrophyRewardsPopup();
-        mShowWinnerRewardsOnClose = false;
-    }
-    else
-    {
-        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, true);
-    }
 }
 
-void CupNewsScene::Update(float dt)
+void CupNewsScene::SetDisplayMode(unsigned int transition)
 {
-    SHStrikerTimesBase::Update(dt);
+    SHStrikerTimesBase::SetDisplayMode(transition);
 }
 
-#pragma dont_inline on
 void CupNewsScene::SceneCreated()
 {
     typedef BasicString<unsigned short, Detail::TempStringAllocator> String;
@@ -156,7 +117,11 @@ void CupNewsScene::SceneCreated()
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_QUALIFY_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_QUALIFY_%s_%d", cupName, character.GetName(), 0);
+#if defined(VERSION_R4QK01)
+            cupManager->mShowCupPhasePopup = true;
+#else
             cupManager->SetShowCupPhasePopup(true);
+#endif
             mood = NEWS_MOOD_POSITIVE;
         }
         break;
@@ -171,7 +136,11 @@ void CupNewsScene::SceneCreated()
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_NOT_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
             nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_NOT_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
+#if defined(VERSION_R4QK01)
+            cupManager->mShowCupPhasePopup = true;
+#else
             cupManager->SetShowCupPhasePopup(true);
+#endif
             formatOpponent = true;
             mood = NEWS_MOOD_POSITIVE;
         }
@@ -197,12 +166,24 @@ void CupNewsScene::SceneCreated()
     {
         int statistic = 0;
         CupManager::Instance()->GetGoalsForLeader(&statistic);
+#if !defined(VERSION_R4QK01)
         String name(g_pLocalization->GetString(character.GetDisplayNameKey()));
+#endif
         nlSNPrintf(mStoryStringID, 0x40, "ST_CUP_AWARDS_GOLDENBOOT_%s", cupName);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_CUP_AWARDS_GOLDENBOOT_%s", cupName);
+#if defined(VERSION_R4QK01)
+        mHeadlineText = FormatKorean(mHeadlineStringID,
+            g_pLocalization->GetString(character.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(character.GetDisplayNameKey())));
+        mStoryText = FormatKorean(mStoryStringID,
+            g_pLocalization->GetString(character.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(character.GetDisplayNameKey())),
+            GetKoreanParticle(g_pLocalization->GetString(character.GetDisplayNameKey())));
+#else
         const unsigned short* story = g_pLocalization->GetString(mStoryStringID);
         mHeadlineText = Format(String(g_pLocalization->GetString(mHeadlineStringID)), name);
         mStoryText = Format(String(story), name);
+#endif
         mUseCustomText = true;
         mood = NEWS_MOOD_POSITIVE;
         break;
@@ -211,12 +192,23 @@ void CupNewsScene::SceneCreated()
     {
         int statistic = 0;
         CupManager::Instance()->GetGoalsAgainstLeader(&statistic);
+#if !defined(VERSION_R4QK01)
         String name(g_pLocalization->GetString(character.GetDisplayNameKey()));
+#endif
         nlSNPrintf(mStoryStringID, 0x40, "ST_CUP_AWARDS_BRICK_%s", cupName);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_CUP_AWARDS_BRICK_%s", cupName);
+#if defined(VERSION_R4QK01)
+        mHeadlineText = FormatKorean(mHeadlineStringID,
+            g_pLocalization->GetString(character.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(character.GetDisplayNameKey())));
+        mStoryText = FormatKorean(mStoryStringID,
+            g_pLocalization->GetString(character.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(character.GetDisplayNameKey())));
+#else
         const unsigned short* story = g_pLocalization->GetString(mStoryStringID);
         mHeadlineText = Format(String(g_pLocalization->GetString(mHeadlineStringID)), name);
         mStoryText = Format(String(story), name);
+#endif
         mUseCustomText = true;
         mood = NEWS_MOOD_POSITIVE;
         break;
@@ -226,11 +218,21 @@ void CupNewsScene::SceneCreated()
     if (formatOpponent == true && !mUseCustomText)
     {
         const CharacterInfo& opponent = GetCharacterInfo(GetCharacterIndexFromCaptain(opponentCaptain));
+#if defined(VERSION_R4QK01)
+        mHeadlineText = FormatKorean(mHeadlineStringID,
+            g_pLocalization->GetString(opponent.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(opponent.GetDisplayNameKey())));
+        mStoryText = FormatKorean(mStoryStringID,
+            g_pLocalization->GetString(opponent.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(opponent.GetDisplayNameKey())),
+            GetKoreanParticle(g_pLocalization->GetString(opponent.GetDisplayNameKey())));
+#else
         String headline(g_pLocalization->GetString(mHeadlineStringID));
         String story(g_pLocalization->GetString(mStoryStringID));
         String name(g_pLocalization->GetString(opponent.GetDisplayNameKey()));
         mHeadlineText = Format(headline, name);
         mStoryText = Format(story, name);
+#endif
         mUseCustomText = true;
     }
 
@@ -257,19 +259,62 @@ void CupNewsScene::SceneCreated()
         break;
     }
 }
-#pragma dont_inline reset
 
-void CupNewsScene::SetDisplayMode(unsigned int transition)
+void CupNewsScene::Update(float dt)
 {
-    SHStrikerTimesBase::SetDisplayMode(transition);
+    SHStrikerTimesBase::Update(dt);
 }
 
-CupNewsScene::~CupNewsScene()
+void CupNewsScene::OnDoneTransitionComplete()
 {
+    SHStrikerTimesBase::OnDoneTransitionComplete();
+
+    for (int i = 0; i < 4; ++i)
+    {
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+    }
+
+    if (mDisplayMode == NEWS_NEXT_CUP)
+    {
+        GameSceneManager::Instance()->Pop();
+        FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
+        FrontEndPresentation::GetInstance()->Call("TransitionToStrikerCupHub");
+    }
+    else if (mDisplayMode == NEWS_CUP_START)
+    {
+        GameSceneManager::Instance()->Pop();
+        FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
+        FrontEndPresentation::GetInstance()->Call("TransitionToInitialStrikerCupHub");
+    }
+    else if (mDisplayMode == NEWS_BRICK_WALL)
+    {
+        GameSceneManager::Instance()->Pop();
+        AdvanceCupAwardPresentation();
+    }
+    else if (mDisplayMode == NEWS_GOLDEN_BOOT)
+    {
+        GameSceneManager::Instance()->Pop();
+        FinishCupAwardPresentation();
+    }
+    else if (mShowAwardsOnClose)
+    {
+        GameSceneManager::Instance()->Pop();
+        BeginCupAwardPresentation();
+        mShowAwardsOnClose = false;
+    }
+    else if (mShowWinnerRewardsOnClose)
+    {
+        GameSceneManager::Instance()->Pop();
+        ShowCupTrophyRewardsPopup();
+        mShowWinnerRewardsOnClose = false;
+    }
+    else
+    {
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, true);
+    }
 }
 
-CupNewsScene::CupNewsScene()
-    : mShowAwardsOnClose(false)
-    , mShowWinnerRewardsOnClose(false)
+int GetCupState(CupManager* cupManager)
 {
+    return cupManager->mState;
 }

@@ -56,7 +56,7 @@ s32 RFLiSearchHiddenData(const RFLCreateID* id);
 u16 RFLiCountupHiddenDataNum(RFLSex sex);
 s16 RFLiGetHiddenNext(u16 index);
 s16 RFLiGetHiddenPrev(u16 index);
-BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex) DECOMP_DONT_INLINE;
+BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex);
 void RFLiClearCacheHDB(RFLiHiddenCharData* hdb);
 BOOL RFLiIsCachedHDB(void);
 
