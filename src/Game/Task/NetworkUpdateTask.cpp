@@ -50,7 +50,14 @@ void NetworkUpdateTask::Initialize()
     }
 
     NetworkStatsManager::CreateInstance();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+#if defined(VERSION_R4QK01)
+    if (GetRegion() == GAME_REGION_KOREA)
+    {
+        g_nAddHoursTime = 9;
+    }
+    else
+#endif
     if (GetRegion() == GAME_REGION_JAPAN)
     {
         g_nAddHoursTime = 9;
