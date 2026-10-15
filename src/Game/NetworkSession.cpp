@@ -59,7 +59,7 @@ DWCFriendsMatchControl gDWCFriendsMatchControl;
 void* gNetworkMemoryPool;
 int gNetworkBuildNumberOverride;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 float gNetworkLoginTimeout = 180.0f;
 #else
 float gNetworkLoginTimeout = 90.0f;
@@ -67,6 +67,9 @@ float gNetworkLoginTimeout = 90.0f;
 u32 gNetworkGameCodeR4QP = 0x52345150;
 u32 gNetworkGameCodeR4QJ = 0x5234514A;
 u32 gNetworkGameCodeR4QE = 0x52345145;
+#if defined(VERSION_R4QK01)
+u32 gNetworkGameCodeR4QK = 0x5234514B;
+#endif
 
 static TweakBoolBinding s_NoPopupNetworkErrorTweak(
     "g_bNoPopupNetworkError", "Network", &g_bNoPopupNetworkError, true);
@@ -112,7 +115,7 @@ void NetworkSession::Initialize(bool first)
         mCupMode = 0;
 
         PushAllocator(&VirtualAllocator);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         if (GetRegion() == GAME_REGION_US)
         {
             u32 poolSize = 0xB0000 - 0x2A90;
@@ -139,6 +142,9 @@ void NetworkSession::Initialize(bool first)
 
         mDWCInitialized = 0;
         mLoginRequestStarted = 0;
+#if defined(VERSION_R4QK01)
+        mLoginThreadRunning = false;
+#endif
         mDWCErrorCode = 0;
         mDWCErrorType = DWC_ERROR_NONE;
         mDWCLastError = 0;
@@ -720,6 +726,12 @@ void NetworkSession::InitializeOnline()
     {
         gameCode = gNetworkGameCodeR4QE;
     }
+#if defined(VERSION_R4QK01)
+    else if (GetRegion() == GAME_REGION_KOREA)
+    {
+        gameCode = gNetworkGameCodeR4QK;
+    }
+#endif
 
     DWC_Init(DWC_SVR_RELEASE, "mschargedwii", gameCode, NetworkAlloc, NetworkFree);
     DWC_SetReportLevel(0);
@@ -778,6 +790,9 @@ static void* StaticSetInternetThreadFunc(void*)
 
 void NetworkSession::StartLoginThread()
 {
+#if defined(VERSION_R4QK01)
+    mLoginThreadRunning = true;
+#endif
     tDebugPrintManager::Print(DC_NETWORK, "Created StaticSetInternetThreadFunc returned %d\n",
         OSCreateThread(
             (OSThread*)mLoginThread, StaticSetInternetThreadFunc, 0,
@@ -951,7 +966,7 @@ bool NetworkSession::RequestLoginRankings()
     return false;
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 void NetworkSession::RequestLoginNearbySeasonRankingsAgain()
 {
     mLoginStage = NET_LOGIN_REFRESH_SEASON_STATS;
@@ -980,7 +995,7 @@ void NetworkSession::RequestLoginNearbyDailyRankings()
     }
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 void NetworkSession::RequestLoginNearbyDailyRankingsAgain()
 {
     mLoginStage = NET_LOGIN_REFRESH_DAILY_STATS;
@@ -1043,7 +1058,7 @@ static inline void CompleteLogin(NetworkSession* session)
     session->mLoginListener->OnStatsResult(true);
     NetworkStatsManager::Instance()->RefreshFriendCount();
     gNetworkMiiChanged = 0;
-#if !defined(VERSION_R4QE01)
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
     if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
     {
         NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_FRIENDS);
@@ -1227,7 +1242,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             RequestLoginNearbySeasonRankingsAgain();
 #else
             RequestLoginNearbyDailyRankings();
@@ -1245,7 +1260,7 @@ void NetworkSession::UpdateLogin()
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     case NET_LOGIN_REFRESH_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
@@ -1289,7 +1304,7 @@ void NetworkSession::UpdateLogin()
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(1, 1);
                     mLoginStage = NET_LOGIN_PUT_DAILY_STATS;
                 }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
                 else if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
                 {
                     RequestLoginFriendsSeasonRankings();
@@ -1330,7 +1345,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             RequestLoginNearbyDailyRankingsAgain();
 #else
             NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_DAILY_NEARBY);
@@ -1348,7 +1363,7 @@ void NetworkSession::UpdateLogin()
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     case NET_LOGIN_REFRESH_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
@@ -1437,6 +1452,9 @@ void NetworkSession::UpdateLogin()
 
 void NetworkSession::ShutdownOnline()
 {
+#if defined(VERSION_R4QK01)
+    bool shutdownSocket = true;
+#endif
     if (ResetTask::s_ResetState != RS_STARTRESET)
     {
         SaveLoad::StartSave(true);
@@ -1445,6 +1463,12 @@ void NetworkSession::ShutdownOnline()
     {
         return;
     }
+#if defined(VERSION_R4QK01)
+    else if (GetSessionState() == NET_SESSION_LOGIN)
+    {
+        shutdownSocket = false;
+    }
+#endif
 
     mFriendsMatchProcessingSuspended = 0;
     DWC_ShutdownFriendsMatch();
@@ -1456,7 +1480,14 @@ void NetworkSession::ShutdownOnline()
     mDirectSocket->Shutdown();
     DWC_Shutdown();
     mDWCInitialized = 0;
+#if defined(VERSION_R4QK01)
+    if (shutdownSocket)
+    {
+        SocketNetworkShutdown();
+    }
+#else
     SocketNetworkShutdown();
+#endif
 
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_GAME_START);
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME);
@@ -2610,6 +2641,11 @@ unsigned int GetNetworkVersionWord()
     case GAME_REGION_JAPAN:
         channel = 15;
         break;
+#if defined(VERSION_R4QK01)
+    case GAME_REGION_KOREA:
+        channel = 13;
+        break;
+#endif
     }
 
     unsigned int low = (u16)g_BuildNumber;

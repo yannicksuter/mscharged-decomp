@@ -81,7 +81,12 @@ extern "C"
         {
             NETMD5Context md5;
             NETSHA1Context sha1;
+#if defined(VERSION_R4QK01)
+            // This SDK revision accepts up to 112 bytes of hash workspace.
+            u8 buffer[112];
+#else
             u8 buffer[1];
+#endif
         } hashContext;
         union
         {

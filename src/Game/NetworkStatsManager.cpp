@@ -28,7 +28,7 @@ static int sLeaderboardJobs[5] = { NET_STATS_GET_DAILY_NEARBY, NET_STATS_GET_DAI
 
 static NetworkStatsManager* sNetworkStatsManager;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 static float sLeaderboardRefreshInterval = 60.0f;
 #else
 static float sLeaderboardRefreshInterval = 70.0f;

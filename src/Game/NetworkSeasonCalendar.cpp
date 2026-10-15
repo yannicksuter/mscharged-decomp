@@ -40,7 +40,7 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
             time->min -= 60;
             ++time->hour;
         }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         else if (time->min < 0)
         {
             time->min += 60;
@@ -63,7 +63,7 @@ bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time)
                 }
             }
         }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         else if (time->hour < 0)
         {
             time->hour += 24;

@@ -463,6 +463,11 @@ bool NetworkRanking::ReportGameResult(int category,
     case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
+#if defined(VERSION_R4QK01)
+    case GAME_REGION_KOREA:
+        region = DWC_RNK_REGION_KR;
+        break;
+#endif
     default:
         region = DWC_RNK_REGION_US;
         break;
@@ -551,6 +556,11 @@ bool NetworkRanking::SubmitScore(int category,
     case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
+#if defined(VERSION_R4QK01)
+    case GAME_REGION_KOREA:
+        region = DWC_RNK_REGION_KR;
+        break;
+#endif
     default:
         region = DWC_RNK_REGION_US;
         break;
@@ -723,6 +733,11 @@ bool NetworkRanking::GetLeaderboardStats(int category,
     case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
+#if defined(VERSION_R4QK01)
+    case GAME_REGION_KOREA:
+        region = DWC_RNK_REGION_KR;
+        break;
+#endif
     default:
         region = DWC_RNK_REGION_US;
         break;

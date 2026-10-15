@@ -52,7 +52,7 @@ enum eNetworkLoginStage
     NET_LOGIN_PUT_FRIENDS_STATS = 4,
     NET_LOGIN_GET_SEASON_STATS = 5,
     NET_LOGIN_PUT_SEASON_STATS = 6,
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     NET_LOGIN_REFRESH_SEASON_STATS = 7,
     NET_LOGIN_GET_DAILY_STATS = 8,
     NET_LOGIN_PUT_DAILY_STATS = 9,
@@ -514,11 +514,11 @@ public:
     void DWCLoginCallback(int error, int profileID, void* param);
     bool RequestLoginRankings();
     void UpdateLogin();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     void RequestLoginNearbySeasonRankingsAgain();
 #endif
     void RequestLoginNearbyDailyRankings();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     void RequestLoginNearbyDailyRankingsAgain();
     void RequestLoginFriendsSeasonRankings();
     void RequestLoginTopDailyRankings();
@@ -606,6 +606,9 @@ public:
     /* 0x24A0 */ float mLoginStartTime;
     /* 0x24A4 */ u8 mLoginRequestStarted;
     /* 0x24A5 */ u8 mDWCInitialized;
+#if defined(VERSION_R4QK01)
+    /* 0x24A6 */ bool mLoginThreadRunning;
+#endif
     /* 0x24A8 */ u32 mLoginThread[0x318 / 4];
     /* 0x27C0 */ u8 mLoginThreadStack[0x4000];
 }; // size: 0x67C0

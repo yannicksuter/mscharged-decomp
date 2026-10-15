@@ -2,6 +2,10 @@
 #include <dwc/dwc_error.h>
 #include <dwc/dwc_ranking.h>
 #include <dwc/dwc_ranksession.h>
+#if defined(VERSION_R4QK01)
+#include <dwc/dwc_report.h>
+#include <revolution/os/OSTime_fwd.h>
+#endif
 
 typedef struct
 {
@@ -28,7 +32,11 @@ struct
 {
     DWCRnkState state;
     s32 pid;
-} g_rankinginfo;
+} g_rankinginfo = { DWC_RNK_STATE_NOTREADY, 0 };
+
+#if defined(VERSION_R4QK01)
+static OSTime s_ranking_start_time;
+#endif
 
 static DWCRnkError DWCi_RankingGetResponse(DWCiRankingResponse* out)
 {
@@ -105,6 +113,10 @@ DWCRnkError DWC_RnkPutScoreAsync(u32 category, DWCRnkRegion region, s32 score, v
     }
 
     g_rankinginfo.state = DWC_RNK_STATE_PUT_ASYNC;
+#if defined(VERSION_R4QK01)
+    s_ranking_start_time = OSGetTime();
+    DWC_Printf(DWC_REPORTFLAG_INFO, "Timeout counter has been reset.\n");
+#endif
     return DWC_RNK_SUCCESS;
 }
 
@@ -150,6 +162,10 @@ DWCRnkError DWC_RnkGetScoreAsync(DWCRnkGetMode mode, u32 category, DWCRnkRegion 
             return DWC_RNK_ERROR_INVALID_PARAMETER;
         break;
     case DWC_RNK_GET_MODE_NEAR:
+#if defined(VERSION_R4QK01)
+    case DWC_RNK_GET_MODE_NEAR_HI:
+    case DWC_RNK_GET_MODE_NEAR_LOW:
+#endif
         if (param->size != sizeof(param->near))
             return DWC_RNK_ERROR_INVALID_PARAMETER;
         switch (param->near.sort)
@@ -189,6 +205,10 @@ DWCRnkError DWC_RnkGetScoreAsync(DWCRnkGetMode mode, u32 category, DWCRnkRegion 
     }
 
     g_rankinginfo.state = DWC_RNK_STATE_GET_ASYNC;
+#if defined(VERSION_R4QK01)
+    s_ranking_start_time = OSGetTime();
+    DWC_Printf(DWC_REPORTFLAG_INFO, "Timeout counter has been reset.\n");
+#endif
     return DWC_RNK_SUCCESS;
 }
 
@@ -196,6 +216,11 @@ DWCRnkError DWC_RnkProcess(void)
 {
     if (DWCi_IsError())
         return DWC_RNK_IN_ERROR;
+
+#if defined(VERSION_R4QK01)
+    if (g_rankinginfo.state == DWC_RNK_STATE_TIMEOUT)
+        return DWC_RNK_PROCESS_TIMEOUT;
+#endif
 
     if (g_rankinginfo.state != DWC_RNK_STATE_PUT_ASYNC && g_rankinginfo.state != DWC_RNK_STATE_GET_ASYNC)
         return DWC_RNK_PROCESS_NOTASK;
@@ -214,6 +239,16 @@ DWCRnkError DWC_RnkProcess(void)
     case DWCi_RANKING_SESSION_STATE_GETTING_TOKEN:
     case DWCi_RANKING_SESSION_STATE_GOT_TOKEN:
     case DWCi_RANKING_SESSION_STATE_SENDING_DATA:
+#if defined(VERSION_R4QK01)
+        if (OSTicksToMilliseconds(OSGetTime() - s_ranking_start_time) > 30000)
+        {
+            DWC_Printf(DWC_REPORTFLAG_INFO, "Timeout!!");
+            DWCi_RankingSessionCancel();
+            g_rankinginfo.state = DWC_RNK_STATE_TIMEOUT;
+            DWCi_SetError(DWC_ERROR_GHTTP_ANY, -98070);
+            return DWC_RNK_PROCESS_TIMEOUT;
+        }
+#endif
         break;
     case DWCi_RANKING_SESSION_STATE_COMPLETED:
         g_rankinginfo.state = DWC_RNK_STATE_COMPLETED;
@@ -243,6 +278,10 @@ DWCRnkError DWC_RnkResGetRow(DWCRnkData* out, u32 index)
     case DWC_RNK_GET_MODE_TOPLIST:
     case DWC_RNK_GET_MODE_NEAR:
     case DWC_RNK_GET_MODE_FRIENDS:
+#if defined(VERSION_R4QK01)
+    case DWC_RNK_GET_MODE_NEAR_HI:
+    case DWC_RNK_GET_MODE_NEAR_LOW:
+#endif
         break;
     }
 
@@ -285,6 +324,10 @@ DWCRnkError DWC_RnkResGetRowCount(u32* count)
     case DWC_RNK_GET_MODE_TOPLIST:
     case DWC_RNK_GET_MODE_NEAR:
     case DWC_RNK_GET_MODE_FRIENDS:
+#if defined(VERSION_R4QK01)
+    case DWC_RNK_GET_MODE_NEAR_HI:
+    case DWC_RNK_GET_MODE_NEAR_LOW:
+#endif
         break;
     }
 

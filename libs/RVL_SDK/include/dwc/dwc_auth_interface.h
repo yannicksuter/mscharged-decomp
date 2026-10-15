@@ -3,7 +3,7 @@
 #include <dwc/dwc_init.h>
 #include <dwc/dwc_memfunc.h>
 #include <dwc/dwc_nastime.h>
-#include <revolution/os/OSTime.h>
+#include <revolution/os/OSTime_fwd.h>
 
 #ifdef __cplusplus
 extern "C"

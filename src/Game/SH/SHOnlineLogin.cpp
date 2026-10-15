@@ -101,9 +101,17 @@ void SHOnlineLogin::Update(float fDeltaT)
         break;
     case ONLINE_LOGIN_WAIT_THREAD:
         if (g_pNetworkSession->IsLoginThreadComplete())
+        {
             mState = ONLINE_LOGIN_CHECK_REQUEST;
+#if defined(VERSION_R4QK01)
+            g_pNetworkSession->mLoginThreadRunning = false;
+#endif
+        }
         break;
     case ONLINE_LOGIN_CHECK_REQUEST:
+#if defined(VERSION_R4QK01)
+        g_pNetworkSession->mLoginThreadRunning = false;
+#endif
         if (!g_pNetworkSession->mLoginRequestStarted)
         {
             int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);
@@ -140,6 +148,9 @@ static void CreateOnlineLoginErrorPopup(FEPopupMenu* menu, ePopupMenu popup, SHO
 
 void SHOnlineLogin::OnLoginResult(int result)
 {
+#if defined(VERSION_R4QK01)
+    g_pNetworkSession->mLoginThreadRunning = false;
+#endif
     if (result == 1)
     {
         int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);

@@ -8,11 +8,17 @@ extern "C"
 {
 #endif
 
+#if defined(VERSION_R4QK01)
+#define DWC_RNK_DATA_MAX     764
+#define DWC_RNK_CATEGORY_MAX 1000
+#define DWC_RNK_GET_MAX      30
+#else
 #define DWC_RNK_DATA_MAX     768
 #define DWC_RNK_CATEGORY_MAX 100
+#define DWC_RNK_GET_MAX      10
+#endif
 #define DWC_RNK_ORDER_ASC    0
 #define DWC_RNK_ORDER_DES    1
-#define DWC_RNK_GET_MAX      10
 #define DWC_RNK_FRIENDS_MAX  64
 
     typedef enum
@@ -32,6 +38,9 @@ extern "C"
         DWC_RNK_ERROR_GET_NOMEMORY,
         DWC_RNK_ERROR_CANCEL_NOTASK,
         DWC_RNK_PROCESS_NOTASK,
+#if defined(VERSION_R4QK01)
+        DWC_RNK_PROCESS_TIMEOUT,
+#endif
         DWC_RNK_ERROR_INVALID_MODE,
         DWC_RNK_ERROR_NOTCOMPLETED,
         DWC_RNK_ERROR_EMPTY_RESPONSE
@@ -44,6 +53,9 @@ extern "C"
         DWC_RNK_STATE_PUT_ASYNC,
         DWC_RNK_STATE_GET_ASYNC,
         DWC_RNK_STATE_COMPLETED,
+#if defined(VERSION_R4QK01)
+        DWC_RNK_STATE_TIMEOUT,
+#endif
         DWC_RNK_STATE_ERROR
     } DWCRnkState;
 
@@ -61,7 +73,11 @@ extern "C"
         DWC_RNK_GET_MODE_ORDER,
         DWC_RNK_GET_MODE_TOPLIST,
         DWC_RNK_GET_MODE_NEAR,
-        DWC_RNK_GET_MODE_FRIENDS
+        DWC_RNK_GET_MODE_FRIENDS,
+#if defined(VERSION_R4QK01)
+        DWC_RNK_GET_MODE_NEAR_HI,
+        DWC_RNK_GET_MODE_NEAR_LOW
+#endif
     } DWCRnkGetMode;
 
     typedef struct
