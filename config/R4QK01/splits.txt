@@ -1725,8 +1725,9 @@ Game/FE/feAsyncImage.cpp:
 	.data       start:0x804E06D0 end:0x804E06E0
 
 Game/FE/LidOpenMessage.cpp:
-	.text       start:0x801BFBF8 end:0x801BFCCC
+	.text       start:0x801BF6FC end:0x801BFCCC
 	.ctors      start:0x804B0A64 end:0x804B0A68
+	.rodata     start:0x804B22B8 end:0x804B4150
 	.data       start:0x804E06E0 end:0x804E0718
 	.bss        start:0x8053D470 end:0x8053D488
 	.sdata      start:0x806009A0 end:0x806009A8
@@ -1759,6 +1760,7 @@ Game/FE/BaseGameSceneManager.cpp:
 Game/FE/GameSceneManager.cpp:
 	.text       start:0x801C61D0 end:0x801C6268
 	.data       start:0x804E1A68 end:0x804E1A80
+	.sbss       start:0x80604EF0 end:0x80604EF4
 
 Game/FE/fePopupMenu.cpp:
 	.rodata     start:0x804B4190 end:0x804B5150
@@ -2049,11 +2051,13 @@ Game/SH/SHStrikerCupAwards.cpp:
 	.sdata2     start:0x80608F08 end:0x80608F18
 
 Game/SH/SHCupNews.cpp:
+	.text       start:0x80217FF8 end:0x80219E58
 	.rodata     start:0x804B5318 end:0x804B5378
 	.data       start:0x804E6C38 end:0x804E6F18
 	.sdata      start:0x80601620 end:0x80601640
 
 Game/SH/SHOnlineRanking.cpp:
+	.text       start:0x80219E58 end:0x8021BD24
 	.data       start:0x804E6F18 end:0x804E7078
 	.sdata      start:0x80601640 end:0x806016D0
 	.sdata2     start:0x80608F18 end:0x80608F20
@@ -6414,7 +6418,7 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 	.sdata2     start:0x8060AD78 end:0x8060AD7C
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
-	.rodata     start:0x804BE5C8 end:0x804BE6F8
+	.rodata     start:0x804BE5C8 end:0x804BE6E8
 	.data       start:0x8052D140 end:0x8052D210
 	.sdata      start:0x806040C8 end:0x80604120
 
@@ -6458,15 +6462,16 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c:
 RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
 	.text       start:0x804A2080 end:0x804A5B24
 	.data       start:0x8052D478 end:0x8052D4A4
-	.sdata      start:0x806041F8 end:0x8060420C
+	.sdata      start:0x806041F8 end:0x80604208
 	.sdata2     start:0x8060AD90 end:0x8060AD9C
 
 RVL_SDK/rfl/RFL_System.c:
 	extab       start:0x800067A0 end:0x800067C8
 	extabindex  start:0x80006E40 end:0x80006E7C
 	.text       start:0x804A5B80 end:0x804A662C
-	.data       start:0x8052D4F0 end:0x8052D500
-	.sdata      start:0x8060420C end:0x80604210 align:4
+	.rodata     start:0x804BE6E8 end:0x804BE6F8
+	.data       start:0x8052D4A8 end:0x8052D500
+	.sdata      start:0x80604208 end:0x80604210
 	.sbss       start:0x80606690 end:0x8060669C
 
 RVL_SDK/rfl/RFL_NANDLoader.c:
@@ -6481,28 +6486,36 @@ RVL_SDK/rfl/RFL_NANDAccess.c:
 	extab       start:0x80006848 end:0x800068C0
 	extabindex  start:0x80006F3C end:0x80006FF0
 	.text       start:0x804A76D0 end:0x804A8F08
+	.data       start:0x8052D520 end:0x8052D5A8
 	.sdata      start:0x80604218 end:0x80604220
 	.sdata2     start:0x8060ADA0 end:0x8060ADA8
+	.sbss2      start:0x8060AF38 end:0x8060AF3C
 
 RVL_SDK/rfl/RFL_Model.c:
-	extab       start:0x800068C0 end:0x80006910
-	extabindex  start:0x80006FF0 end:0x80007068
-	.text       start:0x804A8F10 end:0x804AACE0
+	extab       start:0x800068C0 end:0x80006928
+	extabindex  start:0x80006FF0 end:0x8000708C
+	.text       start:0x804A8F10 end:0x804AAD84
 	.rodata     start:0x804BE788 end:0x804BE898
 	.sdata2     start:0x8060ADA8 end:0x8060ADE4
 
 RVL_SDK/rfl/RFL_MakeTex.c:
 	extab       start:0x80006928 end:0x80006968
 	extabindex  start:0x8000708C end:0x800070EC
-	.text       start:0x804AAD90 end:0x804AD490
+	.text       start:0x804AAD90 end:0x804AD530
 	.rodata     start:0x804BE898 end:0x804BE958
 	.sdata2     start:0x8060ADE8 end:0x8060AEA4
 
 RVL_SDK/rfl/RFL_Icon.c:
-	extab       start:0x80006968 end:0x80006978
-	extabindex  start:0x800070EC end:0x80007104
-	.text       start:0x804AD530 end:0x804ADA70
+	extab       start:0x80006968 end:0x80006980
+	extabindex  start:0x800070EC end:0x80007110
+	.text       start:0x804AD530 end:0x804ADAA0
+	.rodata     start:0x804BE958 end:0x804BE998
 	.sdata2     start:0x8060AEA8 end:0x8060AEE8
+
+RVL_SDK/rfl/RFL_HiddenDatabase.c:
+	extab       start:0x80006980 end:0x80006988
+	extabindex  start:0x80007110 end:0x8000711C
+	.text       start:0x804ADAA0 end:0x804ADAE0
 
 RVL_SDK/rfl/RFL_Database.c:
 	extab       start:0x80006988 end:0x80006A18
@@ -6516,7 +6529,13 @@ RVL_SDK/rfl/RFL_Controller.c:
 
 RVL_SDK/rfl/RFL_DefaultDatabase.c:
 	.text       start:0x804AF380 end:0x804AF3C8
-	.rodata     start:0x804BE998 end:0x804BEB68
+	.rodata     start:0x804BE998 end:0x804BEB54
+
+RVL_SDK/rfl/RFL_DataUtility.c:
+	extab       start:0x80006A40 end:0x80006A68
+	extabindex  start:0x80007230 end:0x8000726C
+	.text       start:0x804AF3D0 end:0x804AFC48
+	.rodata     start:0x804BEB58 end:0x804BEB68
 
 RVL_SDK/rfl/RFL_Format.c:
 	extab       start:0x80006A68 end:0x80006A70

@@ -128,6 +128,9 @@ typedef struct NANDCommandBlock {
     u32 workBlocks;             // at 0xAC
     u32 workInodes;             // at 0xB0
     const char** dir;           // at 0xB4
+#if defined(VERSION_R4QK01)
+    BOOL simpleFlag;            // at 0xB8
+#endif
 } NANDCommandBlock;
 
 s32 NANDCreate(const char* path, u8 perm, u8 attr);

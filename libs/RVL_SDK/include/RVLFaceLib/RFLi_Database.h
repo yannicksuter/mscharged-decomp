@@ -50,7 +50,7 @@ typedef struct RFLiDBManager {
 void RFLiInitDatabase(MEMiHeapHead* heap);
 RFLErrcode RFLiBootLoadDatabaseAsync(RFLiCallback callback);
 RFLErrcode RFLiSaveDatabaseAsync(RFLiCallback callback);
-RFLiCharData* RFLiGetCharData(u16 index) DECOMP_DONT_INLINE;
+RFLiCharData* RFLiGetCharData(u16 index);
 void RFLiConvertRaw2Info(const RFLiCharData* data, RFLiCharInfo* out);
 void RFLiConvertHRaw2Info(const RFLiHiddenCharData* data, RFLiCharInfo* out);
 void RFLiConvertInfo2Raw(const RFLiCharInfo* info, RFLiCharData* out);

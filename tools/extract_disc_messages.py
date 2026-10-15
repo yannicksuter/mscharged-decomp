@@ -13,6 +13,7 @@ TABLE_ADDRESSES = {
     "R4QP01_rev2": 0x804E6A08,
     "R4QP01_rev1": 0x804E6488,
     "R4QJ01": 0x804E7520,
+    "R4QK01": 0x804B4110,
 }
 LANGUAGES = ("eng", "fre", "deu", "spa", "ita", "jpn", "uke")
 IMAGE_TYPES = ("FatalErrorImage", "NoDiskImage", "WrongDiskImage", "RetryImage", "Loading")
@@ -32,11 +33,16 @@ def read_data(dol: bytes, address: int, size: int) -> bytes:
 
 
 def extract(dol: bytes, version: str) -> str:
-    table = read_data(dol, TABLE_ADDRESSES[version], len(LANGUAGES) * len(IMAGE_TYPES) * 16)
+    languages = LANGUAGES
+    image_types = IMAGE_TYPES
+    if version == "R4QK01":
+        languages = ("kor",)
+        image_types = ("FatalErrorImage", "WrongDiskImage", "RetryImage", "Loading")
+    table = read_data(dol, TABLE_ADDRESSES[version], len(languages) * len(image_types) * 16)
     images = []
-    for language_index, language in enumerate(LANGUAGES):
-        for image_index, image_type in enumerate(IMAGE_TYPES):
-            offset = (language_index * len(IMAGE_TYPES) + image_index) * 16
+    for language_index, language in enumerate(languages):
+        for image_index, image_type in enumerate(image_types):
+            offset = (language_index * len(image_types) + image_index) * 16
             width, height, size, address = struct.unpack_from(">4I", table, offset)
             if not width or width % 8 or not height or not size:
                 raise ValueError(f"Invalid image descriptor for {image_type}_{language}")

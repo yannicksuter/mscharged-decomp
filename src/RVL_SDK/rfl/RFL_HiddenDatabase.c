@@ -1,7 +1,7 @@
 #include <RVLFaceLib/RVLFaceLibInternal.h>
 #include <string.h>
 
-static void writeData_(RFLiHiddenCharData* data) DECOMP_DONT_INLINE;
+static void writeData_(RFLiHiddenCharData* data);
 
 static void initWritableList_(void) {
     RFLiHDBManager* mgr = RFLiGetHDBManager();
@@ -250,7 +250,7 @@ static BOOL checkCtrlWritableData_(const RFLiCtrlBuf* buf, BOOL ch, u8 index) {
     return FALSE;
 }
 
-static u8 getCtrlWritableCount_(const RFLiCtrlBuf* buf, volatile s64 ch) {
+static u8 getCtrlWritableCount_(const RFLiCtrlBuf* buf, BOOL ch) {
     u8 i;
     u8 count = 0;
     RFLiHDBManager* mgr = RFLiGetHDBManager();
@@ -458,7 +458,8 @@ s16 RFLiGetHiddenPrev(u16 index) {
 BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex) {
     RFLiHDBManager* mgr;
     RFLiHiddenDB* header;
-    u16 count;
+    const RFLCreateID* id;
+    RFLSex dataSex;
 
     if (!RFLAvailable()) {
         return FALSE;
@@ -470,8 +471,9 @@ BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex) {
     }
 
     header = RFLiGetHiddenHeader();
+    id = &header->data[index].createID;
 
-    if (!RFLiIsValidID(&header->data[index].createID)) {
+    if (!RFLiIsValidID(id)) {
         return FALSE;
     }
 
@@ -479,7 +481,8 @@ BOOL RFLiIsValidHiddenData(u16 index, RFLSex sex) {
         return TRUE;
     }
 
-    switch (header->data[index].sex) {
+    dataSex = header->data[index].sex;
+    switch (dataSex) {
     case RFLSex_Male:
         return sex == RFLSex_Male;
     case RFLSex_Female:

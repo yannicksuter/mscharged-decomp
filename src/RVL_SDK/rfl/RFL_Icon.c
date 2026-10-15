@@ -38,7 +38,11 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
     {
         RFLiCoordinateData iconCoordData = {1, 2, 0, FALSE, FALSE, FALSE};
 
+#if defined(VERSION_R4QK01)
+        coordData = *RFLiGetCoordinateData();
+#else
         coordData = coordinateData;
+#endif
         RFLiSetCoordinateData(&iconCoordData);
     }
 
@@ -57,7 +61,11 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
 
         expFlag = 1 << expression;
 
+#if defined(VERSION_R4QK01)
+        modelBuf = RFLiAlloc(RFLGetModelBufferSize(resolution, expFlag));
+#else
         modelBuf = RFLiAlloc32(RFLGetModelBufferSize(resolution, expFlag));
+#endif
 
         RFLiInitCharModel(&model, (RFLiCharInfo*)info, modelBuf, resolution, expFlag);
 
@@ -161,11 +169,22 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
+#if !defined(VERSION_R4QK01)
     GXDrawDone();
+#endif
     GXCopyTex(buf, GX_TRUE);
 
+#if defined(VERSION_R4QK01)
+    GXPixModeSync();
+    if (RFLiGetManager()->iconDrawCb == NULL) {
+        GXDrawDone();
+    } else {
+        RFLiGetManager()->iconDrawCb();
+    }
+#else
     GXDrawDone();
     GXPixModeSync();
+#endif
 
     RFLiFree(modelBuf);
 
@@ -174,3 +193,9 @@ void RFLiMakeIcon(void* buf, const RFLiCharInfo* info, RFLExpression expression,
 
     RFLiSetCoordinateData(&coordData);
 }
+
+#if defined(VERSION_R4QK01)
+void RFLSetIconDrawDoneCallback(RFLCallback callback) {
+    RFLiGetManager()->iconDrawCb = callback;
+}
+#endif

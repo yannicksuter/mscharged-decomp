@@ -6,7 +6,7 @@
 
 static u8 _devType[WPAD_MAX_CONTROLLERS];
 static u8 _devMode[WPAD_MAX_CONTROLLERS];
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static u8 _retryCnt[WPAD_MAX_CONTROLLERS];
 #endif
 
@@ -38,7 +38,7 @@ void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len);
 #define HID_FW_MASK           (u8)(0xF0)
 #define HID_PRT_MASK          (u8)(0xF)
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 #define HID_CLASSIC_STICK_MIN (-0x200)
 #define HID_CLASSIC_STICK_MAX 0x1FF
 #define HID_REPORT32_CHECK_SIZE 8
@@ -99,7 +99,7 @@ static u8 checkInvalidData[21] = {
 };
 static u8 checkBuffer[21];
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static inline void initExtension(s32 chan);
 #endif
 
@@ -118,7 +118,7 @@ void abortInitExtension(WPADChannel chan, WPADResult result)
         }
         else if (p_wpd->info.attach)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             if (_retryCnt[chan]++ < 32)
             {
                 initExtension(chan);
@@ -129,7 +129,7 @@ void abortInitExtension(WPADChannel chan, WPADResult result)
         }
         else
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             WPADiSendSetReportType(&p_wpd->extCmdQueue, p_wpd->dataFormat, NULL);
             return;
 #else
@@ -491,7 +491,7 @@ void getGameInfo(s32 chan, s32 result, u8 index)
     }
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static inline void initExtension(s32 chan)
 {
     WPADControlBlock* p_wpd = _wpdcb[chan];
@@ -595,7 +595,7 @@ void __a1_20_status_report(u8 chan, u8* data)
             DEBUGPrint("initialize attachment\n");
 
             extcb = p_wpd->extensionCallback;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             _retryCnt[chan] = 0;
             initExtension(chan);
 #else
@@ -629,14 +629,14 @@ void __a1_20_status_report(u8 chan, u8* data)
         p_wpd->devType = WPAD_DEV_CORE;
         p_wpd->devMode = 0;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         WPADiClearQueue(&p_wpd->extCmdQueue);
         WPADiSendSetReportType(&p_wpd->extCmdQueue, p_wpd->dataFormat, NULL);
 #endif
 
         if (attach)
         {
-#if !defined(VERSION_R4QE01)
+#if !defined(VERSION_R4QE01) && !defined(VERSION_R4QJ01)
             u32 format;
 
             WPADiClearQueue(&p_wpd->extCmdQueue);
@@ -712,7 +712,7 @@ void __a1_21_user_data(u8 chan, u8* data)
 
         if (p_wpd->cmdBlkCallback)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
             if (p_wpd->extensionCallback == NULL ||
                 (WPADCallback)p_wpd->extensionCallback != p_wpd->cmdBlkCallback)
 #endif
@@ -910,7 +910,7 @@ void __parse_dpd_data(WPADStatus** p_status, u8 fmt, u8* p_data, u8 len)
 
 static inline s8 getDataFormatError(const WPADControlBlock* p_cb)
 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     return WPAD_ERR_INVALID;
 #else
     return p_cb->status == WPAD_ERR_OK ? WPAD_ERR_INVALID : (s8)p_cb->status;
@@ -1507,7 +1507,7 @@ void __a1_35_data_type(u8 chan, u8* data)
 
 void __a1_36_data_type(u8 chan, u8* data)
 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     WPADControlBlock* p_cb;
     WPADStatus* p_status;
     u8* p_clear;

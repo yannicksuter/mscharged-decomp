@@ -26,9 +26,29 @@ struct DiscMessageImage
     const unsigned char* compressedData;
 };
 
+enum DiscMessageType
+{
+    DISC_MESSAGE_FATAL_ERROR,
+#if !defined(VERSION_R4QK01)
+    DISC_MESSAGE_NO_DISC,
+#endif
+    DISC_MESSAGE_WRONG_DISC,
+    DISC_MESSAGE_RETRY,
+    DISC_MESSAGE_LOADING,
+    DISC_MESSAGE_COUNT
+};
+
 #include "Game/FE/DiscMessageImages.inc"
 
-static const DiscMessageImage sDiscMessageImages[7][5] = {
+static const DiscMessageImage sDiscMessageImages[][DISC_MESSAGE_COUNT] = {
+#if defined(VERSION_R4QK01)
+    {
+        { 400, 200, sizeof(HEADER_FatalErrorImage_kor::g_ImageData), HEADER_FatalErrorImage_kor::g_ImageData },
+        { 400, 200, sizeof(HEADER_WrongDiskImage_kor::g_ImageData), HEADER_WrongDiskImage_kor::g_ImageData },
+        { 400, 200, sizeof(HEADER_RetryImage_kor::g_ImageData), HEADER_RetryImage_kor::g_ImageData },
+        { 256, 48, sizeof(HEADER_Loading_kor::g_ImageData), HEADER_Loading_kor::g_ImageData },
+    },
+#else
     {
         { 400, 200, sizeof(HEADER_FatalErrorImage_eng::g_ImageData), HEADER_FatalErrorImage_eng::g_ImageData },
         { 400, 200, sizeof(HEADER_NoDiskImage_eng::g_ImageData), HEADER_NoDiskImage_eng::g_ImageData },
@@ -78,6 +98,7 @@ static const DiscMessageImage sDiscMessageImages[7][5] = {
         { 400, 200, sizeof(HEADER_RetryImage_uke::g_ImageData), HEADER_RetryImage_uke::g_ImageData },
         { 128, 32, sizeof(HEADER_Loading_uke::g_ImageData), HEADER_Loading_uke::g_ImageData },
     },
+#endif
 };
 
 static int lastImageWidth;
@@ -90,6 +111,7 @@ static bool sAudioPausedForDiscMessage;
 static bool CanGetResetPauseState = true;
 
 
+#if !defined(VERSION_R4QK01)
 static int GetDiscMessageLanguageIndex()
 {
     int lang;
@@ -97,7 +119,7 @@ static int GetDiscMessageLanguageIndex()
     switch (GetRegion())
     {
     case GAME_REGION_US:
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         switch ((u8)SCGetLanguage())
         {
         case 3:
@@ -148,6 +170,7 @@ static int GetDiscMessageLanguageIndex()
     }
     return lang;
 }
+#endif
 
 static void UncompressLidMessage(const unsigned char* compressed, int compressedSize, unsigned char* uncompressed, int)
 {
@@ -314,8 +337,18 @@ void DisplayDVDMessageSebring(int arg)
 
         if (arg == 1)
         {
+#if defined(VERSION_R4QK01)
+            const int lang = 0;
+#else
             int lang = GetDiscMessageLanguageIndex();
-            DisplayMessage(sDiscMessageImages[lang][4].width, sDiscMessageImages[lang][4].height, sDiscMessageImages[lang][4].compressedData, sDiscMessageImages[lang][4].compressedSize, (unsigned long)-1, false);
+#endif
+            DisplayMessage(
+                sDiscMessageImages[lang][DISC_MESSAGE_LOADING].width,
+                sDiscMessageImages[lang][DISC_MESSAGE_LOADING].height,
+                sDiscMessageImages[lang][DISC_MESSAGE_LOADING].compressedData,
+                sDiscMessageImages[lang][DISC_MESSAGE_LOADING].compressedSize,
+                (unsigned long)-1,
+                false);
             return;
         }
     }
@@ -323,20 +356,50 @@ void DisplayDVDMessageSebring(int arg)
     ResetTask::s_resetPaused = false;
     OpenCloseRefCount++;
 
+#if defined(VERSION_R4QK01)
+    const int lang = 0;
+#else
     int lang = GetDiscMessageLanguageIndex();
+#endif
     switch (arg + 1)
     {
     case 5:
-        DisplayMessage(sDiscMessageImages[lang][0].width, sDiscMessageImages[lang][0].height, sDiscMessageImages[lang][0].compressedData, sDiscMessageImages[lang][0].compressedSize, (unsigned long)-1, false);
+        DisplayMessage(
+            sDiscMessageImages[lang][DISC_MESSAGE_FATAL_ERROR].width,
+            sDiscMessageImages[lang][DISC_MESSAGE_FATAL_ERROR].height,
+            sDiscMessageImages[lang][DISC_MESSAGE_FATAL_ERROR].compressedData,
+            sDiscMessageImages[lang][DISC_MESSAGE_FATAL_ERROR].compressedSize,
+            (unsigned long)-1,
+            false);
         break;
     case 0:
-        DisplayMessage(sDiscMessageImages[lang][1].width, sDiscMessageImages[lang][1].height, sDiscMessageImages[lang][1].compressedData, sDiscMessageImages[lang][1].compressedSize, (unsigned long)-1, false);
+#if !defined(VERSION_R4QK01)
+        DisplayMessage(
+            sDiscMessageImages[lang][DISC_MESSAGE_NO_DISC].width,
+            sDiscMessageImages[lang][DISC_MESSAGE_NO_DISC].height,
+            sDiscMessageImages[lang][DISC_MESSAGE_NO_DISC].compressedData,
+            sDiscMessageImages[lang][DISC_MESSAGE_NO_DISC].compressedSize,
+            (unsigned long)-1,
+            false);
+#endif
         break;
     case 12:
-        DisplayMessage(sDiscMessageImages[lang][2].width, sDiscMessageImages[lang][2].height, sDiscMessageImages[lang][2].compressedData, sDiscMessageImages[lang][2].compressedSize, (unsigned long)-1, false);
+        DisplayMessage(
+            sDiscMessageImages[lang][DISC_MESSAGE_WRONG_DISC].width,
+            sDiscMessageImages[lang][DISC_MESSAGE_WRONG_DISC].height,
+            sDiscMessageImages[lang][DISC_MESSAGE_WRONG_DISC].compressedData,
+            sDiscMessageImages[lang][DISC_MESSAGE_WRONG_DISC].compressedSize,
+            (unsigned long)-1,
+            false);
         break;
     case 7:
-        DisplayMessage(sDiscMessageImages[lang][3].width, sDiscMessageImages[lang][3].height, sDiscMessageImages[lang][3].compressedData, sDiscMessageImages[lang][3].compressedSize, (unsigned long)-1, false);
+        DisplayMessage(
+            sDiscMessageImages[lang][DISC_MESSAGE_RETRY].width,
+            sDiscMessageImages[lang][DISC_MESSAGE_RETRY].height,
+            sDiscMessageImages[lang][DISC_MESSAGE_RETRY].compressedData,
+            sDiscMessageImages[lang][DISC_MESSAGE_RETRY].compressedSize,
+            (unsigned long)-1,
+            false);
         break;
     }
 
@@ -421,10 +484,18 @@ static inline int GetLoadingMessageLanguageIndex()
 
 void DisplayLoadingMessageFast()
 {
-#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QK01)
+    const int lang = 0;
+#elif defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
     int lang = GetLoadingMessageLanguageIndex();
 #else
     int lang = GetDiscMessageLanguageIndex();
 #endif
-    DisplayMessage(sDiscMessageImages[lang][4].width, sDiscMessageImages[lang][4].height, sDiscMessageImages[lang][4].compressedData, sDiscMessageImages[lang][4].compressedSize, (unsigned long)-1, false);
+    DisplayMessage(
+        sDiscMessageImages[lang][DISC_MESSAGE_LOADING].width,
+        sDiscMessageImages[lang][DISC_MESSAGE_LOADING].height,
+        sDiscMessageImages[lang][DISC_MESSAGE_LOADING].compressedData,
+        sDiscMessageImages[lang][DISC_MESSAGE_LOADING].compressedSize,
+        (unsigned long)-1,
+        false);
 }

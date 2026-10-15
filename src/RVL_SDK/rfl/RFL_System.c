@@ -4,9 +4,18 @@
 
 #include <string.h>
 
+#if defined(VERSION_R4QK01)
+#define RFL_SYSTEM_HEAP_SIZE 0x24C00
+#define RFL_WORK_SIZE 0x4B400
+#define RFL_DELUXE_WORK_SIZE 0x64400
+
+static char* __RFLVersion = "<< RVL_SDK - RFL \trelease build: Sep 17 2009 09:14:32 (0x4302_145) >>";
+static const RFLiCoordinateData scCoordinate = {1, 2, 0, FALSE, FALSE, FALSE};
+#else
 #define RFL_SYSTEM_HEAP_SIZE 0x24800
 #define RFL_WORK_SIZE 0x4B000
 #define RFL_DELUXE_WORK_SIZE 0x64000
+#endif
 
 static RFLiManager* sRFLManager = NULL;
 static RFLErrcode sRFLLastErrCode = RFLErrcode_NotAvailable;
@@ -25,11 +34,23 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize,
     void* heapBuffer;
     RFLErrcode error;
 
+#if defined(VERSION_R4QK01)
+    if (resBuffer == NULL) {
+        return RFLErrcode_WrongParam;
+    }
+    if (workBuffer == NULL) {
+        return RFLErrcode_WrongParam;
+    }
+#else
     if (resBuffer == NULL) {
         return RFLErrcode_Fatal;
     }
+#endif
 
     if (RFLiGetManager() == NULL) {
+#if defined(VERSION_R4QK01)
+        OSRegisterVersion(__RFLVersion);
+#endif
         workSize = deluxeTex ? RFL_DELUXE_WORK_SIZE : RFL_WORK_SIZE;
         memset(workBuffer, 0, workSize);
 
@@ -63,12 +84,19 @@ RFLErrcode RFLInitResAsync(void* workBuffer, void* resBuffer, u32 resSize,
         RFLiGetManager()->deluxeTex = deluxeTex;
         RFLiGetManager()->brokenType = RFLiFileBrokenType_DBNotFound;
 
+#if defined(VERSION_R4QK01)
+        RFLSetIconDrawDoneCallback(NULL);
+        RFLSetModelDrawDoneCallback(NULL);
+#endif
         RFLiSetWorking(FALSE);
         RFLiInitDatabase(RFLiGetManager()->systemHeap);
         RFLiInitLoader();
         RFLiInitCtrlBuf(RFLiGetManager()->systemHeap);
         RFLiInitHiddenDatabase();
         RFLiInitAccessInfo(RFLiGetManager()->systemHeap);
+#if defined(VERSION_R4QK01)
+        RFLiSetCoordinateData(&scCoordinate);
+#endif
 
         if (resBuffer != NULL) {
             RFLiLoader* loader = RFLiGetLoader();
@@ -122,9 +150,9 @@ static void bootloadDB2Res_(void) {
     RFLiLoadResourceHeaderAsync();
 
     switch (RFLWaitAsync()) {
-    case RFLErrcode_Loadfail:
     case RFLErrcode_Success:
     case RFLErrcode_Busy:
+    case RFLErrcode_Loadfail:
         break;
     default:
         RFLExit();
@@ -144,7 +172,11 @@ static void* allocal_(u32 size, s32 align) {
 }
 
 void* RFLiAlloc(u32 size) {
+#if defined(VERSION_R4QK01)
+    return allocal_(size, 32);
+#else
     return allocal_(size, 8);
+#endif
 }
 
 void* RFLiAlloc32(u32 size) {
