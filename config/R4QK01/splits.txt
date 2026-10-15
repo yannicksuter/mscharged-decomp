@@ -6144,12 +6144,9 @@ RVL_SDK/vf/pdm_dskmng.c:
 
 RVL_SDK/net/md5.c:
 	.text       start:0x8042A2F4 end:0x8042AA20
-	.rodata     start:0x804BDFFC end:0x804BE024 align:4
+	.rodata     start:0x804BDFFC end:0x804BE020 align:4
 	.data       start:0x80520960 end:0x80520B20
 	.sdata      start:0x806038B8 end:0x806038C0
-
-RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
-	.rodata     start:0x804BE474 end:0x804BE4FC align:4
 
 RVL_SDK/net/hmac.c:
 	.text       start:0x8042AA20 end:0x8042AE10
@@ -6161,6 +6158,13 @@ RVL_SDK/hbm/HBMAnmController.cpp:
 
 RVL_SDK/dwc/dwc_base64.c:
 	.data       start:0x80524DF0 end:0x80524E38
+
+RVL_SDK/hbm/HBMFrameController.cpp:
+	.text       start:0x8042AE10 end:0x8042AFC0
+	.rodata     start:0x804BE020 end:0x804BE024 align:4
+
+RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
+	.rodata     start:0x804BE474 end:0x804BE4FC align:4
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0
