@@ -486,7 +486,9 @@ typedef struct {
   GPProfile profile;
   gsi_char nick[GP_NICK_LEN];
   gsi_char uniquenick[GP_UNIQUENICK_LEN];
-  // int namespaceID;
+#if defined(VERSION_R4QK01)
+  int namespaceID;
+#endif
   gsi_char firstname[GP_FIRSTNAME_LEN];
   gsi_char lastname[GP_LASTNAME_LEN];
   gsi_char email[GP_EMAIL_LEN];
@@ -554,6 +556,9 @@ typedef struct {
   gsi_char locationString[GP_LOCATION_STRING_LEN]; // 0x108
   unsigned int ip;                                 // 0x208
   int port;                                        // 0x20C
+#if defined(VERSION_R4QK01)
+  GPEnum quietModeFlags;                           // 0x210
+#endif
 } GPBuddyStatus;
 
 // BETA

@@ -81,6 +81,11 @@ extern "C"
 #define DWC_ACC_FRIENDDATA_MASK          3
 #define DWC_ACC_FRIENDDATA_ISBUDDY       (1u << 2)
 #define DWC_ACC_FRIENDDATA_ISBUDDY_MASK  (1u << 2)
+#if defined(VERSION_R4QK01)
+#define DWC_ACC_FRIENDDATA_AUTHORIZED   (1u << 3)
+#define DWC_ACC_FRIENDDATA_MUTUAL_BUDDY (1u << 4)
+#define DWC_ACC_FRIENDDATA_REQUEST_SENT (1u << 5)
+#endif
 
 #define DWC_ACC_USERDATA_DIRTY      1u
 #define DWC_ACC_USERDATA_DIRTY_MASK 1u
@@ -104,6 +109,19 @@ extern "C"
     BOOL DWC_IsEqualFriendData(const DWCAccFriendData* frienddata1, const DWCAccFriendData* frienddata2);
     BOOL DWC_IsValidFriendData(const DWCAccFriendData* frienddata);
     BOOL DWC_IsBuddyFriendData(const DWCAccFriendData* frienddata);
+#if defined(VERSION_R4QK01)
+    BOOL DWCi_IsBuddyFlagSet(const DWCAccFriendData* frienddata);
+    BOOL DWCi_IsFriendAuthorized(const DWCAccFriendData* frienddata);
+    BOOL DWCi_IsFriendRequestSent(const DWCAccFriendData* frienddata);
+    void DWCi_SetFriendAuthorized(DWCAccFriendData* frienddata, BOOL authorized);
+    void DWCi_SetMutualBuddyFlag(DWCAccFriendData* frienddata, BOOL isBuddy);
+    void DWCi_SetFriendRequestSent(DWCAccFriendData* frienddata, BOOL sent);
+#else
+    static inline BOOL DWCi_IsBuddyFlagSet(const DWCAccFriendData* frienddata)
+    {
+        return DWC_IsBuddyFriendData(frienddata);
+    }
+#endif
     int DWC_GetFriendDataType(const DWCAccFriendData* frienddata);
     void DWC_ClearBuddyFlagFriendData(DWCAccFriendData* frienddata);
 

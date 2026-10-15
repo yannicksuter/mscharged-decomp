@@ -17,6 +17,10 @@ typedef enum {
   DWC_ERROR_FATAL = 9,
   DWC_ERROR_FRIENDS_SHORTAGE = 10,
   DWC_ERROR_NOT_FRIEND_SERVER = 11,
+#if defined(VERSION_R4QK01)
+  DWC_ERROR_SERVER_FULL = 12,
+  DWC_ERROR_MATCH_LOCKED = 23,
+#else
   DWC_ERROR_MO_SC_CONNECT_BLOCK = 12,
   DWC_ERROR_SERVER_FULL = 13,
   DWC_ERROR_ND_ANY,
@@ -26,6 +30,7 @@ typedef enum {
   DWC_ERROR_PROF_PARSEERR,
   DWC_ERROR_PROF_HTTP,
   DWC_ERROR_NUM,
+#endif
 } DWCErrorType;
 
 //! @brief @return Return if there is an error.

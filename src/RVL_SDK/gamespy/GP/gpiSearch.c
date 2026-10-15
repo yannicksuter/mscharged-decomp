@@ -785,8 +785,10 @@ static GPResult gpiProcessSearch(GPConnection* connection,
                   strzcpy(match->nick, value, GP_NICK_LEN);
                 else if (strcmp(key, "uniquenick") == 0)
                   strzcpy(match->uniquenick, value, GP_UNIQUENICK_LEN);
-                // else if (strcmp(key, "namespaceid") == 0)
-                //   match->namespaceID = atoi(value);
+#if defined(VERSION_R4QK01)
+                else if (strcmp(key, "namespaceid") == 0)
+                  match->namespaceID = atoi(value);
+#endif
                 else if (strcmp(key, "firstname") == 0)
                   strzcpy(match->firstname, value, GP_FIRSTNAME_LEN);
                 else if (strcmp(key, "lastname") == 0)
