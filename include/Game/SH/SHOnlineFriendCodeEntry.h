@@ -31,7 +31,7 @@ public:
     void OnDigitPointerLeave(int index, void* context);
     void RestoreFriendCodeInput();
     void UpdateConfirmButton();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     void OnAddFriendErrorDismissed();
 #endif
     void SetDigit(int index, const wchar_t* text);
@@ -40,7 +40,7 @@ public:
     void ClearDigitTexts();
     void SetSelectedDigit(int index);
     unsigned long long ParseFriendKey();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     void ShowAddFriendError(int error);
 #endif
     void OnKeypadPointerPress(int index, void* context);
@@ -56,11 +56,11 @@ public:
     /* 0x1210 */ TLComponentInstance* mKeypadInstances[12];
     /* 0x1240 */ TLComponentInstance* mDigitInstances[12];
     /* 0x1270 */ TLComponentInstance* mOutConfirmButtonInstance;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     /* 0x1274 */ bool mPopupActive;
     /* 0x1275 */ unsigned char mPadding1275[3];
 #endif
-    /* 0x1278 (USA), 0x1274 (Europe) */ int mState;
-}; // size 0x127C (USA), 0x1278 (Europe)
+    /* 0x1278 (USA/Japan/Korea), 0x1274 (Europe) */ int mState;
+}; // size 0x127C (USA/Japan/Korea), 0x1278 (Europe)
 
 #endif // GAME_SH_ONLINE_FRIEND_CODE_ENTRY_H

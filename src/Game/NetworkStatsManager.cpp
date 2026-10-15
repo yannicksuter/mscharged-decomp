@@ -200,7 +200,7 @@ bool NetworkStatsManager::RequestRankings(int category)
     mRequestedCategory = category;
     NetworkLeaderboardCategory& leaderboard = mCategories[category];
     leaderboard.mAvailable = false;
-#if !defined(VERSION_R4QE01)
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
     leaderboard.mCount = 0;
     leaderboard.mLocalPlayerIndex = -1;
 #endif
@@ -215,7 +215,7 @@ bool NetworkStatsManager::RequestRankings(int category)
         return true;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     leaderboard.mCount = 0;
     leaderboard.mLocalPlayerIndex = -1;
 #endif
@@ -879,9 +879,14 @@ void NetworkStatsManager::ReportGameResult(int result,
                 }
             }
 
-            if (mLocalStats[category].mScore > 999999)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+            const int maxScore = 99999;
+#else
+            const int maxScore = 999999;
+#endif
+            if (mLocalStats[category].mScore > maxScore)
             {
-                mLocalStats[category].mScore = 999999;
+                mLocalStats[category].mScore = maxScore;
             }
             if (mLocalStats[category].mWins > 9999)
             {
