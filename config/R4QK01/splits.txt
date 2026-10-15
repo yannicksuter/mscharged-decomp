@@ -6148,18 +6148,19 @@ RVL_SDK/net/md5.c:
 	.data       start:0x80520960 end:0x80520B20
 	.sdata      start:0x806038B8 end:0x806038C0
 
-RVL_SDK/hbm/HBMAnmController.cpp:
-	.data       start:0x80521F60 end:0x80521F8C
-
-RVL_SDK/dwc/dwc_base64.c:
-	.data       start:0x80524DF0 end:0x80524E38
-
 RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
 	.rodata     start:0x804BE474 end:0x804BE4FC align:4
 
 RVL_SDK/net/hmac.c:
 	.text       start:0x8042AA20 end:0x8042AE10
+	.data       start:0x80520B20 end:0x80520B78
 	.sdata      start:0x806038C0 end:0x806038D0
+
+RVL_SDK/hbm/HBMAnmController.cpp:
+	.data       start:0x80521F60 end:0x80521F8C
+
+RVL_SDK/dwc/dwc_base64.c:
+	.data       start:0x80524DF0 end:0x80524E38
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0
