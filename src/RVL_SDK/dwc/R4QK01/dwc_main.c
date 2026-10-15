@@ -58,8 +58,8 @@ typedef struct DWCConnectionInfo
 static GT2Connection stGt2ConnectionList[32];
 static DWCConnectionInfo stConnectionInfoList[32];
 static u8 stAidList[32];
-static DWCControl* stpDwcCnt;
 static int stLastSocketError;
+static DWCControl* stpDwcCnt;
 
 static inline void DWCi_PrintNodeInfo(DWCControl* control, int index);
 static inline void DWCi_PrintReservationData(DWCControl* control, int index);
