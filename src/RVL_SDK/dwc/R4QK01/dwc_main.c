@@ -61,6 +61,9 @@ static u8 stAidList[32];
 static DWCControl* stpDwcCnt;
 static int stLastSocketError;
 
+static inline void DWCi_PrintNodeInfo(DWCControl* control, int index);
+static inline void DWCi_PrintReservationData(DWCControl* control, int index);
+
 void DWCi_MatchedCallback(DWCError, BOOL, BOOL, BOOL, int, void*);
 
 static void DWCi_SetState(DWCState state);
@@ -1041,20 +1044,12 @@ void DWCi_MatchedCallback(DWCError error, BOOL cancel, BOOL self,
         DWC_Printf(DWC_REPORTFLAG_DEBUG, "[**node info]\n");
         for (i = 0; i < stpDwcCnt->matchcnt.nodeList.count; i++)
         {
-            DWCNodeInfo* node = &stpDwcCnt->matchcnt.nodeList.nodes[i];
-            DWC_Printf(DWC_REPORTFLAG_DEBUG,
-                "[%02d] aid = %d, pid = %u, qr2 pub adr=%s\n", i,
-                node->aid, node->profileID,
-                gt2AddressToString(node->publicIP, node->publicPort, NULL));
+            DWCi_PrintNodeInfo(stpDwcCnt, i);
         }
         DWC_Printf(DWC_REPORTFLAG_DEBUG, "[**user data]\n");
         for (i = 0; i < stpDwcCnt->matchcnt.nodeList.count; i++)
         {
-            DWCNodeInfo* node = &stpDwcCnt->matchcnt.nodeList.nodes[i];
-            DWC_Printf(DWC_REPORTFLAG_DEBUG,
-                "[%02d] aid = %d  buf[ 0=%d 1=%d 2=%d 3=%d ]\n", i,
-                node->aid, node->reservationData[0], node->reservationData[1],
-                node->reservationData[2], node->reservationData[3]);
+            DWCi_PrintReservationData(stpDwcCnt, i);
         }
     }
     if (!stpDwcCnt->matchcnt.closeAllRequested)
@@ -1462,20 +1457,12 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
     DWC_Printf(DWC_REPORTFLAG_DEBUG, "[**node info]\n");
     for (i = 0; i < stpDwcCnt->matchcnt.nodeList.count; i++)
     {
-        DWCNodeInfo* node = &stpDwcCnt->matchcnt.nodeList.nodes[i];
-        DWC_Printf(DWC_REPORTFLAG_DEBUG,
-            "[%02d] aid = %d, pid = %u, qr2 pub adr=%s\n", i,
-            node->aid, node->profileID,
-            gt2AddressToString(node->publicIP, node->publicPort, NULL));
+        DWCi_PrintNodeInfo(stpDwcCnt, i);
     }
     DWC_Printf(DWC_REPORTFLAG_DEBUG, "[**user data]\n");
     for (i = 0; i < stpDwcCnt->matchcnt.nodeList.count; i++)
     {
-        DWCNodeInfo* node = &stpDwcCnt->matchcnt.nodeList.nodes[i];
-        DWC_Printf(DWC_REPORTFLAG_DEBUG,
-            "[%02d] aid = %d  buf[ 0=%d 1=%d 2=%d 3=%d ]\n", i,
-            node->aid, node->reservationData[0], node->reservationData[1],
-            node->reservationData[2], node->reservationData[3]);
+        DWCi_PrintReservationData(stpDwcCnt, i);
     }
     if (stpDwcCnt->matchcnt.hostState == 2)
         qr2_send_statechanged(stpDwcCnt->matchcnt.qr2Obj);
@@ -1520,4 +1507,23 @@ static void DWCi_GT2PingCallback(GT2Connection connection, int latency)
 {
     DWC_Printf(DWC_REPORTFLAG_TRANSPORT, "Ping: %dms\n", latency);
     DWCi_PingCallback(connection, latency);
+}
+
+static inline void DWCi_PrintNodeInfo(DWCControl* control, int index)
+{
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "[%02d] aid = %d, pid = %u, qr2 pub adr=%s\n", index,
+        control->matchcnt.nodeList.nodes[index].aid,
+        control->matchcnt.nodeList.nodes[index].profileID,
+        gt2AddressToString(control->matchcnt.nodeList.nodes[index].publicIP,
+            control->matchcnt.nodeList.nodes[index].publicPort, NULL));
+}
+
+static inline void DWCi_PrintReservationData(DWCControl* control, int index)
+{
+    const u8* data = control->matchcnt.nodeList.nodes[index].reservationData;
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "[%02d] aid = %d  buf[ 0=%d 1=%d 2=%d 3=%d ]\n", index,
+        control->matchcnt.nodeList.nodes[index].aid,
+        data[0], data[1], data[2], data[3]);
 }
