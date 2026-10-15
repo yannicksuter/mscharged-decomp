@@ -3954,6 +3954,7 @@ NL/nlFont.cpp:
 	.sdata2     start:0x80609D98 end:0x80609DC0
 
 NL/nlTextBox.cpp:
+	.text       start:0x8030A76C end:0x8030ADB8
 	.sdata2     start:0x80609DC0 end:0x80609DD8
 
 NL/nlTextEscape.cpp:

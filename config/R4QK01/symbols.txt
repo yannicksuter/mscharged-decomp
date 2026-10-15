@@ -6538,7 +6538,7 @@ LexicalCast<49BasicString<c,Q26Detail23TempStringHeapAllocator>,i>__FRCi_49Basic
 Do__Q26Detail70LexicalCastImpl<49BasicString<c,Q26Detail23TempStringHeapAllocator>,i>Fi = .text:0x801CBD9C; // type:function size:0x100
 LexicalCast<46BasicString<Us,Q26Detail19TempStringAllocator>,A11_Us>__FRA11_CUs_46BasicString<Us,Q26Detail19TempStringAllocator> = .text:0x801CBE9C; // type:function size:0xD8
 LexicalCast<46BasicString<Us,Q26Detail19TempStringAllocator>,46BasicString<Us,Q26Detail19TempStringAllocator>>__FRC46BasicString<Us,Q26Detail19TempStringAllocator>_46BasicString<Us,Q26Detail19TempStringAllocator> = .text:0x801CBF74; // type:function size:0x2C
-fn_801CBFA0 = .text:0x801CBFA0; // type:function size:0xA4
+nlBSearch<Q26nlFont9GlyphInfo,Q26nlFont9GlyphInfo>__FRCQ26nlFont9GlyphInfoPQ26nlFont9GlyphInfoi_PQ26nlFont9GlyphInfo = .text:0x801CBFA0; // type:function size:0xA4 scope:weak
 PlaySound__7FEAudioFiUlPCvPv = .text:0x801CC044; // type:function size:0x24
 PlayTrackedSound__7FEAudioFiUlPCvPv = .text:0x801CC068; // type:function size:0x28
 PlayAnimAudioEvent__7FEAudioFUlPCvPvb = .text:0x801CC090; // type:function size:0x44
@@ -10904,7 +10904,7 @@ freeFN__51BasicSlotPoolHigh<30ListEntry<Q26nlFont9GlyphInfo>>FPv = .text:0x8030A
 DeleteEntry__92ListContainerBase<Q26nlFont9GlyphInfo,51BasicSlotPoolHigh<30ListEntry<Q26nlFont9GlyphInfo>>>FP30ListEntry<Q26nlFont9GlyphInfo> = .text:0x8030A74C; // type:function size:0x10
 DeleteEntry__90ListContainerBase<Q26nlFont8KernPair,50BasicSlotPoolHigh<29ListEntry<Q26nlFont8KernPair>>>FP29ListEntry<Q26nlFont8KernPair> = .text:0x8030A75C; // type:function size:0x10
 ProcessString__9nlTextBoxFPC14FontCharStringPC6nlFontRC9nlVector2UlPC9nlMatrix4RQ29nlTextBox14StringDrawInfo = .text:0x8030A76C; // type:function size:0x3DC
-fn_8030AB48 = .text:0x8030AB48; // type:function size:0x270
+DrawString__9nlTextBoxFRCQ29nlTextBox14StringDrawInfoRC9nlVector2RC8nlColourP6GLView = .text:0x8030AB48; // type:function size:0x270
 __ct__16nlEscapeSequenceFPCUs = .text:0x8030ADB8; // type:function size:0x170
 GetExtendedColour__16nlEscapeSequenceFv = .text:0x8030AF28; // type:function size:0xB4
 __sinit_\nlTextEscape_cpp = .text:0x8030AFDC; // type:function size:0xA8 scope:local
