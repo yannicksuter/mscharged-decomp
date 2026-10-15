@@ -159,7 +159,11 @@ void FEScrollBar::SetRange(int value)
         feVector3 position = mThumb->GetAssetPosition();
         if (mThumbStartY == 9999.9f)
             mThumbStartY = position.f.y;
+#if defined(VERSION_R4QK01)
+        mTopPosition = distance / 2.0f + mThumbStartY;
+#else
         mTopPosition = distance / 2.0f + position.f.y;
+#endif
         mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
         mThumb->m_bVisible = true;
     }
