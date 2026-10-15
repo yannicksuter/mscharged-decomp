@@ -1060,7 +1060,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlEvent.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFile.cpp", extra_cflags=["-i src/zlib"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/nlFileGC.cpp", extra_cflags=["-inline nobottomup", "-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlFunctionMemory.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlInit.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/nlIntersection.cpp"),
