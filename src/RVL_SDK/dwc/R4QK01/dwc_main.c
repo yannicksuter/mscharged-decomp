@@ -95,6 +95,18 @@ static void DWCi_GT2ClosedCallback(GT2Connection, GT2CloseReason);
 static void DWCi_GT2PingCallback(GT2Connection, int);
 static void DWCi_LoginCallback(DWCError, int, void*);
 
+static void DWCi_UpdateServersCallback(int error, BOOL isChanged, void* param);
+static GT2Result DWCi_HandleGT2Error(GT2Result result);
+static void DWCi_GT2SocketErrorCallback(GT2Socket socket);
+void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection,
+    unsigned int ip, unsigned short port, int latency, GT2Byte* message, int len);
+GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket,
+    unsigned int ip, unsigned short port, GT2Byte* message, int len);
+BOOL fn_80450660(void);
+int fn_8046F650(void);
+
+#define MULTIPLIER -1664117991
+
 void DWC_InitFriendsMatch(DWCFriendsMatchControl* dwccnt,
     DWCUserData* userdata, int productID, const char* gameName,
     const char* secretKey, int sendBufSize, int recvBufSize,
@@ -346,8 +358,6 @@ void DWC_ProcessFriendsMatch(void)
     }
 }
 
-
-#define MULTIPLIER -1664117991
 static int StringHash(const char* s, int numbuckets)
 {
     goa_uint32 hashcode = 0;
@@ -435,13 +445,6 @@ BOOL DWC_LoginAsync(const u16* ingamesn, const char* reserved,
     return TRUE;
 }
 
-BOOL fn_80450660(void);
-
-static void DWCi_UpdateServersCallback(int error, BOOL isChanged, void* param)
-{
-    stpDwcCnt->updateServersCallback(error, isChanged, stpDwcCnt->updateServersParam);
-}
-
 BOOL DWC_UpdateServersAsync(const char* playerName,
     DWCUpdateServersCallback updateCallback, void* updateParam,
     DWCFriendStatusCallback statusCallback, void* statusParam,
@@ -482,6 +485,81 @@ BOOL DWC_ConnectToAnybodyAsync(int topology, u8 numEntry, const char* addFilter,
     DWCi_ConnectToAnybodyAsync(topology, (u8)(numEntry - 1), addFilter,
         DWCi_MatchedCallback, NULL, newClientCallback, newClientParam,
         evalCallback, evalParam, reservationCallback, reservationData, reservationParam);
+    return TRUE;
+}
+
+BOOL DWC_ConnectToFriendsAsync(int topology, const u8 friendIdxList[],
+    int friendIdxListLen, u8 maxEntry,
+    DWCMatchedSCCallback matchedCallback, void* matchedParam,
+    DWCNewClientCallback newClientCallback, void* newClientParam,
+    DWCEvalPlayerCallback evalCallback, void* evalParam,
+    DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam)
+{
+    u8 tmpFriendIdxList[DWC_MAX_MATCH_IDX_LIST];
+    u8 idxList[DWC_MAX_MATCH_IDX_LIST];
+    int i;
+    int j;
+    u32 randIdx;
+
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "!!DWC_ConnectToFriendsAsync() was called!!\n");
+    if (DWCi_IsError() || stpDwcCnt->state != DWC_STATE_ONLINE)
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
+        return FALSE;
+    }
+
+    DWCi_ClearGT2ConnectionList();
+    stpDwcCnt->matchedCallback = matchedCallback;
+    stpDwcCnt->matchedParam = matchedParam;
+    DWCi_SetState(DWC_STATE_MATCHING);
+    stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_FRIEND;
+    stpDwcCnt->matchcnt._8C8 = 0;
+
+    if (friendIdxList)
+    {
+        DWCi_ConnectToFriendsAsync(topology, friendIdxList, friendIdxListLen,
+            (u8)(maxEntry - 1), DWCi_MatchedCallback, NULL,
+            newClientCallback, newClientParam, evalCallback, evalParam,
+            reservationCallback, reservationData, reservationParam);
+    }
+    else
+    {
+        friendIdxListLen = 0;
+        for (i = 0; i < DWCi_GetFriendListLen(); i++)
+        {
+            idxList[i] = i;
+        }
+
+        for (i = 0; i < DWCi_GetFriendListLen(); i++)
+        {
+            randIdx = DWCi_GetMathRand32(
+                (u32)(DWCi_GetFriendListLen() - i));
+
+#ifdef DWC_MATCH_ACCEPT_NO_FRIEND
+            tmpFriendIdxList[i] = idxList[randIdx];
+            friendIdxListLen++;
+#else
+            if (DWCi_Acc_IsValidFriendData(
+                    &(DWCi_GetFriendList())[idxList[randIdx]]))
+            {
+                tmpFriendIdxList[i] = idxList[randIdx];
+                friendIdxListLen++;
+            }
+#endif
+
+            for (j = randIdx; j < DWCi_GetFriendListLen() - i - 1; j++)
+            {
+                idxList[j] = idxList[j + 1];
+            }
+        }
+
+        DWCi_ConnectToFriendsAsync(topology, tmpFriendIdxList, friendIdxListLen,
+            (u8)(maxEntry - 1), DWCi_MatchedCallback, NULL,
+            newClientCallback, newClientParam, evalCallback, evalParam,
+            reservationCallback, reservationData, reservationParam);
+    }
+
     return TRUE;
 }
 
@@ -578,6 +656,41 @@ error:
     return TRUE;
 }
 
+BOOL DWC_ConnectToGameServerByGroupID(int topology, u32 groupID,
+    DWCMatchedSCCallback matchedCallback, void* matchedParam,
+    DWCNewClientCallback newClientCallback, void* newClientParam,
+    DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam)
+{
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "!!DWC_ConnectToGameServerByGroupID() was called!!\n");
+    if (DWCi_IsError() || stpDwcCnt->state != DWC_STATE_ONLINE)
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
+        return FALSE;
+    }
+    DWCi_ClearGT2ConnectionList();
+    stpDwcCnt->matchedCallback = matchedCallback;
+    stpDwcCnt->matchedParam = matchedParam;
+    DWCi_SetState(DWC_STATE_MATCHING);
+    stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_SC_CL;
+    stpDwcCnt->matchcnt._8C8 = 0;
+    DWCi_ConnectToGameServerByGroupID(topology, groupID,
+        DWCi_MatchedCallback, NULL, newClientCallback, newClientParam,
+        reservationCallback, reservationData, reservationParam);
+    return TRUE;
+}
+
+BOOL DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback callback,
+    void* param)
+{
+    if (stpDwcCnt == NULL)
+    {
+        return FALSE;
+    }
+    stpDwcCnt->closedCallback = callback;
+    stpDwcCnt->closedParam = param;
+    return TRUE;
+}
 
 int DWC_CloseAllConnectionsHard(void)
 {
@@ -639,120 +752,6 @@ int DWC_CloseAllConnectionsHard(void)
     }
     return 0;
 }
-
-static void DWCi_SetState(DWCState state)
-{
-    const char* names[] = {
-        "DWC_STATE_INIT", "DWC_STATE_AVAILABLE_CHECK", "DWC_STATE_LOGIN",
-        "DWC_STATE_ONLINE", "DWC_STATE_MATCHING", "DWC_STATE_CONNECTED"
-    };
-    DWC_Printf(DWC_REPORTFLAG_DEBUG, "dwc state changed %s -> %s\n", names[stpDwcCnt->state], names[state]);
-    stpDwcCnt->lastState = stpDwcCnt->state;
-    stpDwcCnt->state = state;
-}
-
-static void DWCi_ClearGT2ConnectionList(void)
-{
-    memset(stGt2ConnectionList, 0, sizeof(stGt2ConnectionList));
-    memset(stConnectionInfoList, 0, sizeof(stConnectionInfoList));
-}
-
-static GT2Result DWCi_HandleGT2Error(GT2Result result);
-static void DWCi_GT2SocketErrorCallback(GT2Socket socket);
-void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection,
-    unsigned int ip, unsigned short port, int latency, GT2Byte* message, int len);
-GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket,
-    unsigned int ip, unsigned short port, GT2Byte* message, int len);
-
-GT2Result DWCi_GT2Startup(void)
-{
-    u16 port;
-    GT2Result result;
-
-    if (stpDwcCnt->gt2Socket != NULL)
-    {
-        DWC_Printf(8, "gt2Socket is already made.\n");
-        return GT2Success;
-    }
-
-    port = DWCi_GetMathRand32(0x4000) + 0xC000;
-    DWC_Printf(0x40, "--- Private port = %d ---\n", port);
-    result = gt2CreateSocket(&stpDwcCnt->gt2Socket,
-        gt2AddressToString(0, port, NULL),
-        stpDwcCnt->gt2SendBufSize,
-        stpDwcCnt->gt2RecvBufSize,
-        DWCi_GT2SocketErrorCallback);
-    if (DWCi_HandleGT2Error(result))
-    {
-        return result;
-    }
-    gt2Listen(stpDwcCnt->gt2Socket, DWCi_GT2ConnectAttemptCallback);
-    gt2SetUnrecognizedMessageCallback(
-        stpDwcCnt->gt2Socket, DWCi_GT2UnrecognizedMessageCallback);
-    return result;
-}
-
-static GT2Result DWCi_HandleGT2Error(GT2Result result)
-{
-    int error;
-    int errorCode;
-
-    if (result == GT2Success)
-    {
-        return FALSE;
-    }
-    DWC_Printf(2, "Main, GT2 error %d\n", result);
-    switch (result)
-    {
-    case GT2OutOfMemory:
-        error = DWC_ERROR_FATAL;
-        errorCode = DWC_ECODE_TYPE_ALLOC;
-        break;
-    case GT2Rejected:
-    case GT2DuplicateAddress:
-        error = DWC_ERROR_NONE;
-        errorCode = 0;
-        result = FALSE;
-        break;
-    case GT2NetworkError:
-        error = DWC_ERROR_NETWORK;
-        errorCode = DWC_ECODE_TYPE_NETWORK;
-        break;
-    case GT2AddressError:
-        error = DWC_ERROR_NETWORK;
-        errorCode = -30;
-        break;
-    case GT2TimedOut:
-        error = DWC_ERROR_NETWORK;
-        errorCode = -70;
-        break;
-    case GT2NegotiationError:
-        error = DWC_ERROR_NETWORK;
-        errorCode = -80;
-        break;
-    }
-    if (error != 0)
-    {
-        DWCi_StopLogin(error,
-            DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_GT2 + errorCode);
-    }
-    return result;
-}
-
-static void DWCi_GT2SocketErrorCallback(GT2Socket socket)
-{
-    stLastSocketError = GOAGetLastError(gt2GetSocketSOCKET(socket));
-
-    DWC_Printf(DWC_REPORTFLAG_ERROR, "Socket fatal error! (%d)\n",
-        stLastSocketError);
-
-    DWCi_SetError(DWC_ERROR_FATAL,
-        DWC_ECODE_SEQ_ETC + DWC_ECODE_GS_GT2
-            + DWC_ECODE_TYPE_SO_SOCKET);
-    stpDwcCnt->gt2Socket = NULL;
-}
-
-
 
 static BOOL DWCi_HasConnectionList(void)
 {
@@ -821,6 +820,15 @@ BOOL DWC_IsValidAID(u8 aid)
     return DWCi_GetNodeByAID(aid) != NULL;
 }
 
+DWCState DWC_GetState(void)
+{
+    if (stpDwcCnt != NULL)
+    {
+        return stpDwcCnt->state;
+    }
+    return DWC_STATE_INIT;
+}
+
 static inline u8 DWC_GetServerAID(void)
 {
     DWCNodeInfo* node;
@@ -861,25 +869,49 @@ BOOL fn_80454BB0(void)
     return stpDwcCnt->matchcnt.hostState == 2;
 }
 
-u8 fn_804568A0(void)
+static void DWCi_ClearGT2ConnectionList(void)
 {
-    u8 aid = DWC_GetServerAID();
-    if (aid == 0xFF)
-    {
-        DWCNodeInfo* node = DWCi_GetNodeByIndex(0);
-        if (node != NULL)
-            aid = node->aid;
-    }
-    return aid;
+    memset(stGt2ConnectionList, 0, sizeof(stGt2ConnectionList));
+    memset(stConnectionInfoList, 0, sizeof(stConnectionInfoList));
 }
 
-DWCState DWC_GetState(void)
+GT2Result DWCi_GT2Startup(void)
 {
-    if (stpDwcCnt != NULL)
+    u16 port;
+    GT2Result result;
+
+    if (stpDwcCnt->gt2Socket != NULL)
     {
-        return stpDwcCnt->state;
+        DWC_Printf(8, "gt2Socket is already made.\n");
+        return GT2Success;
     }
-    return DWC_STATE_INIT;
+
+    port = DWCi_GetMathRand32(0x4000) + 0xC000;
+    DWC_Printf(0x40, "--- Private port = %d ---\n", port);
+    result = gt2CreateSocket(&stpDwcCnt->gt2Socket,
+        gt2AddressToString(0, port, NULL),
+        stpDwcCnt->gt2SendBufSize,
+        stpDwcCnt->gt2RecvBufSize,
+        DWCi_GT2SocketErrorCallback);
+    if (DWCi_HandleGT2Error(result))
+    {
+        return result;
+    }
+    gt2Listen(stpDwcCnt->gt2Socket, DWCi_GT2ConnectAttemptCallback);
+    gt2SetUnrecognizedMessageCallback(
+        stpDwcCnt->gt2Socket, DWCi_GT2UnrecognizedMessageCallback);
+    return result;
+}
+
+static void DWCi_SetState(DWCState state)
+{
+    const char* names[] = {
+        "DWC_STATE_INIT", "DWC_STATE_AVAILABLE_CHECK", "DWC_STATE_LOGIN",
+        "DWC_STATE_ONLINE", "DWC_STATE_MATCHING", "DWC_STATE_CONNECTED"
+    };
+    DWC_Printf(DWC_REPORTFLAG_DEBUG, "dwc state changed %s -> %s\n", names[stpDwcCnt->state], names[state]);
+    stpDwcCnt->lastState = stpDwcCnt->state;
+    stpDwcCnt->state = state;
 }
 
 GT2Connection DWCi_GetGT2Connection(u8 aid)
@@ -958,7 +990,6 @@ BOOL DWCi_IsValidAID(u8 aid)
     return FALSE;
 }
 
-
 static GPResult DWCi_HandleGPError(GPResult result)
 {
     int errorCode;
@@ -1022,6 +1053,146 @@ static GPResult DWCi_HandleGPError(GPResult result)
     return result;
 }
 
+static GT2Result DWCi_HandleGT2Error(GT2Result result)
+{
+    int error;
+    int errorCode;
+
+    if (result == GT2Success)
+    {
+        return FALSE;
+    }
+    DWC_Printf(2, "Main, GT2 error %d\n", result);
+    switch (result)
+    {
+    case GT2OutOfMemory:
+        error = DWC_ERROR_FATAL;
+        errorCode = DWC_ECODE_TYPE_ALLOC;
+        break;
+    case GT2Rejected:
+    case GT2DuplicateAddress:
+        error = DWC_ERROR_NONE;
+        errorCode = 0;
+        result = FALSE;
+        break;
+    case GT2NetworkError:
+        error = DWC_ERROR_NETWORK;
+        errorCode = DWC_ECODE_TYPE_NETWORK;
+        break;
+    case GT2AddressError:
+        error = DWC_ERROR_NETWORK;
+        errorCode = -30;
+        break;
+    case GT2TimedOut:
+        error = DWC_ERROR_NETWORK;
+        errorCode = -70;
+        break;
+    case GT2NegotiationError:
+        error = DWC_ERROR_NETWORK;
+        errorCode = -80;
+        break;
+    }
+    if (error != 0)
+    {
+        DWCi_StopLogin(error,
+            DWC_ECODE_SEQ_LOGIN + DWC_ECODE_GS_GT2 + errorCode);
+    }
+    return result;
+}
+
+int DWCi_CloseConnectionHard(u8 aid)
+{
+    GT2Connection connection;
+    DWCNodeInfo* node;
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "!!DWCi_CloseConnectionHard() was called!! aid = %d.\n", aid);
+    if (!stpDwcCnt || DWCi_IsError()
+        || (stpDwcCnt->state != DWC_STATE_MATCHING
+            && stpDwcCnt->state != DWC_STATE_CONNECTED))
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
+        return -1;
+    }
+    connection = DWCi_GetGT2Connection(aid);
+    if (connection == NULL)
+    {
+        node = DWCi_GetNodeByAID(aid);
+        if (node == NULL)
+        {
+            DWC_Printf(DWC_REPORTFLAG_DEBUG, "No connection!\n");
+            return -2;
+        }
+        fn_80455E60(NULL, GT2LocalClose, TRUE, node->aid);
+        return 0;
+    }
+    gt2CloseConnectionHard(connection);
+    return 0;
+}
+
+int DWCi_CloseConnectionHardBitmap(u32* bitmap)
+{
+    u8 aid;
+    u32 bitmask;
+
+    DWC_Printf(DWC_REPORTFLAG_DEBUG,
+        "!!DWCi_CloseConnectionHardBitmap() was called!! AID bitmap = 0x%x\n",
+        bitmap == NULL ? 0 : *bitmap);
+
+    if (!stpDwcCnt || !bitmap || DWCi_IsError()
+        || (stpDwcCnt->state != DWC_STATE_MATCHING
+            && stpDwcCnt->state != DWC_STATE_CONNECTED))
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
+        return -1;
+    }
+
+    for (aid = 0; aid < DWC_MAX_CONNECTIONS; aid++)
+    {
+        bitmask = 1U << aid;
+
+        if (*bitmap & bitmask)
+        {
+            if (aid == DWC_GetMyAID())
+            {
+                *bitmap &= ~bitmask;
+            }
+            else if (DWCi_CloseConnectionHard(aid))
+            {
+                *bitmap &= ~bitmask;
+            }
+        }
+    }
+
+    if (!*bitmap)
+    {
+        return -2;
+    }
+    return 0;
+}
+
+static void DWCi_LoginCallback(
+    DWCError error, int profileID, void* param)
+{
+    if (error == 0)
+    {
+        stpDwcCnt->profileID = profileID;
+        DWCi_SetState(DWC_STATE_ONLINE);
+        DWCi_InitGPProcessCount();
+    }
+    else
+    {
+        DWCi_SetState(DWC_STATE_INIT);
+    }
+    if (stpDwcCnt->loginCallback != NULL)
+    {
+        stpDwcCnt->loginCallback(error, profileID, stpDwcCnt->loginParam);
+    }
+}
+
+static void DWCi_UpdateServersCallback(int error, BOOL isChanged, void* param)
+{
+    stpDwcCnt->updateServersCallback(error, isChanged, stpDwcCnt->updateServersParam);
+}
 
 void DWCi_MatchedCallback(DWCError error, BOOL cancel, BOOL self,
     BOOL isServer, int index, void* param)
@@ -1214,74 +1385,10 @@ static void DWCi_GPRecvBuddyMessageCallback(
     }
 }
 
-BOOL DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback callback,
-    void* param)
-{
-    if (stpDwcCnt == NULL)
-    {
-        return FALSE;
-    }
-    stpDwcCnt->closedCallback = callback;
-    stpDwcCnt->closedParam = param;
-    return TRUE;
-}
-
-
-int DWC_CloseConnectionHard(u8 aid)
-{
-    GT2Connection connection;
-    DWCNodeInfo* node;
-    DWC_Printf(DWC_REPORTFLAG_DEBUG,
-        "!!DWCi_CloseConnectionHard() was called!! aid = %d.\n", aid);
-    if (!stpDwcCnt || DWCi_IsError()
-        || (stpDwcCnt->state != DWC_STATE_MATCHING
-            && stpDwcCnt->state != DWC_STATE_CONNECTED))
-    {
-        DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
-        return -1;
-    }
-    connection = DWCi_GetGT2Connection(aid);
-    if (connection == NULL)
-    {
-        node = DWCi_GetNodeByAID(aid);
-        if (node == NULL)
-        {
-            DWC_Printf(DWC_REPORTFLAG_DEBUG, "No connection!\n");
-            return -2;
-        }
-        fn_80455E60(NULL, GT2LocalClose, TRUE, node->aid);
-        return 0;
-    }
-    gt2CloseConnectionHard(connection);
-    return 0;
-}
-
-static void DWCi_LoginCallback(
-    DWCError error, int profileID, void* param)
-{
-    if (error == 0)
-    {
-        stpDwcCnt->profileID = profileID;
-        DWCi_SetState(DWC_STATE_ONLINE);
-        DWCi_InitGPProcessCount();
-    }
-    else
-    {
-        DWCi_SetState(DWC_STATE_INIT);
-    }
-    if (stpDwcCnt->loginCallback != NULL)
-    {
-        stpDwcCnt->loginCallback(error, profileID, stpDwcCnt->loginParam);
-    }
-}
-
-
 static void DWCi_GT2ReceivedCallback(GT2Connection connection, GT2Byte* message, int len, GT2Bool reliable)
 {
     DWCi_RecvCallback(connection, message, len, reliable);
 }
-
-int fn_8046F650(void);
 
 static int DWCi_DeleteNodeAID(u8 aid)
 {
@@ -1507,6 +1614,31 @@ static void DWCi_GT2PingCallback(GT2Connection connection, int latency)
 {
     DWC_Printf(DWC_REPORTFLAG_TRANSPORT, "Ping: %dms\n", latency);
     DWCi_PingCallback(connection, latency);
+}
+
+static void DWCi_GT2SocketErrorCallback(GT2Socket socket)
+{
+    stLastSocketError = GOAGetLastError(gt2GetSocketSOCKET(socket));
+
+    DWC_Printf(DWC_REPORTFLAG_ERROR, "Socket fatal error! (%d)\n",
+        stLastSocketError);
+
+    DWCi_SetError(DWC_ERROR_FATAL,
+        DWC_ECODE_SEQ_ETC + DWC_ECODE_GS_GT2
+            + DWC_ECODE_TYPE_SO_SOCKET);
+    stpDwcCnt->gt2Socket = NULL;
+}
+
+u8 fn_804568A0(void)
+{
+    u8 aid = DWC_GetServerAID();
+    if (aid == 0xFF)
+    {
+        DWCNodeInfo* node = DWCi_GetNodeByIndex(0);
+        if (node != NULL)
+            aid = node->aid;
+    }
+    return aid;
 }
 
 static inline void DWCi_PrintNodeInfo(DWCControl* control, int index)

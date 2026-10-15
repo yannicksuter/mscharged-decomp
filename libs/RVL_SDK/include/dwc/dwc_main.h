@@ -37,13 +37,28 @@ extern "C"
         DWCUpdateServersCallback updateCallback, void* updateParam,
         DWCFriendStatusCallback statusCallback, void* statusParam,
         DWCDeleteFriendListCallback deleteCallback, void* deleteParam);
+#if defined(VERSION_R4QK01)
+    BOOL DWC_ConnectToFriendsAsync(int topology, const u8 friendIdxList[],
+        int friendIdxListLen, u8 maxEntry,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCEvalPlayerCallback evalCallback, void* evalParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    BOOL DWC_ConnectToGameServerByGroupID(int topology, u32 groupID,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    int DWCi_CloseConnectionHard(u8 aid);
+    int DWCi_CloseConnectionHardBitmap(u32* bitmap);
+#else
     BOOL DWC_ConnectToFriendsAsync(const u8 friendIdxList[],
         int friendIdxListLen, u8 numEntry, BOOL distantFriend,
         DWCMatchedCallback matchedCallback, void* matchedParam,
         DWCEvalPlayerCallback evalCallback, void* evalParam);
+    int DWC_CloseConnectionHardBitmap(u32* bitmap);
+#endif
 
     DWCState DWC_GetState(void);
-    int DWC_CloseConnectionHardBitmap(u32* bitmap);
     u32 DWC_GetAIDBitmap(void);
     BOOL DWC_IsValidAID(u8 aid);
 

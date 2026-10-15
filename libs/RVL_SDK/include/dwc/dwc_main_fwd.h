@@ -53,7 +53,9 @@ extern "C"
     void DWC_ShutdownFriendsMatch(void);
     void DWC_ProcessFriendsMatch(void);
     int DWC_CloseAllConnectionsHard(void);
+#if !defined(VERSION_R4QK01)
     int DWC_CloseConnectionHard(unsigned char aid);
+#endif
     int DWC_GetNumConnectionHost(void);
     unsigned char DWC_GetMyAID(void);
     int DWC_GetAIDList(unsigned char** aidList);
