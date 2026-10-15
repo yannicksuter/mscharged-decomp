@@ -85,6 +85,15 @@ void ResetTask::Run(float dt)
 
         if (g_pNetworkSession)
         {
+#if defined(VERSION_R4QK01)
+            if (g_pNetworkSession->mLoginThreadRunning)
+            {
+                while (!g_pNetworkSession->IsLoginThreadComplete())
+                {
+                    OSYieldThread();
+                }
+            }
+#endif
             g_pNetworkSession->Shutdown();
         }
 

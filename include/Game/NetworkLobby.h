@@ -131,10 +131,13 @@ public:
     /* 0x00ED */ bool mMachineInfoReceived[4];
     /* 0x00F1 */ u8 mPadding0F1[3];
     /* 0x00F4 */ NetworkDraftMachineInfo mMachineInfo[4];
-    /* 0x02F4 */ volatile bool mMatchmakingThreadRunning;
-    /* 0x02F5 */ u8 mPadding2F5[3];
-    /* 0x02F8 */ u8 mMatchmakingThread[0x318];
-    /* 0x0610 */ u8 mMatchmakingThreadStack[0x4000];
-}; // size: 0x4610
+#if defined(VERSION_R4QK01)
+    /* 0x02F4 */ int mCachedLocalMachineIndex;
+#endif
+    /* 0x02F4 / 0x02F8 (Korea) */ volatile bool mMatchmakingThreadRunning;
+    // Opaque OSThread storage retains the SDK type's eight-byte alignment.
+    /* 0x02F8 / 0x0300 (Korea) */ unsigned long long mMatchmakingThread[0x318 / sizeof(unsigned long long)];
+    /* 0x0610 / 0x0618 (Korea) */ u8 mMatchmakingThreadStack[0x4000];
+}; // size: 0x4610 / 0x4618 (Korea)
 
 #endif // GAME_NETWORK_LOBBY_H

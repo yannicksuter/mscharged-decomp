@@ -96,6 +96,9 @@ void NetworkLobby::Reset()
     mElapsedTime = 0.0f;
     mConnectionDeadline = 0.0f;
     mMachineCount = 0;
+#if defined(VERSION_R4QK01)
+    mCachedLocalMachineIndex = -1;
+#endif
     mGameStarted = 0;
     mUserMatchDataSize = 0;
     for (int i = 0; i < 4; ++i)
@@ -188,7 +191,16 @@ int NetworkLobby::GetLocalMachineIndex()
     {
         return -1;
     }
+#if defined(VERSION_R4QK01)
+    int index = DWC_GetMyAID();
+    if (index >= 0 && index < mMachineCount)
+    {
+        return index;
+    }
+    return mCachedLocalMachineIndex;
+#else
     return DWC_GetMyAID();
+#endif
 }
 
 TransportPlayerInfo* NetworkLobby::GetLocalPlayerInfo()
@@ -610,6 +622,9 @@ void NetworkLobby::OnMatchmakingResult(
         tDebugPrintManager::Print(DC_NETWORK,
             "Connected to anybody Number %d I am %d!\n",
             DWC_GetNumConnectionHost(), DWC_GetMyAID());
+#if defined(VERSION_R4QK01)
+        mCachedLocalMachineIndex = DWC_GetMyAID();
+#endif
         mMachineCount = GetConnectionCount();
         for (int aid = 0; aid < GetConnectionCount(); ++aid)
         {
@@ -766,6 +781,9 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
                 g_pFriendManager->mOwnStatus.mHeader.mStatus);
         }
 
+#if defined(VERSION_R4QK01)
+        mCachedLocalMachineIndex = DWC_GetMyAID();
+#endif
         if (acceptConnection)
         {
             int previousMachineCount = mMachineCount;
