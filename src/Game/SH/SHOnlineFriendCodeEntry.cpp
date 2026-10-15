@@ -33,7 +33,7 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     , mKeypadButtons()
     , mDigitButtons()
     , mBackButton()
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     , mPopupActive(false)
 #endif
     , mState(FRIEND_CODE_ENTRY_ENTERING)
@@ -195,7 +195,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
         return;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (mPopupActive && !g_pFEInput->HasInputLock(this))
     {
         return;
@@ -464,7 +464,7 @@ void SHOnlineFriendCodeEntry::UpdateConfirmButton()
     }
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
 {
     g_pFriendManager->SetOwnStatusInitial(true);
@@ -495,7 +495,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
 
         unsigned long long friendKey = ParseFriendKey();
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         int error = -1;
         if (g_pFriendManager->AddFriendKey(friendKey, &error))
 #else
@@ -520,7 +520,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         }
         else
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             g_pFriendManager->SetOwnStatusInitial(false);
             ShowAddFriendError(error);
 #endif

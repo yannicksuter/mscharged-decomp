@@ -14,7 +14,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/NetworkLobby.h"
 
-#if !defined(VERSION_R4QE01)
+#if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
 #include "NL/nlFunction.inl"
 #include "Game/FE/fePopupMenu.h"
 #endif
@@ -96,13 +96,13 @@ void FriendManager::GetOwnFriendKeyString(u16* output)
     FormatFriendKey(friendKey, output);
 }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 bool FriendManager::AddFriendKey(unsigned long long friendKey, int* error)
 #else
 bool FriendManager::AddFriendKey(unsigned long long friendKey)
 #endif
 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     *error = -1;
 #endif
 
@@ -113,7 +113,7 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey)
 
     if (friendKey == ownFriendKey)
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         *error = 0x66;
 #else
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
@@ -127,7 +127,7 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey)
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
     if (!DWC_CheckFriendKey(userData, friendKey))
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         *error = 0x65;
 #else
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
@@ -147,7 +147,7 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey)
         if (DWC_IsEqualFriendData(&token, friendData)
             || token.gs_profile_id.id == friendData->gs_profile_id.id)
         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             *error = 0x67;
 #else
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
@@ -176,7 +176,7 @@ bool FriendManager::AddFriendKey(unsigned long long friendKey)
         }
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     if (!added)
     {
         *error = 0x68;
@@ -698,11 +698,15 @@ int FriendManager::CountBuddies()
         if (DWC_IsValidFriendData(friendData)
             && DWC_GetFriendDataType(friendData) == DWC_FRIENDDATA_GS_PROFILE_ID)
         {
+#if defined(VERSION_R4QK01)
+            ++count;
+#else
             bool isBuddy = DWC_IsBuddyFriendData(friendData);
             if (isBuddy)
             {
                 ++count;
             }
+#endif
         }
     }
     return count;

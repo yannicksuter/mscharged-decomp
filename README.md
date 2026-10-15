@@ -42,8 +42,8 @@ your own legally obtained copy of the game.
 | [2007-05-25](https://www.nintendo.com/en-gb/Games/Wii/Mario-Strikers-Charged-Football-281892.html) | `R4QP01_rev1` | Europe - *Mario Strikers Charged Football* | Rev 1 | **Complete: 100% code / 100% linked** | `0a066b755b469648a371d1cfc2d1bcad315b2b4a` |
 | [2007-05-25](https://www.nintendo.com/en-gb/Games/Wii/Mario-Strikers-Charged-Football-281892.html) | `R4QP01_rev2` | Europe - *Mario Strikers Charged Football* | Rev 2 | **Complete: 100% code / 100% linked** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
 | [2007-07-30](https://www.nintendo.co.jp/ir/pdf/2008/080125e.pdf#page=8) | `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code / 100% linked** | `e96d2298067b70652752145b4e63644e6e1b1560` |
-| [2007-09-20](https://www.nintendo.co.jp/wii/softlist/n2007_2006.html) | `R4QJ01` | Japan - *Mario Strikers Charged* | Rev 0 | **In progress: 97.26% code / 91.06% linked** | `74be723403329158b1645d9961a3cd6be755cdb8` |
-| [2010-03-18](https://www.inven.co.kr/webzine/news/?news=26630) | `R4QK01` | Korea - *Mario Power Soccer* | Rev 0 | **In progress: 79.68% code / 69.26% linked** | `c2f893aa71911c4ad4dcead1474e517e8e598fcb` |
+| [2007-09-20](https://www.nintendo.co.jp/wii/softlist/n2007_2006.html) | `R4QJ01` | Japan - *Mario Strikers Charged* | Rev 0 | **In progress: 97.37% code / 91.39% linked** | `74be723403329158b1645d9961a3cd6be755cdb8` |
+| [2010-03-18](https://www.inven.co.kr/webzine/news/?news=26630) | `R4QK01` | Korea - *Mario Power Soccer* | Rev 0 | **In progress: 79.79% code / 69.60% linked** | `c2f893aa71911c4ad4dcead1474e517e8e598fcb` |
 
 Dates are the original regional Wii releases, sorted chronologically. Separate
 release dates for the EU disc revisions have not been verified; both EU rows
