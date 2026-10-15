@@ -1932,6 +1932,7 @@ Game/FE/Overlay/OverlayHandlerSuperAbility.cpp:
 
 Game/FE/Overlay/OverlayHandlerChallengePreview.cpp:
 	.text       start:0x801FC7A0 end:0x801FDD7C
+	.data       start:0x804E5618 end:0x804E5740
 	.sdata      start:0x806010F8 end:0x80601178
 	.sdata2     start:0x80608DE8 end:0x80608DF8
 
