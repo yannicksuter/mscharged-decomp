@@ -6213,7 +6213,7 @@ RVL_SDK/dwc/dwc_main.c:
 	.text       start:0x80453170 end:0x80456960
 	.data       start:0x80525C18 end:0x80526918
 	.bss        start:0x805FC028 end:0x805FC1C8
-	.sdata      start:0x806038F8 end:0x80603928
+	.sdata      start:0x806038F8 end:0x8060391C
 	.sbss       start:0x80606518 end:0x80606520
 
 RVL_SDK/dwc/dwc_match.c:
@@ -6221,7 +6221,7 @@ RVL_SDK/dwc/dwc_match.c:
 	.rodata     start:0x804BE570 end:0x804BE588
 	.data       start:0x80526918 end:0x805295C0
 	.bss        start:0x805FC1C8 end:0x805FC900
-	.sdata      start:0x80603928 end:0x80603A10
+	.sdata      start:0x80603920 end:0x80603A10
 	.sbss       start:0x80606520 end:0x80606540
 
 RVL_SDK/dwc/dwc_transport.c:

@@ -41,7 +41,8 @@ BOOL fn_80456F10(void);
 
 static DWCMatchControl* stpMatchCnt;
 static char* stpAddFilter;
-extern int lbl_80603924;
+int dwcMeshRetryLimit = 5;
+int dwcServerSearchRatio = -2;
 extern int lbl_80606524;
 extern BOOL lbl_80606528;
 extern int lbl_8060652C;
@@ -912,7 +913,7 @@ static qr2_error_t DWCi_HandleQR2Error(qr2_error_t error)
 
 static inline int DWCi_SelectSearchHostState(void)
 {
-    int ratio = lbl_80603924;
+    int ratio = dwcServerSearchRatio;
     if (ratio == -2)
     {
         int hostState = 3;
