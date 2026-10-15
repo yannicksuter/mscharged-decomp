@@ -46,9 +46,15 @@ extern "C"
     typedef struct DWCstTransportHeader DWCTransportHeader;
     typedef struct DWCstTransportConnection DWCTransportConnection;
 
+#if defined(VERSION_R4QK01)
+    typedef void (*DWCUserSendCallback)(int size, u8 aid, void* param);
+    typedef void (*DWCUserRecvTimeoutCallback)(u8 aid, void* param);
+    typedef void (*DWCUserPingCallback)(int latency, u8 aid, void* param);
+#else
     typedef void (*DWCUserSendCallback)(int size, u8 aid);
     typedef void (*DWCUserRecvTimeoutCallback)(u8 aid);
     typedef void (*DWCUserPingCallback)(int latency, u8 aid);
+#endif
 
     struct DWCstTransportConnection
     {
@@ -66,6 +72,9 @@ extern "C"
         u16 lastRecvType;
         OSTime previousRecvTick;
         u32 recvTimeoutTime;
+#if defined(VERSION_R4QK01)
+        OSTime lastPacketRecvTick;
+#endif
     };
 
     struct DWCstTransportInfo
@@ -75,7 +84,16 @@ extern "C"
         DWCUserRecvCallback recvCallback;
         DWCUserRecvTimeoutCallback recvTimeoutCallback;
         DWCUserPingCallback pingCallback;
+#if defined(VERSION_R4QK01)
+        void* sendParam;
+        void* recvParam;
+        void* recvTimeoutParam;
+        void* pingParam;
+#endif
         u16 sendSplitMax;
+#if defined(VERSION_R4QK01)
+        u32 packetRecvTimeout;
+#endif
     };
 
     struct DWCstTransportHeader

@@ -102,7 +102,21 @@ DWCi_Acc_GetFlag_DataType(const DWCAccFlag* userdata)
     return DWCi_Acc_GetFlags(userdata) & DWC_ACC_FRIENDDATA_MASK;
 }
 
+#if defined(VERSION_R4QK01)
 BOOL DWC_IsBuddyFriendData(const DWCAccFriendData* frienddata)
+{
+    if (DWCi_IsBuddyFlagSet(frienddata)
+        && DWCi_CHECK_FLAG(DWCi_Acc_GetFlags(&frienddata->flags), DWC_ACC_FRIENDDATA_AUTHORIZED))
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL DWCi_IsBuddyFlagSet(const DWCAccFriendData* frienddata)
+#else
+BOOL DWC_IsBuddyFriendData(const DWCAccFriendData* frienddata)
+#endif
 {
     if (DWCi_Acc_GetFlag_DataType(&frienddata->flags) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID)
     {
@@ -115,6 +129,18 @@ BOOL DWC_IsBuddyFriendData(const DWCAccFriendData* frienddata)
 
     return FALSE;
 }
+
+#if defined(VERSION_R4QK01)
+BOOL DWCi_IsFriendAuthorized(const DWCAccFriendData* frienddata)
+{
+    return DWCi_CHECK_FLAG(DWCi_Acc_GetFlags(&frienddata->flags), DWC_ACC_FRIENDDATA_AUTHORIZED);
+}
+
+BOOL DWCi_IsFriendRequestSent(const DWCAccFriendData* frienddata)
+{
+    return DWCi_CHECK_FLAG(DWCi_Acc_GetFlags(&frienddata->flags), DWC_ACC_FRIENDDATA_REQUEST_SENT);
+}
+#endif
 
 int DWC_GetFriendDataType(const DWCAccFriendData* frienddata)
 {
@@ -155,6 +181,57 @@ void DWCi_SetBuddyFriendData(DWCAccFriendData* frienddata)
         DWCi_Acc_SetFlags(&frienddata->flags, flags);
     }
 }
+
+#if defined(VERSION_R4QK01)
+void DWCi_SetFriendAuthorized(DWCAccFriendData* frienddata, BOOL authorized)
+{
+    u32 flags;
+    if (authorized)
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags = (flags & ~DWC_ACC_FRIENDDATA_AUTHORIZED) | DWC_ACC_FRIENDDATA_AUTHORIZED;
+    }
+    else
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags &= ~DWC_ACC_FRIENDDATA_AUTHORIZED;
+    }
+    DWCi_Acc_SetFlags(&frienddata->flags, flags);
+}
+
+void DWCi_SetMutualBuddyFlag(DWCAccFriendData* frienddata, BOOL isBuddy)
+{
+    u32 flags;
+    if (isBuddy)
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags = (flags & ~DWC_ACC_FRIENDDATA_MUTUAL_BUDDY) | DWC_ACC_FRIENDDATA_MUTUAL_BUDDY;
+    }
+    else
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags &= ~DWC_ACC_FRIENDDATA_MUTUAL_BUDDY;
+    }
+    DWCi_Acc_SetFlags(&frienddata->flags, flags);
+}
+
+void DWCi_SetFriendRequestSent(DWCAccFriendData* frienddata, BOOL sent)
+{
+    u32 flags;
+    if (sent)
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags = (flags & ~DWC_ACC_FRIENDDATA_REQUEST_SENT) | DWC_ACC_FRIENDDATA_REQUEST_SENT;
+    }
+    else
+    {
+        flags = DWCi_Acc_GetFlags(&frienddata->flags);
+        flags &= ~DWC_ACC_FRIENDDATA_REQUEST_SENT;
+    }
+    DWCi_Acc_SetFlags(&frienddata->flags, flags);
+}
+
+#endif
 
 void DWC_ClearBuddyFlagFriendData(DWCAccFriendData* frienddata)
 {

@@ -30,12 +30,20 @@
 static int s_nTimeoutFindingMaxPlayersAcceptMin = 20;
 static float s_fConnectionTimeout = 5.0f;
 
-static void MatchmakingCallback(
-    DWCError error, BOOL cancelled, void* param);
+#if defined(VERSION_R4QK01)
+static void MatchmakingCallback(DWCError error, BOOL cancelled, BOOL self,
+    BOOL isServer, int index, void* param);
+static void MatchmakingNewClientCallback(int index, void* param);
+static BOOL AcceptMatchmakingReservation(const void* reservationData, void* param);
+static BOOL AcceptFriendReservation(const void* reservationData, void* param);
+static void UserReceiveCallback(u8 aid, u8* buffer, int size, void* param);
+#else
+static void MatchmakingCallback(DWCError error, BOOL cancelled, void* param);
+static void UserReceiveCallback(u8 aid, u8* buffer, int size);
+#endif
 static int EvaluateMatchmakingPlayer(int index, void* param);
 static void ConnectionClosedCallback(
     int error, int isLocal, int isServer, u8 aid, int index, void* param);
-static void UserReceiveCallback(u8 aid, u8* buffer, int size);
 static void* MatchmakingThreadFunc(void* param);
 static void NewClientCallback(int index, void* param);
 static void FriendMatchCallback(DWCError error, BOOL cancelled, BOOL self,
@@ -129,7 +137,11 @@ unsigned int NetworkLobby::GetMachineAid(int index)
     {
         return 0;
     }
+#if defined(VERSION_R4QK01)
+    if (index == GetLocalMachineIndex())
+#else
     if (index == DWC_GetMyAID())
+#endif
     {
         return (unsigned int)-1;
     }
@@ -148,7 +160,11 @@ int NetworkLobby::MachineIdxFromConnection(unsigned int connection)
     }
     if (connection == (unsigned int)-1)
     {
+#if defined(VERSION_R4QK01)
+        return GetLocalMachineIndex();
+#else
         return DWC_GetMyAID();
+#endif
     }
     return *((u8*)connection + 0x27);
 }
@@ -227,7 +243,11 @@ void* NetworkLobby::GetUserMatchData(u8* size)
 
 int NetworkLobby::GetPlayerCount()
 {
+#if defined(VERSION_R4QK01)
+    if (GetLocalMachineIndex() == 0)
+#else
     if (DWC_GetMyAID() == 0)
+#endif
     {
         if (mFriendMatch)
         {
@@ -396,8 +416,11 @@ void NetworkLobby::Shutdown(bool reset)
     CloseConnectionsAndReset();
 }
 
-static void MatchmakingCallback(
-    DWCError error, BOOL cancelled, void* param)
+#if defined(VERSION_R4QK01)
+static void MatchmakingCallback(DWCError error, BOOL cancelled, BOOL, BOOL, int, void* param)
+#else
+static void MatchmakingCallback(DWCError error, BOOL cancelled, void* param)
+#endif
 {
     g_pNetworkSession->GetOnlineLobby()->OnMatchmakingResult(
         error, cancelled, param);
@@ -422,6 +445,17 @@ static int EvaluateMatchmakingPlayer(int index, void*)
     return score;
 }
 
+#if defined(VERSION_R4QK01)
+static void MatchmakingNewClientCallback(int, void*)
+{
+}
+
+static BOOL AcceptMatchmakingReservation(const void*, void*)
+{
+    return TRUE;
+}
+#endif
+
 static void ConnectionClosedCallback(
     int error, int isLocal, int isServer, u8 aid, int index, void* param)
 {
@@ -445,7 +479,11 @@ static void ConnectionClosedCallback(
     }
 }
 
+#if defined(VERSION_R4QK01)
+static void UserReceiveCallback(u8 aid, u8* buffer, int size, void*)
+#else
 static void UserReceiveCallback(u8 aid, u8* buffer, int size)
+#endif
 {
     g_pNetworkSession->GetOnlineLobby();
     g_pNetworkSession->GetDirectSocket()->ReceiveUnreliable(aid, buffer, size);
@@ -457,7 +495,11 @@ bool NetworkLobby::CanCancelMatchmaking()
     {
         return false;
     }
-    if ((mState == NET_LOBBY_MATCHMAKING || mState == NET_LOBBY_FRIEND_MATCHING) && DWC_IsValidCancelMatching())
+    if ((mState == NET_LOBBY_MATCHMAKING || mState == NET_LOBBY_FRIEND_MATCHING)
+#if !defined(VERSION_R4QK01)
+        && DWC_IsValidCancelMatching()
+#endif
+    )
     {
         return true;
     }
@@ -476,7 +518,11 @@ void NetworkLobby::CancelMatchmaking()
 bool NetworkLobby::StartMatchmaking()
 {
     DWC_SetConnectionClosedCallback(ConnectionClosedCallback, 0);
+#if defined(VERSION_R4QK01)
+    DWC_SetUserRecvCallback(UserReceiveCallback, 0);
+#else
     DWC_SetUserRecvCallback(UserReceiveCallback);
+#endif
 
     mFriendMatch = false;
     mMaxMatchmakingEntries = gOnlineMaxMatchmakingEntries;
@@ -486,6 +532,7 @@ bool NetworkLobby::StartMatchmaking()
     mMinCompletionState = -1;
     mMatchFailed = false;
 
+#if !defined(VERSION_R4QK01)
     DWCMatchOptMinComplete option;
     memset(&option, 0, sizeof(option));
     if (mMinMatchmakingEntries > 0)
@@ -504,6 +551,7 @@ bool NetworkLobby::StartMatchmaking()
             "Failed to set Match Options.  Not matchmaking.\n");
         return false;
     }
+#endif
 
     mMatchFlags = 0;
     if (mTournamentMode)
@@ -564,8 +612,14 @@ bool NetworkLobby::StartMatchmaking()
         nlStrNCat(filter, filter, rejectedProfile, sizeof(filter));
     }
 
+#if defined(VERSION_R4QK01)
+    bool started = DWC_ConnectToAnybodyAsync(1, mMaxMatchmakingEntries, filter,
+        MatchmakingCallback, 0, MatchmakingNewClientCallback, 0,
+        EvaluateMatchmakingPlayer, 0, AcceptMatchmakingReservation, 0, 0);
+#else
     bool started = DWC_ConnectToAnybodyAsync(mMaxMatchmakingEntries, filter,
         MatchmakingCallback, 0, EvaluateMatchmakingPlayer, 0);
+#endif
     if (!started)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -657,6 +711,13 @@ static void NewClientCallback(int index, void*)
     tDebugPrintManager::Print(DC_NETWORK, "Friends New Client connecting %d\n", index);
 }
 
+#if defined(VERSION_R4QK01)
+static BOOL AcceptFriendReservation(const void*, void*)
+{
+    return TRUE;
+}
+#endif
+
 static void FriendMatchCallback(DWCError error, BOOL cancelled, BOOL self,
     BOOL isServer, int index, void* param)
 {
@@ -667,14 +728,27 @@ static void FriendMatchCallback(DWCError error, BOOL cancelled, BOOL self,
 bool NetworkLobby::StartFriendServer()
 {
     DWC_SetConnectionClosedCallback(ConnectionClosedCallback, 0);
+#if defined(VERSION_R4QK01)
+    DWC_SetUserRecvCallback(UserReceiveCallback, 0);
+#else
     DWC_SetUserRecvCallback(UserReceiveCallback);
+#endif
     mFriendMatch = true;
     mHostingFriendMatch = true;
     mFriendHostInviting = false;
     mMatchFailed = false;
 
-    int maxPlayers = gOnlineFourMachineFriendLobby ? 4 : 2;
+    int maxPlayers = 2;
+    if (gOnlineFourMachineFriendLobby)
+    {
+        maxPlayers = 4;
+    }
+#if defined(VERSION_R4QK01)
+    bool started = DWC_SetupGameServer(1, maxPlayers, FriendMatchCallback, 0,
+        NewClientCallback, 0, AcceptFriendReservation, 0, 0);
+#else
     bool started = DWC_SetupGameServer(maxPlayers, FriendMatchCallback, 0, NewClientCallback, 0);
+#endif
     if (!started)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Initial failure of DWC_SetupGameServer\n");
@@ -698,24 +772,35 @@ bool NetworkLobby::StopFriendServer()
 
 void NetworkLobby::SetFriendHostInviting()
 {
+#if !defined(VERSION_R4QK01)
     DWC_StopSCMatchingAsync(0, 0);
+#endif
     mFriendHostInviting = true;
 }
 
 bool NetworkLobby::ConnectToFriendServer(int profileId)
 {
     DWC_SetConnectionClosedCallback(ConnectionClosedCallback, 0);
+#if defined(VERSION_R4QK01)
+    DWC_SetUserRecvCallback(UserReceiveCallback, 0);
+#else
     DWC_SetUserRecvCallback(UserReceiveCallback);
+#endif
     mFriendMatch = true;
     mHostingFriendMatch = false;
     mFriendHostInviting = false;
     mMatchFailed = false;
 
+#if defined(VERSION_R4QK01)
+    bool started = DWC_ConnectToGameServerAsync(1, profileId, FriendMatchCallback, 0,
+        NewClientCallback, 0, AcceptFriendReservation, 0, 0);
+#else
     bool started = DWC_ConnectToGameServerAsync(profileId,
         FriendMatchCallback,
         0,
         NewClientCallback,
         0);
+#endif
     if (!started)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Initial failure of DWC_ConnectToGameServerAsync\n");
@@ -881,7 +966,7 @@ void NetworkLobby::BuildLocalMachineInfo(
     {
         record = NetworkStatsManager::Instance()->GetLocalStats(0);
     }
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     else if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
     {
         record = NetworkStatsManager::Instance()->GetLocalStats(2);
@@ -963,10 +1048,12 @@ void NetworkLobby::Update(float dt)
 
     switch (mState)
     {
+#if !defined(VERSION_R4QK01)
     case NET_LOBBY_MATCHMAKING:
         mMinCompletionState =
             DWC_GetMOMinCompState((u64*)&mMinCompletionElapsedMsHigh);
         break;
+#endif
     case NET_LOBBY_FRIEND_EXCHANGE_INFO:
         for (int i = 0; i < mMachineCount; ++i)
         {

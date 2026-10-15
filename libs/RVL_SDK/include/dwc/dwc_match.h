@@ -12,10 +12,18 @@ extern "C"
 {
 #endif
 
+#if defined(VERSION_R4QK01)
+#define DWC_MATCHING_VERSION 90U
+#else
 #define DWC_MATCHING_VERSION 3U
+#endif
 #define DWC_MAX_CONNECTIONS  32
 #define DWC_MAX_MATCH_IDX_LIST 64
+#if defined(VERSION_R4QK01)
+#define DWC_SB_COMMAND_STRING "\xBB\x49\xCC\x4D"
+#else
 #define DWC_SB_COMMAND_STRING "SBCM"
+#endif
 
 #define DWC_QR2_ALIVE_DURING_MATCHING
 #define DWC_MATCH_ACCEPT_NO_FRIEND
@@ -77,9 +85,17 @@ extern "C"
 
 #define DWC_QR2_PID_KEY        NUM_RESERVED_KEYS
 #define DWC_QR2_MATCH_TYPE_KEY (NUM_RESERVED_KEYS + 1)
+#if defined(VERSION_R4QK01)
+#define DWC_QR2_MATCH_VER_KEY  (NUM_RESERVED_KEYS + 2)
+#define DWC_QR2_MATCH_EVAL_KEY (NUM_RESERVED_KEYS + 3)
+#define DWC_QR2_GROUP_ID_KEY   (NUM_RESERVED_KEYS + 4)
+#define DWC_QR2_HOST_STATE_KEY (NUM_RESERVED_KEYS + 5)
+#define DWC_QR2_SUSPEND_KEY    (NUM_RESERVED_KEYS + 6)
+#else
 #define DWC_QR2_MATCH_RESV_KEY (NUM_RESERVED_KEYS + 2)
 #define DWC_QR2_MATCH_VER_KEY  (NUM_RESERVED_KEYS + 3)
 #define DWC_QR2_MATCH_EVAL_KEY (NUM_RESERVED_KEYS + 4)
+#endif
 
 #define DWC_QR2_RESERVED_KEYS      (100 - NUM_RESERVED_KEYS)
 #define DWC_QR2_GAME_RESERVED_KEYS                                             \
@@ -88,7 +104,13 @@ extern "C"
 
 #define DWC_QR2_PID_KEY_STR        "dwc_pid"
 #define DWC_QR2_MATCH_TYPE_KEY_STR "dwc_mtype"
+#if defined(VERSION_R4QK01)
+#define DWC_QR2_GROUP_ID_KEY_STR   "dwc_groupid"
+#define DWC_QR2_HOST_STATE_KEY_STR "dwc_hoststate"
+#define DWC_QR2_SUSPEND_KEY_STR    "dwc_suspend"
+#else
 #define DWC_QR2_MATCH_RESV_KEY_STR "dwc_mresv"
+#endif
 #define DWC_QR2_MATCH_VER_KEY_STR  "dwc_mver"
 #define DWC_QR2_MATCH_EVAL_KEY_STR "dwc_eval"
 
@@ -111,6 +133,18 @@ extern "C"
         DWCSBMessageHeader header;
         u32 data[DWC_MAX_CONNECTIONS];
     } DWCSBMessage;
+
+    typedef struct DWCstMatchCommandControl
+    {
+        u8 command;
+        u8 count;
+        u16 port;
+        u32 ip;
+        u32 data[DWC_MAX_CONNECTIONS];
+        int profileID;
+        int len;
+        OSTime sendTime;
+    } DWCMatchCommandControl;
 
     typedef struct DWCstGameMatchKeyData
     {
@@ -138,14 +172,26 @@ extern "C"
     {
         DWC_MATCH_STATE_INIT = 0,
         DWC_MATCH_STATE_CL_WAITING,
+#if !defined(VERSION_R4QK01)
         DWC_MATCH_STATE_CL_SEARCH_OWN,
+#endif
         DWC_MATCH_STATE_CL_SEARCH_HOST,
         DWC_MATCH_STATE_CL_WAIT_RESV,
+#if defined(VERSION_R4QK01)
+        DWC_MATCH_STATE_CL_SEARCH_EVAL_HOST,
+#else
         DWC_MATCH_STATE_CL_SEARCH_NN_HOST,
+#endif
         DWC_MATCH_STATE_CL_NN,
         DWC_MATCH_STATE_CL_GT2,
         DWC_MATCH_STATE_CL_CANCEL_SYN,
         DWC_MATCH_STATE_CL_SYN,
+#if defined(VERSION_R4QK01)
+        DWC_MATCH_STATE_CL_SVDOWN_1,
+        DWC_MATCH_STATE_CL_SVDOWN_2,
+        DWC_MATCH_STATE_CL_SVDOWN_3,
+        DWC_MATCH_STATE_CL_SEARCH_GROUPID_HOST,
+#endif
         DWC_MATCH_STATE_SV_WAITING,
         DWC_MATCH_STATE_SV_OWN_NN,
         DWC_MATCH_STATE_SV_OWN_GT2,
@@ -155,7 +201,12 @@ extern "C"
         DWC_MATCH_STATE_SV_SYN,
         DWC_MATCH_STATE_SV_SYN_WAIT,
         DWC_MATCH_STATE_WAIT_CLOSE,
+#if defined(VERSION_R4QK01)
+        DWC_MATCH_STATE_SEARCH_OWN,
+        DWC_MATCH_STATE_SV_SYN_CLOSE_WAIT,
+#else
         DWC_MATCH_STATE_SV_POLL_TIMEOUT,
+#endif
         DWC_MATCH_STATE_NUM
     } DWCMatchState;
 
@@ -203,9 +254,25 @@ extern "C"
         int friendIdxListLen, u8 numEntry, BOOL distantFriend,
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCEvalPlayerCallback evalCallback, void* evalParam);
+#if defined(VERSION_R4QK01)
+    void DWCi_ConnectToAnybodyAsync(int topology, u8 numEntry, const char* addFilter,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCEvalPlayerCallback evalCallback, void* evalParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    void DWCi_SetupGameServer(int topology, u8 maxEntry,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    void DWCi_ConnectToGameServerAsync(int topology, int serverPid,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+#else
     void DWCi_ConnectToGameServerAsync(int serverPid,
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCNewClientCallback newClientCallback, void* newClientParam);
+#endif
     void DWCi_ProcessMatchSCClosing(int clientPid);
     BOOL DWCi_ProcessMatchClosing(
         DWCError error, int errorCode, int profileID);
@@ -219,7 +286,11 @@ extern "C"
     int DWCi_GetNumValidConnection(void);
     int DWCi_GetAllAIDList(u8** aidList);
     void DWCi_SetNumValidConnection(void);
+#if defined(VERSION_R4QK01)
+    GPResult DWCi_GPSetServerStatus(int status);
+#else
     GPResult DWCi_GPSetServerStatus(void);
+#endif
     BOOL DWCi_IsShutdownMatch(void);
     void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, u8* data);
 

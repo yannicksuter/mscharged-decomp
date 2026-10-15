@@ -186,7 +186,11 @@ BOOL DWCi_SendReliable(u16 type, u8 aid, const void* buffer, int size)
 
         if (sTransInfo->sendCallback && type == DWC_SEND_TYPE_USERDATA)
         {
+#if defined(VERSION_R4QK01)
+            sTransInfo->sendCallback(reqSendSize, aid, sTransInfo->sendParam);
+#else
             sTransInfo->sendCallback(reqSendSize, aid);
+#endif
         }
     }
 
@@ -218,7 +222,11 @@ BOOL DWC_SendUnreliable(u8 aid, const void* buffer, int size)
     gt2Send(DWCi_GetGT2Connection(aid), buffer, size, GT2False);
     if (sTransInfo->sendCallback != NULL)
     {
+#if defined(VERSION_R4QK01)
+        sTransInfo->sendCallback(size, aid, sTransInfo->sendParam);
+#else
         sTransInfo->sendCallback(size, aid);
+#endif
     }
     return TRUE;
 }
@@ -266,13 +274,20 @@ BOOL DWC_Ping(u8 aid)
     return TRUE;
 }
 
+#if defined(VERSION_R4QK01)
+BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback callback, void* param)
+#else
 BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback callback)
+#endif
 {
     if (sTransInfo == NULL)
     {
         return FALSE;
     }
     sTransInfo->recvCallback = callback;
+#if defined(VERSION_R4QK01)
+    sTransInfo->recvParam = param;
+#endif
     return TRUE;
 }
 
@@ -321,7 +336,11 @@ void DWCi_RecvCallback(GT2Connection connection, GT2Byte* message, int len,
 
     if (sTransInfo->recvCallback != NULL)
     {
+#if defined(VERSION_R4QK01)
+        sTransInfo->recvCallback(aid, entry->recvBuffer, len, sTransInfo->recvParam);
+#else
         sTransInfo->recvCallback(aid, entry->recvBuffer, len);
+#endif
     }
     if (sTransInfo->recvTimeoutCallback != NULL && entry->recvTimeoutTime != 0)
     {
@@ -334,7 +353,11 @@ void DWCi_PingCallback(GT2Connection connection, int latency)
     if (sTransInfo->pingCallback != NULL)
     {
         u8 aid = DWCi_GetConnectionAID(connection);
+#if defined(VERSION_R4QK01)
+        sTransInfo->pingCallback(latency, aid, sTransInfo->pingParam);
+#else
         sTransInfo->pingCallback(latency, aid);
+#endif
     }
 }
 
@@ -376,7 +399,11 @@ void DWCi_TransportProcess(void)
                     DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
                         "DWCi_TransportProcess:timeout aid=%d,time=%d[ms],timeout time=%d[ms]\n",
                         aid, time, transConnection->recvTimeoutTime);
+#if defined(VERSION_R4QK01)
+                    sTransInfo->recvTimeoutCallback(aid, sTransInfo->recvTimeoutParam);
+#else
                     sTransInfo->recvTimeoutCallback(aid);
+#endif
                     transConnection->previousRecvTick = currentTick;
                 }
             }
@@ -431,7 +458,11 @@ void DWCi_TransportProcess(void)
 
                 if (sTransInfo->sendCallback)
                 {
+#if defined(VERSION_R4QK01)
+                    sTransInfo->sendCallback(reqSendSize, aid, sTransInfo->sendParam);
+#else
                     sTransInfo->sendCallback(reqSendSize, aid);
+#endif
                 }
             }
         }
@@ -602,7 +633,11 @@ static void DWCs_RecvDataBody(u8 aid, void* message, int size)
 
         if (sTransInfo->recvCallback)
         {
+#if defined(VERSION_R4QK01)
+            sTransInfo->recvCallback(aid, connection->recvBuffer, requestSize, sTransInfo->recvParam);
+#else
             sTransInfo->recvCallback(aid, connection->recvBuffer, requestSize);
+#endif
         }
     }
 

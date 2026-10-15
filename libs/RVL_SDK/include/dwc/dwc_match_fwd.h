@@ -16,6 +16,9 @@ extern "C"
 
     typedef int (*DWCEvalPlayerCallback)(int index, void* param);
     typedef void (*DWCStopSCCallback)(void* param);
+#if defined(VERSION_R4QK01)
+    typedef int (*DWCReservationCallback)(const void* reservationData, void* param);
+#endif
 
     typedef enum DWCMatchOptType
     {

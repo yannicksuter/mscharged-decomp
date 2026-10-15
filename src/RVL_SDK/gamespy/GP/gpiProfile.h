@@ -54,7 +54,12 @@ typedef struct {
   char* statusString;
   char* locationString;
   unsigned int ip;
+#if defined(VERSION_R4QK01)
+  unsigned short port;
+  GPEnum quietModeFlags;
+#else
   unsigned int port;
+#endif
 } GPIBuddyStatus;
 
 // Profile data.
@@ -63,10 +68,16 @@ typedef struct GPIProfile {
   int profileId;                       // 0x00 0
   int userId;                          // 0x04 4
   GPIBuddyStatus* buddyStatus;
+#if defined(VERSION_R4QK01)
+  GPIBuddyStatusInfo* buddyStatusInfo;
+#endif
   GPIInfoCache* cache;
   char* authSig;
   int requestCount;
   char* peerSig;
+#if defined(VERSION_R4QK01)
+  unsigned char _20[0xC];
+#endif
 } GPIProfile;
 
 // A list of profiles.

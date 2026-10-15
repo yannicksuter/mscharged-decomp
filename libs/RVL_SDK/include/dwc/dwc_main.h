@@ -25,7 +25,9 @@ extern "C"
         DWC_STATE_AVAILABLE_CHECK,
         DWC_STATE_LOGIN,
         DWC_STATE_ONLINE,
+#if !defined(VERSION_R4QK01)
         DWC_STATE_UPDATE_SERVERS,
+#endif
         DWC_STATE_MATCHING,
         DWC_STATE_CONNECTED
     } DWCState;
@@ -51,7 +53,9 @@ extern "C"
     u8 DWCi_GetConnectionIndex(GT2Connection connection);
     void* DWCi_GetConnectionUserData(GT2Connection connection);
     int DWCi_GT2GetConnectionListIdx(void);
+#if !defined(VERSION_R4QK01)
     void DWCi_ClearGT2ConnectionList(void);
+#endif
     GT2Connection* DWCi_GetGT2ConnectionByIdx(int index);
     GT2Connection* DWCi_GetGT2ConnectionByProfileID(
         int profileID, int numHost);

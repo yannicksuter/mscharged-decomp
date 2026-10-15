@@ -15,6 +15,21 @@ extern "C"
 
     int DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback callback,
         void* param);
+#if defined(VERSION_R4QK01)
+    int DWC_ConnectToAnybodyAsync(int topology, unsigned char numEntry, const char* addFilter,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCEvalPlayerCallback evalCallback, void* evalParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    int DWC_SetupGameServer(int topology, unsigned char maxEntry,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    int DWC_ConnectToGameServerAsync(int topology, int serverIndex,
+        DWCMatchedSCCallback matchedCallback, void* matchedParam,
+        DWCNewClientCallback newClientCallback, void* newClientParam,
+        DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+#else
     int DWC_ConnectToAnybodyAsync(unsigned char numEntry, const char* addFilter,
         DWCMatchedCallback matchedCallback, void* matchedParam,
         DWCEvalPlayerCallback evalCallback, void* evalParam);
@@ -24,6 +39,7 @@ extern "C"
     int DWC_ConnectToGameServerAsync(int serverIndex,
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCNewClientCallback newClientCallback, void* newClientParam);
+#endif
 
     typedef void* DWCFriendsMatchControl;
 

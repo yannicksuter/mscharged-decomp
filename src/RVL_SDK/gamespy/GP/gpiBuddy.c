@@ -280,6 +280,13 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection,
       buddyStatus->port = htons(port);
     }
 
+#if defined(VERSION_R4QK01)
+    if (!gpiValueForKey(buffer, "|qm|", intValue, sizeof(intValue)))
+      buddyStatus->quietModeFlags = GP_SILENCE_NONE;
+    else
+      buddyStatus->quietModeFlags = (GPEnum)atoi(intValue);
+#endif
+
     // Call the callback.
     /////////////////////
     callback = iconnection->callbacks[GPI_RECV_BUDDY_STATUS];

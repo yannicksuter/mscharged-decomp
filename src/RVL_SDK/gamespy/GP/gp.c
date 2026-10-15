@@ -1161,7 +1161,9 @@ GPResult gpGetBuddyStatus(GPConnection* connection, int index,
   GPIConnection* iconnection;
   int num;
   GPIProfile* profile;
+#if !defined(VERSION_R4QK01)
   GPIBuddyStatus* buddyStatus;
+#endif
 
   // Error check.
   ///////////////
@@ -1196,8 +1198,24 @@ GPResult gpGetBuddyStatus(GPConnection* connection, int index,
   if (!profile)
     Error(connection, GP_PARAMETER_ERROR, "Invalid index.");
 
+#if defined(VERSION_R4QK01)
+  status->profile = (GPProfile)profile->profileId;
+  status->status = profile->buddyStatus->status;
+  if (profile->buddyStatus->statusString)
+    strzcpy(status->statusString, profile->buddyStatus->statusString,
+            GP_STATUS_STRING_LEN);
+  else
+    status->statusString[0] = '\0';
+  if (profile->buddyStatus->locationString)
+    strzcpy(status->locationString, profile->buddyStatus->locationString,
+            GP_LOCATION_STRING_LEN);
+  else
+    status->locationString[0] = '\0';
+  status->ip = profile->buddyStatus->ip;
+  status->port = profile->buddyStatus->port;
+  status->quietModeFlags = profile->buddyStatus->quietModeFlags;
+#else
   buddyStatus = profile->buddyStatus;
-
   status->profile = (GPProfile)profile->profileId;
   status->status = buddyStatus->status;
   if (buddyStatus->statusString)
@@ -1212,6 +1230,7 @@ GPResult gpGetBuddyStatus(GPConnection* connection, int index,
     status->locationString[0] = '\0';
   status->ip = buddyStatus->ip;
   status->port = buddyStatus->port;
+#endif
   return GP_NO_ERROR;
 }
 
@@ -1241,6 +1260,10 @@ GPResult gpGetBuddyIndex(GPConnection* connection, GPProfile profile,
   /////////////////
   if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatus)
     *index = pProfile->buddyStatus->buddyIndex;
+#if defined(VERSION_R4QK01)
+  else if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatusInfo)
+    *index = pProfile->buddyStatusInfo->buddyIndex;
+#endif
   else
     *index = -1;
 
@@ -1269,6 +1292,10 @@ int gpIsBuddy(GPConnection* connection, GPProfile profile) {
   /////////////////
   if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatus)
     return 1;
+#if defined(VERSION_R4QK01)
+  if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatusInfo)
+    return 1;
+#endif
 
   return 0;
 }

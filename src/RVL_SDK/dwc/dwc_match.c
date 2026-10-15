@@ -70,18 +70,6 @@ typedef struct DWCstConnectionInfo
     void* param;
 } DWCConnectionInfo;
 
-typedef struct DWCstMatchCommandControl
-{
-    u8 command;
-    u8 count;
-    u16 port;
-    u32 ip;
-    u32 data[32];
-    int profileID;
-    int len;
-    OSTime sendTime;
-} DWCMatchCommandControl;
-
 typedef struct DWCstMatchControl
 {
     GPConnection* pGpObj;
