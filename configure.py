@@ -971,7 +971,7 @@ config.libs = [
             Object(Matching, "Game/SH/SHOnlineInviteStatus.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineLogin.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineMatchmakingDraft.cpp", extra_cflags=["-ipa file", "-sym on"] + [flag for flag in cflags_rvl_dwc if flag.startswith("-i ")]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineMiiSelect.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/SH/SHOnlineMiiSelect.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineMiiSelectOverlay.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlinePlayerCount.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineRanking.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
