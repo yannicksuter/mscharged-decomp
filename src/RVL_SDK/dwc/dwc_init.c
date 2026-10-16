@@ -14,7 +14,7 @@
 
 static u32 dwci_gamecode = 0;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 #define DWC_LIBRARY_NAME "RVLDWC"
 #define DWC_BUILD_TIMESTAMP "May 11 2007 13:30:47"
 #else
