@@ -1485,7 +1485,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_nonport.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_ranking.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_ranksession.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_report.c"),
+            Object(Matching, "RVL_SDK/dwc/dwc_report.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwci_np_math.c", cflags=cflags_rvl_dwc),
 
