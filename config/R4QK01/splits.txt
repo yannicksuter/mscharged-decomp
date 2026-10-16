@@ -6188,6 +6188,9 @@ RVL_SDK/dwc/dwc_error.c:
 	.sbss       start:0x806064D8 end:0x806064E0
 
 RVL_SDK/dwc/dwc_init.c:
+	.text       start:0x8044E9E0 end:0x8044EB48 align:16
+	.data       start:0x80524EA0 end:0x80524F48
+	.sdata      start:0x806038D8 end:0x806038E0
 	.sbss       start:0x806064E0 end:0x806064E8
 
 RVL_SDK/dwc/dwc_memfunc.c:

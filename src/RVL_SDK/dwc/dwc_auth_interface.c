@@ -134,7 +134,11 @@ static void DWCi_Auth_HandleNandResult(
     s32 ok_state, s32 retry_state, s32 noexists_state, s32 eaccess_state);
 static char* DWCi_Auth_GetHost(void);
 
+#if defined(VERSION_R4QK01)
+BOOL DWCi_Auth_InitInterface(DWC_AuthServer authServer)
+#else
 void DWCi_Auth_InitInterface(DWC_AuthServer authServer)
+#endif
 {
     memset(&s_auth_result, 0, sizeof(s_auth_result));
     memset(&s_svl_result, 0, sizeof(s_svl_result));
@@ -142,6 +146,9 @@ void DWCi_Auth_InitInterface(DWC_AuthServer authServer)
     s_auth_state = DWCi_AUTH_STATE_NOT_STARTED;
     s_authserver = authServer;
     s_auth_result.ingamesn_check_result = DWC_INGAMESN_NOT_CHECKED;
+#if defined(VERSION_R4QK01)
+    return TRUE;
+#endif
 }
 
 DWC_AuthServer DWCi_Auth_GetServer(void)

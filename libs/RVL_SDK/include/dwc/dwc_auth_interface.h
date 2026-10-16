@@ -10,7 +10,11 @@ extern "C"
 {
 #endif
 
+#if defined(VERSION_R4QK01)
+    BOOL DWCi_Auth_InitInterface(DWC_AuthServer);
+#else
     void DWCi_Auth_InitInterface(DWC_AuthServer);
+#endif
     DWC_AuthServer DWCi_Auth_GetServer(void);
     int DWCi_Auth_StartAuthentication(const u16* ingamesn, const char* gsbrcd,
         u64 userid, DWCAllocFunc allocator, DWCFreeFunc deallocator);
