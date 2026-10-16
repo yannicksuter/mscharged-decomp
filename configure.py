@@ -790,7 +790,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/Overlay/OverlayHandlerDemo.cpp"),
             Object(Matching, "Game/FE/Overlay/OverlayHandlerGoal.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/Overlay/OverlayHandlerHUD.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/Overlay/OverlayHandlerInGameText.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/FE/Overlay/OverlayHandlerInGameText.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FE/Overlay/OverlayHandlerPIP.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/FE/Overlay/OverlayHandlerStrikerTimes.cpp", extra_cflags=["-ipa file", "-sym on"]),
