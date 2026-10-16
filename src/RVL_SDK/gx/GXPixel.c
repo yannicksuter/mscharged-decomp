@@ -25,38 +25,43 @@ void GXSetFog(GXFogType type, GXColor color, f32 start, f32 end, f32 near,
             c = (1.0f / (end - start)) * (start - near);
         }
     } else {
-        f32 f28, f25, f24;
+        f32 perspectiveA, perspectiveB, perspectiveC;
         u32 expB, magB, shiftB;
 
         if (far == near || end == start) {
-            f28 = 0.0f;
-            f25 = 0.5f;
-            f24 = 0.0f;
+            perspectiveA = 0.0f;
+            perspectiveB = 0.5f;
+            perspectiveC = 0.0f;
         } else {
-            f28 = (far * near) / ((far - near) * (end - start));
-            f25 = far / (far - near);
-            f24 = start / (end - start);
+            perspectiveA = (far * near) / ((far - near) * (end - start));
+            perspectiveB = far / (far - near);
+            perspectiveC = start / (end - start);
         }
 
         expB = 0;
-        while (f25 > 1.0l) {
-            f25 /= 2.0f;
+        while (perspectiveB > 1.0l) {
+            perspectiveB /= 2.0f;
             expB++;
         }
-        while (f25 > 0.0f && f25 < 0.5l) {
-            f25 *= 2.0f;
+        while (perspectiveB > 0.0f && perspectiveB < 0.5l) {
+            perspectiveB *= 2.0f;
             expB--;
         }
 
-        a = f28 / (1 << expB + 1);
-        magB = 8388638.0f * f25;
+        a = perspectiveA / (1 << expB + 1);
+        magB = 8388638.0f * perspectiveB;
         shiftB = expB + 1;
-        c = f24;
+        c = perspectiveC;
 
         GX_BP_SET_FOGPARAM1_B_MAG(fogParamReg1, magB);
         GX_BP_SET_OPCODE(fogParamReg1, GX_BP_REG_FOGPARAM1);
         GX_BP_SET_FOGPARAM2_B_SHIFT(fogParamReg2, shiftB);
         GX_BP_SET_OPCODE(fogParamReg2, GX_BP_REG_FOGPARAM2);
+#if defined(VERSION_R4QK01)
+        // Write B before A and leave it untouched for orthographic fog.
+        GX_BP_LOAD_REG(fogParamReg1);
+        GX_BP_LOAD_REG(fogParamReg2);
+#endif
     }
 
     a_bits = *(u32*)&a;
@@ -78,8 +83,10 @@ void GXSetFog(GXFogType type, GXColor color, f32 start, f32 end, f32 near,
     GX_BP_SET_OPCODE(fogColorReg, GX_BP_REG_FOGCOLOR);
 
     GX_BP_LOAD_REG(fogParamReg0);
+#if !defined(VERSION_R4QK01)
     GX_BP_LOAD_REG(fogParamReg1);
     GX_BP_LOAD_REG(fogParamReg2);
+#endif
     GX_BP_LOAD_REG(fogParamReg3);
     GX_BP_LOAD_REG(fogColorReg);
 

@@ -204,6 +204,9 @@ void GXSetCoPlanar(GXBool coplanar) {
 
     GX_BP_LOAD_REG(reg);
     GX_BP_LOAD_REG(gxdt->genMode);
+#if defined(VERSION_R4QK01)
+    gxdt->lastWriteWasXF = FALSE;
+#endif
 }
 
 void __GXSetGenMode(void) {

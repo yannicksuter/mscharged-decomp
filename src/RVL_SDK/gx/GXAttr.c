@@ -1,6 +1,3 @@
-// Uses the hacky GXSetVtxAttrFmtv declaration
-#define GXATTR_MATCH_HACK
-
 #include <revolution/gx.h>
 
 static void SETVCDATTR(GXAttr name, GXAttrType type);
@@ -522,7 +519,7 @@ static DECOMP_INLINE void SETVAT(u32* vatA, u32* vatB, u32* vatC, GXAttr attr,
     }
 }
 
-void GXSetVtxAttrFmtv(s16 fmt, const GXVtxAttrFmtList* list) {
+void GXSetVtxAttrFmtv(GXVtxFmt fmt, const GXVtxAttrFmtList* list) {
     u32* vatA;
     u32* vatB;
     u32* vatC;

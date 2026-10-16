@@ -1,5 +1,6 @@
 #include <revolution/gx.h>
 
+#include <revolution/base/PPCArch.h>
 #include <revolution/os.h>
 
 #include <string.h>
@@ -403,7 +404,9 @@ GXBool GXGetCPUFifo(GXFifoObj* fifo)
         return GX_FALSE;
     }
 
+#if !defined(VERSION_R4QK01)
     GXFlush();
+#endif
     __GXSaveFifo();
 
     *realFifo = CPUFifo;

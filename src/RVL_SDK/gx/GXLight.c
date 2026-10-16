@@ -197,16 +197,15 @@ void GXInitLightColor(GXLightObj* light, GXColor color) {
     *(u32*)&impl->color = *(u32*)&color;
 }
 
-// TODO(kiwi) This inline is fake, and also is a fake match (r6 hardcoded)
 // clang-format off
-inline void WriteLightObj(register volatile void* dst,
-                          register const GXLightObjImpl* src) {
-    register u32 color;
+inline void WriteLightObj(register const GXLightObjImpl* src,
+                          register volatile void* dst) {
+    register u32 zero, color;
     register f32 ps_0, ps_1, ps_2, ps_3, ps_4, ps_5;
 
     ASM_VOLATILE(
         lwz color, src->color
-        xor r6, r6, r6 // make zero
+        xor zero, zero, zero
         psq_l ps_0, GXLightObjImpl.aa(src),   0, 0
         psq_l ps_1, GXLightObjImpl.ac(src),   0, 0
         psq_l ps_2, GXLightObjImpl.kb(src),   0, 0
@@ -214,9 +213,9 @@ inline void WriteLightObj(register volatile void* dst,
         psq_l ps_4, GXLightObjImpl.posZ(src), 0, 0
         psq_l ps_5, GXLightObjImpl.dirY(src), 0, 0
 
-        stw r6, 0(dst)
-        stw r6, 0(dst)
-        stw r6, 0(dst)
+        stw zero, 0(dst)
+        stw zero, 0(dst)
+        stw zero, 0(dst)
 
         stw color,   0(dst)
         psq_st ps_0, 0(dst), 0, 0
@@ -231,14 +230,16 @@ inline void WriteLightObj(register volatile void* dst,
 
 void GXLoadLightObjImm(const GXLightObj* light, GXLightID id) {
     const GXLightObjImpl* impl;
+    u32 addr;
     u32 num;
 
     impl = (GXLightObjImpl*)light;
     num = 31 - __cntlzw(id);
-    num = (num % 8) * XF_MEM_LOBJ_SIZE;
+    num &= 7;
+    addr = num * XF_MEM_LOBJ_SIZE + GX_XF_MEM_LIGHTOBJ;
 
-    GX_XF_LOAD_REGS(XF_MEM_LOBJ_SIZE - 1, num + GX_XF_MEM_LIGHTOBJ);
-    WriteLightObj(&WGPIPE, impl);
+    GX_XF_LOAD_REGS(XF_MEM_LOBJ_SIZE - 1, addr);
+    WriteLightObj(impl, &WGPIPE);
     gxdt->lastWriteWasXF = TRUE;
 }
 
