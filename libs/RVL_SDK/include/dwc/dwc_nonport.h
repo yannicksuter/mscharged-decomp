@@ -14,6 +14,9 @@ extern "C" {
 s64 DWCi_Np_GetTimeInSeconds(void);
 struct tm* DWCi_Np_SecondsToCalendarTime(s64* theTime);
 u64 DWCi_Np_GetConsoleId(void);
+#if defined(VERSION_R4QK01)
+void DWCi_Np_CPUCopyFast(void* destination, const void* source, u32 size);
+#endif
 
 #define DWCi_Np_TicksToMilliSeconds OSTicksToMilliseconds
 #define DWCi_Np_MilliSecondsToTicks(a) OSMillisecondsToTicks((u64)(a))
@@ -34,7 +37,11 @@ static inline void DWCi_Np_GetMacAddress(u8* macAddress)
 static inline void DWCi_Np_CpuCopy8(
     register const void* srcp, register void* dstp, register u32 size)
 {
+#if defined(VERSION_R4QK01)
+    DWCi_Np_CPUCopyFast(dstp, srcp, size);
+#else
     memcpy(dstp, srcp, size);
+#endif
 }
 
 static inline void DWCi_Np_CpuCopy16(

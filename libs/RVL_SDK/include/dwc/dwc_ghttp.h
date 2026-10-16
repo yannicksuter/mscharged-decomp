@@ -9,7 +9,11 @@ extern "C" {
 #endif
 
 #define DWC_GHTTP_FALSE (-1)
+#if defined(VERSION_R4QK01)
+#define DWC_GHTTP_IN_ERROR (-1)
+#else
 #define DWC_GHTTP_IN_ERROR 0
+#endif
 
 #define DWC_GHTTP_SOCKET_INIT 0
 #define DWC_GHTTP_HOST_LOOKUP 1

@@ -1,6 +1,10 @@
 #include <dwc/dwc_memfunc.h>
 #include <dwc/dwci_memfunc.h>
 
+#if defined(VERSION_R4QK01)
+#include <dwc/dwc_nonport.h>
+#endif
+
 #include <string.h>
 
 static DWCAllocEx s_alloc;
@@ -34,6 +38,10 @@ void* DWC_AllocEx(DWCAllocType type, u32 size, int align) {
   void* block;
 
   block = s_alloc(type, size + sizeof(DWCi_AllocateHeader), align);
+#if defined(VERSION_R4QK01)
+  if (block == NULL)
+    return NULL;
+#endif
   return DWCi_SetAllocateHeader(block, size);
 }
 
@@ -57,8 +65,13 @@ void* DWC_ReallocEx(DWCAllocType type, void* block, u32 before, u32 after, int a
 
   if (block) {
     allocSize = DWCi_GetAllocateSize(block);
+#if defined(VERSION_R4QK01)
+    DWCi_Np_CpuCopy8(block, newBlock, allocSize > after ? after : allocSize);
+    DWC_Free(type, block, allocSize);
+#else
     memcpy(newBlock, block, allocSize);
     DWC_Free(type, block, before);
+#endif
   }
   return newBlock;
 }
