@@ -135,6 +135,8 @@ private:
 
 #if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
 static const eGameRegion sDefaultRegion = GAME_REGION_EU;
+#elif defined(VERSION_R4QJ01)
+static const eGameRegion sDefaultRegion = GAME_REGION_JAPAN;
 #elif defined(VERSION_R4QK01)
 static const eGameRegion sDefaultRegion = GAME_REGION_KOREA;
 #else
