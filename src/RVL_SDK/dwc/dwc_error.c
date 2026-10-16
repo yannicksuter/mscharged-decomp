@@ -19,6 +19,53 @@ s32 DWC_GetLastErrorEx(s32* errorCode, DWCErrorType* errorType) {
   if (errorCode)
     *errorCode = stDwcErrorCode;
   if (errorType) {
+#if defined(VERSION_R4QK01)
+    switch (stDwcLastError) {
+    case DWC_ERROR_AUTH_ANY:
+    case DWC_ERROR_AUTH_OUT_OF_SERVICE:
+    case DWC_ERROR_AUTH_STOP_SERVICE:
+    case DWC_ERROR_AC_ANY:
+    case DWC_ERROR_DISCONNECTED:
+    case 14:
+    case 16:
+    case 18:
+    case 21:
+      *errorType = 6;
+      break;
+    case DWC_ERROR_NETWORK:
+      *errorType = 3;
+      break;
+    case DWC_ERROR_GHTTP_ANY:
+      *errorType = 4;
+      break;
+    case 13:
+      *errorType = 5;
+      break;
+    case 22:
+      *errorType = 8;
+      break;
+    case DWC_ERROR_FRIENDS_SHORTAGE:
+    case DWC_ERROR_NOT_FRIEND_SERVER:
+    case DWC_ERROR_SERVER_FULL:
+    case DWC_ERROR_MATCH_LOCKED:
+      *errorType = 1;
+      break;
+    case 15:
+    case 17:
+    case 19:
+    case 20:
+    case 24:
+      *errorType = 2;
+      break;
+    case DWC_ERROR_DS_MEMORY_ANY:
+    case DWC_ERROR_FATAL:
+      *errorType = 7;
+      break;
+    default:
+      *errorType = 0;
+      break;
+    }
+#else
     switch (stDwcLastError) {
     case 2:
     case 3:
@@ -58,6 +105,7 @@ s32 DWC_GetLastErrorEx(s32* errorCode, DWCErrorType* errorType) {
       *errorType = 0;
       break;
     }
+#endif
   }
   return stDwcLastError;
 }

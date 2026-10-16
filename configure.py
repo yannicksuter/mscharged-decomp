@@ -1473,7 +1473,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_base64.c"),
             Object(Matching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_encsession.c", cflags=cflags_rvl_dwc),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_error.c"),
+            Object(Matching, "RVL_SDK/dwc/dwc_error.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_ghttp.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_init.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_init.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
