@@ -357,6 +357,52 @@ void SHOnlineMiiSelectOverlay::SanitizeMiiName(unsigned short* name)
 {
     for (unsigned long i = 0; i < nlStrLen(name); i++)
     {
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+        switch (name[i])
+        {
+        case 0x037E:
+            name[i] = ';';
+            break;
+        case 0x007B:
+            name[i] = '?';
+            break;
+        }
+
+        if (g_pLocalization->m_CurrentLanguage != nlLocalization::LangJapanese)
+        {
+            switch (name[i])
+            {
+            case 0x0384:
+                name[i] = '\'';
+                break;
+            case 0x0385:
+            case 0x0386:
+            case 0x0387:
+            case 0x0388:
+            case 0x0389:
+            case 0x038A:
+            case 0x038C:
+            case 0x038E:
+            case 0x038F:
+            case 0x0390:
+            case 0x03AA:
+            case 0x03AB:
+            case 0x03AC:
+            case 0x03AD:
+            case 0x03AE:
+            case 0x03AF:
+            case 0x03B0:
+            case 0x03C2:
+            case 0x03CA:
+            case 0x03CB:
+            case 0x03CC:
+            case 0x03CD:
+            case 0x03CE:
+                name[i] = '?';
+                break;
+            }
+        }
+#else
         switch (name[i])
         {
         case 0x037E:
@@ -411,6 +457,7 @@ void SHOnlineMiiSelectOverlay::SanitizeMiiName(unsigned short* name)
                 break;
             }
         }
+#endif
 #endif
     }
 }
