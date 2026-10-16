@@ -6,6 +6,7 @@
 #include <dwc/dwc_friend_internal.h>
 #include <dwc/dwc_report.h>
 #include <dwc/dwc_memfunc.h>
+#include <dwc/dwc_nonport.h>
 #include <gamespy/GP/gp.h>
 #include <gamespy/common/gsPlatformSocket.h>
 #include <gamespy/gt2/gt2.h>
@@ -89,7 +90,6 @@ void DWCi_PingCallback(GT2Connection, int);
 void fn_80455E60(GT2Connection, GT2CloseReason, BOOL, u8);
 void fn_80451FF0(void);
 void fn_80452000(void);
-void fn_804711D0(void* destination, const void* source, u32 size);
 static void DWCi_GT2ReceivedCallback(GT2Connection, GT2Byte*, int, GT2Bool);
 static void DWCi_GT2ClosedCallback(GT2Connection, GT2CloseReason);
 static void DWCi_GT2PingCallback(GT2Connection, int);
@@ -166,7 +166,7 @@ void DWC_InitFriendsMatch(DWCFriendsMatchControl* dwccnt,
     cpySize = strlen(secretKey) < sizeof(gcd_secret_key)
         ? strlen(secretKey)
         : sizeof(gcd_secret_key) - 1;
-    fn_804711D0(gcd_secret_key, secretKey, cpySize);
+    DWCi_Np_CPUCopyFast(gcd_secret_key, secretKey, cpySize);
     gcd_secret_key[cpySize] = '\0';
 }
 
@@ -436,7 +436,7 @@ BOOL DWC_LoginAsync(const u16* ingamesn, const char* reserved,
         memset(stpDwcCnt->playerName, 0, sizeof(stpDwcCnt->playerName));
         len = DWCi_WStrLen(ingamesn) <= DWC_MAX_PLAYER_NAME - 1
             ? DWCi_WStrLen(ingamesn) : DWC_MAX_PLAYER_NAME - 1;
-        fn_804711D0(stpDwcCnt->playerName, ingamesn, len * 2);
+        DWCi_Np_CPUCopyFast(stpDwcCnt->playerName, ingamesn, len * 2);
     }
     stpDwcCnt->playerName[len] = 0;
     DWCi_CacheDNSQueries(gcd_gamename);

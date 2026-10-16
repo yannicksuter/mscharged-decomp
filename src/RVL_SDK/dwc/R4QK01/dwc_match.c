@@ -65,7 +65,6 @@ SBError DWCi_SBUpdateAsync(int profileID);
 static SBError DWCi_HandleSBError(SBError result);
 int DWCi_SendResvCommand(int profileID, BOOL delay);
 int DWCi_GetFriendListIndex(int profileID);
-void fn_804711D0(void* destination, const void* source, u32 size);
 
 
 static inline void DWCi_EnterMatchState(DWCMatchState state)
@@ -277,7 +276,7 @@ void DWCi_ConnectToAnybodyAsync(int topology, u8 numEntry, const char* addFilter
             DWCi_StopMatching(DWC_ERROR_FATAL, -80001);
             return;
         }
-        fn_804711D0(stpAddFilter, addFilter, addFilterLenMax);
+        DWCi_Np_CPUCopyFast(stpAddFilter, addFilter, addFilterLenMax);
         stpAddFilter[addFilterLenMax - 1] = '\0';
     }
     DWCi_SetMatchCommonParam(DWC_MATCH_TYPE_ANYBODY, numEntry, matchedCallback, matchedParam);
@@ -368,7 +367,7 @@ void DWCi_ConnectToGameServerAsync(int topology, int serverPid,
     {
         DWCi_GetMatchCnt()->serverNode = savedServer;
         DWCi_PrependNode(&savedSelf);
-        fn_804711D0(DWCi_GetMatchCnt()->reservationData, savedSelf.reservationData, sizeof(savedSelf.reservationData));
+        DWCi_Np_CPUCopyFast(DWCi_GetMatchCnt()->reservationData, savedSelf.reservationData, sizeof(savedSelf.reservationData));
         DWCi_GetMatchCnt()->scResvRetryCount = savedResvRetryCount;
     }
     DWCi_GetMatchCnt()->newClientCallback = newClientCallback;
@@ -1046,7 +1045,7 @@ static inline void DWCi_SendGT2MsgCommand(u8 command, int profileID, DWCNodeInfo
 {
     DWCSBMessage senddata;
     if (data && len)
-        fn_804711D0(senddata.data, data, sizeof(u32) * len);
+        DWCi_Np_CPUCopyFast(senddata.data, data, sizeof(u32) * len);
     else
         len = 0;
     strcpy((char*)&senddata.header, DWC_SB_COMMAND_STRING);
@@ -1069,7 +1068,7 @@ static inline SBError DWCi_SendSBMsgCommand(
     DWCSBMessage senddata;
     SBError sbError;
     if (data && len)
-        fn_804711D0(senddata.data, data, sizeof(u32) * len);
+        DWCi_Np_CPUCopyFast(senddata.data, data, sizeof(u32) * len);
     else
         len = 0;
     strcpy((char*)&senddata.header, DWC_SB_COMMAND_STRING);
@@ -1107,7 +1106,7 @@ static GPResult DWCi_SendGPBuddyMsgCommand(GPConnection* connection,
     if (message)
     {
         len2 = strlen(message);
-        fn_804711D0(&tmpStr[len + 1], message, len2);
+        DWCi_Np_CPUCopyFast(&tmpStr[len + 1], message, len2);
         tmpStr[len + 1 + len2] = '\0';
     }
     result = gpSendBuddyMessage(connection, profileID, tmpStr);
@@ -1166,7 +1165,7 @@ int DWCi_SendMatchCommand(u8 command, int profileID, u32 ip, u16 port,
             DWCi_GetMatchCnt()->cmdCnt.sendTime = sendTime;
         }
         if (data && len)
-            fn_804711D0(DWCi_GetMatchCnt()->cmdCnt.data, data, sizeof(u32) * len);
+            DWCi_Np_CPUCopyFast(DWCi_GetMatchCnt()->cmdCnt.data, data, sizeof(u32) * len);
     }
     return result;
 }
