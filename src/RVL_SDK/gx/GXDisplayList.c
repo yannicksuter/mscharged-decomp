@@ -26,6 +26,9 @@ void GXBeginDisplayList(void* list, u32 size) {
 
     gxdt->dlistActive = TRUE;
 
+#if defined(VERSION_R4QK01)
+    GXFlush();
+#endif
     GXGetCPUFifo(&OldCPUFifo);
     GXSetCPUFifo(&DisplayListFifo);
     GXResetWriteGatherPipe();
@@ -36,6 +39,9 @@ u32 GXEndDisplayList(void) {
     BOOL enabled;
     u32 ctrl;
 
+#if defined(VERSION_R4QK01)
+    GXFlush();
+#endif
     GXGetCPUFifo(&DisplayListFifo);
     wrap = GXGetFifoWrap(&DisplayListFifo);
     GXSetCPUFifo(&OldCPUFifo);

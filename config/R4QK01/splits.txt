@@ -5410,7 +5410,7 @@ RVL_SDK/gx/GXMisc.c:
 	.sbss       start:0x80605EE8 end:0x80605F00
 
 RVL_SDK/gx/GXAttr.c:
-	.text       start:0x803A9BC0 end:0x803AA704
+	.text       start:0x803A9BC0 end:0x803AA710
 	.data       start:0x80506D30 end:0x80506E74
 	.sdata      start:0x806033A8 end:0x806033B4
 
@@ -5419,10 +5419,10 @@ RVL_SDK/gx/GXFrameBuf.c:
 	.sdata2     start:0x8060AAA8 end:0x8060AAB8
 
 RVL_SDK/gx/GXGeometry.c:
-	.text       start:0x803AB100 end:0x803AB6DC
+	.text       start:0x803AB100 end:0x803AB710
 
 RVL_SDK/gx/GXLight.c:
-	.text       start:0x803AC2F0 end:0x803AC854
+	.text       start:0x803AC2F0 end:0x803AC860
 	.sdata2     start:0x8060AAB8 end:0x8060AAC8
 
 RVL_SDK/gx/GXTexture.c:
@@ -5432,11 +5432,11 @@ RVL_SDK/gx/GXTexture.c:
 	.sdata2     start:0x8060AAC8 end:0x8060AAF0
 
 RVL_SDK/gx/GXBump.c:
-	.text       start:0x803AD8D0 end:0x803ADD84
+	.text       start:0x803AD8D0 end:0x803ADD90
 	.sdata2     start:0x8060AAF0 end:0x8060AAF4
 
 RVL_SDK/gx/GXTev.c:
-	.text       start:0x803ADD90 end:0x803AE454
+	.text       start:0x803ADD90 end:0x803AE460
 	.data       start:0x80507280 end:0x805072F4
 
 RVL_SDK/gx/GXPixel.c:
@@ -5449,6 +5449,7 @@ RVL_SDK/gx/GXPerf.c:
 
 RVL_SDK/gx/GXDisplayList.c:
 	.text       start:0x803AEA80 end:0x803AEC64
+	.bss        start:0x80583F68 end:0x80584668
 
 RVL_SDK/gx/GXTransform.c:
 	.text       start:0x803AEC70 end:0x803AF3A8

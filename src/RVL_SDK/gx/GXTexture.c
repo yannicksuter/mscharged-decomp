@@ -11,7 +11,7 @@ static u8 GXTexTlutIds[8] = { 0x98, 0x99, 0x9A, 0x9B, 0xB8, 0xB9, 0xBA, 0xBB };
 
 static u8 GX2HWFiltConv[6] = { 0x00, 0x04, 0x01, 0x05, 0x02, 0x06 };
 
-static void __GXGetTexTileShift(GXTexFmt fmt, u32* rowTileS, u32* colTileS)
+static inline void __GXGetTexTileShift(GXTexFmt fmt, u32* rowTileS, u32* colTileS)
 {
     switch (fmt)
     {
@@ -576,7 +576,20 @@ void GXSetTexCoordScaleManually(GXTexCoordID coord, GXBool enable, u16 ss, u16 t
     }
 }
 
-void __SetSURegs(u32 tmap, u32 tcoord) NO_INLINE
+void GXSetTexCoordCylWrap(GXTexCoordID coord, GXBool s_enable, GXBool t_enable)
+{
+    SET_REG_FIELD(__GXData->suTs0[coord], 1, 17, s_enable);
+    SET_REG_FIELD(__GXData->suTs1[coord], 1, 17, t_enable);
+
+    if (__GXData->tcsManEnab & (1 << coord))
+    {
+        GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
+        GX_WRITE_RAS_REG(__GXData->suTs1[coord]);
+        __GXData->bpSentNot = GX_FALSE;
+    }
+}
+
+void __SetSURegs(u32 tmap, u32 tcoord)
 {
     u32 w, h;
     u8 s_bias, t_bias;
