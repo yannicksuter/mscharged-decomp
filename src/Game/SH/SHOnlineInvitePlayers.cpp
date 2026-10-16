@@ -156,7 +156,11 @@ void SHOnlineInvitePlayers::SceneCreated()
     {
         char name[0x10];
         nlSNPrintf(name, sizeof(name), "FRIEND_%d", i);
+#if defined(VERSION_R4QK01)
+        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindChecked(presentation->m_currentSlide, "Layer", "group", name);
+#else
         mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindChecked(presentation->m_currentSlide, "Layer", name);
+#endif
         TLInstance* over = FEFinder<TLInstance, 5>::Find(mRowInstances[i], "over", "FRIEND_0");
         TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[i], "off", "FRIEND_0");
         mCancelInstances[i] = FEFinder<TLComponentInstance, 4>::Find(over, "cancel");
@@ -373,7 +377,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
         mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
         mRows[index].mStatus = ONLINE_ROW_WAIT_OPPONENT;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         memset(&mRows[index].mStats, 0, sizeof(mRows[index].mStats));
         if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
         {

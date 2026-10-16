@@ -965,7 +965,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineFriendsDraft.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineGuestControllerSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlineHub.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1"), "Game/SH/SHOnlineInvitePlayers.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/SH/SHOnlineInvitePlayers.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineInvitePreview.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineInviteResponse.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHOnlineInviteStatus.cpp", extra_cflags=["-ipa file"]),
