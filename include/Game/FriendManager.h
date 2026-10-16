@@ -72,6 +72,7 @@ public:
     int GetHostInvitationIndex() const { return mHostInvitationIndex; }
     FriendStatusPayload* GetOwnStatus() { return &mOwnStatus; }
     int GetFriendStatusIndex() const { return mFriendStatusIndex; }
+    u16* GetFriendCodeInput();
 
     /* 0x000 */ float mUpdateTime;
     /* 0x004 */ bool mFriendListChanged;

@@ -6,7 +6,7 @@ struct Placeholder
 {
 };
 
-extern Placeholder<0> placeholder0;
+extern const Placeholder<0> placeholder0;
 
 // Bound arguments are selected per call: a placeholder yields the call
 // argument, any other bound value yields itself.

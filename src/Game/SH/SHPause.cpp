@@ -191,16 +191,20 @@ void PauseMenuScene::SceneCreated()
     FEAudio::EnableSounds(true);
     if (GameInfoManager::Instance()->IsInMode4())
     {
+#if !defined(VERSION_R4QJ01)
 #if defined(VERSION_R4QE01)
         if (GetRegion() == GAME_REGION_EU)
-        {
 #endif
+        {
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "down", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
-#if defined(VERSION_R4QE01)
         }
+#if defined(VERSION_R4QE01)
         else
+#endif
+#endif
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         {
             const char* string = g_pStrikerChallenge->mCurrentChallenge < 10
                 ? "101_OBJECTIVES_BUTTON" : "CHALLENGES_OBJECTIVES_BUTTON";
@@ -304,7 +308,7 @@ void PauseMenuScene::Update(float fDeltaT)
     u8 goToChooseSides = 0;
     for (int i = 0; i < 4; ++i)
     {
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2) || defined(VERSION_R4QJ01)
         if (mSelectionMade)
             return;
 #endif
@@ -413,7 +417,7 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
 {
     if (mSelectionMade)
         return;
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QP01_REV2) || defined(VERSION_R4QJ01)
     mSelectionMade = true;
 #endif
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);

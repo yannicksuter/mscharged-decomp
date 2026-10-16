@@ -107,10 +107,7 @@ template <typename T>
 class MenuList
 {
 public:
-    MenuList()
-        : mCurrentIndex(0)
-        , mNumItemsAdded(0)
-        , mFlags(0) { };
+    MenuList();
     virtual ~MenuList() { };
 
     MenuItem<T>* AddItem(T* type)
@@ -234,5 +231,13 @@ private:
     /* 0x20C */ bool mWrapList;
     /* 0x210 */ int mFlags;
 }; // total size: 0x214
+
+template <typename T>
+MenuList<T>::MenuList()
+    : mCurrentIndex(0)
+    , mNumItemsAdded(0)
+    , mFlags(0)
+{
+}
 
 #endif // _FEMENU_H_

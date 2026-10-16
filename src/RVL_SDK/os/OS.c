@@ -32,7 +32,7 @@ __declspec(weak) BOOL __OSIsGcam;
 BOOL __OSInNandBoot;
 BOOL __OSInIPL;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 #define OS_BUILD_DATE "Apr 24 2007"
 #define OS_BUILD_TIME "11:50:47"
 #else

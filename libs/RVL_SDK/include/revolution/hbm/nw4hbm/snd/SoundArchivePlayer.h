@@ -1,14 +1,10 @@
 #ifndef NW4HBM_SND_SOUND_ARCHIVE_PLAYER_H
 #define NW4HBM_SND_SOUND_ARCHIVE_PLAYER_H
 
-// the order is important to get vtables in the right order in `snd_SoundArchivePlayer.cpp`
-// clang-format off
 #include "revolution/hbm/nw4hbm/snd/BasicSound.h"
 #include "revolution/hbm/nw4hbm/snd/PlayerHeap.h"
 
-#define MAKE_DTOR_ZERO
 #include "revolution/hbm/nw4hbm/snd/DisposeCallback.h"
-#undef MAKE_DTOR_ZERO
 
 #include "revolution/hbm/nw4hbm/snd/AxVoice.h"
 #include "revolution/hbm/nw4hbm/snd/SoundStartable.h"
@@ -22,7 +18,6 @@
 #include "revolution/hbm/nw4hbm/snd/NoteOnCallback.h"
 #include "revolution/hbm/nw4hbm/snd/Task.h"
 #include "revolution/hbm/nw4hbm/snd/WaveSound.h"
-// clang-format on
 
 #include "revolution/hbm/HBMAssert.hpp"
 

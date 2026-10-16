@@ -217,8 +217,10 @@ void CupHubScene::Update(float fDeltaT)
         }
         if (mPagingEnabled)
             mPageControls->Update(event, fDeltaT);
+#if !defined(VERSION_R4QJ01)
         if (!mSuppressInput)
             mRulesComponent.HandlePointerEvent(&event);
+#endif
 
         bool back = !mSuppressInput && mNavigationComponent.UpdateBackButton(event, fDeltaT);
         if (back)
@@ -226,6 +228,11 @@ void CupHubScene::Update(float fDeltaT)
             for (int j = 0; j < 4; ++j)
                 mMatchupComponents[j].Disable();
             mState = CUP_HUB_EXITING_BACK;
+#if defined(VERSION_R4QJ01)
+            FEPageControls* pageControls = mPageControls;
+            pageControls->mPadHeld[0] = false;
+            pageControls->mPadHeld[1] = false;
+#endif
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();
@@ -252,6 +259,10 @@ void CupHubScene::Update(float fDeltaT)
                 return;
             }
         }
+#if defined(VERSION_R4QJ01)
+        if (!mSuppressInput)
+            mRulesComponent.HandlePointerEvent(&event);
+#endif
     }
     if (mScrollWidget.IsScrolling(1, true))
     {
@@ -512,6 +523,11 @@ void CupHubScene::OnRulesPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
+#if defined(VERSION_R4QJ01)
+        FEPageControls* pageControls = mPageControls;
+        pageControls->mPadHeld[0] = false;
+        pageControls->mPadHeld[1] = false;
+#endif
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
         mState = CUP_HUB_TRANSITIONING;

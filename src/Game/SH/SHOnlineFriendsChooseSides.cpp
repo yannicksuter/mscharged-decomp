@@ -31,6 +31,12 @@
 
 #include "Game/FE/tlDefault.h"
 
+#if defined(VERSION_R4QJ01)
+#include "Game/BaseSceneHandler.inl"
+#include "Game/FE/tlInstance.inl"
+#include "Game/GameInfo.inl"
+#endif
+
 const char* gOnlineSideGroupNames[2] = { "home_group", "away_group" };
 int gOnlineSideSelectionSeconds = 30;
 
@@ -62,10 +68,7 @@ SHOnlineFriendsChooseSides::SHOnlineFriendsChooseSides()
     for (int i = 0; i < 4; ++i)
     {
         mPointerHoverCounts[i] = 0;
-        for (int j = 0; j < 4; ++j)
-        {
-            mPlayerColours[i].c[j] = 0xFF;
-        }
+        nlColourSet(mPlayerColours[i], 255, 255, 255, 255);
     }
 
     for (int i = 0; i < 3; ++i)
@@ -85,6 +88,134 @@ SHOnlineFriendsChooseSides::~SHOnlineFriendsChooseSides()
     }
 }
 
+#if defined(VERSION_R4QJ01)
+TLTextInstance* SHOnlineFriendsChooseSides::GetPlayerNameText(int machine, bool guest)
+{
+    int slot = machine * 2;
+    if (guest)
+    {
+        ++slot;
+    }
+    char friendName[16];
+    nlSNPrintf(friendName, sizeof(friendName), "friend_%d", slot);
+    return FEFinder<TLTextInstance, 3>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", friendName);
+}
+
+void SHOnlineFriendsChooseSides::SceneCreated()
+{
+    NetworkDraft::Instance();
+    mSideInstances[0] = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        GetPresentation()->GetActiveSlide(), "Layer", "home");
+    mSideInstances[1] = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        GetPresentation()->GetActiveSlide(), "Layer", "away");
+    mSideInstances[0]->SetActiveSlide("controllers", true, false);
+    mSideInstances[1]->SetActiveSlide("controllers", true, false);
+
+    SHNavigation* object = GetNavigationScene();
+    if (object != 0)
+    {
+        object->SetButtons(NAVIGATION_BUTTON_DONE, true);
+        mDoneButtonInstance = object->GetButton(NAVIGATION_BUTTON_DONE);
+    }
+    mDoneButtonInstance->SetVisible(false);
+
+    int machine = 0;
+    bool guest = false;
+    int groups = 0;
+    FEFinder<TLInstance, 3>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "friend_0")->SetVisible(false);
+    FEFinder<TLInstance, 3>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "friend_1")->SetVisible(false);
+    FEFinder<TLInstance, 3>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "friend_2")->SetVisible(false);
+    FEFinder<TLInstance, 3>::Find<>(GetPresentation()->GetActiveSlide(), "Layer", "friend_3")->SetVisible(false);
+    for (int i = 0; i < 4; ++i)
+    {
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+        char controller[16];
+        nlSNPrintf(controller, sizeof(controller), "controller%d", i);
+
+        TLComponentInstance* home = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::Find<>(
+            mSideInstances[0], "controllers", gOnlineSideGroupNames[0], controller));
+        TLComponentInstance* homeOver = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::Find<>(
+            mSideInstances[0], "over", gOnlineSideGroupNames[0], controller));
+        TLComponentInstance* away = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::Find<>(
+            mSideInstances[1], "controllers", gOnlineSideGroupNames[1], controller));
+        TLComponentInstance* awayOver = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::Find<>(
+            mSideInstances[1], "over", gOnlineSideGroupNames[1], controller));
+        FEFinder<TLTextInstance, 3>::FindOrDefault<>(home->GetActiveSlide(), "Text");
+        FEFinder<TLTextInstance, 3>::FindOrDefault<>(homeOver->GetActiveSlide(), "Text");
+        FEFinder<TLTextInstance, 3>::FindOrDefault<>(away->GetActiveSlide(), "Text");
+        FEFinder<TLTextInstance, 3>::FindOrDefault<>(awayOver->GetActiveSlide(), "Text");
+
+        if (machine < mDraftMessage.mMachineCount)
+        {
+            if (!guest)
+            {
+                NetworkDraftMachineInfo entry = mDraftMessage.mEntries[machine];
+                nlStrNCpy(mPlayerNames[i], entry.mName, 14);
+                OnlineSidePlayer player;
+                player.mMachineIndex = machine;
+                player.mIsGuest = false;
+                mOnlinePlayers[i] = player;
+                TLTextInstance* text = GetPlayerNameText(machine, false);
+                if (entry.mGuestEnabled != 0)
+                {
+                    ++groups;
+                    guest = true;
+                    if (groups == 1)
+                    {
+                        nlColourSet(mPlayerColours[i], 237, 0, 12, 255);
+                    }
+                    else
+                    {
+                        nlColourSet(mPlayerColours[i], 34, 98, 171, 255);
+                    }
+                    text->SetAssetColour(mPlayerColours[i]);
+                }
+                else
+                {
+                    guest = false;
+                    ++machine;
+                }
+                text->SetString(mPlayerNames[i]);
+                text->SetVisible(true);
+            }
+            else
+            {
+                nlStrNCpy(mPlayerNames[i], g_pLocalization->GetString("ONLINE_CONTROLLERS_GUEST"), 14);
+                guest = false;
+                OnlineSidePlayer player;
+                player.mMachineIndex = machine;
+                player.mIsGuest = true;
+                mOnlinePlayers[i] = player;
+                TLTextInstance* text = GetPlayerNameText(machine, true);
+                ++machine;
+                if (groups == 1)
+                {
+                    nlColourSet(mPlayerColours[i], 237, 0, 12, 255);
+                }
+                else
+                {
+                    nlColourSet(mPlayerColours[i], 34, 98, 171, 255);
+                }
+                text->SetAssetColour(mPlayerColours[i]);
+                text->SetString(mPlayerNames[i]);
+                text->SetVisible(true);
+            }
+            ++mPlayerCount;
+        }
+        home->SetVisible(false);
+        homeOver->SetVisible(false);
+        away->SetVisible(false);
+        awayOver->SetVisible(false);
+    }
+
+    mSelectSideText = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+        GetPresentation()->GetActiveSlide(), "Layer", "Text");
+    UpdateTimerText();
+    memset(GetFriendManager()->GetFriendCodeInput(), 0, sizeof(g_pFriendManager->mFriendCodeInput));
+    FEAudio::PlayAnimAudioEvent(0x7EF9225A, 0, 0, 1);
+}
+
+#else
 void SHOnlineFriendsChooseSides::SceneCreated()
 {
     NetworkDraft::Instance();
@@ -199,6 +330,8 @@ void SHOnlineFriendsChooseSides::SceneCreated()
     FEAudio::PlayAnimAudioEvent(0x7EF9225A, 0, 0, 1);
 }
 
+#endif
+
 void SHOnlineFriendsChooseSides::OnCountdownTick(FETimer* timer)
 {
     mTimerTextDirty = true;
@@ -218,6 +351,17 @@ void SHOnlineFriendsChooseSides::OnCountdownTick(FETimer* timer)
         }
     }
 }
+
+#if defined(VERSION_R4QJ01)
+void SHOnlineFriendsChooseSides::UpdateTimerText()
+{
+    TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
+    TLInstance* timerInstance = GetNavigationScene()->mTimer;
+    timerInstance->m_bVisible = true;
+    nlSNPrintf(mTimerText, 8, (const unsigned short*)L"%d", mSecondsRemaining);
+    timer->SetString(mTimerText);
+}
+#endif
 
 inline void SHOnlineFriendsChooseSides::SendDisconnectedSideChange(int pad)
 {
@@ -740,10 +884,14 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
                 controller->SetActiveSlide("cursor", true, false);
             }
         }
+#if defined(VERSION_R4QJ01)
+        GetPlayerNameText((s8)message->mMachineIndex, message->mGuest)->SetVisible(mPlayerSides[index] == -1);
+#else
         char friendName[16];
         nlSNPrintf(friendName, sizeof(friendName), "friend_%d", index);
         FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide,
             "Layer", friendName)->m_bVisible = mPlayerSides[index] == -1;
+#endif
     }
 }
 
@@ -813,3 +961,7 @@ void SHOnlineFriendsChooseSides::OnDisconnectPopupClosed()
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
     GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }
+
+#if defined(VERSION_R4QJ01)
+#include "Game/FriendManager.inl"
+#endif

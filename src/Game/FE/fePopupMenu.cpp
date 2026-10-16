@@ -42,7 +42,7 @@
 #include <cmath>
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 static const char* optionOKName = "button_OK";
 #endif
 
@@ -56,13 +56,13 @@ struct PopupEntry
 
 static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "POPUP_CANCEL", 0, 0 }, 1 },
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
 #else
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
 #endif
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "POPUP_CANCEL", 0, 0 }, 1 },
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
 #else
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
@@ -110,7 +110,7 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_WIN_FIRECUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_CRYSTALCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_STRIKERCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     { 0, "POPUP_CHALLENGE_UNLOCK_MARIO", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_SUCCEEDED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_FAILED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
@@ -326,7 +326,7 @@ void FEPopupMenu::SceneCreated()
         pText->SetBoxSize(boxSize);
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     TLComponentInstance* pOK = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
         presentation, "Slide1", "Layer", optionOKName);
     pOK->SetVisible(false);
@@ -336,7 +336,7 @@ void FEPopupMenu::SceneCreated()
     {
         mOptionInstances[optionIndex] = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, "Slide1", "Layer", optionNames[optionIndex]);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (nlStrNCmp(PopupEntries[mType].mOptions[optionIndex], "POPUP_OK", 10) == 0)
         {
             mOptionInstances[optionIndex]->SetVisible(false);
@@ -769,7 +769,7 @@ void FEPopupMenu::SetPositions()
         nlColour optionColour = pText->GetAssetColour();
         optionColour.c[3] = 255;
         pText->SetAssetColour(optionColour);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         float optionHeight = 56.7f;
 #else
         float optionHeight = 50.0f;
@@ -799,7 +799,7 @@ void FEPopupMenu::SetPositions()
         mPresentation, "Slide1", "Layer", "Message");
     nlVector2 size = GetTextDimensions(pText);
     float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     mBackgroundTargetScaleX = (40.0f + width) / 120.0f;
     mBackgroundTargetScaleY = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
 #else
@@ -808,7 +808,7 @@ void FEPopupMenu::SetPositions()
 #endif
     pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
     feVector3 position = pImage->GetAssetPosition();
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
 #else
     pImage->SetAssetPosition(5.0f + position.e[0], position.e[1] - 8.0f, position.e[2]);

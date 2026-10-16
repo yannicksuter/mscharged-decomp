@@ -22,7 +22,7 @@ const char* const __DVDErrorMessage[] = {
     // SC_LANG_EN
     "\n\n\nAn error has occurred.\n"
     "Press the Eject Button, remove the\n"
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     "Game Disc, and turn the power off.\n"
     "Please read the Wii operations manual\n"
 #else

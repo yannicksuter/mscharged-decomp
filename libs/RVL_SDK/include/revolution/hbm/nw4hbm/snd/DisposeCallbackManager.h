@@ -10,8 +10,8 @@ class DisposeCallbackManager {
 public:
     static DisposeCallbackManager& GetInstance();
 
-    void RegisterDisposeCallback(DisposeCallbackBase* callback);
-    void UnregisterDisposeCallback(DisposeCallbackBase* callback);
+    void RegisterDisposeCallback(DisposeCallback* callback);
+    void UnregisterDisposeCallback(DisposeCallback* callback);
 
     static void Dispose(void* mem, u32 size, void* arg);
     static void DisposeWave(void* mem, u32 size, void* arg);
