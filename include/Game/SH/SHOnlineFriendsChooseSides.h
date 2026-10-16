@@ -33,6 +33,10 @@ public:
     void SetDraftMessage(NetMessageDraft message) { mDraftMessage = message; }
 
     void OnCountdownTick(FETimer* timer);
+#if defined(VERSION_R4QJ01)
+    TLTextInstance* GetPlayerNameText(int machine, bool guest);
+    void UpdateTimerText();
+#endif
     void InitializeButtons();
     void OnSidePointerEnter(unsigned int index, void* context);
     void OnSidePointerLeave(unsigned int index, void* context);

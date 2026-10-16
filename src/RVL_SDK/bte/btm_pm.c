@@ -58,7 +58,7 @@ static tBTM_PM_MODE btm_pm_get_set_mode(UINT8 pm_id, tBTM_PM_MCB *p_cb,
 static tBTM_STATUS btm_pm_snd_md_req(UINT8 pm_id, int link_ind,
                                      tBTM_PM_PWR_MD *p_mode);
 
-// NOTE: above .rodata objects to match DWARF order
+// Feature-byte offsets and masks for hold, sniff, and park modes.
 UINT8 const btm_pm_mode_off[BTM_PM_NUM_SET_MODES] =
 {
 	0,

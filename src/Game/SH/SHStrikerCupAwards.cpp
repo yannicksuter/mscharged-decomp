@@ -238,11 +238,18 @@ void StrikerCupAwardsScene::Update(float deltaTime)
         }
 
         mPageControls->Update(event, deltaTime);
+#if !defined(VERSION_R4QJ01)
         mPlayButton.HandlePointerEvent(&event);
+#endif
         mScrollBar.Update(event, deltaTime);
 
         if (mBackButton.UpdateBackButton(event, deltaTime))
         {
+#if defined(VERSION_R4QJ01)
+            FEPageControls* pageControls = mPageControls;
+            pageControls->mPadHeld[0] = false;
+            pageControls->mPadHeld[1] = false;
+#endif
             mTransitionState = STRIKER_CUP_AWARDS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
@@ -271,6 +278,9 @@ void StrikerCupAwardsScene::Update(float deltaTime)
             }
             return;
         }
+#if defined(VERSION_R4QJ01)
+        mPlayButton.HandlePointerEvent(&event);
+#endif
     }
 
     if (mScrollBar.IsScrolling(1, true))
@@ -433,6 +443,11 @@ void StrikerCupAwardsScene::OnButtonPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
+#if defined(VERSION_R4QJ01)
+        FEPageControls* pageControls = mPageControls;
+        pageControls->mPadHeld[0] = false;
+        pageControls->mPadHeld[1] = false;
+#endif
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
         mTransitionState = STRIKER_CUP_AWARDS_TRANSITIONING;

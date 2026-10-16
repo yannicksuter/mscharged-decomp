@@ -136,7 +136,7 @@ static void defaultOptionalCommandChecker(DVDCommandBlock* block,
                                           DVDLowCallback callback);
 
 const char* __DVDVersion =
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     "<< RVL_SDK - DVD \trelease build: Apr 24 2007 11:44:29 (0x4199_60831) >>";
 #else
     "<< RVL_SDK - DVD \trelease build: Jan  9 2007 01:49:43 (0x4199_60831) >>";

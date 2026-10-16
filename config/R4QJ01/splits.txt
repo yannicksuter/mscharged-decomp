@@ -4939,7 +4939,7 @@ MetroTRK/targimpl.c:
 	.bss        start:0x805A28B0 end:0x805A2E2C
 
 MetroTRK/targsupp.c:
-	.text       start:0x8037B790 end:0x8037B7B0 align:8
+	.text       start:0x8037B790 end:0x8037B7B0 align:16
 
 MetroTRK/mpc_7xx_603e.c:
 	.text       start:0x8037B7B0 end:0x8037BB20

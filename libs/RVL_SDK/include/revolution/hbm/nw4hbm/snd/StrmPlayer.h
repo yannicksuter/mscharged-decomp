@@ -5,10 +5,7 @@
 
 #include "revolution/hbm/nw4hbm/snd/AxVoice.h"
 
-//! TODO: find a way to remove this hack
-#define MAKE_DTOR_ZERO
 #include "revolution/hbm/nw4hbm/snd/BasicPlayer.h"
-#undef MAKE_DTOR_ZERO
 
 #include "revolution/hbm/nw4hbm/snd/InstancePool.h"
 #include "revolution/hbm/nw4hbm/snd/StrmChannel.h"

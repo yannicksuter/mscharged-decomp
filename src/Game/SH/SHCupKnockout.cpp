@@ -232,9 +232,16 @@ void CupKnockoutScene::Update(float fDeltaT)
 #endif
         {
             mPageControls->Update(event, fDeltaT);
+#if !defined(VERSION_R4QJ01)
             mBracketButton.HandlePointerEvent(&event);
+#endif
             if (mBackButton.UpdateBackButton(event, fDeltaT))
             {
+#if defined(VERSION_R4QJ01)
+                FEPageControls* pageControls = mPageControls;
+                pageControls->mPadHeld[0] = false;
+                pageControls->mPadHeld[1] = false;
+#endif
                 mTransitionState = CUP_KNOCKOUT_EXITING_BACK;
                 SHNavigation* navigation = GetNavigationScene();
                 if (navigation != 0)
@@ -275,6 +282,9 @@ void CupKnockoutScene::Update(float fDeltaT)
                 return;
             }
         }
+#if defined(VERSION_R4QJ01)
+        mBracketButton.HandlePointerEvent(&event);
+#endif
     }
 }
 
@@ -708,6 +718,11 @@ void CupKnockoutScene::OnBracketPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
+#if defined(VERSION_R4QJ01)
+        FEPageControls* pageControls = mPageControls;
+        pageControls->mPadHeld[0] = false;
+        pageControls->mPadHeld[1] = false;
+#endif
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
         mTransitionState = CUP_KNOCKOUT_TRANSITIONING;

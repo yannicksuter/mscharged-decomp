@@ -26,15 +26,14 @@ static u32 VFiPFENT_compareAttr(u8 attr, u8 attr_required, u8 attr_unwanted) {
 static s32 VFiPFENT_compareEntryName(struct PF_DIR_ENT* p_ent, struct PF_STR* p_pattern, u8 attr) {
     s32 is_match;
 
-    // TODO: dumb hack to prevent inlining
-    s32 i;
-    for (i = 0; i < 0; i++) {
-    }
-
     is_match = 1;
     if (p_ent->num_entry_LFNs != 0 && p_ent->ordinal == 1) {
         if (p_ent->check_sum == VFiPFENT_CalcCheckSum(p_ent)) {
-            is_match = !(VFiPFPATH_cmpNameUni((u16*)p_ent, p_pattern) == 0);
+            if (VFiPFPATH_cmpNameUni((u16*)p_ent, p_pattern) == 0) {
+                is_match = 0;
+            } else {
+                is_match = 1;
+            }
         }
     }
 
@@ -720,8 +719,7 @@ s32 VFiPFENT_MakeRootDir(struct PF_VOLUME* p_vol) {
             return 7;
     }
 
-    // VFiPFVOL_LoadVolumeLabelFromBuf((const u8*)"NO NAME    ", p_vol);
-    VFiPFVOL_LoadVolumeLabelFromBuf((const u8*)"NO NAME    \0\0\0\0", p_vol);
+    VFiPFVOL_LoadVolumeLabelFromBuf((const u8*)"NO NAME    ", p_vol);
     return 0;
 }
 

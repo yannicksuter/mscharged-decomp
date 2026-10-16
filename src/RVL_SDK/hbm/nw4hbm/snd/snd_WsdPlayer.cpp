@@ -1,6 +1,6 @@
-#define MAKE_DTOR_ZERO
+
 #include "revolution/hbm/nw4hbm/snd/WsdPlayer.h"
-#undef MAKE_DTOR_ZERO
+
 
 #include "revolution/hbm/nw4hbm/snd/AxManager.h"
 

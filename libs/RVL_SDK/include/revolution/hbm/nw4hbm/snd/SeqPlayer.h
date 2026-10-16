@@ -5,10 +5,7 @@
 
 #include "revolution/hbm/nw4hbm/snd/BasicPlayer.h"
 
-//! TODO: find a way to remove this hack
-#define MAKE_DTOR_ZERO
 #include "revolution/hbm/nw4hbm/snd/DisposeCallbackManager.h"
-#undef MAKE_DTOR_ZERO
 
 #include "revolution/hbm/nw4hbm/snd/SeqTrack.h"
 #include "revolution/hbm/nw4hbm/snd/SoundThread.h"

@@ -291,8 +291,8 @@ static int DWCi_ChangeToClient(void);
 
 static char* stpAddFilter = NULL;
 static DWCMatchOptMinCompleteIn* stpOptMinComp = NULL;
-#if defined(VERSION_R4QE01)
-// USA callbacks defer browser destruction until ServerBrowserThink returns.
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+// Callbacks defer browser destruction until ServerBrowserThink returns.
 static int s_sbCallbackLevel = 0;
 static BOOL s_needSbFree = FALSE;
 #endif
@@ -802,7 +802,7 @@ qr2_error_t DWCi_QR2Startup(int profileID)
             break;
         }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         qr2_shutdown(DWCi_GetMatchCnt()->qr2Obj);
         DWCi_GetMatchCnt()->qr2Obj = NULL;
 #endif
@@ -1423,14 +1423,14 @@ void DWCi_MatchProcess(BOOL fullSpec)
 
     if (DWCi_GetMatchCnt()->sbObj)
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         s_sbCallbackLevel = 0;
         s_needSbFree = FALSE;
 #endif
 
         (void)ServerBrowserThink(DWCi_GetMatchCnt()->sbObj);
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (s_needSbFree)
         {
             ServerBrowserFree(DWCi_GetMatchCnt()->sbObj);
@@ -1564,7 +1564,7 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket,
     GT2Connection* pGt2Con;
     DWCConnectionInfo* pConInfo;
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     if (DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_CL_NN)
     {
         return;
@@ -2291,13 +2291,13 @@ static void DWCi_CloseMatching(void)
 
     if (stpMatchCnt->sbObj != NULL)
     {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         if (s_sbCallbackLevel == 0)
         {
 #endif
             ServerBrowserFree(stpMatchCnt->sbObj);
             stpMatchCnt->sbObj = NULL;
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
         }
         else
         {
@@ -5510,7 +5510,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
 
     DWC_Printf(0x40, "SBCallback : reason %d (state = %d)\n", reason,
         stpMatchCnt->state);
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     s_sbCallbackLevel++;
 #endif
 
@@ -5557,7 +5557,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                 stpMatchCnt->reqProfileID = 0;
                 if (DWCi_HandleSBError(DWCi_SBUpdateAsync(stpMatchCnt->reqProfileID)))
                 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                     break;
 #else
                     return;
@@ -5588,7 +5588,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                 }
                 if (result != 0)
                 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                     break;
 #else
                     return;
@@ -5645,7 +5645,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                             }
                             if (result != 0)
                             {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                                 break;
 #else
                                 return;
@@ -5669,7 +5669,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                         }
                         if (result != 0)
                         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                             break;
 #else
                             return;
@@ -5688,7 +5688,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                         }
                         if (result != 0)
                         {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                             break;
 #else
                             return;
@@ -5701,7 +5701,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
                 nnError = DWCi_NNStartupAsync(0, 0, ServerBrowserGetServer(sb, 0));
                 if (DWCi_HandleNNError(nnError))
                 {
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
                     break;
 #else
                     return;
@@ -5730,7 +5730,7 @@ static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason,
         break;
     }
 
-#if defined(VERSION_R4QE01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
     s_sbCallbackLevel--;
 #endif
 }

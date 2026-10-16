@@ -24,6 +24,9 @@
 #include "NL/nlBind.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
+#if defined(VERSION_R4QK01)
+#include "NL/nlLocalizationLookup.h"
+#endif
 #include "NL/nlMath.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -121,7 +124,6 @@ void StrikerTimesOverlay::OnCountdownTick(FETimer* timer)
 
 void StrikerTimesOverlay::SceneCreated()
 {
-    FEPresentation* presentation;
     TLTextInstance* bodyText;
     TLTextInstance* headlineText;
     char storyKey[64];
@@ -194,6 +196,126 @@ void StrikerTimesOverlay::SceneCreated()
     nlStrToWcs(gamesPlayedString, gamesPlayedText, 4);
 
     int margin = winnerScore - loserScore;
+#if defined(VERSION_R4QK01)
+    if (margin <= 2)
+    {
+        switch (storyVariant)
+        {
+        case 0:
+            story = FormatKorean("ST_DOMINATION_CLOSE_GAME_0",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 1:
+            story = FormatKorean("ST_DOMINATION_CLOSE_GAME_1",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(loserScore));
+            break;
+        case 2:
+            story = FormatKorean("ST_DOMINATION_CLOSE_GAME_2",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 3:
+        default:
+            story = FormatKorean("ST_DOMINATION_CLOSE_GAME_3",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(loserScore),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        }
+    }
+    else if (margin <= 4)
+    {
+        switch (storyVariant)
+        {
+        case 0:
+            story = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_0",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 1:
+            story = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_1",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 2:
+            story = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_2",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(loserScore),
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())));
+            break;
+        case 3:
+        default:
+            story = FormatKorean("ST_DOMINATION_ONE_SIDED_GAME_3",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        }
+    }
+    else
+    {
+        switch (storyVariant)
+        {
+        case 0:
+            story = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_0",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 1:
+            story = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_1",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        case 2:
+            story = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_2",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())),
+                GetKoreanParticle(loserScore));
+            break;
+        case 3:
+        default:
+            story = FormatKorean("ST_DOMINATION_BLOWOUT_GAME_3",
+                g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
+                g_pLocalization->GetString(loserInfo.GetDisplayNameKey()),
+                winnerScoreText, loserScoreText, gamesPlayedText,
+                GetKoreanParticle(g_pLocalization->GetString(winnerInfo.GetDisplayNameKey())),
+                GetKoreanParticle(g_pLocalization->GetString(loserInfo.GetDisplayNameKey())));
+            break;
+        }
+    }
+#else
     if (margin <= 2)
     {
         nlSNPrintf(storyKey, 64, "ST_DOMINATION_CLOSE_GAME_%d", storyVariant);
@@ -209,6 +331,7 @@ void StrikerTimesOverlay::SceneCreated()
     storyFormat = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString(storyKey));
     story = Format(storyFormat, g_pLocalization->GetString(winnerInfo.GetDisplayNameKey()),
         g_pLocalization->GetString(loserInfo.GetDisplayNameKey()), winnerScoreText, loserScoreText, gamesPlayedText);
+#endif
 
     const CharacterInfo& leaderInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(homeWins > awayWins ? homeCaptain : awayCaptain));
     GetCharacterInfo(GetCharacterIndexFromCaptain(homeWins > awayWins ? awayCaptain : homeCaptain));
@@ -217,8 +340,13 @@ void StrikerTimesOverlay::SceneCreated()
     if ((homeWins > awayWins && homeWins == winsNeeded) || (awayWins > homeWins && awayWins == winsNeeded))
     {
         nlSNPrintf(headlineKey, 64, "STH_DOMINATION_WINS_SERIES_%d", headlineVariant);
+#if defined(VERSION_R4QK01)
+        headline = FormatKorean(headlineKey, g_pLocalization->GetString(leaderInfo.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(leaderInfo.GetDisplayNameKey())), leaderWinsText, trailerWinsText);
+#else
         headlineFormat = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString(headlineKey));
         headline = Format(headlineFormat, g_pLocalization->GetString(leaderInfo.GetDisplayNameKey()), leaderWinsText, trailerWinsText);
+#endif
     }
     else if (homeWins == awayWins)
     {
@@ -229,11 +357,16 @@ void StrikerTimesOverlay::SceneCreated()
     else
     {
         nlSNPrintf(headlineKey, 64, "STH_DOMINATION_LEADS_SERIES_%d", headlineVariant);
+#if defined(VERSION_R4QK01)
+        headline = FormatKorean(headlineKey, g_pLocalization->GetString(leaderInfo.GetDisplayNameKey()),
+            GetKoreanParticle(g_pLocalization->GetString(leaderInfo.GetDisplayNameKey())), leaderWinsText, trailerWinsText);
+#else
         headlineFormat = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString(headlineKey));
         headline = Format(headlineFormat, g_pLocalization->GetString(leaderInfo.GetDisplayNameKey()), leaderWinsText, trailerWinsText);
+#endif
     }
 
-    presentation = mFEScene->GetPackage()->GetPresentation();
+    FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
 
     bodyText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "BODY");
     mStoryScroller.ApplyNewTextInstancePointer(bodyText, -1, -1, 0);

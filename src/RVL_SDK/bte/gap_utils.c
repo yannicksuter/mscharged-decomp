@@ -306,11 +306,6 @@ BOOLEAN gap_is_service_busy(UINT16 request)
 	return FALSE;
 }
 
-# if 0
-// Range: 0x730 -> 0x794
-unsigned short gap_convert_btm_status(unsigned char btm_status /* r3 */) {}
-#endif
-
 UINT16 gap_convert_btm_status(tBTM_STATUS btm_status)
 {
 	switch (btm_status)
