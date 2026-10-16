@@ -189,7 +189,11 @@ GXBool CPGPLinkCheck()
     return GX_FALSE;
 }
 
+#if defined(VERSION_R4QK01)
+void GXSetCPUFifo(const GXFifoObj* fifo)
+#else
 void GXSetCPUFifo(GXFifoObj* fifo)
+#endif
 {
     const __GXFifoObj* realFifo = (const __GXFifoObj*)fifo;
     BOOL enabled = OSDisableInterrupts();
@@ -252,9 +256,13 @@ void GXSetCPUFifo(GXFifoObj* fifo)
     OSRestoreInterrupts(enabled);
 }
 
+#if defined(VERSION_R4QK01)
+void GXSetGPFifo(const GXFifoObj* fifo)
+#else
 void GXSetGPFifo(GXFifoObj* fifo)
+#endif
 {
-    __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
+    const __GXFifoObj* realFifo = (const __GXFifoObj*)fifo;
     BOOL enabled = OSDisableInterrupts();
     u32 stbtmp;
 

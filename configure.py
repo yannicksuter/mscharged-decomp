@@ -1558,7 +1558,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXAttr.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXBump.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXDisplayList.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXFifo.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gx/GXFifo.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXFrameBuf.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXGeometry.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXInit.c"),
