@@ -891,7 +891,7 @@ config.libs = [
             Object(Matching, "Game/Render/Indicators.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/Jumbotron.cpp"),
             Object(Matching, "Game/Render/KoopaShellObject.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/Render/MegaBallIndicators.cpp"),
+            Object(Matching, "Game/Render/MegaBallIndicators.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/MegastrikeBackgroundOverlay.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/Render/NetMesh.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/Nis.cpp", extra_cflags=["-ipa file", "-sym on"]),

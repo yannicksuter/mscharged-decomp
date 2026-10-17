@@ -1,3 +1,4 @@
+#include "revolution/types.h"
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetworkMessageRegistry.h"
 #include "Game/NetworkMessages.h"
@@ -16,10 +17,12 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 #include "NL/plat/DPDData.h"
+#include "NL/plat/WiiFreestylePad.h"
 #include "NL/plat/WiiPad.h"
+#include "NL/plat/WiiRemotePad.h"
 #include <math.h>
 
-void SendMegaBallPointerUpdate(u16 angle, u32 textureIndex, u32 status,
+void SendMegaBallPointerUpdate(u16 angle, unsigned int textureIndex, unsigned int status,
     float x, float y);
 
 static char sReduceTexturesTweakPath[] = "/Rendering/Engine/Reduce Textures";
@@ -591,15 +594,15 @@ void UpdateAndRenderMegaBallPointer(float fDeltaT)
     int nClassID = pPlatform->GetClassID();
     if (nClassID == gWiiRemotePadClassID)
     {
-        pData = reinterpret_cast<DPDData*>(
-            (u8*)pController->mBackend + 0x1B0);
+        pData = &static_cast<WiiRemotePad*>(
+            pController->mBackend)->mDPDData;
         goto have_controller_data;
     }
     nClassID = pPlatform->GetClassID();
     if (nClassID == gWiiFreestylePadClassID)
     {
-        pData = reinterpret_cast<DPDData*>(
-            (u8*)pController->mBackend + 0x1D0);
+        pData = &static_cast<WiiFreestylePad*>(
+            pController->mBackend)->mDPDData;
         goto have_controller_data;
     }
 
@@ -1023,8 +1026,8 @@ void UpdateAndRenderMegaBallIndicators(float fDeltaT)
     UpdateAndRenderMegaBallPointer(fDeltaT);
 }
 
-void SendMegaBallPointerUpdate(u16 nAngle, u32 nTextureIndex,
-    u32 nStatus, float fX, float fY)
+void SendMegaBallPointerUpdate(u16 nAngle, unsigned int nTextureIndex,
+    unsigned int nStatus, float fX, float fY)
 {
     if (gSuppressMegaBallPointerPackets)
     {
