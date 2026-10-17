@@ -389,7 +389,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
             NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
             if (category != 0)
             {
-                int profileId = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex)->unknown_0x01C;
+                int profileId = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex)->mProfileId;
                 int player = category->FindPlayer(profileId);
                 if (player != -1)
                     mRows[index].mStats = category->mMetadata[player];

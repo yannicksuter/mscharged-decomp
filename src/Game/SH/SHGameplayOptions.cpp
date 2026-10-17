@@ -704,9 +704,9 @@ void SHGameplayOptions::CommitSettings()
     if (gameInfo->UseAltRules())
     {
         gameInfo->mUserInfo.mAltGameplayOptions = mSettings;
-        GameInfoManager::Instance()->mNoCheatSettings = mSettings;
+        GameInfoManager::Instance()->mUnrankedGameplaySettings = mSettings;
         GameInfoManager::Instance()->mUserInfo.mAltCheatOptions = mPowerupSettings;
-        GameInfoManager::Instance()->mRulesA = mPowerupSettings;
+        GameInfoManager::Instance()->mUnrankedCheatSettings = mPowerupSettings;
         GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_FORWARD, true);
     }
     else

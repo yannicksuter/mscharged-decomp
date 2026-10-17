@@ -582,12 +582,12 @@ void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
         break;
     }
 
-    if (GameInfoManager::Instance()->GetRule0x0() == 4
+    if (GameInfoManager::Instance()->GetCustomPowerups() == 4
         && pParameters->nnumOfPowerups == 1)
     {
         fMediumChance = 0.0f;
     }
-    else if (GameInfoManager::Instance()->GetRule0x0() == 1)
+    else if (GameInfoManager::Instance()->GetCustomPowerups() == 1)
     {
         fExplodeChance = 1.0f;
     }
@@ -1171,7 +1171,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             && pTeam->m_nSide == 0)
         || (!GameInfoManager::Instance()->GetCurrentSettings()->mAwayPowerupsEnabled
             && pTeam->m_nSide == 1)
-        || GameInfoManager::Instance()->IsRule0x0Equal11())
+        || GameInfoManager::Instance()->IsButterfingersEnabled())
     {
         return -1;
     }
@@ -1309,7 +1309,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         nChanceForFreezeShell = 0;
     }
 
-    switch (GameInfoManager::Instance()->GetRule0x0())
+    switch (GameInfoManager::Instance()->GetCustomPowerups())
     {
     case POWERUP_CHEAT_EXPLOSIVES:
         nChanceForChainChomp = nChanceForStar = nChanceForMushroom
@@ -1440,7 +1440,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         powerUpType = POWER_UP_FREEZE_SHELL;
     }
 
-    if (GameInfoManager::Instance()->GetRule0x0() == 9)
+    if (GameInfoManager::Instance()->GetCustomPowerups() == 9)
     {
         if (powerUpType
             != *(ePowerUpType*)(
@@ -1449,7 +1449,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             powerUpType = POWER_UP_NONE;
         }
 
-        if (GameInfoManager::Instance()->IsRule0x0Equal10()
+        if (GameInfoManager::Instance()->AreInfinitePowerupsEnabled()
             && powerUpType == POWER_UP_NONE && !pTeam->HasCaptainPowerup()
             && pTeam->GetCaptain()->IsShattered() == 0)
         {
@@ -1535,8 +1535,8 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
         break;
     }
 
-    if (GameInfoManager::Instance()->GetRule0x0() == 4
-        || GameInfoManager::Instance()->GetRule0x0() == 1)
+    if (GameInfoManager::Instance()->GetCustomPowerups() == 4
+        || GameInfoManager::Instance()->GetCustomPowerups() == 1)
     {
         nNumOfPowerups = 1;
     }
@@ -1544,7 +1544,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     if (pTeam->SetCurrentPowerUp(powerUpType, nNumOfPowerups))
     {
         if (g_pGame->m_eGameState == GS_KICKOFF
-            && GameInfoManager::Instance()->IsInMode4())
+            && GameInfoManager::Instance()->IsInChallengeMode())
         {
             int mode = g_pStrikerChallenge->mCurrentChallenge;
             if (!(mode != TUTORIAL_SUPER_MARIO && mode != TUTORIAL_BRING_THUNDER))

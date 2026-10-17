@@ -86,7 +86,7 @@ void SHOnlineFriends::UpdateScrollRange()
 void SHOnlineFriends::UpdateFriend(int index)
 {
     FEOnlinePlayerRow* row = &mFriendRows[index];
-    DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetUnknown0x40(gNetworkSaveSlotIndex, index);
+    DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetSavedFriendData(gNetworkSaveSlotIndex, index);
     u16* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
     row->mFriendIndex = index;
     int type = DWC_GetFriendDataType(data);
@@ -466,7 +466,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
         selected = item + mScrollOffset;
         if (!IsOnlineFriendSelectionMode())
             --selected;
-        region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
+        region = *(u8*)GameInfoManager::Instance()->GetSavedFriendRegion(
             gNetworkSaveSlotIndex, mSortedFriendRows[selected]->mFriendIndex);
         bool differentRegion = region != GetOnlineRegion();
         if (differentRegion)

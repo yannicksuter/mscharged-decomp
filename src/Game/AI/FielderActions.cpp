@@ -2270,7 +2270,7 @@ bool cFielder::ApplyCharacterHitReaction(cFielder* pFielder, cPlayer* pAttacker)
     }
 
     int nReact = HIT_REACTION_MEDIUM;
-    if (GameInfoManager::Instance()->IsRule0x8Equal1())
+    if (GameInfoManager::Instance()->AreDevastatingHitsEnabled())
     {
         nReact = HIT_REACTION_HEAVY;
     }
@@ -4604,7 +4604,7 @@ void cFielder::ActionSlideAttack(float fDeltaT)
 
                 if (m_pBall != 0)
                 {
-                    if (GetStadiumUnknown0x10(
+                    if (StadiumHasCrowdAudio(
                             GameInfoManager::Instance()->GetStadium()))
                     {
                         unsigned long soundID = 0x0DCA472D;
@@ -4812,7 +4812,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             QueueAttackSuccessEvent(g_pGame, pNode);
 
             if (pAttacker->m_pBall != 0
-                && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+                && StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
             {
                 unsigned long soundID = 0xDCA472D;
                 if (pAttacker->m_pTeam->m_nSide == 0)

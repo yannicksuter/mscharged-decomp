@@ -109,7 +109,7 @@ void FECharacterPDAComponent::Initialize(TLComponentInstance* component, int sid
         TLTextInstance* captainAway = FEFinder<TLTextInstance, 3>::FindOrDefault(mCaptainAttributes->GetActiveSlide(), "attributes_captains", "AWAY");
         TLTextInstance* team = FEFinder<TLTextInstance, 3>::FindOrDefault(mPositions->GetActiveSlide(), "positions", "TEAM");
         TLTextInstance* teamAway = FEFinder<TLTextInstance, 3>::FindOrDefault(mPositions->GetActiveSlide(), "positions", "AWAY");
-        if (GameInfoManager::Instance()->IsInMode3())
+        if (GameInfoManager::Instance()->IsInCupMode())
         {
             captain->SetVisible(true);
             captainAway->SetVisible(false);
@@ -403,7 +403,7 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
     }
     for (int i = 0; i < 7; ++i)
     {
-        if (GameInfoManager::Instance()->IsInMode3())
+        if (GameInfoManager::Instance()->IsInCupMode())
         {
             TintInstanceForCaptain(mSidekickAttributeImages[i], CupManager::s_pInstance->mPendingCupTeam, 180);
         }

@@ -153,7 +153,7 @@ void FrontEndTask::Run(float dt)
             TakeGameMemSnapshot::Update(dt);
         }
     }
-    else if (GameInfoManager::Instance()->IsInMode3())
+    else if (GameInfoManager::Instance()->IsInCupMode())
     {
         if (!IsHallOfFameImagePreloadStarted())
         {
@@ -178,7 +178,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
         return;
     }
 
-    if (GameInfoManager::Instance()->IsInMode2()
+    if (GameInfoManager::Instance()->IsInDemoMode()
         && (nlTaskManager::m_pInstance->mCurrentState & 0x2))
     {
         g_fIdleGameTime = 0.0f;

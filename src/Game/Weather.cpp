@@ -350,7 +350,7 @@ void Weather::Start()
 
 void Weather::Update(float)
 {
-    if (gDisableWeather || GameInfoManager::Instance()->IsRule0x4Equal1())
+    if (gDisableWeather || GameInfoManager::Instance()->IsSecureStadiumEnabled())
     {
         return;
     }
@@ -636,7 +636,7 @@ void Windy::Start()
     PlaySound(11, 0x04EE0B75, "Wind Event", this);
     float angle = 360.0f * ((float)aWindDirection / 65536.0f);
     float value = nlRandomf(1.0f);
-    if (!gDisableWeather && !GameInfoManager::Instance()->IsRule0x4Equal1()
+    if (!gDisableWeather && !GameInfoManager::Instance()->IsSecureStadiumEnabled()
         && value <= gDebrisChance && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         if (fabsf(angle - 90.0f) < gWindAngleRange / 2.0f || fabsf(angle - 270.0f) < gWindAngleRange / 2.0f)
@@ -798,7 +798,7 @@ void SolarFlare::Reset()
 
 void SolarFlare::OnGetReadyForKickoff()
 {
-    if (gDisableWeather || GameInfoManager::Instance()->IsRule0x4Equal1())
+    if (gDisableWeather || GameInfoManager::Instance()->IsSecureStadiumEnabled())
     {
         return;
     }
@@ -839,7 +839,7 @@ void SolarFlare::OnGetReadyForKickoff()
 
 void SolarFlare::OnKickoff()
 {
-    if (gDisableWeather || GameInfoManager::Instance()->IsRule0x4Equal1())
+    if (gDisableWeather || GameInfoManager::Instance()->IsSecureStadiumEnabled())
     {
         return;
     }
@@ -974,7 +974,7 @@ int SolarFlare::SelectVaporizeTargets()
             count = (int)value + 1;
         }
         bool allowCaptain = !g_pTeams[0]->HasCaptainPowerup() && !g_pTeams[1]->HasCaptainPowerup();
-        if (GameInfoManager::Instance()->GetRule0x0() == 9)
+        if (GameInfoManager::Instance()->GetCustomPowerups() == 9)
         {
             allowCaptain = false;
         }
@@ -1570,14 +1570,14 @@ void SandTombWeather::Start()
 
 void SandTombWeather::OnKickoff()
 {
-    if (gDisableWeather || GameInfoManager::Instance()->IsRule0x4Equal1())
+    if (gDisableWeather || GameInfoManager::Instance()->IsSecureStadiumEnabled())
         return;
     CreateSandPatches();
 }
 
 void SandTombWeather::InvalidateSandPatches()
 {
-    if (gDisableWeather || GameInfoManager::Instance()->IsRule0x4Equal1())
+    if (gDisableWeather || GameInfoManager::Instance()->IsSecureStadiumEnabled())
         return;
     m_bSandPatchesCreated = false;
 }

@@ -678,7 +678,7 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         parameter.friends.since = 0;
         for (int i = 0; i < DWC_RNK_FRIENDS_MAX; ++i)
         {
-            int* entry = (int*)GameInfoManager::GetInstance()->GetUnknown0x40(
+            int* entry = (int*)GameInfoManager::GetInstance()->GetSavedFriendData(
                 gNetworkSaveSlotIndex, i);
             parameter.friends.friends[i] = entry[1];
         }
@@ -896,7 +896,7 @@ int NetworkRanking::CompareLeaderboardRows(
 
     GameInfoSaveSlot* save =
         GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
-    int localProfile = save->unknown_0x01C;
+    int localProfile = save->mProfileId;
     if (a->mPlayer.mProfileId == localProfile)
     {
         return -1;

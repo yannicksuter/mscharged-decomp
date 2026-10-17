@@ -136,7 +136,7 @@ bool DesireMegaStrike::Initialize(void* context)
     m_pFielder->EndShrink();
     mMaxDuration = sMegaStrikeMaxDuration;
 
-    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsRule0x8Equal2())
+    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsSafeMegaStrikeEnabled())
     {
         m_pFielder->muInvincibleStatus |= 0x1F;
     }
@@ -164,7 +164,7 @@ void DesireMegaStrike::Update(
         return;
     }
 
-    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsRule0x8Equal2())
+    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsSafeMegaStrikeEnabled())
     {
         if (!m_pFielder->IsInvincible())
         {

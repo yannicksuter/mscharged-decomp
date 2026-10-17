@@ -216,7 +216,11 @@ s32 __OSSetVIForceDimming(u32 enabled, u32 yShift, u32 xShift)
 #undef in_args
 }
 
+#if defined(VERSION_R4QK01)
+s32 __OSSetIdleLEDMode(u32 mode)
+#else
 static inline s32 __OSSetIdleLEDMode(u32 mode)
+#endif
 {
 #define in_args ((u32*)StmImInBuf)
 

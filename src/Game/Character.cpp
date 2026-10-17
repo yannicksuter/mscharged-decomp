@@ -1818,7 +1818,7 @@ void OnKnockYoshiTongue(cFielder* pFielder)
 
 void OnAttackSuccess(PlayerAttackData* pEventData)
 {
-    if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
+    if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium())
         && pEventData->pTarget != NULL && pEventData->pAttacker != NULL
         && !pEventData->bIsSlideAttack)
     {
@@ -1837,7 +1837,7 @@ void OnAttackSuccess(PlayerAttackData* pEventData)
 
 void OnPowerupStats(CollisionPowerupStatsData* pEventData)
 {
-    if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
+    if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium())
         && pEventData->pThrower != NULL)
     {
         PlayCrowdReaction(pEventData->pThrower->m_pTeam->m_nSide == HOME
@@ -2168,7 +2168,7 @@ void OnCollisionBallGoalpost(CollisionBallGoalpostData* pEventData)
         pControl->SetPosition(pEventData->v3CollisionPosition);
         CancelBallShot(g_pBall, false);
         if (g_pBall->m_pPrevOwner != NULL
-            && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+            && StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
         {
             PlayCrowdReaction(g_pBall->m_pPrevOwner->m_pTeam->m_nSide == HOME
                     ? 0xEF359B65UL : 0xC6A6B1CEUL);

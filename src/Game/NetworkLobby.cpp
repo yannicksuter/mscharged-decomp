@@ -301,7 +301,7 @@ void NetworkLobby::DebugDraw(int column, int* row)
     }
 
     GameInfoSaveSlot* slot = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex);
-    glFontPrintf(GetDebugFontView(), column, (*row)++, "PID: %d", slot->unknown_0x01C);
+    glFontPrintf(GetDebugFontView(), column, (*row)++, "PID: %d", slot->mProfileId);
 }
 
 void NetworkLobby::OnConnected(unsigned int connection, int result)
@@ -563,8 +563,8 @@ bool NetworkLobby::StartMatchmaking()
         mMatchFlags |= 2;
     }
 
-    int wins = GameInfoManager::Instance()->GetUnknown0xA90Total(gNetworkSaveSlotIndex);
-    int losses = GameInfoManager::Instance()->GetUnknown0xA94Total(gNetworkSaveSlotIndex);
+    int wins = GameInfoManager::Instance()->GetTotalRankedWins(gNetworkSaveSlotIndex);
+    int losses = GameInfoManager::Instance()->GetTotalRankedLosses(gNetworkSaveSlotIndex);
     float total = (float)wins + (float)losses;
     int points;
     if (total == 0.0f)
@@ -593,7 +593,7 @@ bool NetworkLobby::StartMatchmaking()
     tDebugPrintManager::Print(DC_NETWORK,
         "Matchmaking points calculated %d from W/L %d/%d\n", points, wins, losses);
     mCountryMatchGroup = IsAlternateOnlineCountryGroup();
-    mProfileId = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex)->unknown_0x01C;
+    mProfileId = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex)->mProfileId;
 
     DWC_AddMatchKeyInt(1, "GT", (int*)&mMatchFlags);
     DWC_AddMatchKeyInt(2, "PI", (int*)&mProfileId);
@@ -979,7 +979,7 @@ void NetworkLobby::BuildLocalMachineInfo(
         {
             int profileId = GameInfoManager::Instance()
                                 ->GetSaveSlot(gNetworkSaveSlotIndex)
-                                ->unknown_0x01C;
+                                ->mProfileId;
             int index = leaderboard->FindPlayer(profileId);
             if (index != -1)
             {
@@ -1005,7 +1005,7 @@ void NetworkLobby::BuildLocalMachineInfo(
 
     info->mProfileId = GameInfoManager::Instance()
                            ->GetSaveSlot(gNetworkSaveSlotIndex)
-                           ->unknown_0x01C;
+                           ->mProfileId;
 
     nlStrNCpy(info->mName, gNetworkMiiNameWide, 11);
     memcpy(info->mMiiData, &gNetworkMiiData, sizeof(info->mMiiData));

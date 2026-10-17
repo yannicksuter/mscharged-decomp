@@ -414,7 +414,7 @@ void HUDScoreDisplay::ResetScores()
     {
         mScore[i] = 0;
         mNewScore[i] = 0;
-        if (nlSingleton<GameInfoManager>::Instance()->IsInMode4())
+        if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode())
         {
             mScore[i] = g_pStrikerChallenge->mScore[i];
             mNewScore[i] = g_pStrikerChallenge->mScore[i];
@@ -602,7 +602,7 @@ void HUDScoreDisplay::Init(FEPresentation* presentation)
     leftOut->m_bVisible = false;
     rightIn->m_bVisible = false;
     rightOut->m_bVisible = false;
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode4())
+    if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode())
     {
         mScore[0] = g_pTeams[0]->m_nScore;
         mScore[1] = g_pTeams[1]->m_nScore;

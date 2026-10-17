@@ -227,7 +227,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
                 ContinuePostGame(mIsNetworkGame);
             }
         }
-        else if (!GameInfoManager::Instance()->IsInMode4())
+        else if (!GameInfoManager::Instance()->IsInChallengeMode())
         {
             FEMusic::StopStream();
             FrontEnd::ReturnToFE();
@@ -476,7 +476,7 @@ void PausePostGameScene::OnSelectRematch()
 
 void PausePostGameScene::OnSelectChangeTeams()
 {
-    GameInfoManager::s_pInstance->unknown_0x71C8 = 2;
+    GameInfoManager::s_pInstance->mFrontEndReturnMode = 2;
     FrontEnd::ReturnToFE();
     SetPointerEnabled(false);
 }

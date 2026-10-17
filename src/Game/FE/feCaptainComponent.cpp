@@ -46,12 +46,12 @@ void FECaptainComponent::Initialize(TLComponentInstance* component, int side)
 
     TLComponentInstance* logos = FEFinder<TLComponentInstance, 4>::Find<>(mPositions->GetActiveSlide(), "team_logos");
     int team;
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
-        GameRules rules = CupManager::s_pInstance->mPendingCupSidekicks;
-        mSidekicks[0] = rules.mValues[0];
-        mSidekicks[1] = rules.mValues[1];
-        mSidekicks[2] = rules.mValues[2];
+        CupSidekicks choices = CupManager::s_pInstance->mPendingCupSidekicks;
+        mSidekicks[0] = choices.mValues[0];
+        mSidekicks[1] = choices.mValues[1];
+        mSidekicks[2] = choices.mValues[2];
         team = CupManager::s_pInstance->mPendingCupTeam;
     }
     else
@@ -74,7 +74,7 @@ void FECaptainComponent::Initialize(TLComponentInstance* component, int side)
 void FECaptainComponent::ApplyTeamColour(TLInstance* instance, int captain, unsigned char alpha)
 {
     nlColour colour;
-    if (GameInfoManager::Instance()->IsInMode3() || GameInfoManager::Instance()->mIsOnlineMode)
+    if (GameInfoManager::Instance()->IsInCupMode() || GameInfoManager::Instance()->mIsOnlineMode)
     {
         const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
         const CharacterInfo& opponent = GetCharacterInfo(GetCharacterIndexFromCaptain(0));
@@ -153,7 +153,7 @@ TLImageInstance* FECaptainComponent::FindPositionImage(int index, const char* na
 void FECaptainComponent::SetRecycleState(int index, int state)
 {
     int team;
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
         team = CupManager::s_pInstance->mPendingCupTeam;
     }
@@ -407,20 +407,20 @@ void FECaptainComponent::RandomizeSidekicks()
         }
     }
 
-    GameRules rules;
-    rules.mValues[0] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
-    rules.mValues[1] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
-    rules.mValues[2] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
-    mSidekicks[0] = rules.mValues[0];
-    mSidekicks[1] = rules.mValues[1];
-    mSidekicks[2] = rules.mValues[2];
-    nlSingleton<GameInfoManager>::Instance()->SetRules(mCaptain, rules);
+    CupSidekicks choices;
+    choices.mValues[0] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    choices.mValues[1] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    choices.mValues[2] = (eSidekickID)sidekicks[nlRandom(count, &nlDefaultSeed)];
+    mSidekicks[0] = choices.mValues[0];
+    mSidekicks[1] = choices.mValues[1];
+    mSidekicks[2] = choices.mValues[2];
+    nlSingleton<GameInfoManager>::Instance()->SetSidekickChoices(mCaptain, choices);
 }
 
 void FECaptainComponent::ResetSidekicks()
 {
     int team;
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode3())
+    if (nlSingleton<GameInfoManager>::Instance()->IsInCupMode())
     {
         team = CupManager::s_pInstance->mPendingCupTeam;
     }
@@ -428,14 +428,14 @@ void FECaptainComponent::ResetSidekicks()
     {
         team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)mSide);
     }
-    nlSingleton<GameInfoManager>::Instance()->ResetRules(team);
+    nlSingleton<GameInfoManager>::Instance()->ResetSidekickChoices(team);
     ReloadSidekicks();
 }
 
 void FECaptainComponent::ReloadSidekicks()
 {
     int team;
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode3())
+    if (nlSingleton<GameInfoManager>::Instance()->IsInCupMode())
     {
         team = CupManager::s_pInstance->mPendingCupTeam;
     }
@@ -443,10 +443,10 @@ void FECaptainComponent::ReloadSidekicks()
     {
         team = nlSingleton<GameInfoManager>::Instance()->GetTeam((short)mSide);
     }
-    GameRules rules = nlSingleton<GameInfoManager>::Instance()->mRulesTable[team];
-    mSidekicks[0] = rules.mValues[0];
-    mSidekicks[1] = rules.mValues[1];
-    mSidekicks[2] = rules.mValues[2];
+    CupSidekicks choices = nlSingleton<GameInfoManager>::Instance()->mSidekickChoices[team];
+    mSidekicks[0] = choices.mValues[0];
+    mSidekicks[1] = choices.mValues[1];
+    mSidekicks[2] = choices.mValues[2];
 }
 
 int FECaptainComponent::GetSidekick(int index)

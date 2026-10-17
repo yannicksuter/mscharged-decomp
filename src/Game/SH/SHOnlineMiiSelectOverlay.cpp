@@ -133,7 +133,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
     {
         OSCalendarTime calendar;
         OSTicksToCalendarTime(
-            *(OSTime*)GameInfoManager::Instance()->GetUnknown0xA88(mSaveSlot), &calendar);
+            *(OSTime*)GameInfoManager::Instance()->GetSaveSlotLastUsedTime(mSaveSlot), &calendar);
 
         unsigned short day[5];
         unsigned short month[5];
@@ -148,8 +148,8 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
         nlStrNCpy(mDateText, formattedDate.c_str(), 0x40);
         FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "DATE")->SetString(mDateText);
 
-        int wins = GameInfoManager::Instance()->GetUnknown0xAA0Total(mSaveSlot);
-        int losses = GameInfoManager::Instance()->GetUnknown0xAA4Total(mSaveSlot);
+        int wins = GameInfoManager::Instance()->GetTotalOnlineWins(mSaveSlot);
+        int losses = GameInfoManager::Instance()->GetTotalOnlineLosses(mSaveSlot);
         WideBasicString formattedRecord = Format(
             WideBasicString(g_pLocalization->GetString("ONLINE_TOTAL_WINS_LOSSES")), wins, losses);
         nlStrNCpy(mRecordText, formattedRecord.c_str(), 0x40);
@@ -199,7 +199,7 @@ void SHOnlineMiiSelectOverlay::InitializeButtons()
 
 static void StoreSaveSlotTime(int slot)
 {
-    void* saveTime = GameInfoManager::Instance()->GetUnknown0xA88(slot);
+    void* saveTime = GameInfoManager::Instance()->GetSaveSlotLastUsedTime(slot);
     OSTime time = OSGetTime();
     memcpy(saveTime, &time, sizeof(time));
 }
@@ -302,9 +302,9 @@ bool SHOnlineMiiSelectOverlay::SelectMii()
     }
 
     unsigned short* savedName
-        = (unsigned short*)GameInfoManager::Instance()->GetUnknown0xAA8(
+        = (unsigned short*)GameInfoManager::Instance()->GetSavedMiiName(
             gNetworkSaveSlotIndex);
-    void* savedStoreData = GameInfoManager::Instance()->GetUnknown0xABE(
+    void* savedStoreData = GameInfoManager::Instance()->GetSavedMiiData(
         gNetworkSaveSlotIndex);
 
     if (nlStrCmp(gNetworkMiiNameWide, savedName) != 0)

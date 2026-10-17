@@ -717,7 +717,7 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         params.mUseIntensityAlpha = 0;
         params.mBaseAngle = 0xc000;
         eFEImpostorMode modelType = FE_IMPOSTOR_DEFAULT;
-        if (GameInfoManager::Instance()->IsInMode3())
+        if (GameInfoManager::Instance()->IsInCupMode())
         {
             modelType = CupManager::s_pInstance->GetCurrentMode() == -1 ? FE_IMPOSTOR_INITIAL_CUP : FE_IMPOSTOR_CUP;
         }

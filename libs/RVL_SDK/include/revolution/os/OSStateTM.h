@@ -16,6 +16,9 @@ extern "C"
     void __OSShutdownToSBY(void);
     void __OSHotReset(void);
     s32 __OSSetVIForceDimming(u32 enabled, u32 yShift, u32 xShift);
+#if defined(VERSION_R4QK01)
+    s32 __OSSetIdleLEDMode(u32 mode);
+#endif
     s32 __OSUnRegisterStateEvent(void);
 
 #ifdef __cplusplus

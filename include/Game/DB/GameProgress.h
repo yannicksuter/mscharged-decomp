@@ -158,7 +158,7 @@ public:
     TeamStats* pGetTeamStatsByIndex(u16 index) const;
     BasicGameInfo* GetMatchupInfo(int phase, short round, int matchup) const;
     eTeamID GetUserSelectedCupTeam() const;
-    void SetSidekicks(GameRules sidekicks) { mPendingCupSidekicks = sidekicks; }
+    void SetSidekicks(CupSidekicks sidekicks) { mPendingCupSidekicks = sidekicks; }
     int GetPendingCupTeam() const { return mPendingCupTeam; }
     int GetPreviousGameTeam(int index) const;
     bool ShouldShowCupPhasePopup() const;
@@ -224,7 +224,7 @@ public:
     /* 0x8A24 */ bool mShowCupPhasePopup;
     /* 0x8A25 */ u8 unknown_0x8A25[3];
     /* 0x8A28 */ int mPendingCupTeam;
-    /* 0x8A2C */ GameRules mPendingCupSidekicks;
+    /* 0x8A2C */ CupSidekicks mPendingCupSidekicks;
     /* 0x8A38 */ u32 mPreGameUnlockedState;
 };
 

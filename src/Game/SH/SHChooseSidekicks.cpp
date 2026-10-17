@@ -97,7 +97,7 @@ ChooseSidekicksSceneV2::ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::SceneType 
 
     mBackButton.SetPopScene(false);
 
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
         mTeams[0] = CupManager::s_pInstance->mPendingCupTeam;
         mTeams[1] = -1;
@@ -260,7 +260,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
         mCaptainComponents[side].SetSidekickInfo(-1, 0, 0);
     }
     int captain;
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
         captain = CupManager::Instance()->GetPendingCupTeam();
     else
         captain = GameInfoManager::Instance()->GetTeam(0);
@@ -529,7 +529,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
     mSelectedSlots[side] = -1;
     mSidePads[side] = -1;
     FEAudio::PlayAnimAudioEvent(FECharacterSound::GetSidekickAcceptSound((eSidekickID)sSidekickButtonIDs[which]), 0, 0, 1);
-    GameInfoManager::Instance()->mRulesTable[GetTeam(side)].mValues[slot] = (eSidekickID)sSidekickButtonIDs[which];
+    GameInfoManager::Instance()->mSidekickChoices[GetTeam(side)].mValues[slot] = (eSidekickID)sSidekickButtonIDs[which];
 }
 
 /**
@@ -910,7 +910,7 @@ void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
     {
         mSidekicksLayer->SetActiveSlide("out", true, false);
     }
-    if (GameInfoManager::Instance()->mIsOnlineMode == 0 && !GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->mIsOnlineMode == 0 && !GameInfoManager::Instance()->IsInCupMode())
     {
         FEAudio::PlayAnimAudioEvent(0x4861E03D, 0, 0, 1);
     }
@@ -1191,11 +1191,11 @@ void ChooseSidekicksSceneV2::CommitSidekickChoices()
 {
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
-        GameRules rules;
-        rules.mValues[0] = (eSidekickID)mSidekickComponents[0].GetSidekick(0);
-        rules.mValues[1] = (eSidekickID)mSidekickComponents[0].GetSidekick(1);
-        rules.mValues[2] = (eSidekickID)mSidekickComponents[0].GetSidekick(2);
-        CupManager::s_pInstance->SetSidekicks(rules);
+        CupSidekicks choices;
+        choices.mValues[0] = (eSidekickID)mSidekickComponents[0].GetSidekick(0);
+        choices.mValues[1] = (eSidekickID)mSidekickComponents[0].GetSidekick(1);
+        choices.mValues[2] = (eSidekickID)mSidekickComponents[0].GetSidekick(2);
+        CupManager::s_pInstance->SetSidekicks(choices);
     }
     else
     {
@@ -1220,7 +1220,7 @@ void ChooseSidekicksSceneV2::SubmitSidekickChoice()
     {
         NetworkDraft::Instance()->SendSidekickChoice();
     }
-    else if (gameInfo->IsInMode3())
+    else if (gameInfo->IsInCupMode())
     {
         mReadyPressed[0] = false;
         mCaptainComponents[0].SetReadyPromptVisible(false);

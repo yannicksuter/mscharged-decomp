@@ -1780,6 +1780,7 @@ Game/FE/feHelpFuncs.cpp:
 	.rodata     start:0x804B5150 end:0x804B51C0
 	.data       start:0x804E2DC0 end:0x804E34A0
 	.sdata      start:0x80600A80 end:0x80600AA8
+	.sbss       start:0x80604F00 end:0x80604F10
 	.sdata2     start:0x80608BE0 end:0x80608C20
 
 Game/SH/SHLoading.cpp:
@@ -1984,6 +1985,7 @@ Game/Render/FrontEndPresentation.cpp:
 	.ctors      start:0x804B0A9C end:0x804B0AA0
 	.data       start:0x804E5BA0 end:0x804E5CC8
 	.bss        start:0x8053D528 end:0x8053D5E8
+	.sdata      start:0x80601260 end:0x80601288
 	.sbss       start:0x80604F50 end:0x80604F58
 	.sdata2     start:0x80608E68 end:0x80608E80
 
@@ -4666,6 +4668,7 @@ NL/plat/SwappablePad.cpp:
 NL/nlFileGC.cpp:
 	.text       start:0x8036B9E0 end:0x8036D3AC
 	.ctors      start:0x804B0E44 end:0x804B0E48
+	.data       start:0x804FFCC8 end:0x804FFD10
 	.bss        start:0x8054EF30 end:0x8054F8C8
 	.sdata      start:0x806031E0 end:0x806031E8
 	.sbss       start:0x80605970 end:0x80605998
@@ -4823,6 +4826,7 @@ NL/plat/nlFileCache.cpp:
 NL/plat/SocketNetwork.cpp:
 	.text       start:0x80379038 end:0x80379D08
 	.ctors      start:0x804B0E64 end:0x804B0E68
+	.data       start:0x80500660 end:0x805007E8
 	.bss        start:0x80561F58 end:0x80566428
 	.sdata      start:0x80603298 end:0x806032A0
 	.sbss       start:0x80605B20 end:0x80605B30
@@ -5249,9 +5253,6 @@ RVL_SDK/arc/arc.c:
 	.data       start:0x80501618 end:0x80501688
 	.sdata      start:0x80603308 end:0x80603310
 
-RVL_SDK/ax/AXComp.c:
-	.data       start:0x80501760 end:0x80502720 align:32
-
 RVL_SDK/ax/AX.c:
 	.text       start:0x80393E20 end:0x80393E88
 	.sdata      start:0x80603310 end:0x80603314
@@ -5264,10 +5265,6 @@ RVL_SDK/ax/AXAlloc.c:
 RVL_SDK/ax/AXAux.c:
 	.bss        start:0x80568EA0 end:0x8056C020 align:32
 	.sbss       start:0x80605C00 end:0x80605C48
-
-RVL_SDK/ax/DSPCode.c:
-	.data       start:0x80502720 end:0x80504720
-	.sdata      start:0x80603318 end:0x80603320
 
 RVL_SDK/ax/AXCL.c:
 	.text       start:0x80394AF0 end:0x803955D8
@@ -5284,8 +5281,17 @@ RVL_SDK/ax/AXSPB.c:
 
 RVL_SDK/ax/AXVPB.c:
 	.text       start:0x80396220 end:0x80397728
+	.data       start:0x805016D0 end:0x80501760
+	.bss        start:0x8056CFA0 end:0x8057E6A0
 	.sbss       start:0x80605D00 end:0x80605D1C
 	.sdata2     start:0x8060A998 end:0x8060A9B8
+
+RVL_SDK/ax/AXComp.c:
+	.data       start:0x80501760 end:0x80502720 align:32
+
+RVL_SDK/ax/DSPCode.c:
+	.data       start:0x80502720 end:0x80504720
+	.sdata      start:0x80603318 end:0x80603320
 
 RVL_SDK/ax/AXProf.c:
 	.text       start:0x80397730 end:0x80397770
@@ -6048,6 +6054,7 @@ RVL_SDK/ncd/ncdsystem.c:
 
 RVL_SDK/nwc24/NWC24Schedule.c:
 	.text       start:0x8041D3CC end:0x8041DAA8
+	.data       start:0x80520040 end:0x80520084
 	.bss        start:0x805CE420 end:0x805CE5A0
 	.sbss       start:0x80606448 end:0x80606458
 
@@ -6063,6 +6070,7 @@ RVL_SDK/nwc24/NWC24Ipc.c:
 
 RVL_SDK/nwc24/NWC24System.c:
 	.text       start:0x8041E114 end:0x8041E2A4
+	.data       start:0x805200B0 end:0x805200F8
 	.bss        start:0x805CE680 end:0x805CE6E0
 	.sdata      start:0x80603810 end:0x80603818
 	.sbss       start:0x80606468 end:0x80606478

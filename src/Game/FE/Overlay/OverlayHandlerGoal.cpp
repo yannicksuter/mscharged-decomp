@@ -81,7 +81,7 @@ GoalOverlay::GoalOverlay()
     mIsInOvertime = false;
     CreateGoalEventHandler(this);
 
-    if (GameInfoManager::Instance()->IsInFriendlyMode() || GameInfoManager::Instance()->IsInMode1())
+    if (GameInfoManager::Instance()->IsInFriendlyMode() || GameInfoManager::Instance()->IsInOnlineTournamentMode())
     {
         mHasSniperCup = true;
     }
@@ -117,7 +117,7 @@ void GoalOverlay::Reset()
     mSidekickGoals[1] = 0;
     mIsInOvertime = false;
 
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         mCaptainGoals[0] = g_pStrikerChallenge->mScore[0];
         mCaptainGoals[1] = g_pStrikerChallenge->mScore[1];
@@ -236,7 +236,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
     pText->SetString(mClockBuffer);
     if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
-        && !GameInfoManager::Instance()->IsInMode4())
+        && !GameInfoManager::Instance()->IsInChallengeMode())
         pText->SetVisible(true);
     else
         pText->SetVisible(false);
@@ -398,7 +398,7 @@ void GoalOverlay::DoMatchEndOverlay()
 #endif
         }
     }
-    else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
+    else if (GameInfoManager::Instance()->IsInChallengeMode() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         BasicString<unsigned short, Detail::TempStringAllocator> unformatted(g_pLocalization->GetString("SHUTOUT_FAILED"));
         formatted = Format(unformatted, g_pLocalization->GetString(GetLOCCharacterName(winnerID)));
@@ -441,12 +441,12 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     int otherSide = !homeAway;
     if (isMatchEnd)
     {
-        if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
+        if (GameInfoManager::Instance()->IsInChallengeMode() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
         {
             homeAway = 1;
             unformatted = g_pLocalization->GetString("POPUP_CHALLENGE_FAILED");
         }
-        else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
+        else if (GameInfoManager::Instance()->IsInChallengeMode() && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
             && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
         {
             homeAway = 1;
@@ -476,7 +476,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
         unformatted = g_pLocalization->GetString("GOAL_TITLE_TIED");
 #endif
     eTeamID winningTeam = (eTeamID)GameInfoManager::Instance()->GetTeam((short)homeAway);
-    if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
+    if (GameInfoManager::Instance()->IsInChallengeMode() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("POPUP_CHALLENGE_FAILED"));
     }
@@ -520,7 +520,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     pText->SetString(mScoresBuffer);
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
     if (!isMatchEnd && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
-        && !GameInfoManager::Instance()->IsInMode4())
+        && !GameInfoManager::Instance()->IsInChallengeMode())
         pText->m_bVisible = true;
     else
         pText->m_bVisible = false;
@@ -538,7 +538,7 @@ void GoalOverlay::DoCupWinOverlay(int cup)
         NisPlayer* nisPlayer = NisPlayer::Instance();
         winners = (eTeamID)GameInfoManager::Instance()->GetTeam((short)nisPlayer->mWinnerSide[NIS_GAME_WINNER]);
     }
-    else if (GameInfoManager::Instance()->IsInMode3())
+    else if (GameInfoManager::Instance()->IsInCupMode())
     {
         winners = (eTeamID)CupManager::s_pInstance->GetUserSelectedCupTeam();
         cup = CupManager::s_pInstance->GetCurrentMode();

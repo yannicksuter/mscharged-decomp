@@ -183,8 +183,8 @@ void JoinOnlineFriendInvitation()
 {
     int index = g_pFriendManager->mHostInvitationIndex;
     FriendStatusPayload* payload = g_pFriendManager->GetFriendStatusPayload(index);
-    GameInfoManager::Instance()->mNoCheatSettings = payload->mGameplaySettings;
-    GameInfoManager::Instance()->mRulesA = payload->mPowerupSettings;
+    GameInfoManager::Instance()->mUnrankedGameplaySettings = payload->mGameplaySettings;
+    GameInfoManager::Instance()->mUnrankedCheatSettings = payload->mPowerupSettings;
     InitializeOnlineMatch(HasOnlineTwoLocalPlayers(), 0, false);
     g_pNetworkSession->GetOnlineLobby()->ConnectToFriendServer(index);
     GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);

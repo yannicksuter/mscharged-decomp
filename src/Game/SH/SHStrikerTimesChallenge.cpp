@@ -81,7 +81,7 @@ void SHStrikerTimesChallenge::OnSelectNewChallenge()
 {
     FEMusic::StopStream();
     SetPointerEnabled(false);
-    GameInfoManager::Instance()->unknown_0x71C8 = 1;
+    GameInfoManager::Instance()->mFrontEndReturnMode = 1;
     FrontEnd::ReturnToFE();
 }
 
@@ -92,7 +92,7 @@ void SHStrikerTimesChallenge::OnSelectMainMenu()
 {
     FEMusic::StopStream();
     SetPointerEnabled(false);
-    GameInfoManager::Instance()->unknown_0x71C8 = 0;
+    GameInfoManager::Instance()->mFrontEndReturnMode = 0;
     FrontEnd::ReturnToFE();
 }
 

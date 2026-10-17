@@ -993,7 +993,7 @@ void cTeam::ResetCharacters()
     } while (i_player < 5);
     mfPowerupTimer = 0.0f;
 
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         int nMissingSidekicks
             = g_pStrikerChallenge->mMissingSidekicks[m_nSide];
@@ -1170,7 +1170,7 @@ void cTeam::UpdateControllers()
  */
 void UpdateTeamCaptainChant(cTeam* pTeam)
 {
-    if (!GetStadiumUnknown0x10(
+    if (!StadiumHasCrowdAudio(
             GameInfoManager::Instance()->GetStadium()))
     {
         return;
@@ -1191,7 +1191,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
         |= pTeam->m_ePowerupList[1].eType == nCaptainPowerup;
 
     if (bCaptainPowerupActive
-        && GameInfoManager::Instance()->GetRule0x0() != 9
+        && GameInfoManager::Instance()->GetCustomPowerups() != 9
         && !pCaptain->IsSuperPowerActive())
     {
         bPlayCaptainChant = true;
@@ -1352,7 +1352,7 @@ void UpdateTeamTimers(cTeam* pTeam, float fDeltaT)
         if (pTeam->mfPowerupTimer < 0.0f)
         {
             pTeam->mfPowerupTimer = gTeamPowerupAwardInterval;
-            if (GameInfoManager::Instance()->IsRule0x0Equal10()
+            if (GameInfoManager::Instance()->AreInfinitePowerupsEnabled()
                 || gAlwaysAwardPeriodicPowerups)
             {
                 PowerupBase::AwardPowerup(pTeam, NULL, false);
@@ -1880,7 +1880,7 @@ void cTeam::Reset()
     }
     mpBestBallInterceptor = NULL;
 
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         m_nScore = nScore;
     }
