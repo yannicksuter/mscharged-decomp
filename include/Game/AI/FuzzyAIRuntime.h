@@ -266,7 +266,7 @@ inline DesireUpdate*
 FuzzyRuntimeBase::CreateReturnValue(
     eVariantType type, T value, float confidence)
 {
-    DesireUpdate* result = new (lbl_805842C8.Allocate())
+    DesireUpdate* result = new (g_DesireUpdatePool.Allocate())
         DesireUpdate(type, value);
     result->SetParameter(4, FuzzyVariant(confidence));
     mReturnInstructionOffset = GetInstructionOffset() + 1;
@@ -278,7 +278,7 @@ FuzzyRuntimeBase::CreateReturnValue(
     DesireUpdate* value, float confidence)
 {
     DesireUpdate* result;
-    lbl_805842C8.Allocate(result);
+    g_DesireUpdatePool.Allocate(result);
     result = new (result) DesireUpdate(value);
     result->SetParameter(4, FuzzyVariant(confidence));
     mReturnInstructionOffset = GetInstructionOffset() + 1;
@@ -290,7 +290,7 @@ extern "C" inline DesireUpdate* FuzzyReturnVariantCopy(
     DesireUpdate value, float confidence)
 {
     DesireUpdate* result =
-        new (lbl_805842C8.Allocate())
+        new (g_DesireUpdatePool.Allocate())
             DesireUpdate(value);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;

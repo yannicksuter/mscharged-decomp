@@ -11,7 +11,7 @@ void SetupMatrices(cBaseCamera*, const nlMatrix4*);
 
 extern bool g_bFrameSmiler;
 extern bool g_bFrameStatsOnScreen;
-extern float lbl_806DC7C8;
+extern float g_AspectRatioOverride;
 
 enum eModelSkinMethod
 {

@@ -264,7 +264,7 @@ Goalie::~Goalie()
         delete mpShootToScoreCamera;
         mpShootToScoreCamera = 0;
 
-        lbl_806DC7C8 = -1.0f;
+        g_AspectRatioOverride = -1.0f;
         DrawableCharacter::RenderAllCharacters();
 
         if (g_pBall != 0)
@@ -3745,7 +3745,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
 
     ResetMegaBallIndicators();
     ResetMegaBallPointer();
-    lbl_806DC7C8 = -1.0f;
+    g_AspectRatioOverride = -1.0f;
     DrawableCharacter::RenderAllCharacters();
     UnFreezeEveryoneButCaptain(0);
     pGoalie->RestoreBallAfterMegaStrike(true);

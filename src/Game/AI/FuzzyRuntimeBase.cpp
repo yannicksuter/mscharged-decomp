@@ -95,10 +95,10 @@ FuzzyRuntimeBase::~FuzzyRuntimeBase()
         g_pFuzzyByteCode = 0;
 
         g_FuzzyQuestionCache.FreeBlocks();
-        lbl_80584200.FreeBlocks();
+        g_IndexedFuzzyVariantPool.FreeBlocks();
         g_ScriptActionQueuePool.FreeBlocks();
         g_FuzzyActionQueuePool.FreeBlocks();
-        lbl_805842C8.FreeBlocks();
+        g_DesireUpdatePool.FreeBlocks();
 
         nlDeleteList(&g_FuzzyParameters.mHead, &g_FuzzyParameters.mTail);
     }
@@ -424,8 +424,8 @@ FuzzyRuntimeBase::EndActionQueue()
     DesireUpdate* selected = queue->SelectAction();
     if (queue->m_pSelectedAction == 0)
     {
-        selected = new (lbl_805842C8.Allocate())
-            DesireUpdate(lbl_80584250);
+        selected = new (g_DesireUpdatePool.Allocate())
+            DesireUpdate(g_DefaultDesireUpdate);
     }
     else if (entry->mQuestionHash != 0)
     {

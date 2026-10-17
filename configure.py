@@ -604,10 +604,10 @@ config.libs = [
             Object(Matching, "Game/AI/DesireStatusEffects.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/FielderDesireMachine.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/FielderDesireTransitions.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/FuzzyVariantCollection.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/AIContext.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/ScriptActionQueue.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-inline noauto", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/tu_803115F4.cpp", cflags=[*cflags_game, "-char signed"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/DesireUpdate.cpp", cflags=[*cflags_game, "-char signed"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/Scripts/ScriptCaching.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/FuzzyRuntimeBase.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/AI/TransitionFunc.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
@@ -1719,7 +1719,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24SecretFList.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24StdApi.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24System.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24Time.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nwc24/NWC24Time.c"),
 
             # RVL_SDK/os
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/__ppc_eabi_init.c"),

@@ -1,7 +1,7 @@
 #include "Game/AI/DesireUpdate.h"
 
 IndexedFuzzyVariant gDefaultFuzzyVariantData;
-SlotPool<IndexedFuzzyVariant> lbl_80584200(16, 16);
+SlotPool<IndexedFuzzyVariant> g_IndexedFuzzyVariantPool(16, 16);
 
 FuzzyVariantCollection::FuzzyVariantCollection()
 {
@@ -63,7 +63,7 @@ void FuzzyVariantCollection::Set(int index, FuzzyVariant value)
     }
     else
     {
-        mData[index] = new (lbl_80584200.Allocate())
+        mData[index] = new (g_IndexedFuzzyVariantPool.Allocate())
             IndexedFuzzyVariant(index, value);
     }
 }

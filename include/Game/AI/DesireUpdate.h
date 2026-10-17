@@ -193,11 +193,11 @@ public:
     int mNumSelectionWeights;
 };
 
-extern DesireUpdate lbl_80584250;
+extern DesireUpdate g_DefaultDesireUpdate;
 
-extern SlotPool<IndexedFuzzyVariant> lbl_80584200;
+extern SlotPool<IndexedFuzzyVariant> g_IndexedFuzzyVariantPool;
 extern SlotPool<ScriptActionQueue> g_ScriptActionQueuePool;
-extern SlotPool<DesireUpdate> lbl_805842C8;
+extern SlotPool<DesireUpdate> g_DesireUpdatePool;
 
 #include "Game/AI/FuzzyRuntimeCall_fwd.h"
 
@@ -215,7 +215,7 @@ inline DesireUpdate::DesireUpdate(
 
 inline void IndexedFuzzyVariant::operator delete(void* entry)
 {
-    lbl_80584200.DeleteEntry((IndexedFuzzyVariant*)entry);
+    g_IndexedFuzzyVariantPool.DeleteEntry((IndexedFuzzyVariant*)entry);
 }
 
 inline FuzzyVariantCollection& FuzzyVariantCollection::operator=(
@@ -227,7 +227,7 @@ inline FuzzyVariantCollection& FuzzyVariantCollection::operator=(
         {
             if (mData[i] == 0)
             {
-                mData[i] = new (lbl_80584200.Allocate())
+                mData[i] = new (g_IndexedFuzzyVariantPool.Allocate())
                     IndexedFuzzyVariant(
                         i, (const FuzzyVariant&)*other.mData[i]);
             }
@@ -246,7 +246,7 @@ inline FuzzyVariantCollection& FuzzyVariantCollection::operator=(
 
 inline void DesireUpdate::operator delete(void* entry)
 {
-    lbl_805842C8.DeleteEntry((DesireUpdate*)entry);
+    g_DesireUpdatePool.DeleteEntry((DesireUpdate*)entry);
 }
 
 inline void ScriptActionQueue::operator delete(void* entry)
