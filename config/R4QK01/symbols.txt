@@ -11231,7 +11231,8 @@ Format<45BasicString<c,Q26Detail19TempStringAllocator>,f,f,f>__FRC45BasicString<
 Format<45BasicString<c,Q26Detail19TempStringAllocator>,f>__FRC45BasicString<c,Q26Detail19TempStringAllocator>RCf_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x8031FD24; // type:function size:0x22C scope:weak
 Format<45BasicString<c,Q26Detail19TempStringAllocator>,Ul>__FRC45BasicString<c,Q26Detail19TempStringAllocator>RCUl_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x8031FF50; // type:function size:0x22C scope:weak
 Format<45BasicString<c,Q26Detail19TempStringAllocator>,c>__FRC45BasicString<c,Q26Detail19TempStringAllocator>RCc_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x8032017C; // type:function size:0x22C scope:weak
-LexicalCast<45BasicString<c,Q26Detail19TempStringAllocator>,Pc>__FRCPc_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x803203A8; // type:function size:0xD4 scope:weak
+LexicalCast<45BasicString<c,Q26Detail19TempStringAllocator>,Pc>__FRCPc_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x803203A8; // type:function size:0x4 scope:weak
+Do__Q26Detail67LexicalCastImpl<45BasicString<c,Q26Detail19TempStringAllocator>,Pc>FRCPc = .text:0x803203AC; // type:function size:0xD0 scope:weak
 LexicalCast<45BasicString<c,Q26Detail19TempStringAllocator>,c>__FRCc_45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x8032047C; // type:function size:0xC scope:weak
 Do__Q26Detail66LexicalCastImpl<45BasicString<c,Q26Detail19TempStringAllocator>,c>Fc = .text:0x80320488; // type:function size:0x110 scope:weak
 __ct__45BasicString<c,Q26Detail19TempStringAllocator>FRC45BasicString<c,Q26Detail19TempStringAllocator> = .text:0x80320598; // type:function size:0x28 scope:weak
