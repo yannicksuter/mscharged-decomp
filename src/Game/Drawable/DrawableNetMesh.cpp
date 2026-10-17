@@ -378,15 +378,15 @@ void DrawableNetMesh::Blend(
     int i;
     for (i = 0, offset = 0; i < mNumVertices; ++i, offset += sizeof(nlVector3))
     {
-        source = (nlVector3*)((char*)((const volatile DrawableNetMesh*)&lhs)->mPositions + offset);
-        destination = (nlVector3*)((char*)((volatile DrawableNetMesh*)this)->mPositions + offset);
+        source = (nlVector3*)((char*)lhs.mPositions + offset);
+        destination = (nlVector3*)((char*)mPositions + offset);
         nlVec3Scale(*destination, *source, oneMinusBlend);
     }
 
     for (int i = 0; i < mNumVertices; ++i)
     {
-        destination = &((volatile DrawableNetMesh*)this)->mPositions[i];
-        source = (nlVector3*)&((const volatile DrawableNetMesh*)&rhs)->mPositions[i];
+        destination = &mPositions[i];
+        source = &rhs.mPositions[i];
         nlVec3ScaleAdd(*destination, blendFactor, *source, *destination);
     }
 
