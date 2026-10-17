@@ -980,7 +980,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHPause.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHPausePostGame.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHRoadToStrikersCupHub.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHStadiumSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/SH/SHStadiumSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHStrikerCupAwards.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHStrikerCupStandings.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHStrikerTimesBase.cpp", extra_cflags=["-ipa file", "-sym on"]),
