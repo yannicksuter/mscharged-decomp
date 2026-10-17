@@ -23,7 +23,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
     gTweakFileLoader.mCount = 0;
 
     int stadium = GameInfoManager::Instance()->GetStadium();
-    int terrain = GetStadiumUnknown0x08(stadium);
+    int terrain = GetStadiumTerrainType(stadium);
     state->mTerrainType = terrain;
 
     char terrainName[100];
@@ -33,8 +33,8 @@ void InitializeGameTweaks(GameTweaksManager* state)
         TerrainTweaks(terrainName, sTerrainTweakCategory);
     state->mTerrainTweaks = terrainTweaks;
 
-    state->mWeatherType = GetStadiumUnknown0x0C(stadium);
-    state->mCrowdRiotEnabled = GetStadiumUnknown0x11(stadium);
+    state->mWeatherType = GetStadiumWeatherType(stadium);
+    state->mCrowdRiotEnabled = IsStadiumCrowdRiotEnabled(stadium);
 
     GameTweaks* gameTweaks = new (8, false)
         GameTweaks("/ini/GameTweaks.ini", "/Game/GameTweaks");
@@ -51,7 +51,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
         new (nlMalloc(sizeof(SkillTweaks), 8, false))
             SkillTweaks(sSkillTweakCategories[1]);
 
-    GameInfoManager::Instance()->GetMappedRule0x0();
+    GameInfoManager::Instance()->GetGameplaySkillLevel();
     int difficulties[2] = {
         GameInfoManager::Instance()->mCurrentDifficulty[0],
         GameInfoManager::Instance()->mCurrentDifficulty[1],

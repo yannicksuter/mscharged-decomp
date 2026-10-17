@@ -1109,7 +1109,7 @@ int GetFielderHitReaction(cFielder* pReceiver,
     float fReceiverDefenseSize = pReceiver->m_pTweaks->GetDefenseSize();
     float fAttackerDefenseSize = pAttacker->m_pTweaks->GetDefenseSize();
     int nReaction = HIT_REACTION_MEDIUM;
-    if (gForceHeavyHitReaction || GameInfoManager::Instance()->IsRule0x8Equal1())
+    if (gForceHeavyHitReaction || GameInfoManager::Instance()->AreDevastatingHitsEnabled())
         return HIT_REACTION_HEAVY;
 
     if (fAttackerDefenseSize < 0.0f && fReceiverDefenseSize >= 0.0f)
@@ -1289,7 +1289,7 @@ bool cFielder::CanBeHitBySkillshot()
 
 bool cFielder::CanGetElectrocuted() const
 {
-    if (gDisableElectrocution || GameInfoManager::Instance()->IsRule0x4Equal2())
+    if (gDisableElectrocution || GameInfoManager::Instance()->IsPowerShortageEnabled())
         return false;
     if (IsInFallAction())
         return false;
@@ -1388,7 +1388,7 @@ bool cFielder::CanGetElectrocuted(
             }
 
             if (gEnableStandingWallElectrocution != 0
-                || GameInfoManager::Instance()->IsRule0x4Equal3())
+                || GameInfoManager::Instance()->IsHighVoltageEnabled())
             {
                 if (m_eActionState != ACTION_ELECTROCUTION)
                 {
@@ -1409,7 +1409,7 @@ bool cFielder::CanGetElectrocuted(
 
 bool cFielder::CanDoCaptainShootToScore()
 {
-    if (GameInfoManager::Instance()->IsRule0x8Equal4())
+    if (GameInfoManager::Instance()->IsGlassJawEnabled())
     {
         return false;
     }
@@ -2199,7 +2199,7 @@ void cFielder::CollideWithWallCallback(
             eventData->contactPoint, eventData->wallNormal, true);
 
         int stadium = GameInfoManager::Instance()->GetStadium();
-        if (GetStadiumUnknown0x10(stadium))
+        if (StadiumHasCrowdAudio(stadium))
         {
             unsigned long soundID = 0xCE269987;
             if (m_pTeam->m_nSide == 0)
@@ -4146,7 +4146,7 @@ bool cFielder::CanDoSidekickShootToScore()
         return false;
     }
 
-    if (GameInfoManager::Instance()->IsRule0x8Equal4())
+    if (GameInfoManager::Instance()->IsGlassJawEnabled())
     {
         return false;
     }
@@ -4292,7 +4292,7 @@ void cFielder::BeginDekeIntangibility()
                 if (fabsf(destination.y) < 0.5f * cNet::GetNetWidth())
                 {
                     destination.x = AIsgn(destination.x) * cField::GetGoalLineX(1U);
-                    if (gDisableElectrocution || GameInfoManager::Instance()->IsRule0x4Equal2()
+                    if (gDisableElectrocution || GameInfoManager::Instance()->IsPowerShortageEnabled()
                         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_STAR))
                     {
                         if (destination.y < 0.0f)

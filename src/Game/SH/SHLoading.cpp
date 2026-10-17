@@ -281,9 +281,9 @@ void MatchLoadingScene::SceneCreated()
 
     if (GameInfoManager::Instance()->IsOnline())
         DisplayOnlineInfo();
-    else if (GameInfoManager::Instance()->IsInMode3())
+    else if (GameInfoManager::Instance()->IsInCupMode())
         DisplayCupInfo();
-    else if (GameInfoManager::Instance()->IsInMode4())
+    else if (GameInfoManager::Instance()->IsInChallengeMode())
         DisplayChallengeInfo();
     else
         DisplayFriendlyInfo();

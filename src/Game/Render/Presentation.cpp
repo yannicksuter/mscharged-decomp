@@ -136,7 +136,7 @@ static inline bool IsCupWinner()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     int winnerTeam
         = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
-    return gameInfo->IsInMode3()
+    return gameInfo->IsInCupMode()
         && CupManager::s_pInstance->IsCupWinningGame(winnerTeam);
 }
 
@@ -151,7 +151,7 @@ static inline bool IsCupPersonaWinner()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     int winnerTeam
         = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
-    return gameInfo->mIsOnlineMode && gameInfo->IsInMode1()
+    return gameInfo->mIsOnlineMode && gameInfo->IsInOnlineTournamentMode()
         && NetTournManager::Instance()->IsCupWinningGame(winnerTeam);
 }
 
@@ -277,7 +277,7 @@ void Presentation::UpdateAllowedToSkip()
  */
 bool Presentation::DetectSkipPress()
 {
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode2())
+    if (nlSingleton<GameInfoManager>::Instance()->IsInDemoMode())
     {
         return false;
     }
@@ -849,7 +849,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     mLoserReactionOutraged = false;
 
     if (!suddenDeath && !mLastGoalUsedLoserReaction
-        && !nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+        && !nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
         && nlRandomf(1.0f, &mRandomSeed) < sGoalCelebrationVariationChance)
     {
         mLastGoalUsedLoserReaction = true;
@@ -869,7 +869,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         mLastGoalUsedLoserReaction = false;
     }
 
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+    if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
         && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && g_pTeams[1]->m_nScore > 0)
     {
@@ -1054,7 +1054,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         ->UpdateCaptainS2SGoalInfo(scoringSide);
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+    if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
         && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && data->pPlayer->m_pTeam->m_nSide == 1 && data->goals > 0)
     {
@@ -1108,7 +1108,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         bool hasGoals = data->goals != 0;
         mMegaStrikeScored = hasGoals;
         mLoserReactionOutraged = !hasGoals;
-        if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+        if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
             || nlSingleton<GameInfoManager>::Instance()
                    ->mIsInStrikers101Mode)
         {
@@ -1516,7 +1516,7 @@ void Presentation::LoadNis(const char* name, int variant)
         winnerTeam
             = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
         isCupWinner = false;
-        if (gameInfo->mIsOnlineMode && gameInfo->IsInMode1()
+        if (gameInfo->mIsOnlineMode && gameInfo->IsInOnlineTournamentMode()
             && NetTournManager::Instance()->IsCupWinningGame(winnerTeam))
         {
             isCupWinner = true;
@@ -1552,7 +1552,7 @@ void Presentation::LoadNis(const char* name, int variant)
             gameInfo = nlSingleton<GameInfoManager>::Instance();
             winnerTeam = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
             isCupWinner = false;
-            if (gameInfo->IsInMode3()
+            if (gameInfo->IsInCupMode()
                 && CupManager::s_pInstance->IsCupWinningGame(winnerTeam))
             {
                 isCupWinner = true;

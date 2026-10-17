@@ -224,7 +224,7 @@ void OverlayManager::OnKickoff()
 void OverlayManager::OnGameOver()
 {
     if (GetTweakBool("/user/dosoak", false)
-        || (g_e3_Build && GameInfoManager::Instance()->IsInMode2()))
+        || (g_e3_Build && GameInfoManager::Instance()->IsInDemoMode()))
     {
         nlTaskManager::SetNextState(TASK_GAME_TO_FE);
         return;
@@ -235,7 +235,7 @@ void OverlayManager::OnGameOver()
         SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push(OVERLAY_POST_GAME_RESULTS, SCREEN_NOTHING, false));
         scene->SetDisplayMode(NEWS_FRIENDLY_RESULTS);
     }
-    else if (GameInfoManager::Instance()->IsInMode4())
+    else if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push(SCENE_CHALLENGE_NEWS, SCREEN_NOTHING, false));
         if (scene != 0)

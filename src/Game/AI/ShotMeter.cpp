@@ -304,7 +304,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
     if (m_eShotMeterState != SHOT_METER_STS_RELEASED)
     {
         if ((gShotMeterSidekickShootToScoreEnabled
-                || GameInfoManager::Instance()->IsRule0x8Equal3())
+                || GameInfoManager::Instance()->IsSkillShotCheatEnabled())
             && pFielder->CanDoSidekickShootToScore())
         {
             m_eShotMeterState = SHOT_METER_STS_RELEASED;

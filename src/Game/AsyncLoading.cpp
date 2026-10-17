@@ -653,7 +653,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 54:
-        InitializeCrowdImpostors(GetStadiumUnknown0x34(
+        InitializeCrowdImpostors(StadiumUsesAlternateCrowdView(
             GameInfoManager::Instance()->GetStadium()));
         break;
     case 55:
@@ -1446,7 +1446,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
     manager->SetLoadingComment("InitializeFEState2");
     ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
     particleTask->Initialize(GetLayerView(eCLV_Particles), 0x5F6, 0x2FB);
-    GameInfoManager::Instance()->ResetUnknown0xA0();
+    GameInfoManager::Instance()->ClearGameSettingsOverride();
     FEMusic::StopStream();
     BaseSceneHandler* scene = GameSceneManager::Instance()->Push(SCENE_NAVIGATION, SCREEN_NOTHING, false);
     FESceneManager::Instance()->SetTopMostScene(scene);
@@ -1479,7 +1479,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
             GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, false);
             FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineMainMenu");
         }
-        else if (GameInfoManager::Instance()->IsInMode2())
+        else if (GameInfoManager::Instance()->IsInDemoMode())
         {
             GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
             FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
@@ -1487,7 +1487,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
         }
         else if (GameInfoManager::Instance()->IsInFriendlyMode())
         {
-            if (GameInfoManager::Instance()->unknown_0x71C8 == 2)
+            if (GameInfoManager::Instance()->mFrontEndReturnMode == 2)
             {
                 FrontEndPresentation::GetInstance()->Call("TransitionGameToChooseCaptains");
                 GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_BACK, false);
@@ -1499,7 +1499,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
                 FrontEndPresentation::GetInstance()->Call("StartMainMenuSequence");
             }
         }
-        else if (GameInfoManager::Instance()->IsInMode3())
+        else if (GameInfoManager::Instance()->IsInCupMode())
         {
             CupManager* cup = CupManager::Instance();
             if (cup->GetCurrentRoundNumber() == -5 && cup->mState == CUP_STATE_WON)
@@ -1525,9 +1525,9 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
             SaveLoad::StartSave(false);
             FrontEndPresentation::GetInstance()->Call("TransitionGameToStrikerCup");
         }
-        else if (GameInfoManager::Instance()->IsInMode4())
+        else if (GameInfoManager::Instance()->IsInChallengeMode())
         {
-            if (GameInfoManager::Instance()->unknown_0x71C8 == 1)
+            if (GameInfoManager::Instance()->mFrontEndReturnMode == 1)
             {
                 ChallengeSelectScene* challengeScene = static_cast<ChallengeSelectScene*>(
                     GameSceneManager::Instance()->Push(g_pStrikerChallenge->mCurrentChallenge < 10 ? SCENE_STRIKERS_101_SELECT : SCENE_CHALLENGE_SELECT,
@@ -1588,7 +1588,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
         StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
 
-    GameInfoManager::Instance()->unknown_0x71C8 = 0;
+    GameInfoManager::Instance()->mFrontEndReturnMode = 0;
     manager->mLoadingState = ASYNC_RESOURCES_LOADED;
     lbl_806E1040->SetVisible(false);
     ResetHallOfFameImagePreload();
@@ -1698,7 +1698,7 @@ void InitializeGameState1(AsyncLoadingManager* manager)
     manager->SetLoadingComment("InitializeGameState1");
     OnResourceLoadBegin(1);
     ClearTweakRegistryReset();
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
         CupManager::Instance()->PrepareCurrentGame();
     }
@@ -1788,7 +1788,7 @@ void StartAsyncGameWorldLoading(AsyncLoadingManager* manager)
     fxSetTerrain(nlStringLowerHash(GetStadiumTerrain(stadium)));
     lbl_806E1058 += gAudioEnabled ? 7 : 0;
     GameAudio* audio = static_cast<GameAudio*>(g_pAudioSystem);
-    LoadSoundBank(audio, GetStadiumUnknown0x14(stadium), 0xB, OnAsyncSoundBankLoaded, (void*)"STAD_*");
+    LoadSoundBank(audio, GetStadiumAudioBank(stadium), 0xB, OnAsyncSoundBankLoaded, (void*)"STAD_*");
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_STAD_GEN, 0xA, OnAsyncSoundBankLoaded, (void*)"STAD_GEN");
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_WEATHER_LIGHTNING, 0xC, OnAsyncSoundBankLoaded, (void*)"WEATHER_LIGHTNING");
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_CROWD_GEN, 0xD, OnAsyncSoundBankLoaded, (void*)"CROWD_GEN");
@@ -2219,14 +2219,14 @@ void AsyncLoadingManager::LoadTrophyTemplates()
         gNPCManager->CreateNPCTemplate("TrophySunshine", false);
     }
     else if (GameInfoManager::Instance()->IsOnline()
-        && GameInfoManager::Instance()->IsInMode1())
+        && GameInfoManager::Instance()->IsInOnlineTournamentMode())
     {
         int cupPersona = NetTournManager::Instance()->GetCupPersona();
         const char* name = GetCupPersonaTrophyNames()[cupPersona];
         nlSNPrintf(trophyName, sizeof(trophyName), "Trophy%s", name);
         gNPCManager->CreateNPCTemplate(trophyName, false);
     }
-    else if (GameInfoManager::Instance()->IsInMode3())
+    else if (GameInfoManager::Instance()->IsInCupMode())
     {
         int cup = CupManager::Instance()->GetCurrentMode();
         const char* name = GetCupTrophyNames()[cup];

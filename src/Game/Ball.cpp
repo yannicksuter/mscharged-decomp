@@ -365,7 +365,7 @@ void cBall::CollideWithCharacterCallback(
             {
                 DeflectSkillshotBall(this, pShooter);
                 pCharacterFielder->InitActionGroundElectrocution(pShooter->m_DetChar.m_v3Position);
-                if (GetStadiumUnknown0x10(
+                if (StadiumHasCrowdAudio(
                         GameInfoManager::Instance()->GetStadium()))
                 {
                     unsigned long soundID = 0xCE269987;
@@ -1287,7 +1287,7 @@ void ResetBallCharge(cBall* pBall, bool bParam)
     KillBallShot("skillshot_ball_drybones", 0);
     KillBallShot("skillshot_ball_boo", 0);
 
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -1314,7 +1314,7 @@ void ResetBallCharge(cBall* pBall, bool bParam)
 // inline without changing SetBallCharge or its other callers.
 static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
 {
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -1340,7 +1340,7 @@ static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
 
 void SetBallCharge(cBall* pBall, float fParam)
 {
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -2046,7 +2046,7 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
         float fCharge = Interpolate(lbl_806DB504, lbl_806DB508, fPercent);
         float fCurrentCharge = pBall->mfChargeValue;
         if (lbl_806E0BCC
-            || GameInfoManager::Instance()->IsRule0x4Equal5())
+            || GameInfoManager::Instance()->IsWhiteBallEnabled())
         {
             pBall->mfChargeValue = 4.0f;
         }
@@ -2500,7 +2500,7 @@ void DecayBallCharge(cBall* pBall)
 
     float fValue = pBall->mfChargeValue;
     float fChargeLoss = (g_fSimulationTick / lbl_806DB50C) * FullBallCharge();
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -3258,7 +3258,7 @@ void OnBallStateChange(int previousState, int currentState)
         if (IsDryBonesSkillshot(pBall))
         {
             if (lbl_806E0BCC
-                || GameInfoManager::Instance()->IsRule0x4Equal5())
+                || GameInfoManager::Instance()->IsWhiteBallEnabled())
             {
                 pBall->mfChargeValue = 4.0f;
             }

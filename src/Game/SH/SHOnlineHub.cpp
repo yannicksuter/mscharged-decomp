@@ -230,7 +230,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
         return;
     for (int i = 0; i < 64; ++i)
     {
-        DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetUnknown0x40(gNetworkSaveSlotIndex, i);
+        DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetSavedFriendData(gNetworkSaveSlotIndex, i);
         int type = DWC_GetFriendDataType(data);
         if (DWC_IsValidFriendData(data) && type == DWC_FRIENDDATA_GS_PROFILE_ID)
         {

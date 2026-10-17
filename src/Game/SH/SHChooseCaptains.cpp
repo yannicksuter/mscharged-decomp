@@ -72,7 +72,7 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     mSelectedCaptains[0] = -1;
     mSelectedCaptains[1] = -1;
     mConfirmed[0] = false;
-    if (GameInfoManager::Instance()->IsInMode3() || GameInfoManager::Instance()->mIsOnlineMode != 0)
+    if (GameInfoManager::Instance()->IsInCupMode() || GameInfoManager::Instance()->mIsOnlineMode != 0)
     {
         mConfirmed[1] = true;
     }
@@ -255,7 +255,7 @@ void ChooseCaptainsSceneV2::SceneCreated()
     {
         mSelectDisplays[0] = mSelectButtonInstances[0];
         mSelectButtonInstances[0]->SetVisible(true);
-        if (!GameInfoManager::Instance()->IsInMode3() && !GameInfoManager::Instance()->IsOnline())
+        if (!GameInfoManager::Instance()->IsInCupMode() && !GameInfoManager::Instance()->IsOnline())
         {
             mCaptainComponents[0].ApplyCaptainColours(mCaptainIds[0], mCaptainIds[1]);
             mCaptainComponents[1].ApplyCaptainColours(mCaptainIds[1], mCaptainIds[0]);

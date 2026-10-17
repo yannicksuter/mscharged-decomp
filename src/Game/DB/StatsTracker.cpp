@@ -584,7 +584,7 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
         Track(STATS_LOSS, homeaway == 0, 0, 0, 0, 0, 0);
         GameInfoManager* gameInfoManager = GameInfoManager::Instance();
         CupManager* cupManager = CupManager::Instance();
-        if (gameInfoManager->IsInMode3() == 1)
+        if (gameInfoManager->IsInCupMode() == 1)
         {
             if (mBasicGameInfo->GetTeam(homeaway) == cupManager->GetUserSelectedCupTeam())
                 cupManager->GetCupRecord().mCurrentRecord.mValues[0]++;
@@ -600,7 +600,7 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
         Track(STATS_OT_LOSS, homeaway == 0, 0, 0, 0, 0, 0);
         GameInfoManager* gameInfoManager = GameInfoManager::Instance();
         CupManager* cupManager = CupManager::Instance();
-        if (gameInfoManager->IsInMode3() == 1)
+        if (gameInfoManager->IsInCupMode() == 1)
         {
             if (mBasicGameInfo->GetTeam(homeaway) == cupManager->GetUserSelectedCupTeam())
                 cupManager->GetCupRecord().mCurrentRecord.mValues[0]++;
@@ -609,7 +609,7 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
     }
     case STATS_LOSS:
         AddStat(STATS_LOSS, homeaway, -1, 1);
-        if (GameInfoManager::Instance()->IsInMode3() == 1)
+        if (GameInfoManager::Instance()->IsInCupMode() == 1)
         {
             if (mBasicGameInfo->GetTeam(homeaway) == CupManager::Instance()->GetUserSelectedCupTeam())
                 CupManager::Instance()->GetCupRecord().mCurrentRecord.mValues[1]++;
@@ -617,7 +617,7 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
         break;
     case STATS_OT_LOSS:
         AddStat(STATS_OT_LOSS, homeaway, -1, 1);
-        if (GameInfoManager::Instance()->IsInMode3() == 1)
+        if (GameInfoManager::Instance()->IsInCupMode() == 1)
         {
             if (mBasicGameInfo->GetTeam(homeaway) == CupManager::Instance()->GetUserSelectedCupTeam())
                 CupManager::Instance()->GetCupRecord().mCurrentRecord.mValues[2]++;
@@ -979,7 +979,7 @@ static inline void AccumulateUserStats(PlayerStats* total, const PlayerStats& cu
 
 void StatsTracker::CompileEndOfGameStats()
 {
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
         int homeAwayIndex[2] = {-1, -1};
         CupManager* cup = CupManager::Instance();
@@ -1063,7 +1063,7 @@ void StatsTracker::CompileEndOfGameStats()
                 tempStat = mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumMegaStrikeGoals;
                 cumulative->mPlayerTotalStats.mNumMegaStrikeGoals += tempStat;
                 cumulative->mPlayerTotalStats.mNumGamesPlayed++;
-                if (GameInfoManager::Instance()->IsInMode3())
+                if (GameInfoManager::Instance()->IsInCupMode())
                 {
                     if (cumulative->mTeamIndex == cup->GetUserSelectedCupTeam())
                     {
@@ -1116,7 +1116,7 @@ void StatsTracker::CompileEndOfGameStats()
 
     for (int i = 0; i < 4; i++)
     {
-        AccumulateUserStats(&GameInfoManager::Instance()->unknown_0x128[i].mStats, mCurrentUserStats[i]);
+        AccumulateUserStats(&GameInfoManager::Instance()->mUserStats[i].mStats, mCurrentUserStats[i]);
     }
 }
 
@@ -1250,13 +1250,13 @@ void StatsTracker::TrackWinner(int forfeitSide)
 
     if (!mHasGameEnded)
     {
-        if (GameInfoManager::Instance()->IsInOddCupMode())
+        if (GameInfoManager::Instance()->IsInCupOrTournamentMode())
         {
             if (mIsOvertime && !wasForfeit)
             {
                 s_pInstance->TrackStat(STATS_OT_WIN, winningSide, 0,
                     homeScore, awayScore, 0, 0);
-                if (GameInfoManager::Instance()->IsInMode3())
+                if (GameInfoManager::Instance()->IsInCupMode())
                 {
                     CupManager::s_pInstance->SetRoundResult(true, winningSide);
                 }
@@ -1265,13 +1265,13 @@ void StatsTracker::TrackWinner(int forfeitSide)
             {
                 s_pInstance->TrackStat(STATS_WIN, winningSide, 0,
                     homeScore, awayScore, 0, 0);
-                if (GameInfoManager::Instance()->IsInMode3())
+                if (GameInfoManager::Instance()->IsInCupMode())
                 {
                     CupManager::s_pInstance->SetRoundResult(false, winningSide);
                 }
             }
 
-            if (GameInfoManager::Instance()->IsInMode3())
+            if (GameInfoManager::Instance()->IsInCupMode())
             {
                 s_pInstance->CompileEndOfGameStats();
             }

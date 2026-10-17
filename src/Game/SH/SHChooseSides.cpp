@@ -244,7 +244,7 @@ void SHChooseSides2::SceneCreated()
     TLComponentInstance* awayCPUOver = FEFinder<TLComponentInstance, 4>::Find<>(
         mSideGroups[1], "over", "away_group", "CPU");
 
-    if (GameInfoManager::Instance()->IsInMode3())
+    if (GameInfoManager::Instance()->IsInCupMode())
     {
         if (GameInfoManager::Instance()->GetTeam(0) == CupManager::Instance()->GetUserSelectedCupTeam())
         {
@@ -259,7 +259,7 @@ void SHChooseSides2::SceneCreated()
             awayCPUOver->m_bVisible = false;
         }
     }
-    else if (GameInfoManager::Instance()->IsInMode4())
+    else if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         mControllerComponents[1].Disable();
         homeCPU->m_bVisible = false;
@@ -441,7 +441,7 @@ void SHChooseSides2::Update(float fDeltaT)
         event.mPosition = GetPointerPosition(i, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
 
-        if (GameInfoManager::Instance()->IsInMode4())
+        if (GameInfoManager::Instance()->IsInChallengeMode())
         {
             int available = 4 - g_pStrikerChallenge->mMissingSidekicks[HOME];
             int required = available > 0 ? available : 1;
@@ -826,7 +826,7 @@ void SHChooseSides2::Proceed()
     }
     else if (mContext == TOURNAMENT)
     {
-        GameInfoManager::Instance()->unknown_0x71C8 = 1;
+        GameInfoManager::Instance()->mFrontEndReturnMode = 1;
         FrontEndPresentation::GetInstance()->Call("StartChallengeSequence");
         GameSceneManager::Instance()->PushLoadingScene(true);
         object->SetButtons(NAVIGATION_BUTTON_NONE, true);

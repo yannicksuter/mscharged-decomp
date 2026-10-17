@@ -460,7 +460,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                     break;
                 }
                 pFielder->InitActionGroundElectrocution(pShockwave->mPosition);
-                if (GetStadiumUnknown0x10(
+                if (StadiumHasCrowdAudio(
                         GameInfoManager::Instance()->GetStadium()))
                 {
                     unsigned long soundID = 0x70A628D8;

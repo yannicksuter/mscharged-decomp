@@ -103,14 +103,14 @@ void PauseMenuScene::OnSelectQUIT()
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY
-            || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
+            || GameInfoManager::Instance()->IsInChallengeMode() || g_pGame->m_eGameState == GS_END_GAME)
         {
             popup->Create(POPUP_QUIT,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
-        else if (GameInfoManager::Instance()->IsInMode3()
-            || (GameInfoManager::Instance()->IsInMode1()
+        else if (GameInfoManager::Instance()->IsInCupMode()
+            || (GameInfoManager::Instance()->IsInOnlineTournamentMode()
                 && GameInfoManager::Instance()->GetPlayingSide((unsigned short)mQuittingController) != -1))
         {
             popup->Create(POPUP_FORFEIT,
@@ -152,7 +152,7 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
     if (g_pGame->m_eGameState != GS_END_GAME)
     {
         s32 quittingSide = -1;
-        if (gameInfoManager->IsInMode3())
+        if (gameInfoManager->IsInCupMode())
         {
             int userTeam = cupManager->GetUserSelectedCupTeam();
             if (userTeam == gameInfoManager->GetTeam(0))
@@ -160,11 +160,11 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
             else if (userTeam == gameInfoManager->GetTeam(1))
                 quittingSide = 1;
         }
-        else if (gameInfoManager->IsInMode1())
+        else if (gameInfoManager->IsInOnlineTournamentMode())
         {
             quittingSide = gameInfoManager->GetPlayingSide((unsigned short)mQuittingController);
         }
-        if (gameInfoManager->IsInOddCupMode())
+        if (gameInfoManager->IsInCupOrTournamentMode())
         {
             if (quittingSide == 0)
                 StatsTracker::Instance()->TrackWinner(0);
@@ -189,7 +189,7 @@ void PauseMenuScene::SceneCreated()
             presentation->m_currentSlide, "Layer", MENU_NAMES[i]);
     }
     FEAudio::EnableSounds(true);
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
 #if !defined(VERSION_R4QJ01)
 #if defined(VERSION_R4QE01)
@@ -436,7 +436,7 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
         TransitionOut(TT_VISUAL_OPTIONS);
         break;
     case PAUSE_MATCH_INFO:
-        if (GameInfoManager::Instance()->IsInMode4())
+        if (GameInfoManager::Instance()->IsInChallengeMode())
             TransitionOut(TT_CHALLENGE_PREVIEW);
         else
             TransitionOut(TT_STATISTICS);

@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-static const int kDefaultRules[12][3] = {
+static const int kDefaultSidekickChoices[12][3] = {
     { 1, 1, 7 },
     { 4, 5, 5 },
     { 6, 1, 5 },
@@ -50,7 +50,7 @@ GameInfoManager::GameInfoManager()
     , mOnlineFriendSelectionMode(false)
     , mMainUserPadNumber(FE_PAD1_ID)
 {
-    unknown_0x71C8 = 0;
+    mFrontEndReturnMode = 0;
     mGameInfo[GM_FRIENDLY] = 0;
     mGameInfo[GM_ONLINE_TOURNAMENT] = 0;
     mGameInfo[GM_DEMO] = 0;
@@ -83,9 +83,9 @@ GameInfoManager::GameInfoManager()
     mUserInfo.mNumSTSAttempts = 0;
 
     for (int i = 0; i < 4; i++) {
-        memset(&unknown_0x128[i], 0, sizeof(GameInfoSlotEntry));
-        unknown_0x128[i].mStats.mRecordType.mControllerID = i;
-        unknown_0x128[i].mStats.mType = TYPE_USER;
+        memset(&mUserStats[i], 0, sizeof(GameInfoSlotEntry));
+        mUserStats[i].mStats.mRecordType.mControllerID = i;
+        mUserStats[i].mStats.mType = TYPE_USER;
     }
 
     mUserInfo.mGameplayOptions.InitializeDefaults();
@@ -96,17 +96,17 @@ GameInfoManager::GameInfoManager()
     mDefaultSettings.GameLimitType = GAME_LIMIT_TIME;
     mDefaultSettings.GoalLimit = 5;
     mDefaultSettings.GameTime = 0xB4;
-    mMode1Settings.SkillLevel = GameplaySettings::ROOKIE;
-    mMode1Settings.NumGames = 1;
-    mMode1Settings.GameLimitType = GAME_LIMIT_TIME;
-    mMode1Settings.GoalLimit = 5;
-    mMode1Settings.GameTime = 0xB4;
+    mOnlineTournamentSettings.SkillLevel = GameplaySettings::ROOKIE;
+    mOnlineTournamentSettings.NumGames = 1;
+    mOnlineTournamentSettings.GameLimitType = GAME_LIMIT_TIME;
+    mOnlineTournamentSettings.GoalLimit = 5;
+    mOnlineTournamentSettings.GameTime = 0xB4;
     sThis = this;
 
     for (int i = 0; i < 12; i++) {
-        mRulesTable[i].mValues[0] = (eSidekickID)kDefaultRules[i][0];
-        mRulesTable[i].mValues[1] = (eSidekickID)kDefaultRules[i][1];
-        mRulesTable[i].mValues[2] = (eSidekickID)kDefaultRules[i][2];
+        mSidekickChoices[i].mValues[0] = (eSidekickID)kDefaultSidekickChoices[i][0];
+        mSidekickChoices[i].mValues[1] = (eSidekickID)kDefaultSidekickChoices[i][1];
+        mSidekickChoices[i].mValues[2] = (eSidekickID)kDefaultSidekickChoices[i][2];
     }
 
     memset(mSaveSlots, 0, sizeof(mSaveSlots));
@@ -122,7 +122,7 @@ GameInfoManager::~GameInfoManager()
     SaveLoad::FreeBannerBuffer();
 }
 
-static bool (GameInfoManager::*sModeCheck)() const = &GameInfoManager::IsInMode3;
+static bool (GameInfoManager::*sModeCheck)() const = &GameInfoManager::IsInCupMode;
 
 int GameInfoManager::GetTeam(short side) const
 {
@@ -200,8 +200,8 @@ void GameInfoManager::SerializeSettings(void* data) const
 {
     memcpy(data, &mUserInfo, sizeof(mUserInfo));
     data = (u8*)data + 0x80;
-    memcpy(data, mRulesTable, sizeof(mRulesTable));
-    g_pStrikerChallenge->SerializeData(CupManager::s_pInstance->SerializeData((u8*)data + sizeof(mRulesTable)));
+    memcpy(data, mSidekickChoices, sizeof(mSidekickChoices));
+    g_pStrikerChallenge->SerializeData(CupManager::s_pInstance->SerializeData((u8*)data + sizeof(mSidekickChoices)));
 }
 
 void GameInfoManager::GetMemoryCardData(void* data) const
@@ -213,8 +213,8 @@ void GameInfoManager::DeserializeSettings(void* data)
 {
     memcpy(&mUserInfo, data, sizeof(mUserInfo));
     data = (u8*)data + 0x80;
-    memcpy(mRulesTable, data, sizeof(mRulesTable));
-    g_pStrikerChallenge->DeserializeData(CupManager::s_pInstance->DeserializeData((u8*)data + sizeof(mRulesTable)));
+    memcpy(mSidekickChoices, data, sizeof(mSidekickChoices));
+    g_pStrikerChallenge->DeserializeData(CupManager::s_pInstance->DeserializeData((u8*)data + sizeof(mSidekickChoices)));
 }
 
 void GameInfoManager::SetMemoryCardData(const void* data)
@@ -227,17 +227,17 @@ bool GameInfoManager::HasTrophy(eTrophyType trophyType) const
     return false;
 }
 
-bool GameInfoManager::IsInMode3() const
+bool GameInfoManager::IsInCupMode() const
 {
     return mCurrentMode == GM_CUP;
 }
 
-bool GameInfoManager::IsInOddCupMode() const
+bool GameInfoManager::IsInCupOrTournamentMode() const
 {
     return mCurrentMode == GM_ONLINE_TOURNAMENT || mCurrentMode == GM_CUP;
 }
 
-bool GameInfoManager::IsInMode2() const
+bool GameInfoManager::IsInDemoMode() const
 {
     return mCurrentMode == GM_DEMO;
 }
@@ -247,12 +247,12 @@ bool GameInfoManager::IsInFriendlyMode() const
     return mCurrentMode == GM_FRIENDLY;
 }
 
-bool GameInfoManager::IsInMode1() const
+bool GameInfoManager::IsInOnlineTournamentMode() const
 {
     return mCurrentMode == GM_ONLINE_TOURNAMENT;
 }
 
-bool GameInfoManager::IsInMode4() const
+bool GameInfoManager::IsInChallengeMode() const
 {
     return mCurrentMode == GM_CHALLENGE;
 }
@@ -278,7 +278,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
     if (mIsOnlineMode != 0) {
         if (mOnlineRankedMatch != 0) {
             if (mCurrentMode == GM_ONLINE_TOURNAMENT) {
-                const GameplaySettings* settings = &mMode1Settings;
+                const GameplaySettings* settings = &mOnlineTournamentSettings;
 
                 return settings;
             }
@@ -288,7 +288,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
             return settings;
         }
 
-        const GameplaySettings* settings = &mNoCheatSettings;
+        const GameplaySettings* settings = &mUnrankedGameplaySettings;
 
         return settings;
     }
@@ -308,7 +308,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
 const CheatSettings* GameInfoManager::GetActiveRules() const
 {
     if (UseAltRules()) {
-        return &mRulesA;
+        return &mUnrankedCheatSettings;
     }
 
     return &mUserInfo.mCheatOptions;
@@ -426,7 +426,7 @@ void GameInfoManager::SetupGameFromConfig()
     }
 }
 
-void GameInfoManager::ResetUnknown0xA0()
+void GameInfoManager::ClearGameSettingsOverride()
 {
     mUseCurGameSettings = 0;
     mUserInfo.mAudioOptions.ApplySettings();
@@ -472,7 +472,7 @@ void GameInfoManager::ApplyDifficultySettings()
     mCurrentDifficulty[1] = DifficultyMap[skillLevel][humansOnSide[1] ? 0 : 1];
 }
 
-bool GameInfoManager::IsRule0x8Equal4() const
+bool GameInfoManager::IsGlassJawEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -485,7 +485,7 @@ bool GameInfoManager::IsRule0x8Equal4() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x0Equal10() const
+bool GameInfoManager::AreInfinitePowerupsEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -510,7 +510,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x4Equal4() const
+bool GameInfoManager::IsScoreTiltEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -523,7 +523,7 @@ bool GameInfoManager::IsRule0x4Equal4() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x8Equal2() const
+bool GameInfoManager::IsSafeMegaStrikeEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -536,7 +536,7 @@ bool GameInfoManager::IsRule0x8Equal2() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x4Equal1() const
+bool GameInfoManager::IsSecureStadiumEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -549,7 +549,7 @@ bool GameInfoManager::IsRule0x4Equal1() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x8Equal3() const
+bool GameInfoManager::IsSkillShotCheatEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -562,7 +562,7 @@ bool GameInfoManager::IsRule0x8Equal3() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x8Equal1() const
+bool GameInfoManager::AreDevastatingHitsEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -575,7 +575,7 @@ bool GameInfoManager::IsRule0x8Equal1() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x4Equal3() const
+bool GameInfoManager::IsHighVoltageEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -588,7 +588,7 @@ bool GameInfoManager::IsRule0x4Equal3() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x4Equal2() const
+bool GameInfoManager::IsPowerShortageEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -601,7 +601,7 @@ bool GameInfoManager::IsRule0x4Equal2() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x4Equal5() const
+bool GameInfoManager::IsWhiteBallEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -614,7 +614,7 @@ bool GameInfoManager::IsRule0x4Equal5() const
     return false;
 }
 
-bool GameInfoManager::IsRule0x0Equal11() const
+bool GameInfoManager::IsButterfingersEnabled() const
 {
     if (mIsInStrikers101Mode) {
         return false;
@@ -632,9 +632,9 @@ GameInfoSaveSlot* GameInfoManager::GetSaveSlot(int slot)
     return &mSaveSlots[slot];
 }
 
-void* GameInfoManager::GetUnknown0x40(int slot, int index)
+void* GameInfoManager::GetSavedFriendData(int slot, int index)
 {
-    return mSaveSlots[slot].unknown_0x040[index];
+    return mSaveSlots[slot].mFriendData[index];
 }
 
 void* GameInfoManager::GetSaveSlotIdAddress(int slot)
@@ -680,50 +680,50 @@ u16* GameInfoManager::GetSavedFriendName(int slot, int index)
     return mSaveSlots[slot].mFriendNames[index];
 }
 
-void* GameInfoManager::GetUnknown0xA88(int slot)
+void* GameInfoManager::GetSaveSlotLastUsedTime(int slot)
 {
-    return mSaveSlots[slot].unknown_0xA88;
+    return mSaveSlots[slot].mLastUsedTime;
 }
 
-void* GameInfoManager::GetUnknown0xA40(int slot, int index)
+void* GameInfoManager::GetSavedFriendRegion(int slot, int index)
 {
-    return &mSaveSlots[slot].unknown_0xA40[index];
+    return &mSaveSlots[slot].mFriendRegions[index];
 }
 
-int* GameInfoManager::GetUnknown0xA90(int slot)
+int* GameInfoManager::GetPastSeasonWins(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xA90;
+    return &mSaveSlots[slot].mPastSeasonWins;
 }
 
-int* GameInfoManager::GetUnknown0xA94(int slot)
+int* GameInfoManager::GetPastSeasonLosses(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xA94;
+    return &mSaveSlots[slot].mPastSeasonLosses;
 }
 
-int* GameInfoManager::GetUnknown0xA98(int slot)
+int* GameInfoManager::GetCurrentSeasonWins(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xA98;
+    return &mSaveSlots[slot].mCurrentSeasonWins;
 }
 
-int* GameInfoManager::GetUnknown0xA9C(int slot)
+int* GameInfoManager::GetCurrentSeasonLosses(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xA9C;
+    return &mSaveSlots[slot].mCurrentSeasonLosses;
 }
 
-int* GameInfoManager::GetUnknown0xAA0(int slot)
+int* GameInfoManager::GetUnrankedWins(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xAA0;
+    return &mSaveSlots[slot].mUnrankedWins;
 }
 
-int* GameInfoManager::GetUnknown0xAA4(int slot)
+int* GameInfoManager::GetUnrankedLosses(int slot)
 {
-    return &mSaveSlots[slot].unknown_0xAA4;
+    return &mSaveSlots[slot].mUnrankedLosses;
 }
 
-int GameInfoManager::GetUnknown0xA90Total(int index)
+int GameInfoManager::GetTotalRankedWins(int index)
 {
     GameInfoSaveSlot* slot = &mSaveSlots[index];
-    int total = slot->unknown_0xA90 + slot->unknown_0xA98;
+    int total = slot->mPastSeasonWins + slot->mCurrentSeasonWins;
 
     if (total >= 9999) {
         total = 9999;
@@ -732,10 +732,10 @@ int GameInfoManager::GetUnknown0xA90Total(int index)
     return total;
 }
 
-int GameInfoManager::GetUnknown0xA94Total(int index)
+int GameInfoManager::GetTotalRankedLosses(int index)
 {
     GameInfoSaveSlot* slot = &mSaveSlots[index];
-    int total = slot->unknown_0xA94 + slot->unknown_0xA9C;
+    int total = slot->mPastSeasonLosses + slot->mCurrentSeasonLosses;
 
     if (total >= 9999) {
         total = 9999;
@@ -744,10 +744,10 @@ int GameInfoManager::GetUnknown0xA94Total(int index)
     return total;
 }
 
-int GameInfoManager::GetUnknown0xAA0Total(int index)
+int GameInfoManager::GetTotalOnlineWins(int index)
 {
     GameInfoSaveSlot* slot = &mSaveSlots[index];
-    int total = slot->unknown_0xA90 + slot->unknown_0xA98 + slot->unknown_0xAA0;
+    int total = slot->mPastSeasonWins + slot->mCurrentSeasonWins + slot->mUnrankedWins;
 
     if (total >= 9999) {
         total = 9999;
@@ -756,10 +756,10 @@ int GameInfoManager::GetUnknown0xAA0Total(int index)
     return total;
 }
 
-int GameInfoManager::GetUnknown0xAA4Total(int index)
+int GameInfoManager::GetTotalOnlineLosses(int index)
 {
     GameInfoSaveSlot* slot = &mSaveSlots[index];
-    int total = slot->unknown_0xA94 + slot->unknown_0xA9C + slot->unknown_0xAA4;
+    int total = slot->mPastSeasonLosses + slot->mCurrentSeasonLosses + slot->mUnrankedLosses;
 
     if (total >= 9999) {
         total = 9999;
@@ -768,14 +768,14 @@ int GameInfoManager::GetUnknown0xAA4Total(int index)
     return total;
 }
 
-void* GameInfoManager::GetUnknown0xAA8(int slot)
+void* GameInfoManager::GetSavedMiiName(int slot)
 {
-    return mSaveSlots[slot].unknown_0xAA8;
+    return mSaveSlots[slot].mMiiName;
 }
 
-void* GameInfoManager::GetUnknown0xABE(int slot)
+void* GameInfoManager::GetSavedMiiData(int slot)
 {
-    return mSaveSlots[slot].unknown_0xABE;
+    return mSaveSlots[slot].mMiiData;
 }
 
 void GameInfoManager::ClearSaveSlot(int slot)
@@ -793,7 +793,7 @@ void GameInfoManager::ValidateSaveSlot(int index)
     }
 }
 
-int GameInfoManager::GetMappedRule0x0()
+int GameInfoManager::GetGameplaySkillLevel()
 {
     int skillToDifficulty[6] = { 0, 1, 2, 3, 4, 5 };
     GameplaySettings::eSkillLevel level;
@@ -807,7 +807,7 @@ int GameInfoManager::GetMappedRule0x0()
     return skillToDifficulty[level];
 }
 
-int GameInfoManager::GetRule0x0() const
+int GameInfoManager::GetCustomPowerups() const
 {
     if (mIsInStrikers101Mode) {
         return 0;
@@ -824,9 +824,9 @@ int GameInfoManager::GetRule0x0() const
     return 0;
 }
 
-void GameInfoManager::ResetRules(int index)
+void GameInfoManager::ResetSidekickChoices(int index)
 {
-    mRulesTable[index].mValues[0] = (eSidekickID)kDefaultRules[index][0];
-    mRulesTable[index].mValues[1] = (eSidekickID)kDefaultRules[index][1];
-    mRulesTable[index].mValues[2] = (eSidekickID)kDefaultRules[index][2];
+    mSidekickChoices[index].mValues[0] = (eSidekickID)kDefaultSidekickChoices[index][0];
+    mSidekickChoices[index].mValues[1] = (eSidekickID)kDefaultSidekickChoices[index][1];
+    mSidekickChoices[index].mValues[2] = (eSidekickID)kDefaultSidekickChoices[index][2];
 }

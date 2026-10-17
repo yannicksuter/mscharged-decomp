@@ -64,6 +64,9 @@ NWC24Err NWC24iSaveMailNow(void);
 NWC24Err NWC24iRequestGenerateUserId(u64* pId, u32* arg1);
 NWC24Err NWC24iTrySuspendForOpenLib(void);
 NWC24Err NWC24iResumeForCloseLib(void);
+#if defined(VERSION_R4QK01)
+NWC24Err NWC24iSetScriptMode(s32 mode);
+#endif
 
 #ifdef __cplusplus
 }

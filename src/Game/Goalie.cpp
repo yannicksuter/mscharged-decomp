@@ -376,7 +376,7 @@ bool Goalie::CheckForDaze()
     {
         cPlayer* pScorer = g_pGame->m_pScorer;
         bool bStunGoalieCheat = false;
-        if (GameInfoManager::Instance()->IsInMode4()
+        if (GameInfoManager::Instance()->IsInChallengeMode()
             && g_pStrikerChallenge->mCaptain == 7 && m_pTeam->m_nSide == 0)
             bStunGoalieCheat = true;
         if (bStunGoalieCheat
@@ -1604,7 +1604,7 @@ void Goalie::FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir, nlVector3
 
 unsigned int Goalie::FindDumpDirection(unsigned short aDesired, bool bConstrain)
 {
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         switch (g_pStrikerChallenge->mCurrentChallenge)
         {
@@ -2631,7 +2631,7 @@ bool Goalie::IsLooseBallTowardNet()
 
 bool Goalie::IsAttackDisabled()
 {
-    if (GameInfoManager::Instance()->IsInMode4())
+    if (GameInfoManager::Instance()->IsInChallengeMode())
     {
         switch (g_pStrikerChallenge->mCurrentChallenge)
         {
@@ -2820,7 +2820,7 @@ void Goalie::MakeSaveEvent(bool bIsSTS)
     }
 
     if (GetBallChargeValue(g_pBall, 0) >= 4.0f
-        && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+        && StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
     {
         unsigned long uParam = 0x3ACB01E9;
         if (m_pTeam->m_nSide == 0)

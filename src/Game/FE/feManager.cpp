@@ -114,7 +114,7 @@ void FrontEnd::EnterStartScreen(bool bStraightToKickoff)
 {
     bool isInStrikers101 = false;
     if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
-        || nlSingleton<GameInfoManager>::Instance()->IsInMode4())
+        || nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode())
     {
         isInStrikers101 = true;
     }
@@ -129,7 +129,7 @@ void FrontEnd::ExitWinnerScreen()
     delete m_pPauseMenuCamera;
     m_pPauseMenuCamera = 0;
     if (!nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
-        && !nlSingleton<GameInfoManager>::Instance()->IsInMode4())
+        && !nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode())
     {
         g_AllActorsHidden = 0.5f;
     }
@@ -179,7 +179,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
         {
             g_pOverlayManager->Push(SCENE_STRIKERS_101_PAUSE, SCREEN_NOTHING, false);
         }
-        else if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+        else if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
                  && !sInitialModePauseMenuShown)
         {
             g_pOverlayManager->Push(OVERLAY_CHALLENGE_PREVIEW, SCREEN_FORWARD, false);
@@ -275,7 +275,7 @@ void FrontEnd::Update(float fTimeDelta)
         m_pauseDelay = 0.0f;
     }
 
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode2())
+    if (nlSingleton<GameInfoManager>::Instance()->IsInDemoMode())
     {
         UpdateForDemoMode(fTimeDelta);
     }
@@ -296,7 +296,7 @@ void FrontEnd::Update(float fTimeDelta)
     case eFE_PRE_GAME_START:
         g_pBall->m_bVisible = true;
         if ((nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
-                || nlSingleton<GameInfoManager>::Instance()->IsInMode4())
+                || nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode())
             && !sInitialModePauseMenuShown)
         {
             bool bPauseDelayElapsed = m_pauseDelay <= 0.0f;
@@ -520,7 +520,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
         return;
     }
 
-    if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
+    if (nlSingleton<GameInfoManager>::Instance()->IsInChallengeMode()
         && !sInitialModePauseMenuShown)
     {
         return;

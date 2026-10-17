@@ -10,8 +10,6 @@
 
 typedef unsigned long long u64;
 
-typedef CupSidekicks GameRules;
-
 struct UserInfo
 {
     UserInfo()
@@ -49,21 +47,21 @@ struct UserInfo
 struct GameInfoSaveSlot
 {
     /* 0x000 */ u8 unknown_0x000[0x1C];
-    /* 0x01C */ int unknown_0x01C;
+    /* 0x01C */ int mProfileId;
     /* 0x020 */ u8 unknown_0x020[0x20];
-    /* 0x040 */ u8 unknown_0x040[64][0xC];
+    /* 0x040 */ u8 mFriendData[64][0xC];
     /* 0x340 */ u16 mFriendNames[64][14];
-    /* 0xA40 */ u8 unknown_0xA40[0x40];
+    /* 0xA40 */ u8 mFriendRegions[0x40];
     /* 0xA80 */ u64 mSaveId;
-    /* 0xA88 */ u8 unknown_0xA88[0x8];
-    /* 0xA90 */ int unknown_0xA90;
-    /* 0xA94 */ int unknown_0xA94;
-    /* 0xA98 */ int unknown_0xA98;
-    /* 0xA9C */ int unknown_0xA9C;
-    /* 0xAA0 */ int unknown_0xAA0;
-    /* 0xAA4 */ int unknown_0xAA4;
-    /* 0xAA8 */ u8 unknown_0xAA8[0x16];
-    /* 0xABE */ u8 unknown_0xABE[0x52];
+    /* 0xA88 */ u8 mLastUsedTime[0x8];
+    /* 0xA90 */ int mPastSeasonWins;
+    /* 0xA94 */ int mPastSeasonLosses;
+    /* 0xA98 */ int mCurrentSeasonWins;
+    /* 0xA9C */ int mCurrentSeasonLosses;
+    /* 0xAA0 */ int mUnrankedWins;
+    /* 0xAA4 */ int mUnrankedLosses;
+    /* 0xAA8 */ u8 mMiiName[0x16];
+    /* 0xABE */ u8 mMiiData[0x52];
 };
 
 struct GameInfoSlotEntry
@@ -111,12 +109,12 @@ public:
     void SetMemoryCardData(const void* data);
     bool HasTrophy(eTrophyType trophyType) const;
 
-    bool IsInMode3() const;
-    bool IsInOddCupMode() const;
-    bool IsInMode2() const;
+    bool IsInCupMode() const;
+    bool IsInCupOrTournamentMode() const;
+    bool IsInDemoMode() const;
     bool IsInFriendlyMode() const;
-    bool IsInMode1() const;
-    bool IsInMode4() const;
+    bool IsInOnlineTournamentMode() const;
+    bool IsInChallengeMode() const;
 
     unsigned long GetSettingsDataSize() const;
     void SerializeSettings(void* data) const;
@@ -128,10 +126,10 @@ public:
     bool HasSaveSlot(u64 id) const;
     int GetSaveSlotName(int index) const;
     void ValidateSaveSlot(int index);
-    int GetMappedRule0x0();
-    int GetRule0x0() const;
-    void ResetRules(int index);
-    void SetRules(int index, GameRules rules) { mRulesTable[index] = rules; }
+    int GetGameplaySkillLevel();
+    int GetCustomPowerups() const;
+    void ResetSidekickChoices(int index);
+    void SetSidekickChoices(int index, CupSidekicks choices) { mSidekickChoices[index] = choices; }
 
     bool IsOnline() const { return mIsOnlineMode; }
 
@@ -141,51 +139,51 @@ public:
     void SetupGameFromConfig();
     void ApplyDifficultySettings();
 
-    bool IsRule0x8Equal4() const;
-    bool IsRule0x0Equal10() const;
-    bool IsRule0x4Equal4() const;
-    bool IsRule0x8Equal2() const;
-    bool IsRule0x4Equal1() const;
-    bool IsRule0x8Equal3() const;
-    bool IsRule0x8Equal1() const;
-    bool IsRule0x4Equal3() const;
-    bool IsRule0x4Equal2() const;
-    bool IsRule0x4Equal5() const;
-    bool IsRule0x0Equal11() const;
+    bool IsGlassJawEnabled() const;
+    bool AreInfinitePowerupsEnabled() const;
+    bool IsScoreTiltEnabled() const;
+    bool IsSafeMegaStrikeEnabled() const;
+    bool IsSecureStadiumEnabled() const;
+    bool IsSkillShotCheatEnabled() const;
+    bool AreDevastatingHitsEnabled() const;
+    bool IsHighVoltageEnabled() const;
+    bool IsPowerShortageEnabled() const;
+    bool IsWhiteBallEnabled() const;
+    bool IsButterfingersEnabled() const;
 
     UserInfo& GetUserInfo();
     int GetCurrentMode() const;
     AudioSettings* GetAudioSettings();
     VisualSettings* GetVisualOptions();
-    void ResetUnknown0xA0();
+    void ClearGameSettingsOverride();
 
     GameInfoSaveSlot* GetSaveSlot(int slot);
-    void* GetUnknown0x40(int slot, int index);
+    void* GetSavedFriendData(int slot, int index);
     void* GetSaveSlotIdAddress(int slot);
     u16* GetSavedFriendName(int slot, int index);
-    void* GetUnknown0xA88(int slot);
-    void* GetUnknown0xA40(int slot, int index);
-    int* GetUnknown0xA90(int slot);
-    int* GetUnknown0xA94(int slot);
-    int* GetUnknown0xA98(int slot);
-    int* GetUnknown0xA9C(int slot);
-    int* GetUnknown0xAA0(int slot);
-    int* GetUnknown0xAA4(int slot);
-    int GetUnknown0xA90Total(int index);
-    int GetUnknown0xA94Total(int index);
-    int GetUnknown0xAA0Total(int index);
-    int GetUnknown0xAA4Total(int index);
-    void* GetUnknown0xAA8(int slot);
-    void* GetUnknown0xABE(int slot);
+    void* GetSaveSlotLastUsedTime(int slot);
+    void* GetSavedFriendRegion(int slot, int index);
+    int* GetPastSeasonWins(int slot);
+    int* GetPastSeasonLosses(int slot);
+    int* GetCurrentSeasonWins(int slot);
+    int* GetCurrentSeasonLosses(int slot);
+    int* GetUnrankedWins(int slot);
+    int* GetUnrankedLosses(int slot);
+    int GetTotalRankedWins(int index);
+    int GetTotalRankedLosses(int index);
+    int GetTotalOnlineWins(int index);
+    int GetTotalOnlineLosses(int index);
+    void* GetSavedMiiName(int slot);
+    void* GetSavedMiiData(int slot);
     void ClearSaveSlot(int slot);
 
     BasicGameInfo* GetCurrentGameInfo() const { return mGameInfo[mCurrentMode]; }
 
     /* 0x0004 */ GameplaySettings mCurGameGameplayOptions;
     /* 0x0020 */ GameplaySettings mDefaultSettings;
-    /* 0x003C */ GameplaySettings mMode1Settings;
-    /* 0x0058 */ GameplaySettings mNoCheatSettings;
-    /* 0x0074 */ CheatSettings mRulesA;
+    /* 0x003C */ GameplaySettings mOnlineTournamentSettings;
+    /* 0x0058 */ GameplaySettings mUnrankedGameplaySettings;
+    /* 0x0074 */ CheatSettings mUnrankedCheatSettings;
     /* 0x0080 */ BasicGameInfo* mGameInfo[GM_NUM_MODES];
     /* 0x0094 */ int mCurrentDifficulty[2];
     /* 0x009C */ UserInfo mUserInfo;
@@ -198,14 +196,14 @@ public:
     /* 0x0125 */ bool mOnlineTwoLocalPlayers;
     /* 0x0126 */ bool mOnlineFriendSelectionMode;
     /* 0x0127 */ u8 unknown_0x127;
-    /* 0x0128 */ GameInfoSlotEntry unknown_0x128[4];
+    /* 0x0128 */ GameInfoSlotEntry mUserStats[4];
     /* 0x0278 */ eFEINPUT_PAD mMainUserPadNumber;
     /* 0x027C */ u8 mUseCurGameSettings;
     /* 0x027D */ u8 unknown_0x27D[3];
     /* 0x0280 */ AudioSettings mCurGameAudioSettings;
-    /* 0x0298 */ GameRules mRulesTable[12];
+    /* 0x0298 */ CupSidekicks mSidekickChoices[12];
     /* 0x0328 */ GameInfoSaveSlot mSaveSlots[10];
-    /* 0x71C8 */ int unknown_0x71C8;
+    /* 0x71C8 */ int mFrontEndReturnMode;
     /* 0x71CC */ u8 unknown_0x71CC[4];
 
     static GameInfoManager* sThis;

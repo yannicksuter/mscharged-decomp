@@ -92,7 +92,7 @@ StadiumSelectScene::~StadiumSelectScene()
     }
     if (mPlayingStadiumIndex != -1)
     {
-        FEAudio::StopAnimAudioEvent(GetStadiumUnknown0x28(mStadiumOrder[mPlayingStadiumIndex]), this);
+        FEAudio::StopAnimAudioEvent(GetStadiumPreviewAudioEvent(mStadiumOrder[mPlayingStadiumIndex]), this);
     }
     mMoviePlayer.Stop();
 }

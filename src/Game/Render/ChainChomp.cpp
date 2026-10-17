@@ -615,7 +615,7 @@ void ChainChomp::Spawn(cFielder* pThrower, cFielder* pTarget)
         mv3Position,
         0.0f,
         0);
-    if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+    if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
     {
         unsigned long hash = pThrower->m_pTeam->m_nSide == 0 ? 0x5AB49659 : 0x56C11782;
         PlayCrowdReaction(hash);

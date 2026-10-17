@@ -861,7 +861,7 @@ bool NetworkSession::StartLogin()
     DWC_InitFriendsMatch(
         &gDWCFriendsMatchControl, (DWCUserData*)gameInfo->GetSaveSlot(gNetworkSaveSlotIndex), 0x2AAF,
         "mschargedwii", "B4LdGW", 0, 0,
-        (DWCFriendData*)gameInfo->GetUnknown0x40(gNetworkSaveSlotIndex, 0), 0x40);
+        (DWCFriendData*)gameInfo->GetSavedFriendData(gNetworkSaveSlotIndex, 0), 0x40);
 
     const u16* name = (const u16*)L"unnamed";
     if (gNetworkMiiNameWide[0] != 0)

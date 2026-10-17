@@ -240,7 +240,7 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
         GameInfoSaveSlot* slot = GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
         for (int i = 0; i < leaderboard->mCount; ++i)
         {
-            if (slot->unknown_0x01C == leaderboard->mPlayers[i].mProfileId
+            if (slot->mProfileId == leaderboard->mPlayers[i].mProfileId
                 && leaderboard->mPlayers[i].mName[0] != 0)
             {
                 leaderboard->mLocalPlayerIndex = i;
@@ -263,8 +263,8 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
                     if (leaderboard->mLocalStatsCategory == 0 && leaderboard->mFilter == RANKING_FILTER_NEARBY)
                     {
                         NetworkRankingMeta& record = mLocalStats[leaderboard->mLocalStatsCategory];
-                        int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
-                        int* pendingLosses = GameInfoManager::GetInstance()->GetUnknown0xA9C(gNetworkSaveSlotIndex);
+                        int* pendingWins = GameInfoManager::GetInstance()->GetCurrentSeasonWins(gNetworkSaveSlotIndex);
+                        int* pendingLosses = GameInfoManager::GetInstance()->GetCurrentSeasonLosses(gNetworkSaveSlotIndex);
                         int wins = *pendingWins;
                         int losses = *pendingLosses;
                         if (wins != record.mWins)
@@ -304,10 +304,10 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
 void NetworkStatsManager::CommitPendingOnlineTotals(
     NetworkRankingMeta*)
 {
-    int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
-    int* pendingLosses = GameInfoManager::GetInstance()->GetUnknown0xA9C(gNetworkSaveSlotIndex);
-    int* wins = GameInfoManager::GetInstance()->GetUnknown0xA90(gNetworkSaveSlotIndex);
-    int* losses = GameInfoManager::GetInstance()->GetUnknown0xA94(gNetworkSaveSlotIndex);
+    int* pendingWins = GameInfoManager::GetInstance()->GetCurrentSeasonWins(gNetworkSaveSlotIndex);
+    int* pendingLosses = GameInfoManager::GetInstance()->GetCurrentSeasonLosses(gNetworkSaveSlotIndex);
+    int* wins = GameInfoManager::GetInstance()->GetPastSeasonWins(gNetworkSaveSlotIndex);
+    int* losses = GameInfoManager::GetInstance()->GetPastSeasonLosses(gNetworkSaveSlotIndex);
 
     *wins += *pendingWins;
     *losses += *pendingLosses;
@@ -340,12 +340,12 @@ void NetworkStatsManager::UpdateFriendRankingNames(
         for (friendIndex = 0; friendIndex < 64; ++friendIndex)
         {
             friendData = reinterpret_cast<DWCAccFriendData*>(
-                GameInfoManager::GetInstance()->GetUnknown0x40(
+                GameInfoManager::GetInstance()->GetSavedFriendData(
                     gNetworkSaveSlotIndex, friendIndex));
             name = GameInfoManager::GetInstance()->GetSavedFriendName(
                 gNetworkSaveSlotIndex, friendIndex);
             region = static_cast<u8*>(
-                GameInfoManager::GetInstance()->GetUnknown0xA40(
+                GameInfoManager::GetInstance()->GetSavedFriendRegion(
                     gNetworkSaveSlotIndex, friendIndex));
             if (friendData->gs_profile_id.id == profileId)
             {
@@ -370,7 +370,7 @@ void NetworkStatsManager::BuildFriendsLeaderboard()
     int write = 0;
     GameInfoSaveSlot* slot = GameInfoManager::GetInstance()->GetSaveSlot(
         gNetworkSaveSlotIndex);
-    int localProfileId = slot->unknown_0x01C;
+    int localProfileId = slot->mProfileId;
 
     for (int read = 0; read < source.mCount; ++read)
     {
@@ -388,7 +388,7 @@ void NetworkStatsManager::BuildFriendsLeaderboard()
             {
                 DWCAccFriendData* friendData =
                     reinterpret_cast<DWCAccFriendData*>(
-                        GameInfoManager::GetInstance()->GetUnknown0x40(
+                        GameInfoManager::GetInstance()->GetSavedFriendData(
                             gNetworkSaveSlotIndex, friendIndex));
                 if (friendData->gs_profile_id.id == profileId)
                 {
@@ -611,8 +611,8 @@ void NetworkStatsManager::UpdateOnlineResultTotals(
         &details.mGoalPoints, &details.mBonusPoints);
 #endif
 
-    int* wins = GameInfoManager::GetInstance()->GetUnknown0xAA0(gNetworkSaveSlotIndex);
-    int* losses = GameInfoManager::GetInstance()->GetUnknown0xAA4(gNetworkSaveSlotIndex);
+    int* wins = GameInfoManager::GetInstance()->GetUnrankedWins(gNetworkSaveSlotIndex);
+    int* losses = GameInfoManager::GetInstance()->GetUnrankedLosses(gNetworkSaveSlotIndex);
 #if defined(VERSION_R4QP01_REV1)
     if (mLastGameWon)
 #else

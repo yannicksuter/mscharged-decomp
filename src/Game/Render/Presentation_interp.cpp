@@ -270,8 +270,8 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 30:
         ++m_SP;
         m_SP[-1] = Config::Global().Get<bool>("no_weather", false) == true
-            || GameInfoManager::Instance()->IsRule0x4Equal1() == true
-            || GameInfoManager::Instance()->IsInMode4();
+            || GameInfoManager::Instance()->IsSecureStadiumEnabled() == true
+            || GameInfoManager::Instance()->IsInChallengeMode();
         break;
     case 31:
         if (g_pNetworkSession->IsLiveNetworkGame())

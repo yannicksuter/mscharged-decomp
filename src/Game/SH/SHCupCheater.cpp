@@ -207,7 +207,7 @@ void CupCheaterScene::ProcessPostGame()
     cup->mPreviousGameTeams[0] = GameInfoManager::Instance()->GetTeam(0);
     cup->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
 
-    if (gameInfoManager->IsInMode3())
+    if (gameInfoManager->IsInCupMode())
     {
         CupManager::Instance()->AdvanceToNextUserGame();
         GameSceneManager::Instance()->Pop();

@@ -13,6 +13,10 @@ enum {
     NWC24_IOCTL_TRY_SUSPEND_SCHEDULER = 2,
     NWC24_IOCTL_RESUME_SCHEDULER = 3,
     NWC24_IOCTL_GENERATE_USER_ID = 15,
+#if defined(VERSION_R4QK01)
+    NWC24_IOCTL_GET_SCHEDULER_STAT = 30,
+    NWC24_IOCTL_SET_SCRIPT_MODE = 34,
+#endif
 };
 
 #pragma pack(push, 1)
@@ -104,6 +108,87 @@ s32 NWC24ResumeScheduler(void) {
 
     return count;
 }
+
+#if defined(VERSION_R4QK01)
+NWC24Err NWC24iGetSchedulerStat(NWC24ScdStat* scdStat, u32 scdStatSize) {
+    s32 fd;
+    NWC24Err result;
+    NWC24Err close;
+
+    if (scdStatSize > sizeof(NWC24ScdStat)) {
+        return NWC24_ERR_OVERFLOW;
+    }
+
+    if (OSGetCurrentThread() == NULL) {
+        return NWC24_ERR_FATAL;
+    }
+
+    LockRight();
+    {
+        result = NWC24_OPEN_DEVICE(NWC24i_SCHEDULER_DEVICE, &fd, IPC_OPEN_NONE);
+
+        if (result >= 0) {
+            result = NWC24_IOCTL_DEVICE(
+                fd, NWC24_IOCTL_GET_SCHEDULER_STAT, NULL, 0,
+                scdStat, scdStatSize);
+
+            if (result >= 0) {
+                result = scdStat->result;
+            }
+
+            close = NWC24_CLOSE_DEVICE(fd);
+            if (result >= 0) {
+                result = close;
+            }
+        }
+
+        if (scdStatSize > 0x10) {
+            NWC24iSetNewMsgArrived(scdStat->newMsgFlag);
+        }
+    }
+    UnlockRight();
+
+    return result;
+}
+
+NWC24Err NWC24iSetScriptMode(s32 mode) {
+    s32 fd;
+    NWC24Err result;
+    NWC24Err close;
+
+    result = CHECK_CALLING_STATUS(FALSE);
+    if (result < 0) {
+        return result;
+    }
+
+    LockRight();
+    memset(&nwc24ScdCommonBuffer, 0, sizeof(CommonBuffer));
+    {
+        result = NWC24_OPEN_DEVICE(NWC24i_SCHEDULER_DEVICE, &fd, IPC_OPEN_NONE);
+
+        if (result >= 0) {
+            nwc24ScdCommonBuffer.WORD_0x0 = mode;
+
+            result = NWC24_IOCTL_DEVICE(
+                fd, NWC24_IOCTL_SET_SCRIPT_MODE,
+                &nwc24ScdCommonBuffer, sizeof(CommonBuffer),
+                &nwc24ScdCommonResult, sizeof(CommonResult));
+
+            if (result >= 0) {
+                result = nwc24ScdCommonResult.result;
+            }
+
+            close = NWC24_CLOSE_DEVICE(fd);
+            if (result >= 0) {
+                result = close;
+            }
+        }
+    }
+    UnlockRight();
+
+    return result;
+}
+#endif
 
 NWC24Err NWC24ExecDownloadTask(u32 flags, u16 taskId, u32 subTaskMask) {
     static const char* pTempName = "dlcnt.bin";
@@ -389,7 +474,9 @@ static void UnlockCounters(void) {
 
 static NWC24Err CheckCallingStatus(const char* pUser, BOOL block) {
 #pragma unused(pUser)
+#if !defined(VERSION_R4QK01)
 #pragma unused(block)
+#endif
 
     if (OSGetCurrentThread() == NULL) {
         return NWC24_ERR_FATAL;
@@ -398,6 +485,12 @@ static NWC24Err CheckCallingStatus(const char* pUser, BOOL block) {
     if (NWC24IsMsgLibOpened() || NWC24IsMsgLibOpenedByTool()) {
         return NWC24_ERR_LIB_OPENED;
     }
+
+#if defined(VERSION_R4QK01)
+    if (!block && NWC24IsMsgLibOpenBlocking()) {
+        return NWC24_ERR_BUSY;
+    }
+#endif
 
     return NWC24_OK;
 }

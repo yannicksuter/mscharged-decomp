@@ -1,6 +1,9 @@
 #include <revolution/nwc24.h>
 #include <revolution/nwc24/NWC24Internal.h>
 #include <revolution/os.h>
+#if defined(VERSION_R4QK01)
+#include <revolution/sc.h>
+#endif
 
 #define SHUTDOWN_RETRY_MAX 5
 
@@ -12,6 +15,30 @@ static s32 nwc24ShtFd = -1;
 static s32 nwc24ShtRetryRest = 0;
 
 static OSShutdownFunctionInfo ShutdownFuncInfo;
+
+#if defined(VERSION_R4QK01)
+NWC24Err NWC24EnableLedNotification(BOOL enable) {
+    SCIdleModeInfo idleMode;
+    u32 status;
+    u32 led = 0;
+
+    if (enable) {
+        do {
+            status = SCCheckStatus();
+
+            if (status == SC_STATUS_FATAL) {
+                return NWC24_ERR_FATAL;
+            }
+        } while (status == SC_STATUS_BUSY);
+
+        SCGetIdleMode(&idleMode);
+        led = idleMode.slotLight;
+    }
+
+    __OSSetIdleLEDMode(led);
+    return NWC24_OK;
+}
+#endif
 
 NWC24Err NWC24iPrepareShutdown(void) {
     NWC24Err result = NWC24_OK;
@@ -28,6 +55,14 @@ NWC24Err NWC24iPrepareShutdown(void) {
     }
 
     nwc24ShtRetryRest = SHUTDOWN_RETRY_MAX;
+
+#if defined(VERSION_R4QK01)
+    NWC24EnableLedNotification(TRUE);
+
+    if (OSGetAppType() == OS_APP_TYPE_IPL) {
+        NWC24iSetScriptMode(1);
+    }
+#endif
 
     return result;
 }

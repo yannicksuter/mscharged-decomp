@@ -220,7 +220,7 @@ void UpdateSteeringAvoidance(DesireSteering* desire, float fDeltaT)
                 nThingsToAvoid = AVOID_NOTHING;
             }
             else if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
-                || GameInfoManager::Instance()->IsRule0x4Equal3())
+                || GameInfoManager::Instance()->IsHighVoltageEnabled())
             {
                 if (desire->m_pFielder->IsOnScreen()
                     && !gForceSidelineAvoidance)

@@ -144,7 +144,7 @@ static inline void PlayNisCue(NisPlayer* player, const char* nisName)
     char cueName[128];
     nlStrNCpy(cueName, nisName, sizeof(cueName));
     unsigned long length = nlStrLen(cueName);
-    if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+    if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
     {
         cueName[length - 4] = '\0';
     }

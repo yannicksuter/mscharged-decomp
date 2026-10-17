@@ -810,7 +810,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     m_pPostGameDoneClock->Reset(0.0f, 1.5f, 1.0f);
     m_pPostGameDoneClock->Stop();
     gpNumberDisplay->Reset();
-    if (!GameInfoManager::Instance()->IsInMode4())
+    if (!GameInfoManager::Instance()->IsInChallengeMode())
     {
         gpNumberDisplay->SetScores(0, 0);
         g_pTeams[0]->m_nScore = 0;
@@ -875,7 +875,7 @@ void cGame::CheckForGoal()
         m_nLastTeamToScore = nSide;
         g_pTeams[nSide]->m_nScore += 1;
 
-        if (GameInfoManager::Instance()->IsInMode4()
+        if (GameInfoManager::Instance()->IsInChallengeMode()
             && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && nSide == 1)
         {
             ChangeGameState(GS_END_GAME);
@@ -962,7 +962,7 @@ void cGame::CheckForGoal()
 
         DeliverGoalScored(g_pGame, &goalScored.data);
 
-        if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+        if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
         {
             unsigned long soundID;
             if (GetTeamScoreDifference(g_pTeams[nSide]) == 0)
@@ -1434,7 +1434,7 @@ void cGame::Update(float fDeltaT)
         {
             if (m_eGameState == GS_GAMEPLAY)
             {
-                if (GameInfoManager::Instance()->IsInMode4()
+                if (GameInfoManager::Instance()->IsInChallengeMode()
                     && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
                 {
@@ -1525,7 +1525,7 @@ void cGame::Update(float fDeltaT)
             mfYTilt, 0.0f, gMegaStrikeTiltLevelRate, fDeltaT);
         SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if (GameInfoManager::Instance()->IsRule0x4Equal4() || gForceScoreTilt)
+    else if (GameInfoManager::Instance()->IsScoreTiltEnabled() || gForceScoreTilt)
     {
         // The field tilts towards the side that is behind.
         float fMin = -gScoreTiltMaxDifference;
@@ -1541,7 +1541,7 @@ void cGame::Update(float fDeltaT)
     }
     else if ((GameInfoManager::Instance()->GetStadium() == STAD_STORM_SHIP || gForceWeatherTilt)
         && !GetConfigBool(Config::Global(), "no_weather", false)
-        && !GameInfoManager::Instance()->IsRule0x4Equal1())
+        && !GameInfoManager::Instance()->IsSecureStadiumEnabled())
     {
         // Weather tilt: wander towards random targets, ramping up over time.
         mfTiltTime += fDeltaT;
@@ -1655,7 +1655,7 @@ void cGame::Update(float fDeltaT)
         int awayScore = g_pTeams[1]->m_nScore;
         int homeScore = g_pTeams[0]->m_nScore;
         int nWinner = homeScore < awayScore;
-        if ((GameInfoManager::Instance()->IsInMode4()
+        if ((GameInfoManager::Instance()->IsInChallengeMode()
                 && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                 && g_pTeams[1]->m_nScore > 0)
             || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
@@ -1944,7 +1944,7 @@ void cGame::ChangeGameState(eGameState state)
 
         if (state == GS_END_GAME)
         {
-            if ((GameInfoManager::Instance()->IsInMode4()
+            if ((GameInfoManager::Instance()->IsInChallengeMode()
                     && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                     && g_pTeams[1]->m_nScore > 0)
                 || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
@@ -1957,7 +1957,7 @@ void cGame::ChangeGameState(eGameState state)
                 cTeam* pTeam = g_pTeams[0];
                 bool useAlternateMusic = false;
                 if (pTeam->m_nScore - pTeam->GetOtherTeam()->m_nScore > 0
-                    && GetStadiumUnknown0x10(
+                    && StadiumHasCrowdAudio(
                         GameInfoManager::Instance()->GetStadium()))
                 {
                     useAlternateMusic = true;
@@ -2216,7 +2216,7 @@ void FinishMegaStrike(cGame* pGame)
         g_pTeams[side]->m_nScore += pGame->m_uMegastrikeGoals;
         int score;
 
-        if (GameInfoManager::Instance()->IsInMode4()
+        if (GameInfoManager::Instance()->IsInChallengeMode()
             && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && side == 1)
         {
             pGame->ChangeGameState(GS_END_GAME);
@@ -2236,7 +2236,7 @@ void FinishMegaStrike(cGame* pGame)
             pGame->ChangeGameState(GS_POST_GOAL);
         }
 
-        if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+        if (StadiumHasCrowdAudio(GameInfoManager::Instance()->GetStadium()))
         {
             unsigned long soundID = 0xC274C205;
             if (side == 0)
@@ -2634,7 +2634,7 @@ void SetFieldTilt(int relative, float xTilt, float yTilt)
 
         g_pGame->mfXTilt = xTilt;
         g_pGame->mfYTilt = yTilt;
-        if (!GameInfoManager::Instance()->IsRule0x4Equal4())
+        if (!GameInfoManager::Instance()->IsScoreTiltEnabled())
         {
             g_pGame->mfTiltLevelTimer = -0.01f;
         }

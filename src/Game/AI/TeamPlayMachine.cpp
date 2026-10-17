@@ -47,7 +47,7 @@ void TeamPlayMachine::SelectState()
         values.Set(7, FuzzyVariant(gKickoffStateTimeLimit));
         state = TEAM_PLAY_KICKOFF;
     }
-    else if (GameInfoManager::Instance()->IsInMode4()
+    else if (GameInfoManager::Instance()->IsInChallengeMode()
         && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES)
     {
         state = TEAM_PLAY_TUTORIAL_MEGA_STRIKE;
