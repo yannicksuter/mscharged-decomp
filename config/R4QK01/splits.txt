@@ -4053,7 +4053,7 @@ Game/SAnimDecode.cpp:
 	.text       start:0x80313C80 end:0x80313E00
 	.sdata2     start:0x80609EA8 end:0x80609EC0
 
-Game/AI/tu_8030EDB0.cpp:
+Game/AI/FuzzyVariantCollection.cpp:
 	.text       start:0x80313E00 end:0x8031462C
 	.ctors      start:0x804B0DA8 end:0x804B0DAC
 	.bss        start:0x80549388 end:0x805493D8
@@ -4074,7 +4074,7 @@ Game/AI/ScriptActionQueue.cpp:
 	.bss        start:0x805493D8 end:0x80549400
 	.sdata2     start:0x80609ED8 end:0x80609EE8
 
-Game/AI/tu_803115F4.cpp:
+Game/AI/DesireUpdate.cpp:
 	.text       start:0x80316644 end:0x80316784
 	.ctors      start:0x804B0DB0 end:0x804B0DB4
 	.bss        start:0x80549400 end:0x805494A0
