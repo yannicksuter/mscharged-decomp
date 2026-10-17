@@ -1763,9 +1763,11 @@ Game/FE/GameSceneManager.cpp:
 	.sbss       start:0x80604EF0 end:0x80604EF4
 
 Game/FE/fePopupMenu.cpp:
+	.text       start:0x801C6268 end:0x801CC044
 	.rodata     start:0x804B4190 end:0x804B5150
 	.data       start:0x804E1A80 end:0x804E2DC0
 	.sdata      start:0x80600A10 end:0x80600A70
+	.sbss       start:0x80604EF8 end:0x80604F00
 	.sdata2     start:0x80608B58 end:0x80608BE0
 
 Game/FE/FEAudio.cpp:

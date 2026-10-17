@@ -760,7 +760,7 @@ config.libs = [
             Object(Matching, "Game/FE/fePointer.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/fePointerButton.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/fePointerManager.cpp", extra_cflags=["-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/fePopupMenu.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/FE/fePopupMenu.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/FE/fePresentation.cpp", extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feRender.cpp", cflags=cflags_game),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/FE/feResourceManager.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
