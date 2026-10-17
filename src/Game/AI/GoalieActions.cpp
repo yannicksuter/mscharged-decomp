@@ -6912,7 +6912,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     float netX = m_pTeam->m_pNet->m_v3NetLocation.x;
     mpShootToScoreCamera->AlignToSide(netX);
     cCameraManager::PushCamera(mpShootToScoreCamera);
-    lbl_806DC7C8 = 1.5f;
+    g_AspectRatioOverride = 1.5f;
     SetAnimState(5, false, 0.0f, false, false);
     m_DetChar.m_aDesiredFacingDirection = netX > 0.0f ? 0x8000 : 0;
     InitMovementNone(0.0f, 0.0f);

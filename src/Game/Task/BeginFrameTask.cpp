@@ -34,16 +34,11 @@
 #include "Game/Render/Presentation.h"
 #include "Game/Sys/tweak.h"
 
-extern "C" {
-void GXPokeARGB(u16 x, u16 y, u32 color);
-void GXCopyDisp(void* dest, u8 clear);
-void GXDrawDone();
-void VISetNextFrameBuffer(void* fb);
-void VIFlush();
-void VIWaitForRetrace();
-}
+#include <revolution/gx/GXFrameBuf_fwd.h>
+#include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/vi/vi_fwd.h>
 
-float lbl_806DC7C8 = -1.0f;
+float g_AspectRatioOverride = -1.0f;
 static float dimx = 48.0f;
 static float dimy = 28.0f;
 
@@ -63,7 +58,7 @@ bool g_bFrameStatsOnScreen;
 static bool g_bDrawSafeFrame;
 static s32 g_nGridDisplaySpacing;
 static s32 g_eWaitMode;
-static bool lbl_806E0FDC;
+static bool sScreenshotHotkeyEnabled;
 
 static TweakValueBool g_bDisplayFrameRate(
     "g_bDisplayFrameRate", "/Rendering/Statistics", false);
@@ -92,13 +87,13 @@ static inline float RadiansToDegrees(float radians)
 
 static inline float GetAspectRatio()
 {
-    if (lbl_806DC7C8 > 0.1f)
+    if (g_AspectRatioOverride > 0.1f)
     {
         if (IsWidescreen())
         {
-            return 1.666f * lbl_806DC7C8 / 1.25f;
+            return 1.666f * g_AspectRatioOverride / 1.25f;
         }
-        return lbl_806DC7C8;
+        return g_AspectRatioOverride;
     }
     if (IsWidescreen())
     {
@@ -419,7 +414,7 @@ void BeginFrameTask::Run(float dt)
     }
 
     gWarbleEnabled = false;
-    if (lbl_806E0FDC)
+    if (sScreenshotHotkeyEnabled)
     {
         cGlobalPad* pad = g_pPadManager->GetPad(0);
         if (pad != NULL && pad->PlatJustPressed(0x12, true))
