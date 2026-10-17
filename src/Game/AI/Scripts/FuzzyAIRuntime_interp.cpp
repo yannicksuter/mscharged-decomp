@@ -3263,7 +3263,7 @@ extern "C" void FuzzyAISetIteratorParameter(
 extern "C" DesireUpdate* FuzzyAIReturnPlayer(
     FuzzyAIRuntime* runtime, cPlayer* value, float confidence)
 {
-    DesireUpdate* result = new (lbl_805842C8.Allocate())
+    DesireUpdate* result = new (g_DesireUpdatePool.Allocate())
         DesireUpdate(value);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
@@ -3275,7 +3275,7 @@ extern "C" DesireUpdate* FuzzyAIReturnFielder(
     FuzzyFielderIterator* value, float confidence)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
-    DesireUpdate* result = new (lbl_805842C8.Allocate())
+    DesireUpdate* result = new (g_DesireUpdatePool.Allocate())
         DesireUpdate(fielder);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;

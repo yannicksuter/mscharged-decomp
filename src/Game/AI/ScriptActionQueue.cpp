@@ -257,7 +257,7 @@ DesireUpdate* ScriptActionQueue::SelectAction()
         = m_lQueuedActions.m_pStart;
     if (pAction == 0)
     {
-        return &lbl_80584250;
+        return &g_DefaultDesireUpdate;
     }
 
     pSelectedAction = 0;

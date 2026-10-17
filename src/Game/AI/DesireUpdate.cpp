@@ -1,4 +1,4 @@
 #include "Game/AI/DesireUpdate.h"
 
-DesireUpdate lbl_80584250;
-SlotPool<DesireUpdate> lbl_805842C8(16, 16);
+DesireUpdate g_DefaultDesireUpdate;
+SlotPool<DesireUpdate> g_DesireUpdatePool(16, 16);
