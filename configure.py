@@ -805,7 +805,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/GLCompactColourMeshWriter.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/GLFloatTexturedColourMeshWriter.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/GLFourTextureAddMeshWriter.cpp"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/GL/GLInventory.cpp", extra_cflags=["-ipa file", "-inline depth=3", "-sym on"]),
+            Object(Matching, "Game/GL/GLInventory.cpp", extra_cflags=["-ipa file", "-inline depth=3", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/glModelBuilder.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/GLShadowBlendMeshWriter.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/GL/GLSkinMesh.cpp"),

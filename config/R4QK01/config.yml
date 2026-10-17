@@ -19,6 +19,20 @@ add_relocations:
   # The HUD power-up name table is hoisted through r0 and a stack slot.
   - { source: .text:0x801EB924, type: ha, target: POWER_UP_IMAGE_NAMES }
   - { source: .text:0x801EB96C, type: l, target: POWER_UP_IMAGE_NAMES }
+  # GLInventory::~GLInventory hoists release-function and AVL vtable addresses
+  # through r0 and stack slots.
+  - { source: .text:0x802D58E0, type: ha, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
+  - { source: .text:0x802D58EC, type: ha, target: "glReleaseTexture__FP11PlatTexture" }
+  - { source: .text:0x802D590C, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D5910, type: l, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
+  - { source: .text:0x802D592C, type: ha, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D5930, type: l, target: "glReleaseTexture__FP11PlatTexture" }
+  - { source: .text:0x802D594C, type: ha, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D5950, type: l, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D596C, type: ha, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D5970, type: l, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D5990, type: l, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D59B0, type: l, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
 block_relocations:
   # Receive-pass animation tables pack u16 angles 0x8000 and 0xE000.
   - { source: 0x804B14DC }
