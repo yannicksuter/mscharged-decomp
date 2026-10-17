@@ -945,7 +945,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHCupCheater.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHCupFinalRounds.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHCupHub.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHCupKnockout.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/SH/SHCupKnockout.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHCupNews.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHGameplayOptions.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHGameResults.cpp"),
