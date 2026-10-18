@@ -36,7 +36,13 @@ Please see the GameSpy Presence SDK documentation for more information
 #define GPI_NEW_LIST_RETRIEVAL_ON_LOGIN (1 << 3)
 
 // Extended SDK features
-#define GPI_SDKREV 0x3
+#if defined(VERSION_R4QK01)
+#define GPI_SDKREV                                                             \
+  (GPI_NEW_AUTH_NOTIFICATION | GPI_NEW_REVOKE_NOTIFICATION |                   \
+   GPI_NEW_LIST_RETRIEVAL_ON_LOGIN)
+#else
+#define GPI_SDKREV (GPI_NEW_AUTH_NOTIFICATION | GPI_NEW_REVOKE_NOTIFICATION)
+#endif
 
 // New UDP Layer port
 #define GPI_PEER_PORT 6500

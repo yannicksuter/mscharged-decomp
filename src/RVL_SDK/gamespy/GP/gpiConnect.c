@@ -415,8 +415,13 @@ static GPResult gpiSendLogin(GPConnection* connection, GPIConnectData* data) {
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                             "\\firewall\\1");
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\port\\");
+#if defined(VERSION_R4QK01)
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->peerPort);
+#else
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
                        (short)ntohs((unsigned short)iconnection->peerPort));
+#endif
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                           "\\productid\\");
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
@@ -432,6 +437,11 @@ static GPResult gpiSendLogin(GPConnection* connection, GPIConnectData* data) {
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                           "\\sdkrevision\\");
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, GPI_SDKREV);
+#if defined(VERSION_R4QK01)
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\quiet\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->quietModeFlags);
+#endif
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\id\\1");
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
 
@@ -783,11 +793,33 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection* connection,
   // Even if we cache buddy/block info, free it up to get rid of mem
   // leaks, just don't remove the profile until we save the cache.
   //////////////////////////////////////////////////////////////////
+#if defined(VERSION_R4QK01)
+  if (profile->buddyStatus) {
+    profile->buddyOrBlockCache = gsi_true;
+#else
   if (profile->buddyStatus && iconnection->infoCachingBuddyAndBlockOnly == 0) {
+#endif
     freeclear(profile->buddyStatus->statusString);
     freeclear(profile->buddyStatus->locationString);
     freeclear(profile->buddyStatus);
   }
+
+#if defined(VERSION_R4QK01)
+  if (profile->buddyStatusInfo) {
+    profile->buddyOrBlockCache = gsi_true;
+    freeclear(profile->buddyStatusInfo->richStatus);
+    freeclear(profile->buddyStatusInfo->gameType);
+    freeclear(profile->buddyStatusInfo->gameVariant);
+    freeclear(profile->buddyStatusInfo->gameMapName);
+    if (profile->buddyStatusInfo->extendedInfoKeys) {
+      ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
+      profile->buddyStatusInfo->extendedInfoKeys = NULL;
+    }
+    freeclear(profile->buddyStatusInfo);
+  }
+  if (profile->blocked)
+    profile->buddyOrBlockCache = gsi_true;
+#endif
 
   freeclear(profile->authSig);
   freeclear(profile->peerSig);
@@ -798,7 +830,11 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection* connection,
   //    (we only cache buddies/blocked and the user is not a buddy or a block)
   if ((!profile->cache) ||
       (iconnection->infoCachingBuddyAndBlockOnly == GPITrue &&
+#if defined(VERSION_R4QK01)
+       !profile->buddyOrBlockCache)) {
+#else
        profile->buddyStatus == 0)) {
+#endif
     gpiRemoveProfile(connection, profile);
     return GPIFalse;
   }
