@@ -1281,7 +1281,7 @@ config.libs = [
         "cflags": cflags_metrotrk,
         "progress_category": "sdk",
         "objects": [
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MetroTRK/__exception.s"),
+            Object(Matching, "MetroTRK/__exception.s"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MetroTRK/cc_gdev.c", extra_cflags=["-sdata 8"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MetroTRK/CircleBuffer.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MetroTRK/dispatch.c"),

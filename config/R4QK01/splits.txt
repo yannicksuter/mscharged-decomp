@@ -4936,6 +4936,9 @@ MetroTRK/mpc_7xx_603e.c:
 MetroTRK/mslsupp.c:
 	.text       start:0x80380150 end:0x80380790
 
+MetroTRK/__exception.s:
+	.init       start:0x80004054 end:0x80005F88
+
 MetroTRK/dolphin_trk.c:
 	.init       start:0x80005F88 end:0x80005FB4
 	.text       start:0x80380790 end:0x80380AAC
