@@ -45,6 +45,11 @@ extern "C"
     void DWCi_FriendInit(DWCFriendControl* friendcnt, GPConnection* pGpObj,
         const u16* playerName, DWCFriendData* friendList, int friendListLen);
     void DWCi_ShutdownFriend(void);
+#if defined(VERSION_R4QK01)
+    BOOL DWCi_IsUpdatingServers(void);
+    void DWCi_BeginCloseStatsConnection(void);
+    void DWCi_EndCloseStatsConnection(void);
+#endif
 
 #ifdef __cplusplus
 }

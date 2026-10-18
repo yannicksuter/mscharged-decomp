@@ -6289,11 +6289,13 @@ RVL_SDK/dwc/dwc_common.c:
 	.bss        start:0x805FC010 end:0x805FC028
 
 RVL_SDK/dwc/dwc_friend.c:
-	.text       start:0x8044FD00 end:0x80451FE4
+	.text       start:0x8044FD00 end:0x80452290
 	.data       start:0x805251E8 end:0x805257A0
+	.sdata      start:0x806038E8 end:0x806038F1
+	.sbss       start:0x80606500 end:0x80606510
 
 RVL_SDK/dwc/dwc_login.c:
-	.text       start:0x80452290 end:0x80453168
+	.text       start:0x80452290 end:0x80453168 align:16
 	.data       start:0x805257A0 end:0x80525C18
 	.sbss       start:0x80606510 end:0x80606518
 

@@ -81,8 +81,6 @@ void DWCi_GT2ConnectedCallback(GT2Connection, GT2Result, GT2Byte*, int);
 void DWCi_RecvCallback(GT2Connection, GT2Byte*, int, GT2Bool);
 void DWCi_PingCallback(GT2Connection, int);
 void fn_80455E60(GT2Connection, GT2CloseReason, BOOL, u8);
-void fn_80451FF0(void);
-void fn_80452000(void);
 static void DWCi_GT2ReceivedCallback(GT2Connection, GT2Byte*, int, GT2Bool);
 static void DWCi_GT2ClosedCallback(GT2Connection, GT2CloseReason);
 static void DWCi_GT2PingCallback(GT2Connection, int);
@@ -95,7 +93,6 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection,
     unsigned int ip, unsigned short port, int latency, GT2Byte* message, int len);
 GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket,
     unsigned int ip, unsigned short port, GT2Byte* message, int len);
-BOOL fn_80450660(void);
 int fn_8046F650(void);
 
 #define MULTIPLIER -1664117991
@@ -189,9 +186,9 @@ void DWC_ShutdownFriendsMatch(void)
 
     DWCi_FreeNegotiateList();
 
-    fn_80451FF0();
+    DWCi_BeginCloseStatsConnection();
     CloseStatsConnection();
-    fn_80452000();
+    DWCi_EndCloseStatsConnection();
 
     if (stpDwcCnt->gpObj)
     {
@@ -444,7 +441,7 @@ BOOL DWC_UpdateServersAsync(const char* playerName,
     DWCDeleteFriendListCallback deleteCallback, void* deleteParam)
 {
     DWC_Printf(DWC_REPORTFLAG_DEBUG, "!!DWC_UpdateServersAsync() was called!!\n");
-    if (DWCi_IsError() || stpDwcCnt->state < DWC_STATE_ONLINE || fn_80450660())
+    if (DWCi_IsError() || stpDwcCnt->state < DWC_STATE_ONLINE || DWCi_IsUpdatingServers())
     {
         DWC_Printf(DWC_REPORTFLAG_DEBUG, "But ignored.\n");
         return FALSE;

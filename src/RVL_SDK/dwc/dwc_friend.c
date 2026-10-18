@@ -6,6 +6,7 @@
 #include <dwc/dwc_main.h>
 #if defined(VERSION_R4QK01)
 #include <dwc/R4QK01/dwc_match_internal.h>
+#include <dwc/dwc_memfunc.h>
 #endif
 #include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
@@ -21,6 +22,13 @@
 
 static DWCFriendControl* stpFriendCnt = NULL;
 static int stPersState = DWC_PERS_STATE_INIT;
+#if defined(VERSION_R4QK01)
+static BOOL s_bInPersistThink = FALSE;
+static BOOL s_bNeedCloseStatsConnection = FALSE;
+static BOOL s_bInCloseStatsConnection = FALSE;
+static void DWCi_GPGetReverseBuddiesCallback(GPConnection* connection,
+    GPGetReverseBuddiesListResponseArg* arg, void* param);
+#endif
 
 static GPResult DWCi_GPProcess(void);
 static void DWCi_CloseFriendProcess(void);
@@ -400,7 +408,22 @@ BOOL DWC_LoginToStorageServerAsync(DWCStorageLoginCallback callback,
 
 void DWC_LogoutFromStorageServer(void)
 {
-    CloseStatsConnection();
+#if defined(VERSION_R4QK01)
+    if (s_bInPersistThink == TRUE)
+    {
+        s_bNeedCloseStatsConnection = TRUE;
+    }
+    else if (!s_bInCloseStatsConnection)
+#endif
+    {
+#if defined(VERSION_R4QK01)
+        s_bInCloseStatsConnection = TRUE;
+#endif
+        CloseStatsConnection();
+#if defined(VERSION_R4QK01)
+        s_bInCloseStatsConnection = FALSE;
+#endif
+    }
 
     stPersState = DWC_PERS_STATE_INIT;
 
@@ -541,18 +564,48 @@ void DWCi_FriendProcess(void)
 {
     GPResult gpResult;
 
+#if defined(VERSION_R4QK01)
+    if (!stpFriendCnt || DWCi_IsError())
+#else
     if (!stpFriendCnt || !stpFriendCnt->friendList || DWCi_IsError())
+#endif
     {
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    if (!stpFriendCnt->friendList)
+    {
+        if (stpFriendCnt->pGpObj && *stpFriendCnt->pGpObj)
+        {
+            DWCi_GPProcess();
+        }
+        return;
+    }
+#endif
+
     if (DWCi_GetPersCallbackLevel() || IsStatsConnected())
     {
+#if defined(VERSION_R4QK01)
+        s_bInPersistThink = TRUE;
+        s_bNeedCloseStatsConnection = FALSE;
+#endif
         if (!PersistThink())
         {
+#if defined(VERSION_R4QK01)
+            s_bInPersistThink = FALSE;
+#endif
             DWC_Printf(DWC_REPORTFLAG_WARNING,
                 "Connection to the stats server was lost\n");
         }
+#if defined(VERSION_R4QK01)
+        s_bInPersistThink = FALSE;
+        if (s_bNeedCloseStatsConnection == TRUE)
+        {
+            s_bNeedCloseStatsConnection = FALSE;
+            CloseStatsConnection();
+        }
+#endif
     }
 
     if (stpFriendCnt->pGpObj && *stpFriendCnt->pGpObj)
@@ -563,6 +616,13 @@ void DWCi_FriendProcess(void)
         {
             return;
         }
+
+#if defined(VERSION_R4QK01)
+        if (stpFriendCnt->state == DWC_FRIEND_STATE_INIT)
+        {
+            return;
+        }
+#endif
 
         if (stpFriendCnt->friendList
             && stpFriendCnt->buddyUpdateState
@@ -589,10 +649,71 @@ void DWCi_FriendProcess(void)
 
     if (stpFriendCnt->svUpdateComplete >= 2)
     {
+#if defined(VERSION_R4QK01)
+        if (stpFriendCnt->pGpObj && *stpFriendCnt->pGpObj)
+        {
+            int i;
+            int numTargets = 0;
+            int targetIndex;
+
+            for (i = 0; i < stpFriendCnt->friendListLen; i++)
+            {
+                if (DWC_GetFriendDataType(&stpFriendCnt->friendList[i]) == DWC_FRIENDDATA_GS_PROFILE_ID)
+                {
+                    numTargets++;
+                }
+            }
+            if (numTargets == 0)
+            {
+                stpFriendCnt->svUpdateComplete = 0;
+                DWCi_EndUpdateServers();
+                return;
+            }
+            stpFriendCnt->reverseBuddyTargets = DWC_Alloc(
+                DWC_ALLOCTYPE_BASE, numTargets * sizeof(GPProfile));
+            if (!stpFriendCnt->reverseBuddyTargets)
+            {
+                DWC_Printf(DWC_REPORTFLAG_DEBUG, "DWC_Alloc Error\n");
+                DWCi_StopFriendProcess(DWC_ERROR_FATAL,
+                    DWC_ECODE_SEQ_FRIEND + DWC_ECODE_TYPE_ALLOC);
+                return;
+            }
+            for (i = 0, targetIndex = 0; i < stpFriendCnt->friendListLen; i++)
+            {
+                if (DWC_GetFriendDataType(&stpFriendCnt->friendList[i]) == DWC_FRIENDDATA_GS_PROFILE_ID)
+                {
+                    stpFriendCnt->reverseBuddyTargets[targetIndex] = DWC_GetGsProfileId(
+                        DWCi_GetUserData(), &stpFriendCnt->friendList[i]);
+                    targetIndex++;
+                }
+            }
+            gpResult = gpGetReversBuddiesList(stpFriendCnt->pGpObj,
+                stpFriendCnt->reverseBuddyTargets, numTargets, GP_NON_BLOCKING,
+                (GPCallback)DWCi_GPGetReverseBuddiesCallback, NULL);
+            if (DWCi_HandleGPError(gpResult))
+            {
+                return;
+            }
+        }
+        stpFriendCnt->svUpdateComplete = 0;
+#else
         stpFriendCnt->svUpdateComplete = 0;
         DWCi_EndUpdateServers();
+#endif
     }
 }
+
+#if defined(VERSION_R4QK01)
+BOOL DWCi_IsUpdatingServers(void)
+{
+    BOOL updating = FALSE;
+    if (stpFriendCnt && stpFriendCnt->state == DWC_FRIEND_STATE_PERS_LOGIN)
+    {
+        updating = TRUE;
+    }
+    return updating;
+}
+#endif
 
 void DWCi_UpdateServersAsync(const char* authToken,
     const char* partnerChallenge, DWCUpdateServersCallback updateCallback,
@@ -631,9 +752,20 @@ void DWCi_StopFriendProcess(DWCError error, int errorCode)
 
     DWCi_SetError(error, errorCode);
 
+#if defined(VERSION_R4QK01)
+    if (DWCi_IsUpdatingServers())
+#else
     if (stpFriendCnt->state != DWC_FRIEND_STATE_INIT
         && stpFriendCnt->state != DWC_FRIEND_STATE_LOGON)
+#endif
     {
+#if defined(VERSION_R4QK01)
+        if (stpFriendCnt->reverseBuddyTargets)
+        {
+            DWC_Free(DWC_ALLOCTYPE_BASE, stpFriendCnt->reverseBuddyTargets, 0);
+            stpFriendCnt->reverseBuddyTargets = NULL;
+        }
+#endif
         stpFriendCnt->updateCallback(
             error, stpFriendCnt->friendListChanged, stpFriendCnt->updateParam);
     }
@@ -685,13 +817,29 @@ void DWCi_GPRecvBuddyStatusCallback(GPConnection* connection,
     DWC_Printf(DWC_REPORTFLAG_UPDATE_SV,
         "RECV update friend status. p:%d\n", arg->profile);
 
+#if defined(VERSION_R4QK01)
+    friendIdx = DWCi_GetFriendListIndex(arg->profile);
+    if (friendIdx == -1)
+    {
+        DWC_Printf(DWC_REPORTFLAG_UPDATE_SV, " But from already deleted friend.\n");
+        if (gpIsBuddy(connection, arg->profile))
+        {
+            gpDeleteBuddy(connection, arg->profile);
+            DWC_Printf(DWC_REPORTFLAG_UPDATE_SV, " delete friend again.\n");
+        }
+        return;
+    }
+#endif
+
     if (stpFriendCnt->statusCallback)
     {
+#if !defined(VERSION_R4QK01)
         friendIdx = DWCi_GetFriendListIndex(arg->profile);
         if (friendIdx == -1)
         {
             return;
         }
+#endif
 
         gpGetBuddyStatus(connection, arg->index, &status);
 
@@ -1644,6 +1792,28 @@ static void DWCi_PersAuthCallback(int localid, int profileid,
     }
 }
 
+#if defined(VERSION_R4QK01)
+static inline BOOL DWCi_ProcessPersistLoadResult(BOOL success, char* data, int len)
+{
+    static const char failed[] = "Failed to load persistent data.\n";
+    static const char missing[] = "Persitent, Specified key is not exist.\n";
+    static const char loaded[] = "Loaded data from persistent server. -> %s\n";
+
+    if (!success)
+    {
+        DWC_Printf(DWC_REPORTFLAG_ERROR, failed);
+        return FALSE;
+    }
+    if (len == 0)
+    {
+        DWC_Printf(DWC_REPORTFLAG_WARNING, missing);
+        return FALSE;
+    }
+    DWC_Printf(DWC_REPORTFLAG_DEBUG, loaded, data);
+    return TRUE;
+}
+#endif
+
 static void DWCi_PersDataCallback(int localid, int profileid,
     persisttype_t type, int index, int success, time_t modified, char* data,
     int len, void* instance)
@@ -1656,6 +1826,14 @@ static void DWCi_PersDataCallback(int localid, int profileid,
 
     DWCi_SubPersCallbackLevel();
 
+#if defined(VERSION_R4QK01)
+    result = DWCi_ProcessPersistLoadResult(success, data, len);
+    if (stpFriendCnt->loadCallback)
+    {
+        stpFriendCnt->loadCallback(result,
+            DWCi_GetFriendListIndex(profileid), data, len, instance);
+    }
+#else
     if (success)
     {
         if (len == 0)
@@ -1688,6 +1866,7 @@ static void DWCi_PersDataCallback(int localid, int profileid,
                 DWCi_GetFriendListIndex(profileid), data, len, instance);
         }
     }
+#endif
 }
 
 static void DWCi_PersDataSaveCallback(int localid, int profileid,
@@ -1761,3 +1940,80 @@ static u32 DWCi_GetPersCallbackLevel(void)
 {
     return stpFriendCnt->persCallbackLevel;
 }
+
+#if defined(VERSION_R4QK01)
+void DWCi_BeginCloseStatsConnection(void)
+{
+    s_bInCloseStatsConnection = TRUE;
+}
+
+void DWCi_EndCloseStatsConnection(void)
+{
+    s_bInCloseStatsConnection = FALSE;
+}
+
+static void DWCi_GPGetReverseBuddiesCallback(GPConnection* connection,
+    GPGetReverseBuddiesListResponseArg* arg, void* param)
+{
+#pragma unused(connection)
+#pragma unused(param)
+    int i;
+    int j;
+
+    if (!DWCi_IsUpdatingServers())
+    {
+        return;
+    }
+    if (stpFriendCnt->reverseBuddyTargets)
+    {
+        DWC_Free(DWC_ALLOCTYPE_BASE, stpFriendCnt->reverseBuddyTargets, 0);
+        stpFriendCnt->reverseBuddyTargets = NULL;
+    }
+    if (arg->result != GP_NO_ERROR)
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG,
+            " ERROR: GetReverseBuddies Req. why??? : %d\n", arg->result);
+        DWCi_EndUpdateServers();
+        return;
+    }
+    for (i = 0; i < arg->numOfUniqueMatchs; i++)
+    {
+        DWC_Printf(DWC_REPORTFLAG_DEBUG,
+            "GetReverseBuddies   profileID = %u \n", arg->matches[i].profile);
+    }
+    for (i = 0; i < stpFriendCnt->friendListLen; i++)
+    {
+        if (DWC_GetFriendDataType(&stpFriendCnt->friendList[i]) == DWC_FRIENDDATA_GS_PROFILE_ID)
+        {
+            for (j = 0; j < arg->numOfUniqueMatchs; j++)
+            {
+                if (arg->matches[j].profile == DWC_GetGsProfileId(
+                        DWCi_GetUserData(), &stpFriendCnt->friendList[i]))
+                {
+                    if (!DWCi_IsFriendAuthorized(&stpFriendCnt->friendList[i]))
+                    {
+                        stpFriendCnt->friendListChanged = TRUE;
+                        DWCi_SetFriendAuthorized(&stpFriendCnt->friendList[i], TRUE);
+                        if (DWC_IsBuddyFriendData(&stpFriendCnt->friendList[i]))
+                        {
+                            DWCi_SetMutualBuddyFlag(&stpFriendCnt->friendList[i], TRUE);
+                        }
+                    }
+                    break;
+                }
+            }
+            if (j == arg->numOfUniqueMatchs
+                && DWCi_IsFriendAuthorized(&stpFriendCnt->friendList[i]) == TRUE)
+            {
+                stpFriendCnt->friendListChanged = TRUE;
+                DWCi_SetFriendAuthorized(&stpFriendCnt->friendList[i], FALSE);
+            }
+            if (DWC_IsBuddyFriendData(&stpFriendCnt->friendList[i]))
+            {
+                DWCi_SetMutualBuddyFlag(&stpFriendCnt->friendList[i], TRUE);
+            }
+        }
+    }
+    DWCi_EndUpdateServers();
+}
+#endif
