@@ -88,14 +88,22 @@ SOCKET accept(SOCKET sock, SOCKADDR* addr, int* len)
 }
 
 int recv(SOCKET sock, char* buf, int len, int flags) {
+#if defined(VERSION_R4QK01)
+  int rcode = SORecv(sock, buf, len, 4);
+#else
   int rcode = SORecv(sock, buf, len, flags);
+#endif
   return CheckRcode(rcode, REVOlUTION_SOCKET_ERROR);
 }
 int recvfrom(SOCKET sock, char* buf, int len, int flags, SOCKADDR* addr,
              int* fromlen) {
   int rcode;
   addr->len = (u8)*fromlen;
+#if defined(VERSION_R4QK01)
+  rcode = SORecvFrom(sock, buf, len, 4, addr);
+#else
   rcode = SORecvFrom(sock, buf, len, flags, addr);
+#endif
   *fromlen = addr->len;
   return CheckRcode(rcode, REVOlUTION_SOCKET_ERROR);
 }

@@ -1504,7 +1504,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/darray.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/hashtable.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/md5c.c", cflags=cflags_rvl_spy),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/nonport.c", cflags=cflags_rvl_spy, extra_cflags=["-D_REVOLUTION"]),
+            Object(Matching, "RVL_SDK/gamespy/nonport.c", cflags=cflags_rvl_spy, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-D_REVOLUTION"] + (["-func_align 16"] if config.version == "R4QK01" else [])),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsAvailable.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsCrypt.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsLargeInt.c", cflags=cflags_rvl_spy),
