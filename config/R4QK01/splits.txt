@@ -6483,9 +6483,10 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c:
 	.sdata      start:0x806041F0 end:0x806041F8
 
 RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
-	.text       start:0x804A2080 end:0x804A5B24
+	.text       start:0x804A2080 end:0x804A5B24 align:16
 	.data       start:0x8052D478 end:0x8052D4A4
 	.sdata      start:0x806041F8 end:0x80604208
+	.sbss       start:0x80606680 end:0x80606688
 	.sdata2     start:0x8060AD90 end:0x8060AD9C
 
 RVL_SDK/rfl/RFL_System.c:

@@ -1552,7 +1552,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/serverbrowsing/sb_server.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c", cflags=cflags_rvl_spy),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c", cflags=cflags_rvl_spy, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
 
             # RVL_SDK/gx
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXAttr.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
