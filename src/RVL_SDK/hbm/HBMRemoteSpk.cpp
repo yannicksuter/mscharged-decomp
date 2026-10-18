@@ -81,10 +81,17 @@ void RemoteSpk::UpdateSpeaker(OSAlarm*, OSContext*) {
 }
 
 void RemoteSpk::ClearPcm(void) {
+#if defined(VERSION_R4QK01)
+    for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++) {
+        info[i].in_pcm = NULL;
+        info[i].seId = -1;
+    }
+#else
     ChanInfo* info = GetInstance()->info;
 
     info->seId = -1;
     info->in_pcm = NULL;
+#endif
 }
 
 RemoteSpk::RemoteSpk(void* spkSeBuf) {
@@ -125,9 +132,25 @@ void RemoteSpk::Start(void) {
 
     OSCreateAlarm(&speakerAlarm);
     OSSetPeriodicAlarm(&speakerAlarm, OSGetTime(), OSNanosecondsToTicks(6666667), &UpdateSpeaker);
+#if defined(VERSION_R4QK01)
+    for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++) {
+        OSCreateAlarm(&info[i].alarm);
+        info[i].in_pcm = NULL;
+        info[i].seId = -1;
+        info[i].first = true;
+        info[i].playReady = true;
+    }
+#endif
 }
 
-void RemoteSpk::Stop(void) { OSCancelAlarm(&speakerAlarm); }
+void RemoteSpk::Stop(void) {
+    OSCancelAlarm(&speakerAlarm);
+#if defined(VERSION_R4QK01)
+    for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++) {
+        OSCancelAlarm(&info[i].alarm);
+    }
+#endif
+}
 
 void RemoteSpk::DelaySpeakerOnCallback(OSAlarm* alarm, OSContext*) {
     WPADChannel chan = OSGetAlarmUserDataAny(WPADChannel, alarm);
@@ -145,6 +168,12 @@ void RemoteSpk::SpeakerOnCallback(WPADChannel chan, WPADResult result) {
             pRmtSpk->info[chan].first = true;
             result = WPADControlSpeaker(chan, WPAD_SPEAKER_PLAY, &SpeakerPlayCallback);
             break;
+
+#if defined(VERSION_R4QK01)
+        case WPAD_ERR_TRANSFER:
+            pRmtSpk->info[chan].playReady = false;
+            break;
+#endif
 
         case WPAD_ECOMM:
             OSSetAlarmUserDataAny(&pRmtSpk->info[chan].alarm, chan);
@@ -170,6 +199,12 @@ void RemoteSpk::SpeakerPlayCallback(WPADChannel chan, WPADResult result) {
             pRmtSpk->info[chan].playReady = true;
             break;
 
+#if defined(VERSION_R4QK01)
+        case WPAD_ERR_TRANSFER:
+            pRmtSpk->info[chan].playReady = false;
+            break;
+#endif
+
         case WPAD_ENODEV:
             pRmtSpk->info[chan].playReady = false;
             break;
@@ -190,7 +225,13 @@ void RemoteSpk::Connect(WPADChannel chan) {
     int result = WPADControlSpeaker(chan, WPAD_SPEAKER_ON, &SpeakerOnCallback);
 
     byte4_t* p = reinterpret_cast<byte4_t*>(&info[chan].wencinfo);
+#if defined(VERSION_R4QK01)
+    for (int i = sizeof(WENCInfo) / sizeof(*p); i > 0; i--, p++) {
+        *p = 0;
+    }
+#else
     memset(p, 0, sizeof(WENCInfo));
+#endif
 
     info[chan].first = true;
     info[chan].playReady = false;
