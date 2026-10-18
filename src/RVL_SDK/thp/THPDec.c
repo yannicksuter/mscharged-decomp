@@ -1,6 +1,10 @@
 #include <revolution/thp.h>
 
+#if defined(VERSION_R4QK01)
+const char* __THPVersion = "<< RVL_SDK - THP \trelease build: Feb 27 2009 09:52:24 (0x4302_145) >>";
+#else
 const char* __THPVersion = "<< RVL_SDK - THP \trelease build: Nov 30 2006 03:09:42 (0x4199_60831) >>";
+#endif
 
 static THPHuffmanTab* Ydchuff __attribute__((aligned(32)));
 static THPHuffmanTab* Udchuff __attribute__((aligned(32)));

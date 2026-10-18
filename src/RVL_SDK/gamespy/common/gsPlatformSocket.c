@@ -137,6 +137,11 @@ HOSTENT* getlocalhost(void) {
   SOGetInterfaceOpt(NULL, SO_SOL_CONFIG, SO_CONFIG_IP_ADDR_NUMBER, &aNumOfIps,
                     &aSizeNumOfIps);
 
+#if defined(VERSION_R4QK01)
+  if (aNumOfIps < 1 || aNumOfIps > MAX_IPS)
+    return NULL;
+#endif
+
   memset(aAddrs, 0xBE, aNumOfIps * sizeof(IPAddrEntry));
 
   aSizeAddrList = (int)(aNumOfIps * sizeof(IPAddrEntry));

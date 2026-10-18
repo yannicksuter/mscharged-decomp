@@ -76,7 +76,9 @@ typedef struct GPIProfile {
   int requestCount;
   char* peerSig;
 #if defined(VERSION_R4QK01)
-  unsigned char _20[0xC];
+  gsi_bool blocked;
+  int blockIndex;
+  gsi_bool buddyOrBlockCache;
 #endif
 } GPIProfile;
 
@@ -86,6 +88,9 @@ typedef struct {
   HashTable profileTable;
   int num;
   int numBuddies;
+#if defined(VERSION_R4QK01)
+  int numBlocked;
+#endif
 } GPIProfileList;
 
 // FUNCTIONS

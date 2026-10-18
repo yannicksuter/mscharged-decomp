@@ -398,6 +398,24 @@ GPResult gpiOthersBuddy(GPConnection* connection, GPEnum blocking,
   return GP_NO_ERROR;
 }
 
+#if defined(VERSION_R4QK01)
+GPResult gpiOthersBuddyList(GPConnection* connection, int* profiles,
+                            int numOfProfiles, GPEnum blocking,
+                            GPCallback callback, void* param) {
+  GPISearchData* data;
+
+  CHECK_RESULT(
+      gpiInitSearchData(connection, &data, GPI_SEARCH_OTHERS_BUDDY_LIST));
+
+  data->revBuddyProfileIds = profiles;
+  data->numOfRevBuddyProfiles = numOfProfiles;
+
+  CHECK_RESULT(gpiStartSearch(connection, data, blocking, callback, param));
+
+  return GP_NO_ERROR;
+}
+
+#endif
 GPResult gpiSuggestUniqueNick(GPConnection* connection,
                               const char desirednick[GP_NICK_LEN],
                               GPEnum blocking, GPCallback callback,
@@ -440,6 +458,9 @@ static GPResult gpiProcessSearch(GPConnection* connection,
   int rcode;
   int pid;
   GPProfileSearchMatch* match;
+#if defined(VERSION_R4QK01)
+  GPUniqueMatch* uniqueNickMatch;
+#endif
 
   // password encryption stuff
   char passwordenc[GP_PASSWORDENC_LEN];
@@ -545,6 +566,37 @@ static GPResult gpiProcessSearch(GPConnection* connection,
                                     "\\skip\\");
             gpiAppendIntToBuffer(connection, &data->outputBuffer, data->skip);
           }
+#if defined(VERSION_R4QK01)
+        } else if (data->type == GPI_SEARCH_PROFILE_UNIQUENICK) {
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\searchunique\\");
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\sesskey\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               iconnection->sessKey);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\profileid\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               iconnection->profileid);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\uniquenick\\");
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  data->uniquenick);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\namespaces\\");
+          if (data->numNamespaces > 0) {
+            int i;
+            for (i = 0; i < data->numNamespaces; i++) {
+              if (i > 0)
+                gpiAppendCharToBuffer(connection, &data->outputBuffer, ',');
+              gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                                   data->namespaceIDs[i]);
+            }
+          } else {
+            gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                                 iconnection->namespaceID);
+          }
+#endif
         } else if (data->type == GPI_SEARCH_IS_VALID) {
           gpiAppendStringToBuffer(connection, &data->outputBuffer, "\\valid\\");
           gpiAppendStringToBuffer(connection, &data->outputBuffer, "\\email\\");
@@ -649,6 +701,40 @@ static GPResult gpiProcessSearch(GPConnection* connection,
                                   "\\namespaceid\\");
           gpiAppendIntToBuffer(connection, &data->outputBuffer,
                                iconnection->namespaceID);
+#if defined(VERSION_R4QK01)
+        } else if (data->type == GPI_SEARCH_OTHERS_BUDDY_LIST) {
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\otherslist\\");
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\sesskey\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               iconnection->sessKey);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\profileid\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               iconnection->profileid);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\numopids\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               data->numOfRevBuddyProfiles);
+          gpiAppendStringToBuffer(connection, &data->outputBuffer, "\\opids\\");
+          if (data->revBuddyProfileIds) {
+            int i;
+
+            gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                                 data->revBuddyProfileIds[0]);
+
+            for (i = 1; i < data->numOfRevBuddyProfiles; i++) {
+              gpiAppendStringToBuffer(connection, &data->outputBuffer, "|");
+              gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                                   data->revBuddyProfileIds[i]);
+            }
+          }
+          gpiAppendStringToBuffer(connection, &data->outputBuffer,
+                                  "\\namespaceid\\");
+          gpiAppendIntToBuffer(connection, &data->outputBuffer,
+                               iconnection->namespaceID);
+#endif
         } else if (data->type == GPI_SEARCH_SUGGEST_UNIQUE) {
           gpiAppendStringToBuffer(connection, &data->outputBuffer,
                                   "\\uniquesearch\\");
@@ -715,7 +801,12 @@ static GPResult gpiProcessSearch(GPConnection* connection,
 
         // Process it based on type.
         ////////////////////////////
+#if defined(VERSION_R4QK01)
+        if ((data->type == GPI_SEARCH_PROFILE) ||
+            (data->type == GPI_SEARCH_PROFILE_UNIQUENICK)) {
+#else
         if (data->type == GPI_SEARCH_PROFILE) {
+#endif
           GPProfileSearchResponseArg arg;
           // Start setting up the arg.
           ////////////////////////////
@@ -1191,6 +1282,94 @@ static GPResult gpiProcessSearch(GPConnection* connection,
             CHECK_RESULT(gpiAddCallback(connection, callback, arg, operation,
                                         GPI_ADD_REVERSE_BUDDIES));
           }
+#if defined(VERSION_R4QK01)
+        } else if (data->type == GPI_SEARCH_OTHERS_BUDDY_LIST) {
+          callback = operation->callback;
+          if (callback.callback != NULL) {
+            GPGetReverseBuddiesListResponseArg* arg;
+
+            // Setup the arg.
+            /////////////////
+            arg = (GPGetReverseBuddiesListResponseArg*)gsimalloc(
+                sizeof(GPGetReverseBuddiesListResponseArg));
+            if (arg == NULL)
+              Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+            arg->result = GP_NO_ERROR;
+            arg->numOfUniqueMatchs = 0;
+            arg->matches = NULL;
+
+            CHECK_RESULT(gpiReadKeyAndValue(
+                connection, data->inputBuffer.buffer, &index, key, value));
+            if (strcmp(key, "otherslist") != 0)
+              CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                                 "Error reading from the search server.");
+
+            // Get the profiles.
+            /////////////////
+            done = GPIFalse;
+            do {
+              // Read the next key and value.
+              ///////////////////////////////
+              CHECK_RESULT(gpiReadKeyAndValue(
+                  connection, data->inputBuffer.buffer, &index, key, value));
+
+              // Is the list done?
+              ////////////////////
+              if (strcmp(key, "oldone") == 0) {
+                // Done.
+                ////////
+                done = GPITrue;
+              } else if (strcmp(key, "o") == 0) {
+                // Add it.
+                //////////
+                tempPtr =
+                    gsirealloc(arg->matches, sizeof(GPUniqueMatch) *
+                                                 (arg->numOfUniqueMatchs + 1));
+                if (tempPtr == NULL)
+                  Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+                arg->matches = (GPUniqueMatch*)tempPtr;
+                uniqueNickMatch = &arg->matches[arg->numOfUniqueMatchs];
+                memset(uniqueNickMatch, 0, sizeof(GPUniqueMatch));
+                arg->numOfUniqueMatchs++;
+
+                // Get the profile id.
+                //////////////////////
+                uniqueNickMatch->profile = atoi(value);
+
+                // Read key/value pairs.
+                ////////////////////////
+                doneParsingMatch = GPIFalse;
+                do {
+                  // Read the next key/value.
+                  ///////////////////////////
+                  oldIndex = index;
+                  CHECK_RESULT(gpiReadKeyAndValue(connection,
+                                                  data->inputBuffer.buffer,
+                                                  &index, key, value));
+                  // Set the field based on the key.
+                  //////////////////////////////////
+                  if (strcmp(key, "uniquenick") == 0)
+                    strzcpy(uniqueNickMatch->uniqueNick, value,
+                            GP_UNIQUENICK_LEN);
+                  else if ((strcmp(key, "o") == 0) ||
+                           (strcmp(key, "oldone") == 0)) {
+                    doneParsingMatch = GPITrue;
+                    index = oldIndex;
+                  }
+                } while (!doneParsingMatch);
+              } else {
+                CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                                   "Error reading from the search server.");
+              }
+            } while (!done);
+
+            // Do it.
+            /////////
+            CHECK_RESULT(gpiAddCallback(connection, callback, arg, operation,
+                                        GPI_ADD_REVERSE_BUDDIES_LIST));
+          }
+
+#endif
         } else if (data->type == GPI_SEARCH_SUGGEST_UNIQUE) {
           callback = operation->callback;
           if (callback.callback != NULL) {

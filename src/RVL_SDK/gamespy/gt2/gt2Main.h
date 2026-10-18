@@ -51,7 +51,11 @@ devsupport@gamespy.com
 // buffer size only needs to be slighty larger than the largest message that
 // will be sent ("slighty larger" due to overhead with reliable messages, and
 // unreliable messages starting with the magic string).
+#if defined(VERSION_R4QK01)
+#define GTI2_STACK_RECV_BUFFER_SIZE 4096
+#else
 #define GTI2_STACK_RECV_BUFFER_SIZE 65535
+#endif
 
 // a server will disconnect a client that doesn't not successfully connect
 // within this time (in milliseconds). if the connectAttemptCallback has been

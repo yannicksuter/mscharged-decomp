@@ -53,10 +53,46 @@ static GPResult gpiStartConnect(GPConnection* connection,
                                 GPIOperation* operation) {
   struct sockaddr_in address;
   int rcode;
+#if !defined(VERSION_R4QK01)
   int len;
+#endif
   GPIConnection* iconnection = (GPIConnection*)*connection;
   struct hostent* host;
 
+#if defined(VERSION_R4QK01)
+  GSUdpErrorCode anError;
+  strncpy(iconnection->mHeader, GPI_UDP_HEADER, GS_UDP_MSG_HEADER_LEN);
+
+  if (!gsUdpEngineIsInitialized()) {
+    unsigned short peerPort = GPI_PEER_PORT;
+    anError = gsUdpEngineInitialize(peerPort, 0, 0, NULL, NULL, NULL, NULL,
+                                   NULL, NULL, NULL, NULL);
+    if (anError != GS_UDP_NO_ERROR) {
+      while (anError != GS_UDP_NO_ERROR && peerPort < GPI_PEER_PORT + 100) {
+        anError = gsUdpEngineInitialize(++peerPort, 0, 0, NULL, NULL, NULL,
+                                       NULL, NULL, NULL, NULL, NULL);
+      }
+      if (anError != GS_UDP_NO_ERROR) {
+        CallbackFatalError(connection, GP_NETWORK_ERROR, GP_UDP_LAYER,
+                           "There was error starting the UDP layer.");
+      }
+    }
+    if (!iconnection->firewall)
+      iconnection->peerPort = peerPort;
+  } else {
+    iconnection->peerPort = gsUdpEngineGetLocalPort();
+  }
+  anError = gsUdpEngineAddMsgHandler(
+      iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback,
+      gpiPeerLeftCallback, gpiPeerPingReplyCallback, gpiPeerMessageCallback,
+      connection);
+  if (anError != GS_UDP_NO_ERROR) {
+    CallbackFatalError(connection, GP_NETWORK_ERROR, GP_UDP_LAYER,
+                       "There was an error starting the UDP Layer.");
+  }
+  if (iconnection->firewall)
+    iconnection->peerPort = 0;
+#else
   if (!iconnection->firewall) {
     // Create the peer listening socket.
     ////////////////////////////////////
@@ -104,6 +140,7 @@ static GPResult gpiStartConnect(GPConnection* connection,
     iconnection->peerSocket = INVALID_SOCKET;
     iconnection->peerPort = 0;
   }
+#endif
 
   // Create the cm socket.
   ////////////////////////
@@ -378,8 +415,13 @@ static GPResult gpiSendLogin(GPConnection* connection, GPIConnectData* data) {
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                             "\\firewall\\1");
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\port\\");
+#if defined(VERSION_R4QK01)
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->peerPort);
+#else
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
                        (short)ntohs((unsigned short)iconnection->peerPort));
+#endif
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                           "\\productid\\");
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
@@ -395,6 +437,11 @@ static GPResult gpiSendLogin(GPConnection* connection, GPIConnectData* data) {
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
                           "\\sdkrevision\\");
   gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, GPI_SDKREV);
+#if defined(VERSION_R4QK01)
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\quiet\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->quietModeFlags);
+#endif
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\id\\1");
   gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
 
@@ -746,11 +793,33 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection* connection,
   // Even if we cache buddy/block info, free it up to get rid of mem
   // leaks, just don't remove the profile until we save the cache.
   //////////////////////////////////////////////////////////////////
+#if defined(VERSION_R4QK01)
+  if (profile->buddyStatus) {
+    profile->buddyOrBlockCache = gsi_true;
+#else
   if (profile->buddyStatus && iconnection->infoCachingBuddyAndBlockOnly == 0) {
+#endif
     freeclear(profile->buddyStatus->statusString);
     freeclear(profile->buddyStatus->locationString);
     freeclear(profile->buddyStatus);
   }
+
+#if defined(VERSION_R4QK01)
+  if (profile->buddyStatusInfo) {
+    profile->buddyOrBlockCache = gsi_true;
+    freeclear(profile->buddyStatusInfo->richStatus);
+    freeclear(profile->buddyStatusInfo->gameType);
+    freeclear(profile->buddyStatusInfo->gameVariant);
+    freeclear(profile->buddyStatusInfo->gameMapName);
+    if (profile->buddyStatusInfo->extendedInfoKeys) {
+      ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
+      profile->buddyStatusInfo->extendedInfoKeys = NULL;
+    }
+    freeclear(profile->buddyStatusInfo);
+  }
+  if (profile->blocked)
+    profile->buddyOrBlockCache = gsi_true;
+#endif
 
   freeclear(profile->authSig);
   freeclear(profile->peerSig);
@@ -761,7 +830,11 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection* connection,
   //    (we only cache buddies/blocked and the user is not a buddy or a block)
   if ((!profile->cache) ||
       (iconnection->infoCachingBuddyAndBlockOnly == GPITrue &&
+#if defined(VERSION_R4QK01)
+       !profile->buddyOrBlockCache)) {
+#else
        profile->buddyStatus == 0)) {
+#endif
     gpiRemoveProfile(connection, profile);
     return GPIFalse;
   }
@@ -812,11 +885,19 @@ void gpiDisconnect(GPConnection* connection, GPIBool tellServer) {
       iconnection->cmSocket = INVALID_SOCKET;
     }
 
+#if defined(VERSION_R4QK01)
+    if (gsUdpEngineIsInitialized()) {
+      gsUdpEngineRemoveMsgHandler(iconnection->mHeader);
+      if (gsUdpEngineNoMoreMsgHandlers() && gsUdpEngineNoApp())
+        gsUdpEngineShutdown();
+    }
+#else
     if (iconnection->peerSocket != INVALID_SOCKET) {
       shutdown(iconnection->peerSocket, 2);
       closesocket(iconnection->peerSocket);
       iconnection->peerSocket = INVALID_SOCKET;
     }
+#endif
 
     // We're disconnected.
     //////////////////////

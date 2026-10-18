@@ -39,7 +39,11 @@ extern "C"
 #define DWC_MATCH_COMMAND_NEW_PID_AID  0x07
 #define DWC_MATCH_COMMAND_LINK_CLS_REQ 0x08
 #define DWC_MATCH_COMMAND_LINK_CLS_SUC 0x09
+#if defined(VERSION_R4QK01)
+#define DWC_MATCH_COMMAND_LINK_CLS_REP 0x0A
+#else
 #define DWC_MATCH_COMMAND_CLOSE_LINK   0x0A
+#endif
 #define DWC_MATCH_COMMAND_RESV_PRIOR   0x0B
 #define DWC_MATCH_COMMAND_CANCEL       0x0C
 #define DWC_MATCH_COMMAND_CANCEL_SYN   0x0D
@@ -52,6 +56,15 @@ extern "C"
 #define DWC_MATCH_COMMAND_FRIEND_ACCEPT 0x20
 #define DWC_MATCH_COMMAND_CL_WAIT_POLL  0x40
 #define DWC_MATCH_COMMAND_SV_KA_TO_CL   0x41
+#if defined(VERSION_R4QK01)
+#define DWC_MATCH_COMMAND_SVDOWN_QUERY           0x52
+#define DWC_MATCH_COMMAND_SVDOWN_ACK             0x53
+#define DWC_MATCH_COMMAND_SVDOWN_NAK             0x54
+#define DWC_MATCH_COMMAND_SVDOWN_KEEP            0x55
+#define DWC_MATCH_COMMAND_RETRY_SB_SEARCH        0x70
+#define DWC_MATCH_COMMAND_SUSPEND_MATCH          0x82
+#define DWC_MATCH_COMMAND_SERVER_POLL            0x83
+#endif
 #define DWC_MATCH_COMMAND_DUMMY         0xFF
 
 #define DWC_MATCH_RESV_DENY_REASON_SV_FULL 0x10
@@ -237,7 +250,12 @@ extern "C"
     } DWCMatchOptSCConnectBlock;
 
 
+#if defined(VERSION_R4QK01)
+    BOOL DWC_RegisterMatchStatus(void);
+    BOOL DWC_RequestSuspendMatchAsync(BOOL suspend, DWCSuspendCallback callback, void* param);
+#else
     BOOL DWC_RegisterMatchingStatus(void);
+#endif
     u8 DWC_AddMatchKeyString(u8 keyID, const char* keyString,
         const char* valueSrc);
     const char* DWC_GetMatchStringValue(

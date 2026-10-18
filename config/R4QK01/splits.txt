@@ -722,6 +722,7 @@ Game/DB/SaveLoad.cpp:
 	.ctors      start:0x804B08D4 end:0x804B08D8
 	.data       start:0x804D1888 end:0x804D19B8
 	.bss        start:0x805334C0 end:0x805334D0
+	.sdata      start:0x805FFE50 end:0x805FFE80
 	.sbss       start:0x80604620 end:0x80604650
 	.sdata2     start:0x80607C30 end:0x80607C40
 
@@ -859,6 +860,8 @@ Game/Task/ResetTask.cpp:
 	.ctors      start:0x804B0900 end:0x804B0904
 	.data       start:0x804D3F98 end:0x804D3FAC
 	.bss        start:0x80533708 end:0x80533730
+	.sdata      start:0x805FFFB8 end:0x805FFFC0
+	.sbss       start:0x80604730 end:0x80604748
 	.sdata2     start:0x80607D40 end:0x80607D58
 
 Game/main.cpp:
@@ -1969,6 +1972,7 @@ Game/FE/feMusic.cpp:
 	.sbss       start:0x80604F30 end:0x80604F40
 
 Game/SH/SHNetworkStart.cpp:
+	.text       start:0x801FFB80 end:0x80201ED4
 	.data       start:0x804E5910 end:0x804E5B68
 	.sdata      start:0x80601210 end:0x80601258
 	.sbss       start:0x80604F40 end:0x80604F48
@@ -1999,6 +2003,7 @@ Game/Font/FontLoading.cpp:
 	.sdata2     start:0x80608E80 end:0x80608E88
 
 Game/SH/SHCupHub.cpp:
+	.text       start:0x80203E1C end:0x802073FC
 	.data       start:0x804E5E80 end:0x804E6020
 	.sdata      start:0x806012A0 end:0x80601308
 	.sdata2     start:0x80608E88 end:0x80608E98
@@ -2328,8 +2333,9 @@ Game/SH/SHStrikerTimesBase.cpp:
 	.sdata2     start:0x80609248 end:0x80609258
 
 Game/SH/SHOnlineFriendsChooseSides.cpp:
-	.text       start:0x8026FC40 end:0x80273D8C
+	.text       start:0x8026FC40 end:0x80273E80
 	.data       start:0x804EB6C8 end:0x804EB868
+	.sdata      start:0x806024C8 end:0x80602528
 	.sdata2     start:0x80609258 end:0x80609268
 
 Game/MiiManager.cpp:
@@ -4694,6 +4700,7 @@ NL/gc/gcSwizzler.cpp:
 NL/gl/glPlat.cpp:
 	.text       start:0x8036E3E0 end:0x8036EDFC
 	.ctors      start:0x804B0E48 end:0x804B0E4C
+	.data       start:0x804FFD10 end:0x804FFD80
 	.bss        start:0x8054F8C8 end:0x8054F918
 	.sdata      start:0x806031F0 end:0x80603208
 	.sbss       start:0x80605998 end:0x806059B8
@@ -5669,6 +5676,7 @@ RVL_SDK/sp/sp.c:
 RVL_SDK/thp/THPDec.c:
 	.text       start:0x803CB890 end:0x803CED1C
 	.rodata     start:0x804B9520 end:0x804B95B0
+	.data       start:0x80515CF0 end:0x80515D38
 	.bss        start:0x8058B6C0 end:0x8058B80C
 	.sdata      start:0x80603538 end:0x8060353C
 	.sbss       start:0x80606100 end:0x80606224 align:32
@@ -6299,8 +6307,9 @@ RVL_SDK/gamespy/hashtable.c:
 	.text       start:0x80479C30 end:0x8047A0FC
 
 RVL_SDK/gamespy/nonport.c:
-	.text       start:0x8047B040 end:0x8047CAC0
+	.text       start:0x8047B040 end:0x8047CAC0 align:16
 	.data       start:0x8052A760 end:0x8052A770
+	.bss        start:0x805FCDF8 end:0x805FCF30
 	.sdata      start:0x80603B80 end:0x80603B90
 	.sbss       start:0x80606588 end:0x80606598
 	.sdata2     start:0x8060AD58 end:0x8060AD64
@@ -6310,8 +6319,12 @@ RVL_SDK/gamespy/common/gsAvailable.c:
 	.sdata      start:0x80603B90 end:0x80603B94
 	.sbss       start:0x80606598 end:0x8060659C
 
+RVL_SDK/gamespy/common/gsUdpEngine.c:
+	.text       start:0x8047CE20 end:0x8047E070 align:16
+	.bss        start:0x805FD008 end:0x805FD060
+
 RVL_SDK/gamespy/common/gsXML.c:
-	.text       start:0x8047E070 end:0x8047E088
+	.text       start:0x8047E070 end:0x8047E088 align:16
 
 RVL_SDK/gamespy/GP/gp.c:
 	.text       start:0x8047E090 end:0x8047EF2C
@@ -6331,29 +6344,33 @@ RVL_SDK/gamespy/GP/gpiBuddy.c:
 RVL_SDK/gamespy/GP/gpiBuffer.c:
 	.text       start:0x80481A10 end:0x80482490
 	.data       start:0x8052ABB0 end:0x8052AC18
+	.sdata      start:0x80603CA0 end:0x80603CB8
 
 RVL_SDK/gamespy/GP/gpiCallback.c:
 	.text       start:0x80482490 end:0x804829D0
 	.data       start:0x8052AC18 end:0x8052AC68
 
 RVL_SDK/gamespy/GP/gpiConnect.c:
+	.text       start:0x804829D0 end:0x80484030 align:16
 	.data       start:0x8052AC68 end:0x8052B010
 	.sdata      start:0x80603CB8 end:0x80603D50
 
 RVL_SDK/gamespy/GP/gpiInfo.c:
-	.text       start:0x80484030 end:0x804864F4
+	.text       start:0x80484030 end:0x80486500
 	.data       start:0x8052B010 end:0x8052B368
-	.sdata      start:0x80603D50 end:0x80603E10
+	.sdata      start:0x80603D50 end:0x80603E08
 	.sdata2     start:0x8060AD68 end:0x8060AD6C
-
-RVL_SDK/gamespy/GP/gpiPeer.c:
-	.sdata      start:0x80603E10 end:0x80603E70
 
 RVL_SDK/gamespy/GP/gpiOperation.c:
 	.data       start:0x8052B368 end:0x8052B3C0
 
+RVL_SDK/gamespy/GP/gpiPeer.c:
+	.text       start:0x804872D0 end:0x80488A00
+	.data       start:0x8052B3C0 end:0x8052B490
+	.sdata      start:0x80603E10 end:0x80603E70
+
 RVL_SDK/gamespy/GP/gpiProfile.c:
-	.text       start:0x80488A00 end:0x804893C8
+	.text       start:0x80488A00 end:0x804893C8 align:16
 	.data       start:0x8052B490 end:0x8052B678
 	.sdata      start:0x80603E70 end:0x80603E98
 
@@ -6393,7 +6410,8 @@ RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x8048DAF0 end:0x8048DFA8
 
 RVL_SDK/gamespy/gt2/gt2Message.c:
-	.text       start:0x8048DFB0 end:0x80491320
+	.text       start:0x8048DFB0 end:0x80491320 align:16
+	.bss        start:0x805FD060 end:0x805FE060 align:32
 	.sdata      start:0x80603FC0 end:0x80603FD0
 
 RVL_SDK/gamespy/gt2/gt2Socket.c:
@@ -6405,8 +6423,9 @@ RVL_SDK/gamespy/gt2/gt2Utility.c:
 	.sbss       start:0x806065A0 end:0x806065A4
 
 RVL_SDK/gamespy/qr2/qr2.c:
-	.text       start:0x804921F0 end:0x80494B50
+	.text       start:0x804921F0 end:0x80494B50 align:16
 	.data       start:0x8052BB00 end:0x8052CA08
+	.bss        start:0x805FE0A0 end:0x805FE200 align:32
 	.sdata      start:0x80603FE8 end:0x80604018
 	.sbss       start:0x806065A8 end:0x806065B0
 	.sdata2     start:0x8060AD70 end:0x8060AD78
@@ -6483,9 +6502,10 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c:
 	.sdata      start:0x806041F0 end:0x806041F8
 
 RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
-	.text       start:0x804A2080 end:0x804A5B24
+	.text       start:0x804A2080 end:0x804A5B24 align:16
 	.data       start:0x8052D478 end:0x8052D4A4
 	.sdata      start:0x806041F8 end:0x80604208
+	.sbss       start:0x80606680 end:0x80606688
 	.sdata2     start:0x8060AD90 end:0x8060AD9C
 
 RVL_SDK/rfl/RFL_System.c:

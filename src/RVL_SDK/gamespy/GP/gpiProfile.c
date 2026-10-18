@@ -412,6 +412,13 @@ static GPIBool gpiCheckForBuddy(GPConnection* connection, GPIProfile* profile,
     data->profile = profile;
     return GPIFalse;
   }
+#if defined(VERSION_R4QK01)
+  else if (profile->buddyStatusInfo &&
+           (data->index == profile->buddyStatusInfo->buddyIndex)) {
+    data->profile = profile;
+    return GPIFalse;
+  }
+#endif
 
   GSI_UNUSED(connection);
 

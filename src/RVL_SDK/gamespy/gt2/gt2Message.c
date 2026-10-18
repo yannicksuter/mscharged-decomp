@@ -951,9 +951,14 @@ static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte* message, int len, un
     {
         message[3] = message[1];
         message[2] = message[0];
+#if defined(VERSION_R4QK01)
+        message += GTI2_MAGIC_STRING_LEN;
+        actualMessage += GTI2_MAGIC_STRING_LEN;
+#else
         message = actualMessage;
         actualMessage += socket->protocolOffset;
         actualLength -= socket->protocolOffset;
+#endif
         len -= GTI2_MAGIC_STRING_LEN;
         magicString = GT2False;
     }
@@ -961,6 +966,14 @@ static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte* message, int len, un
     // if it doesn't have a magic string it's an app unreliable
     if (!magicString)
     {
+#if defined(VERSION_R4QK01)
+        if (connection->state < GTI2Connected)
+        {
+            if (!gti2UnrecognizedMessageCallback(socket, ip, port, message, len, &handled))
+                return GT2False;
+        }
+        else
+#endif
         if (!gti2HandleAppUnreliable(connection, message, len))
             return GT2False;
 
@@ -1153,7 +1166,9 @@ GT2Bool gti2ReceiveMessages(GT2Socket socket)
     int addressLen;
 
 // avoid overflowing stack
-#if (GTI2_STACK_RECV_BUFFER_SIZE > 1600)
+#if defined(VERSION_R4QK01)
+    static char buffer[GTI2_STACK_RECV_BUFFER_SIZE] POST_ALIGN(32);
+#elif (GTI2_STACK_RECV_BUFFER_SIZE > 1600)
     static char buffer[GTI2_STACK_RECV_BUFFER_SIZE];
 #else
     char buffer[GTI2_STACK_RECV_BUFFER_SIZE];

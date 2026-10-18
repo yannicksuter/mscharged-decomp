@@ -42,8 +42,10 @@ typedef struct {
   GPIBuffer outputBuffer;
   char nick[GP_NICK_LEN];
   char uniquenick[GP_UNIQUENICK_LEN];
-  // int namespaceIDs[GP_MAX_NAMESPACEIDS];
-  // int numNamespaces;
+#if defined(VERSION_R4QK01)
+  int namespaceIDs[GP_MAX_NAMESPACEIDS];
+  int numNamespaces;
+#endif
   char email[GP_EMAIL_LEN];
   char firstname[GP_FIRSTNAME_LEN];
   char lastname[GP_LASTNAME_LEN];
@@ -56,6 +58,10 @@ typedef struct {
   GPIBool processing;
   GPIBool remove;
   gsi_time searchStartTime;
+#if defined(VERSION_R4QK01)
+  int* revBuddyProfileIds;
+  int numOfRevBuddyProfiles;
+#endif
 } GPISearchData;
 
 // FUNCTIONS

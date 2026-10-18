@@ -204,7 +204,9 @@ GPResult gpiReset(GPConnection* connection) {
   iconnection->updateuiBuffer.size = 0;
   freeclear(iconnection->updateuiBuffer.buffer);
   iconnection->updateuiBuffer.buffer = NULL;
+#if !defined(VERSION_R4QK01)
   iconnection->peerSocket = INVALID_SOCKET;
+#endif
   iconnection->nextOperationID = 2;
   while (iconnection->operationList != NULL)
     gpiRemoveOperation(connection, iconnection->operationList);

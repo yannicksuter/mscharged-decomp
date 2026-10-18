@@ -494,7 +494,11 @@ static SBError SendWithRetry(SBServerList* slist, char* data, int len) {
   while (retryCount >= 0) {
     retryCount--;
     ret = send(slist->slsocket, data, len, 0);
+#if defined(VERSION_R4QK01)
+    if (ret <= 0 && retryCount >= 0 && slist->inbufferlen <= 0)
+#else
     if (ret <= 0 && retryCount >= 0) // error! try to reconnect
+#endif
     {
       SBServerListDisconnect(slist);
       err = SBServerListConnectAndQuery(slist, NULL, NULL, NO_SERVER_LIST, 0);
@@ -1608,6 +1612,9 @@ SBError SBSendNatNegotiateCookieToServer(SBServerList* slist, goa_uint32 ip,
 }
 
 static SBError ProcessLanData(SBServerList* slist) {
+#if defined(VERSION_R4QK01)
+  __attribute__((aligned(32)))
+#endif
   char indata[1500]; // make sure we have enough room for a large UDP packet
   struct sockaddr_in saddr;
   int saddrlen = sizeof(saddr);

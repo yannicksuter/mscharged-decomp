@@ -171,7 +171,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
         event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)i, 30, true, 0);
         mPageControls->Update(event, fDeltaT);
-#if !defined(VERSION_R4QJ01)
+#if !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
         mBracketButton.HandlePointerEvent(&event);
 #endif
         for (int j = 0; j < 3; ++j)
@@ -181,7 +181,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
             mTransitionState = CUP_FINAL_ROUNDS_EXITING_BACK;
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             FEPageControls* pageControls = mPageControls;
             pageControls->mPadHeld[0] = false;
             pageControls->mPadHeld[1] = false;
@@ -210,7 +210,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
                 return;
             }
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         mBracketButton.HandlePointerEvent(&event);
 #endif
     }
@@ -442,7 +442,7 @@ void CupFinalRoundsScene::OnBracketPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         FEPageControls* pageControls = mPageControls;
         pageControls->mPadHeld[0] = false;
         pageControls->mPadHeld[1] = false;

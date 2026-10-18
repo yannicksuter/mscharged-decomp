@@ -352,6 +352,9 @@ void NumberDisplay::RenderScores()
     {
         position.x = centerX;
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangGerman
+#if defined(VERSION_R4QK01)
+            || g_pLocalization->m_CurrentLanguage == nlLocalization::LangKorean
+#endif
             || gScoreUseAlternateSeparator == true)
         {
             RenderGlyph(11, scale, opacity, position);

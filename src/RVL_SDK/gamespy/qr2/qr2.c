@@ -433,12 +433,13 @@ void qr2_think(qr2_t qrec) {
   // NNThink();
 }
 
-// Linker will remove this function through dead-stripping.
-// We use this to force some strings to be defined.
-
 /* qr2_check_queries: Processes any waiting queries */
 void qr2_check_queries(qr2_t qrec) {
+#if defined(VERSION_R4QK01)
+  static char indata[INBUF_LEN] POST_ALIGN(32);
+#else
   static char indata[INBUF_LEN]; // 256 byte input buffer
+#endif
   struct sockaddr_in saddr;
   int error;
 
@@ -893,7 +894,11 @@ qr_build_split_query_reply(qr2_t qrec, qr2_buffer_t buf,
 
   // Make sure the key type is valid
   //    (The key type is set to invalid when all keys have been processed.)
+#if defined(VERSION_R4QK01)
+  if (progress->mCurKeyType >= key_type_count)
+#else
   if (progress->mCurKeyType < 0 || progress->mCurKeyType >= key_type_count)
+#endif
     return gsi_false; // stop processing
 
   // check buffer space
@@ -1217,6 +1222,10 @@ static gsi_bool qr2_process_ip_verify(qr2_t qrec, struct qr2_buffer_s* buf,
                                       struct sockaddr_in* sender) {
   int i = 0;
   gsi_time now = current_time();
+#if defined(VERSION_R4QK01)
+  int firstFreeIndex = -1;
+  int numDuplicates = 0;
+#endif
 
   // if the query challenge is disabled, return 0 as the challenge
   if ((qrec->backendoptions & QR2_OPTION_USE_QUERY_CHALLENGE) == 0) {
@@ -1224,6 +1233,28 @@ static gsi_bool qr2_process_ip_verify(qr2_t qrec, struct qr2_buffer_s* buf,
     return gsi_true;
   }
 
+#if defined(VERSION_R4QK01)
+  // Find a free slot and count outstanding challenges for this IP and port.
+  for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
+    if (firstFreeIndex == -1 && qrec->ipverify[i].addr.sin_addr.s_addr == 0)
+      firstFreeIndex = i;
+    if (qrec->ipverify[i].addr.sin_addr.s_addr == sender->sin_addr.s_addr &&
+        qrec->ipverify[i].addr.sin_port == sender->sin_port)
+      numDuplicates++;
+  }
+
+  if (numDuplicates > QR2_IPVERIFY_MAXDUPLICATES)
+    return gsi_false;
+  if (firstFreeIndex == -1)
+    return gsi_false;
+
+  qrec->ipverify[firstFreeIndex].addr = *sender;
+  qrec->ipverify[firstFreeIndex].challenge = htonl((rand() << 16) | rand());
+  qrec->ipverify[firstFreeIndex].createtime = now;
+
+  qr2_buffer_add_int(buf, (int)qrec->ipverify[firstFreeIndex].challenge);
+  return gsi_true;
+#else
   for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
     if (qrec->ipverify[i].addr.sin_addr.s_addr == 0) {
       qrec->ipverify[i].addr = *sender;
@@ -1236,6 +1267,7 @@ static gsi_bool qr2_process_ip_verify(qr2_t qrec, struct qr2_buffer_s* buf,
   }
 
   return gsi_false;
+#endif
 }
 
 // Check if the returned ipverify value matches the random we sent earlier
@@ -1251,13 +1283,16 @@ static gsi_bool qr2_check_ip_verify(qr2_t qrec, struct sockaddr_in* sender,
         qrec->ipverify[i].addr.sin_addr.s_addr = 0;
         qrec->ipverify[i].addr.sin_port = 0;
         return gsi_true;
-      } else {
+      }
+#if !defined(VERSION_R4QK01)
+      else {
         gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network,
                       GSIDebugLevel_Warning,
                       "Received incorrect IP verify info from %s\r\n",
                       inet_ntoa(sender->sin_addr));
         return gsi_false;
       }
+#endif
     }
   }
   return gsi_false;

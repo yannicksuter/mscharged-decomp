@@ -190,6 +190,12 @@ static GPResult gpiSendData(GPConnection* connection, SOCKET sock,
 
 GPResult gpiSendOrBufferChar(GPConnection* connection, GPIPeer_st peer,
                              char c) {
+#if defined(VERSION_R4QK01)
+  GSI_UNUSED(c);
+  GSI_UNUSED(peer);
+  GSI_UNUSED(connection);
+  return GP_NO_ERROR;
+#else
   GPIBool closed;
   int sent;
 
@@ -208,19 +214,33 @@ GPResult gpiSendOrBufferChar(GPConnection* connection, GPIPeer_st peer,
   // Buffer if not sent.
   //////////////////////
   return gpiAppendCharToBuffer(connection, &peer->outputBuffer, c);
+#endif
 }
 
 GPResult gpiSendOrBufferStringLenToPeer(GPConnection* connection,
                                         GPIPeer_st peer, const char* string,
                                         int stringLen) {
+#if defined(VERSION_R4QK01)
+  GPIConnection* iconnection;
+  unsigned int sent;
+  unsigned int total;
+  unsigned int remaining;
+#else
   GPIBool closed;
   int sent;
   int total;
   int remaining;
+#endif
 
   assert(peer->outputBuffer.buffer != NULL);
 
+#if defined(VERSION_R4QK01)
+  sent = 0;
+  iconnection = (GPIConnection*)*connection;
+  remaining = (unsigned int)stringLen;
+#else
   remaining = stringLen;
+#endif
   total = 0;
 
   // Check for nothing to send.
@@ -232,6 +252,27 @@ GPResult gpiSendOrBufferStringLenToPeer(GPConnection* connection,
   /////////////////////////////////////////////////////////////////////
   if (!(peer->outputBuffer.len - peer->outputBuffer.pos) &&
       !ArrayLength(peer->messages)) {
+#if defined(VERSION_R4QK01)
+    if ((int)remaining <=
+        (gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip, peer->port) -
+         GS_UDP_RELIABLE_MSG_HEADER - GS_UDP_MSG_HEADER_LEN)) {
+      gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader,
+                            (unsigned char*)string, remaining, gsi_true);
+      total = remaining;
+      remaining = 0;
+    } else {
+      unsigned int freeSpace =
+          (unsigned int)gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip,
+                                                           peer->port);
+      if (freeSpace > (GS_UDP_MSG_HEADER_LEN + GS_UDP_RELIABLE_MSG_HEADER)) {
+        sent = freeSpace - (GS_UDP_MSG_HEADER_LEN + GS_UDP_RELIABLE_MSG_HEADER);
+        gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader,
+                              (unsigned char*)string, sent, gsi_true);
+        total = sent;
+        remaining -= sent;
+      }
+    }
+#else
     do {
       CHECK_RESULT(gpiSendData(connection, peer->sock, &string[total],
                                remaining, &closed, &sent, "PT"));
@@ -240,13 +281,14 @@ GPResult gpiSendOrBufferStringLenToPeer(GPConnection* connection,
         remaining -= sent;
       }
     } while (sent && remaining);
+#endif
   }
 
   // Buffer what wasn't sent.
   ///////////////////////////
   if (remaining)
     CHECK_RESULT(gpiAppendStringToBufferLen(connection, &peer->outputBuffer,
-                                            &string[total], remaining));
+                                            &string[total], (int)remaining));
 
   return GP_NO_ERROR;
 }
@@ -360,6 +402,10 @@ GPResult gpiRecvToBuffer(GPConnection* connection, SOCKET sock,
       buffer = (char*)gsirealloc(buffer, (unsigned int)size + 1);
       if (buffer == NULL)
         Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+#if defined(VERSION_R4QK01)
+      inputBuffer->size = size;
+      inputBuffer->buffer = buffer;
+#endif
     }
 
     // Read from the network.
@@ -484,6 +530,81 @@ GPResult gpiSendFromBuffer(GPConnection* connection, SOCKET sock,
   return GP_NO_ERROR;
 }
 
+
+#if defined(VERSION_R4QK01)
+GPResult gpiSendBufferToPeer(GPConnection* connection, unsigned int ip,
+                             unsigned short port, GPIBuffer* outputBuffer,
+                             GPIBool* closed, GPIBool clipSentData) {
+  GPIConnection* iconnection = (GPIConnection*)*connection;
+  // GPIBool closed;
+  unsigned int remaining;
+  unsigned char* buffer;
+  unsigned int pos;
+  unsigned int len;
+  unsigned int total = 0;
+  GSUdpPeerState aPeerState;
+  assert(outputBuffer != NULL);
+
+  buffer = (unsigned char*)outputBuffer->buffer;
+  len = (unsigned int)outputBuffer->len;
+  pos = (unsigned int)outputBuffer->pos;
+  remaining = (len - pos);
+
+  // Check for nothing to send.
+  /////////////////////////////
+  if (remaining == 0)
+    return GP_NO_ERROR;
+
+  // length of message remaining must be smaller than total buffer size minus
+  // gt2 reliable msg header size minus in order to send the message in one
+  // shot.
+  if ((int)remaining <= (gsUdpEngineGetPeerOutBufferFreeSpace(ip, port) -
+                         GS_UDP_RELIABLE_MSG_HEADER - GS_UDP_MSG_HEADER_LEN)) {
+    gsUdpEngineSendMessage(ip, port, iconnection->mHeader, &buffer[pos],
+                           remaining, gsi_true);
+    total = remaining;
+    remaining = 0;
+  } else {
+    unsigned int freeSpace = 0;
+    unsigned int sendAmount = 0;
+    do {
+      freeSpace = (unsigned int)gsUdpEngineGetPeerOutBufferFreeSpace(ip, port);
+      sendAmount =
+          freeSpace - (GS_UDP_MSG_HEADER_LEN + GS_UDP_RELIABLE_MSG_HEADER);
+      if (sendAmount <= (GS_UDP_MSG_HEADER_LEN + GS_UDP_RELIABLE_MSG_HEADER))
+        break;
+      if (gsUdpEngineSendMessage(ip, port, iconnection->mHeader,
+                                 &buffer[pos + total], sendAmount,
+                                 gsi_true) == GS_UDP_SEND_FAILED)
+        break;
+      total += sendAmount;
+      remaining -= sendAmount;
+    } while (remaining);
+  }
+
+  if (clipSentData) {
+    if (total > 0) {
+      memmove(buffer, &buffer[total], remaining + 1);
+      len -= total;
+    }
+  } else {
+    pos += total;
+  }
+  // Set outputs.
+  ///////////////
+  outputBuffer->len = (int)len;
+  outputBuffer->pos = (int)pos;
+
+  gsUdpEngineGetPeerState(ip, port, &aPeerState);
+  if (aPeerState == GS_UDP_PEER_CLOSED)
+    *closed = GPITrue;
+  else
+    *closed = GPIFalse;
+
+  return GP_NO_ERROR;
+}
+
+#endif
 
 GPResult gpiReadMessageFromBuffer(GPConnection* connection,
                                   GPIBuffer* inputBuffer, char** message,

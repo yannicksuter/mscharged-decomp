@@ -236,14 +236,14 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             mTeamButtons[j].HandlePointerEvent(&event);
         mHelpButton.HandlePointerEvent(&event);
         mPageControls->Update(event, fDeltaT);
-#if !defined(VERSION_R4QJ01)
+#if !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
         mBracketButton.HandlePointerEvent(&event);
 #endif
         mScrollBar.Update(event, fDeltaT);
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             FEPageControls* pageControls = mPageControls;
             pageControls->mPadHeld[0] = false;
             pageControls->mPadHeld[1] = false;
@@ -253,7 +253,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             if (navigation != 0)
                 navigation->HideButtons();
             mPresentation->SetActiveSlide("out", true);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             mPresentation->Update(0.0f);
 #endif
             return;
@@ -270,7 +270,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
                 mTransitionState = CUP_STANDINGS_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
                 mPresentation->Update(0.0f);
 #endif
                 if (mPageControls->IsButtonPressed(1))
@@ -280,7 +280,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 return;
             }
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         mBracketButton.HandlePointerEvent(&event);
 #endif
     }
@@ -526,7 +526,7 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
     {
     case CUP_STANDINGS_BUTTON_BRACKET:
     {
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         FEPageControls* pageControls = mPageControls;
         pageControls->mPadHeld[0] = false;
         pageControls->mPadHeld[1] = false;
@@ -542,7 +542,7 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
         }
 
         mPresentation->SetActiveSlide("out", true);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         mPresentation->Update(0.0f);
 #endif
         break;
