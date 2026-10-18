@@ -1886,7 +1886,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gap_api.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/gap_conn.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gap_utils.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gki_buffer.c"),
+            Object(Matching, "RVL_SDK/bte/gki_buffer.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gki_ppc.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gki_time.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/hcicmds.c"),
