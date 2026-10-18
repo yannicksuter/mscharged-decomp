@@ -369,8 +369,12 @@ typedef void (*cdkey_process_t)(char* buf, int len, struct sockaddr* fromaddr);
 
 /* ip verification / spoof prevention */
 #define QR2_IPVERIFY_TIMEOUT 4000 // timeout after 4 seconds round trip time
-#define QR2_IPVERIFY_ARRAY_SIZE                                                \
-  40 // allowed outstanding queryies in those 4 seconds
+// Allowed outstanding queries in those four seconds.
+#if defined(VERSION_R4QK01)
+#define QR2_IPVERIFY_ARRAY_SIZE 200
+#else
+#define QR2_IPVERIFY_ARRAY_SIZE 40
+#endif
 #define QR2_IPVERIFY_MAXDUPLICATES 5 // allow maximum of 5 requests per IP/PORT
 struct qr2_ipverify_info_s {
   struct sockaddr_in addr; // addr = 0 when not in use

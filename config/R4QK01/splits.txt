@@ -6407,8 +6407,9 @@ RVL_SDK/gamespy/gt2/gt2Utility.c:
 	.sbss       start:0x806065A0 end:0x806065A4
 
 RVL_SDK/gamespy/qr2/qr2.c:
-	.text       start:0x804921F0 end:0x80494B50
+	.text       start:0x804921F0 end:0x80494B50 align:16
 	.data       start:0x8052BB00 end:0x8052CA08
+	.bss        start:0x805FE0A0 end:0x805FE200 align:32
 	.sdata      start:0x80603FE8 end:0x80604018
 	.sbss       start:0x806065A8 end:0x806065B0
 	.sdata2     start:0x8060AD70 end:0x8060AD78
