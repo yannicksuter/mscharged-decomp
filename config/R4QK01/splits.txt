@@ -6186,12 +6186,14 @@ RVL_SDK/net/hmac.c:
 	.data       start:0x80520B20 end:0x80520B78
 	.sdata      start:0x806038C0 end:0x806038D0
 
-RVL_SDK/hbm/HBMAnmController.cpp:
-	.data       start:0x80521F60 end:0x80521F8C
-
 RVL_SDK/hbm/HBMFrameController.cpp:
 	.text       start:0x8042AE10 end:0x8042AFC0
 	.rodata     start:0x804BE020 end:0x804BE024 align:4
+	.data       start:0x80520B78 end:0x80520BA0
+
+RVL_SDK/hbm/HBMAnmController.cpp:
+	.text       start:0x8042AFC0 end:0x8042B0D0 align:16
+	.data       start:0x80520BA0 end:0x80520BE8
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0 align:16
