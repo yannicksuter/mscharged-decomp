@@ -2,7 +2,11 @@
 #include <revolution/vi/vi_fwd.h>
 #include <revolution/os.h>
 
+#if defined(VERSION_R4QK01)
+static const char* __SIVersion = "<< RVL_SDK - SI \trelease build: Feb 27 2009 10:04:44 (0x4302_145) >>";
+#else
 static const char* __SIVersion = "<< RVL_SDK - SI \trelease build: Nov 30 2006 03:31:44 (0x4199_60831) >>";
+#endif
 
 static SIControl Si = { -1, 0, 0, NULL, NULL };
 static SIPacket Packet[SI_MAX_CHAN];

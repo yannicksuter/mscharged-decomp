@@ -4936,6 +4936,9 @@ MetroTRK/mpc_7xx_603e.c:
 MetroTRK/mslsupp.c:
 	.text       start:0x80380150 end:0x80380790
 
+MetroTRK/__exception.s:
+	.init       start:0x80004054 end:0x80005F88
+
 MetroTRK/dolphin_trk.c:
 	.init       start:0x80005F88 end:0x80005FB4
 	.text       start:0x80380790 end:0x80380AAC
@@ -5660,6 +5663,7 @@ RVL_SDK/pad/Pad.c:
 
 RVL_SDK/si/SIBios.c:
 	.text       start:0x803C9B20 end:0x803CAF80
+	.data       start:0x80515BE8 end:0x80515C58
 	.bss        start:0x8058B4A0 end:0x8058B6C0
 	.sdata      start:0x80603530 end:0x80603534
 	.sbss       start:0x806060E8 end:0x806060F8
@@ -6183,12 +6187,30 @@ RVL_SDK/net/hmac.c:
 	.data       start:0x80520B20 end:0x80520B78
 	.sdata      start:0x806038C0 end:0x806038D0
 
-RVL_SDK/hbm/HBMAnmController.cpp:
-	.data       start:0x80521F60 end:0x80521F8C
-
 RVL_SDK/hbm/HBMFrameController.cpp:
 	.text       start:0x8042AE10 end:0x8042AFC0
-	.rodata     start:0x804BE020 end:0x804BE024 align:4
+	.rodata     start:0x804BE020 end:0x804BE028 align:4
+	.data       start:0x80520B78 end:0x80520BA0
+
+RVL_SDK/hbm/HBMAnmController.cpp:
+	.text       start:0x8042AFC0 end:0x8042B0D0 align:16
+	.data       start:0x80520BA0 end:0x80520BE8
+
+RVL_SDK/hbm/HBMGUIManager.cpp:
+	.text       start:0x8042B0D0 end:0x8042C8F0 align:16
+	.rodata     start:0x804BE028 end:0x804BE038
+	.data       start:0x80520BE8 end:0x80520E58
+	.bss        start:0x805FB1F8 end:0x805FB200
+
+RVL_SDK/hbm/HBMController.cpp:
+	.text       start:0x8042C8F0 end:0x8042D500 align:16
+	.rodata     start:0x804BE038 end:0x804BE048
+	.bss        start:0x805FB200 end:0x805FB398
+
+RVL_SDK/hbm/HBMRemoteSpk.cpp:
+	.text       start:0x8042D500 end:0x8042DE20 align:16
+	.data       start:0x80520E58 end:0x80520E88
+	.bss        start:0x805FB398 end:0x805FB3A0
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0 align:16
@@ -6270,10 +6292,10 @@ RVL_SDK/dwc/dwc_transport.c:
 	.sbss       start:0x80606548 end:0x80606550
 
 RVL_SDK/dwc/dwci_np_math.c:
-	.text       start:0x80471E10 end:0x80473254
+	.text       start:0x80471E10 end:0x804732D0
 
 RVL_SDK/dwc/dwc_account.c:
-	.text       start:0x804732D0 end:0x80474AE4
+	.text       start:0x804732D0 end:0x80474AE4 align:16
 	.data       start:0x80529BA8 end:0x80529CB8
 	.sdata      start:0x80603A28 end:0x80603A30
 

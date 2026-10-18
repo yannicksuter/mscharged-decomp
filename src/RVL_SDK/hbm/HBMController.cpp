@@ -11,7 +11,11 @@ void Controller::wpadConnectCallback(WPADChannel chan, WPADResult result) {
     switch (result) {
         case WPAD_ESUCCESS:
             if (!sThis[chan]->mCallbackFlag) {
+#if defined(VERSION_R4QK01)
+                WPADSetExtensionCallback(chan, &wpadExtensionCallback);
+#else
                 sThis[chan]->mOldExtensionCallback = WPADSetExtensionCallback(chan, &wpadExtensionCallback);
+#endif
                 sThis[chan]->mCallbackFlag = true;
             }
 
@@ -20,14 +24,20 @@ void Controller::wpadConnectCallback(WPADChannel chan, WPADResult result) {
 
         case WPAD_ENODEV:
             WPADSetExtensionCallback(chan, sThis[chan]->mOldExtensionCallback);
+#if !defined(VERSION_R4QK01)
             sThis[chan]->mOldExtensionCallback = NULL;
+#endif
             sThis[chan]->mCallbackFlag = false;
             sThis[chan]->mCheckSoundTimeFlag = false;
             sThis[chan]->mCheckSoundIntervalFlag = false;
             break;
     }
 
+#if defined(VERSION_R4QK01)
+    if (sThis[chan]->mOldConnectCallback && sThis[chan]->mOldConnectCallback != &wpadConnectCallback) {
+#else
     if (sThis[chan]->mOldConnectCallback) {
+#endif
         (*sThis[chan]->mOldConnectCallback)(chan, result);
     }
 }
@@ -77,12 +87,21 @@ Controller::~Controller() {
 void Controller::initCallback() {
     WPADDeviceType type;
 
+#if defined(VERSION_R4QK01)
+    WPADSetCallbackByKPAD(FALSE);
+#endif
     mOldConnectCallback = WPADSetConnectCallback(mHBController.chan, &wpadConnectCallback);
+#if defined(VERSION_R4QK01)
+    WPADSetCallbackByKPAD(TRUE);
+    mOldExtensionCallback = WPADSetExtensionCallback(mHBController.chan, &wpadExtensionCallback);
+#endif
     mRumbleFlag = true;
 
     switch (WPADProbe(mHBController.chan, &type)) {
         case WPAD_ESUCCESS:
+#if !defined(VERSION_R4QK01)
             mOldExtensionCallback = WPADSetExtensionCallback(mHBController.chan, &wpadExtensionCallback);
+#endif
             mCallbackFlag = true;
             break;
         case WPAD_ENODEV:
@@ -92,7 +111,14 @@ void Controller::initCallback() {
 }
 
 void Controller::clearCallback() {
+#if defined(VERSION_R4QK01)
+    WPADControlSpeaker(mHBController.chan, WPAD_SPEAKER_ON, NULL);
+    WPADSetCallbackByKPAD(FALSE);
+#endif
     WPADSetConnectCallback(mHBController.chan, mOldConnectCallback);
+#if defined(VERSION_R4QK01)
+    WPADSetCallbackByKPAD(TRUE);
+#endif
     mOldConnectCallback = NULL;
 
     WPADSetExtensionCallback(mHBController.chan, mOldExtensionCallback);
@@ -118,7 +144,11 @@ void Controller::setKpad(const HBMKPadData* con, bool updatePos) {
     mHBController.hold = con->kpad->hold;
     mHBController.release = con->kpad->release;
 
+#if defined(VERSION_R4QK01)
+    if (con->kpad->dev_type == WPAD_DEV_CLASSIC && con->use_devtype == WPAD_DEV_CLASSIC) {
+#else
     if (con->kpad->dev_type == WPAD_DEV_CLASSIC) {
+#endif
         u32 h = con->kpad->ex_status.cl.hold;
         u32 t = con->kpad->ex_status.cl.trig;
         u32 r = con->kpad->ex_status.cl.release;
@@ -173,7 +203,11 @@ void Controller::clrKpadButton() {
 
 void Controller::setInValidPos() {
     mHBController.x = -10000.0f;
+#if defined(VERSION_R4QK01)
+    mHBController.y = -15000.0f;
+#else
     mHBController.y = -10000.0f;
+#endif
 }
 
 int Controller::getChan() const { return mHBController.chan; }
@@ -186,7 +220,11 @@ void Controller::setSpeakerVol(f32 vol) { mHBController.spVol = vol; }
 
 f32 Controller::getSpeakerVol() const { return mHBController.spVol; }
 
+#if defined(VERSION_R4QK01)
+void Controller::playSound(int id) {
+#else
 void Controller::playSound(nw4hbm::snd::SoundArchivePlayer* pSoundArchivePlayer, int id) {
+#endif
     if (!mSoundOffFlag) {
         getRemoteSpk()->Play(getChan(), id, getSpeakerVol() * 10.0f);
 
@@ -289,7 +327,11 @@ bool Controller::isPlayReady() const { return getRemoteSpk()->isPlayReady(getCha
 HBController* Controller::getController() { return &mHBController; }
 
 void Controller::startMotor() {
+#if defined(VERSION_R4QK01)
+    if (getChan() < WPAD_MAX_CONTROLLERS && mRumbleFlag && !isPlayingSound()) {
+#else
     if (getChan() < WPAD_MAX_CONTROLLERS && !isPlayingSound() && mRumbleFlag) {
+#endif
         setRumble();
         WPADControlMotor(getChan(), WPAD_MOTOR_RUMBLE);
     }

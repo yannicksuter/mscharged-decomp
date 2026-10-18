@@ -136,6 +136,10 @@ public:
     /* 0x18 */ virtual void draw();
     /* 0x1C */ virtual ~Manager();
     /* 0x20 */ virtual void addComponent(Component* pComponent);
+#if defined(VERSION_R4QK01)
+    /* 0x24 */ virtual void delComponent(Component* pComponent);
+#endif
+    // Subsequent Manager slots are four bytes later in the Korean SDK.
     /* 0x24 */ virtual Component* getComponent(u32 uID);
     /* 0x28 */ virtual bool update(int, const KPADStatus*, f32, f32, void*) { return false; }
     /* 0x2C */ virtual bool update(int i, f32 x, f32 y, u32 uTrigFlag, u32 uHoldFlag, u32 uReleaseFlag, void* pData);
@@ -156,7 +160,9 @@ public:
         }
     }
 
+#if !defined(VERSION_R4QK01)
     void delComponent(Component* pComponent);
+#endif
 
 protected:
     /* 0x00 (base) */
@@ -188,16 +194,24 @@ public:
     }
 
     /* 0x1C */ virtual ~PaneManager();
-    /* 0x30 */ virtual void createLayoutScene(const nw4hbm::lyt::Layout& rLayout);
-    /* 0x34 */ virtual PaneComponent* getPaneComponentByPane(nw4hbm::lyt::Pane* pPane);
-    /* 0x38 */ virtual const nw4hbm::lyt::DrawInfo* getDrawInfo() { return mpDrawInfo; }
-    /* 0x3C */ virtual void setDrawInfo(const nw4hbm::lyt::DrawInfo* pDrawInfo) { mpDrawInfo = pDrawInfo; }
-    /* 0x40 */ virtual void setAllBoundingBoxComponentTriggerTarget(bool b);
-    /* 0x44 */ virtual void walkInChildren(nw4hbm::lyt::PaneList& rPaneList);
+    /* 0x3C (K: 0x40) */ virtual void createLayoutScene(const nw4hbm::lyt::Layout& rLayout);
+#if defined(VERSION_R4QK01)
+    /* 0x44 */ virtual void addLayoutScene(const nw4hbm::lyt::Layout& rLayout);
+    /* 0x48 */ virtual void delLayoutScene(const nw4hbm::lyt::Layout& rLayout);
+#endif
+    /* 0x40 (K: 0x4C) */ virtual PaneComponent* getPaneComponentByPane(nw4hbm::lyt::Pane* pPane);
+    /* 0x44 (K: 0x50) */ virtual const nw4hbm::lyt::DrawInfo* getDrawInfo() { return mpDrawInfo; }
+    /* 0x48 (K: 0x54) */ virtual void setDrawInfo(const nw4hbm::lyt::DrawInfo* pDrawInfo) { mpDrawInfo = pDrawInfo; }
+    /* 0x4C (K: 0x58) */ virtual void setAllBoundingBoxComponentTriggerTarget(bool b);
+    /* 0x50 (K: 0x5C) */ virtual void walkInChildren(nw4hbm::lyt::PaneList& rPaneList);
 
+#if defined(VERSION_R4QK01)
+    /* 0x60 */ virtual void walkInChildrenDel(nw4hbm::lyt::PaneList& rPaneList);
+#else
     void walkInChildrenDel(nw4hbm::lyt::PaneList& rPaneList);
     void delLayoutScene(const nw4hbm::lyt::Layout& rLayout);
     void addLayoutScene(const nw4hbm::lyt::Layout& rLayout);
+#endif
 
 private:
     /* 0x00 (base) */
@@ -218,10 +232,10 @@ public:
 
     /* 0x18 */ virtual void draw();
     /* 0x1C */ virtual ~PaneComponent() {}
-    /* 0x20 */ virtual bool isVisible();
-    /* 0x24 */ virtual bool contain(f32 x_, f32 y_);
-    /* 0x28 */ virtual void setPane(nw4hbm::lyt::Pane* pPane) { mpPane = pPane; }
-    /* 0x2C */ virtual nw4hbm::lyt::Pane* getPane() { return mpPane; }
+    /* 0x58 */ virtual bool isVisible();
+    /* 0x5C */ virtual bool contain(f32 x_, f32 y_);
+    /* 0x60 */ virtual void setPane(nw4hbm::lyt::Pane* pPane) { mpPane = pPane; }
+    /* 0x64 */ virtual nw4hbm::lyt::Pane* getPane() { return mpPane; }
 
 protected:
     /* 0x00 (base) */

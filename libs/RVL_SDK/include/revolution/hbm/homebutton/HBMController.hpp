@@ -56,7 +56,12 @@ public:
 
     void initSound();
     void updateSound();
+#if defined(VERSION_R4QK01)
+    void playSound(int id);
+    void playSound(nw4hbm::snd::SoundArchivePlayer*, int id) { playSound(id); }
+#else
     void playSound(nw4hbm::snd::SoundArchivePlayer* pSoundArchivePlayer, int id);
+#endif
 
     void soundOn();
     void soundOff(int msec);
@@ -75,10 +80,12 @@ private:
 
 private:
     /* 0x00 */ HBController mHBController;
+#if !defined(VERSION_R4QK01)
     /* 0x20 */ nw4hbm::snd::SoundHandle mSoundHandle;
-    /* 0x24 */ RemoteSpk* remotespk;
-    /* 0x28 */ WPADConnectCallback* mOldConnectCallback;
-    /* 0x2C */ WPADExtensionCallback* mOldExtensionCallback;
+#endif
+    /* 0x24 (K: 0x20) */ RemoteSpk* remotespk;
+    /* 0x28 (K: 0x24) */ WPADConnectCallback* mOldConnectCallback;
+    /* 0x2C (K: 0x28) */ WPADExtensionCallback* mOldExtensionCallback;
     /* 0x30 */ OSTime mPlaySoundTime;
     /* 0x38 */ OSTime mStopSoundTime;
     /* 0x40 */ bool mCallbackFlag;

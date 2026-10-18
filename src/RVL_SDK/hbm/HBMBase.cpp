@@ -2787,7 +2787,7 @@ void HomeButton::startTrigEvent(const char* pPane)
                     for (len = 0; true; len++)
                     {
                         // U+FF1F FULLWIDTH QUESTION MARK
-                        if (mpText[mpHBInfo->region][btn_no + 2][len] == L'？')
+                        if (mpText[mpHBInfo->region][btn_no + 2][len] == L'\xFF1F')
                         {
                             break;
                         }

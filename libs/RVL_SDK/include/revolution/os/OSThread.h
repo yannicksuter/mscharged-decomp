@@ -68,6 +68,7 @@ struct OSThread {
 // Compatibility spelling used by the existing mutex reconstruction.
 #define queueMutex mutexQueue
 
+typedef void (*OSIdleFunction)(void* argument);
 typedef void (*OSSwitchThreadCallback)(OSThread* current, OSThread* next);
 
 OSSwitchThreadCallback
@@ -91,6 +92,8 @@ s32 OSSuspendThread(OSThread* thread);
 void OSSleepThread(OSThreadQueue* queue);
 void OSWakeupThread(OSThreadQueue* queue);
 BOOL OSSetThreadPriority(OSThread* thread, s32 priority);
+OSThread* OSSetIdleFunction(OSIdleFunction idleFunction, void* argument,
+                            void* stack, u32 stackSize);
 void OSClearStack(u8 value);
 void OSSleepTicks(s64 ticks);
 
