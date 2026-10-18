@@ -43,7 +43,6 @@ static char* stpAddFilter;
 int dwcMeshRetryLimit = 5;
 int dwcServerSearchRatio = -2;
 
-BOOL fn_80454BB0(void);
 GPResult DWCi_SetGPStatus(int status, const char* statusString, const char* locationString);
 int DWCi_GetFriendListIndex(int profileID);
 
@@ -68,11 +67,6 @@ typedef enum
 static const int stEvalRate[DWC_SB_UPDATE_MAX_SERVERS] = { 3, 3, 2, 2, 1, 1 };
 void SBServerAddIntKeyValue(SBServer server, const char* keyname, int value);
 
-void fn_80470900(u8, u8, const void*, int, BOOL);
-
-BOOL fn_8046FEB0(u16 type, u8 aid, const void* buffer, int size);
-
-void fn_804708C0(u8 aid);
 
 static DWCMatchControl* DWCi_GetMatchCnt(void);
 static inline void DWCi_EnterMatchState(DWCMatchState state);
@@ -180,7 +174,6 @@ void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result,
 void DWCi_MatchGPRecvBuddyMsgCallback(GPConnection* connection, u32 profileID, char* message);
 void DWCi_StopMatching(DWCError error, int errorCode);
 void DWCi_ClearQR2Key(void);
-void fn_8045C740(u8 aid, u16 type, u8* data);
 void fn_8045C7B0(u8 aid, u16 type, u8* data);
 void fn_8045DBB0(const u32* data);
 BOOL DWCi_ProcessMatchClosing(DWCError error, int errorCode, int profileID);
@@ -239,7 +232,6 @@ static void DWCi_QR2AddErrorCallback(
 static void DWCi_QR2PublicAddrCallback(
     unsigned int ip, unsigned short port, void* userdata);
 void DWCi_QR2NatnegCallback(int cookie, void* userdata);
-void fn_8046C590(const void* data, u32 len);
 void DWCi_QR2ClientMsgCallback(
     gsi_char* data, int len, void* userdata);
 static void DWCi_NNProgressCallback(NegotiateState state, void* userdata);
@@ -248,14 +240,12 @@ void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gamesocket,
 BOOL fn_8046DB10(void);
 BOOL DWCi_IsBackupMine(void);
 void fn_8046DCC0(int newGroup);
-int fn_8046E040(BOOL force);
 BOOL fn_8046E250(u8 aid, BOOL suspend, int reply);
 BOOL fn_8046E730(void);
 static BOOL DWCi_RequestSuspendMatch(BOOL suspend,
     DWCSuspendCallback callback, void* param);
 BOOL fn_8046EC30(void);
 BOOL fn_8046ED90(BOOL suspend);
-BOOL fn_8046F060(void);
 void DWCi_SetMatchStatus(DWCMatchState state);
 BOOL fn_8046F180(void);
 void DWCi_ClearNodeList(void);
@@ -331,7 +321,7 @@ BOOL DWC_IsValidCancelMatching(void)
 
 static BOOL DWCi_IsReadyToSuspend(void)
 {
-    if (fn_80454BB0())
+    if (DWC_IsServerMyself())
     {
         if (DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_SV_WAITING
             || DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_SEARCH_OWN)
@@ -414,7 +404,7 @@ static BOOL DWCi_IsMatchLocked(void)
 {
     if (!DWCi_GetMatchCnt()->_908)
         return FALSE;
-    if (fn_80454BB0()
+    if (DWC_IsServerMyself()
         && (DWCi_GetMatchCnt()->qr2MatchType == 1 || DWCi_GetMatchCnt()->qr2MatchType == 3 || DWCi_GetMatchCnt()->qr2MatchType == 2)
         && !DWCi_GetMatchCnt()->_8F4)
         return TRUE;
@@ -514,7 +504,7 @@ static inline void DWCi_SendGT2MsgCommand(u8 command, int profileID, DWCNodeInfo
     senddata.header.profileID = DWCi_HtoLEl(DWCi_GetMatchCnt()->profileID);
     DWC_Printf(DWC_REPORTFLAG_MATCH_NN,
         "<GT2> SEND-0x%02x -> [--------:-----] [pid=%u]\n", command, profileID);
-    fn_80470900(DWC_GetMyAID(), node->aid, &senddata,
+    DWCi_SendUnreliable(DWC_GetMyAID(), node->aid, &senddata,
         sizeof(DWCSBMessageHeader) + senddata.header.size, FALSE);
 }
 
@@ -1046,7 +1036,7 @@ static void DWCi_ResetNodePacketReceiveTicks(void)
 {
     int i;
     for (i = 0; i < DWCi_GetNodeCount(); i++)
-        fn_804708C0(DWCi_GetNodeByIndex(i)->aid);
+        DWCi_ResetLastSomeDataRecvTimeByAid(DWCi_GetNodeByIndex(i)->aid);
 }
 
 static void DWCi_ReadNodePacket(DWCNodeInfo* node, const u32* data)
@@ -2030,7 +2020,7 @@ void DWCi_MatchProcess(BOOL fullSpec)
         DWCi_RestartFromCancel(1);
     }
     fn_8046EC30();
-    fn_8046E040(0);
+    DWCi_SendServerPolling(0);
     if (!fn_80467570())
         return;
     if (!fn_804681D0())
@@ -2172,7 +2162,7 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket,
     pConInfo->index = (u8)index;
     pConInfo->aid = DWCi_GetMatchCnt()->serverNode.aid;
     pConInfo->profileID = DWCi_GetMatchCnt()->serverNode.profileID;
-    fn_804708C0(pConInfo->aid);
+    DWCi_ResetLastSomeDataRecvTimeByAid(pConInfo->aid);
     gt2SetConnectionData(connection, pConInfo);
     DWCi_PostProcessConnection(DWC_PP_CONNECTION_CL_GT2_ACCEPT);
 }
@@ -2289,7 +2279,7 @@ void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result,
             pConInfo->aid = DWCi_GetMatchCnt()->meshNode.aid;
             pConInfo->profileID = DWCi_GetMatchCnt()->meshNode.profileID;
         }
-        fn_804708C0(pConInfo->aid);
+        DWCi_ResetLastSomeDataRecvTimeByAid(pConInfo->aid);
         gt2SetConnectionData(connection, pConInfo);
         if (DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_SV_OWN_GT2
             || DWCi_GetMatchCnt()->meshState == DWC_MATCH_STATE_SV_OWN_GT2)
@@ -2355,7 +2345,7 @@ void DWCi_ClearQR2Key(void)
     }
 }
 
-void fn_8045C740(u8 aid, u16 type, u8* data)
+void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, u8* data)
 {
     DWC_Printf(DWC_REPORTFLAG_MATCH_GT2,
         "Received SYN %d packet from aid %d.\n", type - DWC_SEND_TYPE_MATCH_SYN, aid);
@@ -2463,7 +2453,7 @@ void fn_8045DBB0(const u32* data)
     pollingID = DWCi_LEtoHl(data[2]);
     DWC_Printf(DWC_REPORTFLAG_RECV_INFO,
         "Received Polling packet from pid %d(%08x).\n", profileID, bitmap);
-    if (fn_80454BB0())
+    if (DWC_IsServerMyself())
     {
         DWC_Printf(DWC_REPORTFLAG_RECV_INFO, "I'm a server. ignore.\n");
         return;
@@ -4521,7 +4511,7 @@ void fn_804671A0(u8 aid, u16 type)
         }
         break;
     }
-    fn_8046FEB0(type, aid, packet, size);
+    DWCi_SendReliable(type, aid, packet, size);
     if (packet != buf)
         DWC_Free(DWC_ALLOCTYPE_BASE, packet, 0);
     DWCi_GetMatchCnt()->lastSynSent = DWCi_Np_GetTick();
@@ -5472,7 +5462,7 @@ void DWCi_QR2NatnegCallback(int cookie, void* userdata)
 {
     NegotiateError nnError;
     DWC_Printf(DWC_REPORTFLAG_MATCH_NN, "Got NN request, cookie = %x.\n", cookie);
-    if (!fn_80454BB0() && DWCi_GetMatchCnt()->newClientNode.profileID)
+    if (!DWC_IsServerMyself() && DWCi_GetMatchCnt()->newClientNode.profileID)
     {
         DWC_Printf(DWC_REPORTFLAG_MATCH_NN, "But I'm waiting new client...\n", cookie);
         return;
@@ -5506,7 +5496,7 @@ void DWCi_QR2NatnegCallback(int cookie, void* userdata)
         DWCi_GetMatchCnt()->cmdCnt.command = DWC_MATCH_COMMAND_DUMMY;
 }
 
-void fn_8046C590(const void* data, u32 len)
+void DWCi_HandleGT2UnreliableMatchCommandMessage(const void* data, u32 len)
 {
     DWCSBMessage sbMsg;
     if (DWC_GetState() != DWC_STATE_MATCHING)
@@ -5802,12 +5792,12 @@ void fn_8046DCC0(int newGroup)
     DWCi_GetMatchCnt()->reqProfileID = 0;
 }
 
-int fn_8046E040(BOOL force)
+int DWCi_SendServerPolling(BOOL force)
 {
     u32 senddata[3];
     int i;
     int result;
-    if (!fn_80454BB0())
+    if (!DWC_IsServerMyself())
         return 1;
     if (DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_SV_SYN
         || DWCi_GetMatchCnt()->state == DWC_MATCH_STATE_SV_SYN_WAIT)
@@ -6027,7 +6017,7 @@ BOOL fn_8046ED90(BOOL suspend)
     return TRUE;
 }
 
-BOOL fn_8046F060(void)
+BOOL DWCi_IsServerChanging(void)
 {
     switch (DWCi_GetMatchCnt()->state)
     {

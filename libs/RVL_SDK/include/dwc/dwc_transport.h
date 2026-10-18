@@ -103,6 +103,13 @@ extern "C"
         char magicStrings[DWC_MAGIC_STRINGS_LEN];
     };
 
+#if defined(VERSION_R4QK01)
+    u32 DWC_SendUnreliableBitmap(u32 bitmap, const void* buffer, int size);
+    BOOL DWC_SetConnectionKeepAliveTime(u32 time);
+    u32 DWC_GetConnectionKeepAliveTime(void);
+    void DWCi_ResetLastSomeDataRecvTimeByAid(u8 aid);
+    void DWCi_SendUnreliable(u8 srcAid, u8 dstAid, const void* buffer, int size, BOOL forward);
+#endif
     BOOL DWC_Ping(u8 aid);
     void DWCi_InitTransport(DWCTransportInfo* info);
     void DWCi_ClearTransConnection(u8 aid);
