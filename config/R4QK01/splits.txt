@@ -6212,6 +6212,17 @@ RVL_SDK/hbm/HBMRemoteSpk.cpp:
 	.data       start:0x80520E58 end:0x80520E88
 	.bss        start:0x805FB398 end:0x805FB3A0
 
+RVL_SDK/hbm/HBMCommon.cpp:
+	.text       start:0x8042E950 end:0x8042ECB0 align:16
+	.data       start:0x805211D8 end:0x80521228
+	.bss        start:0x805FB3A8 end:0x805FB3B8
+
+RVL_SDK/hbm/HBMBase.cpp:
+	.text       start:0x8042ECB0 end:0x80437060 align:16
+	.rodata     start:0x804BE080 end:0x804BE3E0
+	.data       start:0x80521228 end:0x80521F18
+	.bss        start:0x805FB3B8 end:0x805FB3D8
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0 align:16
 	.rodata     start:0x804BE400 end:0x804BE410
