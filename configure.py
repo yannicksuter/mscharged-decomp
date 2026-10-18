@@ -1590,7 +1590,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_drawInfo.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_group.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_layout.cpp", cflags=cflags_rvl_hbm),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_material.cpp", cflags=cflags_rvl_hbm),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_material.cpp", cflags=cflags_rvl_hbm, mw_version="Wii/1.0a" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_pane.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp", cflags=cflags_rvl_hbm),
