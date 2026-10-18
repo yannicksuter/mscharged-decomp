@@ -231,7 +231,11 @@ void MIXInit(void)
 {
     u32 i;
 
+#if defined(VERSION_R4QK01)
+    if (AXIsInit() && !__init)
+#else
     if (AXIsInit())
+#endif
     {
         __MIXMaxVoices = AXGetMaxVoices();
         __MIXChannel = __s_MIXChannel;
