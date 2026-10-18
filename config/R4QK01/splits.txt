@@ -6185,11 +6185,13 @@ RVL_SDK/hbm/HBMFrameController.cpp:
 	.text       start:0x8042AE10 end:0x8042AFC0
 	.rodata     start:0x804BE020 end:0x804BE024 align:4
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
+	.text       start:0x80438130 end:0x80438FC0 align:16
+	.rodata     start:0x804BE400 end:0x804BE410
+	.bss        start:0x805FB3E0 end:0x805FB408
+
 RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
 	.rodata     start:0x804BE474 end:0x804BE4FC align:4
-
-RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
-	.text       start:0x80438130 end:0x80438FC0
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
 	.text       start:0x8043E830 end:0x8043E888
