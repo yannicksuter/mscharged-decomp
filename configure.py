@@ -960,7 +960,7 @@ config.libs = [
             Object(Matching, "Game/SH/SHNetworkStart.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineConnectionQuality.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineFriendCodeEntry.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Game/SH/SHOnlineFriends.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/SH/SHOnlineFriends.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlineFriendsChooseSides.cpp", extra_cflags=["-ipa file"] + (["-sym on"] if config.version in ("R4QJ01", "R4QK01") else [])),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineFriendsDraft.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Game/SH/SHOnlineGuestControllerSelect.cpp", extra_cflags=["-ipa file", "-sym on"]),

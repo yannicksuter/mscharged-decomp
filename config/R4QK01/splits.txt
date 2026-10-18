@@ -2176,6 +2176,7 @@ Game/SH/SHOnlineHub.cpp:
 	.sdata2     start:0x80609088 end:0x80609098
 
 Game/SH/SHOnlineFriends.cpp:
+	.text       start:0x80243B60 end:0x80247BFC
 	.rodata     start:0x804B5400 end:0x804B5430
 	.data       start:0x804E8AE0 end:0x804E8CA0
 	.sdata      start:0x80601C70 end:0x80601D00
