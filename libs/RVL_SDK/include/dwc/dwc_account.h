@@ -133,8 +133,21 @@ extern "C"
     void DWCi_Acc_CreateTempLoginId(DWCAccLoginId* loginid);
     u64 DWC_Acc_NumericKeyToFriendKey(const char* numerickey);
     void DWC_Acc_FriendKeyToNumericKey(u64 friendkey, char* numerickey);
+#if defined(VERSION_R4QK01)
+    typedef enum
+    {
+        DWCi_FRIENDKEY_GENERATOR_CRC,
+        DWCi_FRIENDKEY_GENERATOR_MD5,
+        DWCi_FRIENDKEY_GENERATOR_NUM
+    } DWCiFriendKeyGenerator;
+
+    BOOL DWC_Acc_CheckFriendKey(u64 friendkey, u32 gamecode, DWCiFriendKeyGenerator method);
+    u64 DWC_Acc_CreateFriendKey(int gs_profile_id, u32 gamecode, DWCiFriendKeyGenerator method);
+    void DWCi_Acc_U64ToString32(u64 num, int bitnum, char* result);
+#else
     BOOL DWC_Acc_CheckFriendKey(u64 friendkey, u32 gamecode);
     u64 DWC_Acc_CreateFriendKey(int gs_profile_id, u32 gamecode);
+#endif
     int DWC_Acc_FriendKeyToGsProfileId(u64 friendkey, u32 gamecode);
     u64 DWCi_Acc_GetUserId(const DWCAccLoginId* data);
     u32 DWCi_Acc_GetPlayerId(const DWCAccLoginId* data);
