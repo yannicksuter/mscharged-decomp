@@ -171,6 +171,7 @@ class IndirectStage {
 public:
     IndirectStage() { Set(GX_TEXCOORD0, GX_TEXMAP0, GX_ITS_1, GX_ITS_1); }
 
+#if !defined(VERSION_R4QK01)
     IndirectStage& operator=(const IndirectStage& rhs) {
         texCoordGen = rhs.texCoordGen;
         texMap = rhs.texMap;
@@ -178,6 +179,7 @@ public:
         scaleT = rhs.scaleT;
         return *this;
     }
+#endif
 
     GXTexCoordID GetTexCoordGen() const { return static_cast<GXTexCoordID>(texCoordGen); }
 

@@ -42,7 +42,7 @@
 #include <cmath>
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 static const char* optionOKName = "button_OK";
 #endif
 
@@ -56,13 +56,13 @@ struct PopupEntry
 
 static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "POPUP_CANCEL", 0, 0 }, 1 },
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
 #else
     { 0, "POPUP_END_CUP_MESSAGE", { "POPUP_END_CUP_SAVE", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
 #endif
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "POPUP_CANCEL", 0, 0 }, 1 },
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "CUP_BACKPOPUP_RESTART", "POPUP_CANCEL", 0 }, 1 },
 #else
     { 0, "POPUP_END_CUP_MESSAGE", { "PAUSE_QUIT", "RESTART_CUP", "POPUP_CANCEL", 0 }, 1 },
@@ -110,7 +110,7 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_WIN_FIRECUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_CRYSTALCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_WIN_STRIKERCUP_MAINCUP_REWARDS", { "POPUP_OK", 0, 0, 0 }, 0 },
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     { 0, "POPUP_CHALLENGE_UNLOCK_MARIO", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_SUCCEEDED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
     { 0, "POPUP_CHALLENGE_FAILED", { "POPUP_SELECT_NEW_CHALLENGE", "POPUP_RESTART_CHALLENGE", "POPUP_MAIN_MENU", 0 }, 0 },
@@ -208,7 +208,11 @@ static const PopupEntry PopupEntries[] = {
     { 0, "POPUP_LOCKED_CRYSTAL_BRICK_WALL", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_LOCKED_CRYSTAL_GOLDEN_BOOT", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 0, "POPUP_PROFILE_NO_MIIS", { "POPUP_OK", 0, 0, 0 }, 0 },
+#if defined(VERSION_R4QK01)
+    { 0, "POPUP_PROFILE_DATABASE_CORRUPT", { "POPUP_MII_DB_CORRUPT_BUTTON", 0, 0, 0 }, 0 },
+#else
     { 0, "POPUP_PROFILE_DATABASE_CORRUPT", { "POPUP_MANAGE_MEMORY", 0, 0, 0 }, 0 },
+#endif
     { 0, "POPUP_PROFILE_MII_NOT_FOUND", { "POPUP_OK", 0, 0, 0 }, 0 },
     { 1, "POPUP_PROFILE_UNLINK_WARNING", { "POPUP_YES", "POPUP_NO", 0, 0 }, 1 },
     { 0, "POPUP_PROFILE_MII_DELETION_WARNING", { "POPUP_OK", 0, 0, 0 }, 0 },
@@ -326,7 +330,7 @@ void FEPopupMenu::SceneCreated()
         pText->SetBoxSize(boxSize);
     }
 
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     TLComponentInstance* pOK = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
         presentation, "Slide1", "Layer", optionOKName);
     pOK->SetVisible(false);
@@ -336,7 +340,7 @@ void FEPopupMenu::SceneCreated()
     {
         mOptionInstances[optionIndex] = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, "Slide1", "Layer", optionNames[optionIndex]);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         if (nlStrNCmp(PopupEntries[mType].mOptions[optionIndex], "POPUP_OK", 10) == 0)
         {
             mOptionInstances[optionIndex]->SetVisible(false);
@@ -707,21 +711,10 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     mHighlightedOption = popupEntry->mInitialHighlight;
 }
 
-void FEPopupMenu::CentrePopup(float totalHeight, float topOfMessageBox)
+static inline float GetPopupWidth(TLTextInstance* text)
 {
-    float halfHeight = totalHeight;
-    halfHeight *= 0.5f;
-    float verticalOffset = halfHeight - topOfMessageBox;
-    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
-        presentation, "Slide1", "Layer", "Message");
-    feVector3 position = pText->GetAssetPosition();
-    pText->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
-    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
-    {
-        position = mOptionInstances[optionIndex]->GetAssetPosition();
-        mOptionInstances[optionIndex]->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
-    }
+    nlVector2 size = GetTextDimensions(text);
+    return size.e[0] > 630.0f ? size.e[0] : 630.0f;
 }
 
 void FEPopupMenu::SetPositions()
@@ -729,9 +722,24 @@ void FEPopupMenu::SetPositions()
     float topOfMessage;
     const nlFont* pFont;
     feVector3 optionPosition;
+    float optionHeight;
     float prevOptionHeight = 0.0f;
     float totalHeight = 0.0f;
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+#if defined(VERSION_R4QK01)
+    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
+        presentation, "Slide1", "Layer", "Message");
+    pFont = ((const FEText*)pText->m_component)->m_pFeFontResource->GetFontReference();
+    float textHeight = pFont->GetStringHeight(
+        pText->GetString(),
+        (unsigned long)((pText->m_OverloadFlags & 4)
+                ? pText->m_OverloadedAttributes.BoxSize
+                : ((const FEText*)pText->m_component)->m_TextAttributes.BoxSize).x,
+        true);
+    feVector3 messageScale = pText->GetAssetScale();
+    const feVector3 messagePosition = pText->GetAssetPosition();
+    float messageHeight = textHeight * messageScale.e[1] + 8.0f;
+#else
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
         presentation, nlStringLowerHash("Slide1"), nlStringLowerHash("Layer"), nlStringLowerHash("Message"), 0, 0, 0);
     const feVector3 messagePosition = pText->GetAssetPosition();
@@ -739,6 +747,7 @@ void FEPopupMenu::SetPositions()
     nlTextBox::StringDrawInfo drawInfo = pText->m_DrawInfo;
     feVector3 messageScale = pText->GetAssetScale();
     float messageHeight = messageScale.e[1] * (float)(drawInfo.RowCount * pFont->m_Metrics.Height);
+#endif
     totalHeight += messageHeight;
     topOfMessage = messagePosition.e[1] + messageHeight / 2.0f;
 
@@ -769,10 +778,10 @@ void FEPopupMenu::SetPositions()
         nlColour optionColour = pText->GetAssetColour();
         optionColour.c[3] = 255;
         pText->SetAssetColour(optionColour);
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
-        float optionHeight = 56.7f;
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
+        optionHeight = 56.7f;
 #else
-        float optionHeight = 50.0f;
+        optionHeight = 50.0f;
 #endif
         totalHeight += optionHeight;
         float optionY;
@@ -797,9 +806,8 @@ void FEPopupMenu::SetPositions()
         presentation->GetActiveSlide(), "Layer", "blackbox");
     pText = FEFinder<TLTextInstance, 3>::Find(
         mPresentation, "Slide1", "Layer", "Message");
-    nlVector2 size = GetTextDimensions(pText);
-    float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+    float width = GetPopupWidth(pText);
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     mBackgroundTargetScaleX = (40.0f + width) / 120.0f;
     mBackgroundTargetScaleY = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
 #else
@@ -808,13 +816,30 @@ void FEPopupMenu::SetPositions()
 #endif
     pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
     feVector3 position = pImage->GetAssetPosition();
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
 #else
     pImage->SetAssetPosition(5.0f + position.e[0], position.e[1] - 8.0f, position.e[2]);
 #endif
     SetMessageAndOptionsVisible(false);
     mMenuDisplayed = true;
+}
+
+void FEPopupMenu::CentrePopup(float totalHeight, float topOfMessageBox)
+{
+    float halfHeight = totalHeight;
+    halfHeight *= 0.5f;
+    float verticalOffset = halfHeight - topOfMessageBox;
+    FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
+    TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
+        presentation, "Slide1", "Layer", "Message");
+    feVector3 position = pText->GetAssetPosition();
+    pText->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
+    for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
+    {
+        position = mOptionInstances[optionIndex]->GetAssetPosition();
+        mOptionInstances[optionIndex]->SetAssetPosition(position.e[0], position.e[1] + verticalOffset, position.e[2]);
+    }
 }
 
 void FEPopupMenu::SetMessageAndOptionsVisible(bool visible)

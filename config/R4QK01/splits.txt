@@ -1763,9 +1763,11 @@ Game/FE/GameSceneManager.cpp:
 	.sbss       start:0x80604EF0 end:0x80604EF4
 
 Game/FE/fePopupMenu.cpp:
+	.text       start:0x801C6268 end:0x801CC044
 	.rodata     start:0x804B4190 end:0x804B5150
 	.data       start:0x804E1A80 end:0x804E2DC0
 	.sdata      start:0x80600A10 end:0x80600A70
+	.sbss       start:0x80604EF8 end:0x80604F00
 	.sdata2     start:0x80608B58 end:0x80608BE0
 
 Game/FE/FEAudio.cpp:
@@ -6176,18 +6178,25 @@ RVL_SDK/net/hmac.c:
 RVL_SDK/hbm/HBMAnmController.cpp:
 	.data       start:0x80521F60 end:0x80521F8C
 
-RVL_SDK/dwc/dwc_base64.c:
-	.data       start:0x80524DF0 end:0x80524E38
-
 RVL_SDK/hbm/HBMFrameController.cpp:
 	.text       start:0x8042AE10 end:0x8042AFC0
 	.rodata     start:0x804BE020 end:0x804BE024 align:4
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
+	.text       start:0x80438130 end:0x80438FC0 align:16
+	.rodata     start:0x804BE400 end:0x804BE410
+	.bss        start:0x805FB3E0 end:0x805FB408
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_material.cpp:
+	.text       start:0x8043A070 end:0x8043D2E0 align:16
+	.rodata     start:0x804BE420 end:0x804BE450
+	.data       start:0x805221A8 end:0x80522230
+
+RVL_SDK/dwc/dwc_base64.c:
+	.data       start:0x80524DF0 end:0x80524E38
+
 RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
 	.rodata     start:0x804BE474 end:0x804BE4FC align:4
-
-RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
-	.text       start:0x80438130 end:0x80438FC0
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
 	.text       start:0x8043E830 end:0x8043E888

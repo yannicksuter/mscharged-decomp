@@ -157,6 +157,25 @@ void CupKnockoutScene::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 }
 
+#if defined(VERSION_R4QK01)
+static inline void HideMatchupTimers(TLSlide* slide)
+{
+    for (int i = 0; i < 7; ++i)
+    {
+        char matchupName[8];
+        char gameName[4];
+        nlSNPrintf(matchupName, sizeof(matchupName), "game_%d", i);
+        nlSNPrintf(gameName, sizeof(gameName), "g_%d", i);
+        TLComponentInstance* timer = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
+            slide, "Layer", "tournament_screens", matchupName, "off", gameName, "TIMER");
+        timer->m_bVisible = false;
+        timer = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
+            slide, "Layer", "tournament_screens", matchupName, "over", gameName, "TIMER");
+        timer->m_bVisible = false;
+    }
+}
+#endif
+
 void CupKnockoutScene::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
@@ -232,12 +251,12 @@ void CupKnockoutScene::Update(float fDeltaT)
 #endif
         {
             mPageControls->Update(event, fDeltaT);
-#if !defined(VERSION_R4QJ01)
+#if !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
             mBracketButton.HandlePointerEvent(&event);
 #endif
             if (mBackButton.UpdateBackButton(event, fDeltaT))
             {
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
                 FEPageControls* pageControls = mPageControls;
                 pageControls->mPadHeld[0] = false;
                 pageControls->mPadHeld[1] = false;
@@ -247,6 +266,9 @@ void CupKnockoutScene::Update(float fDeltaT)
                 if (navigation != 0)
                     navigation->HideButtons();
                 mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QK01)
+                HideMatchupTimers(mPresentation->GetActiveSlide());
+#endif
                 return;
             }
         }
@@ -275,6 +297,9 @@ void CupKnockoutScene::Update(float fDeltaT)
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
                 mTransitionState = CUP_KNOCKOUT_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QK01)
+                HideMatchupTimers(mPresentation->GetActiveSlide());
+#endif
                 if (mPageControls->IsButtonPressed(1))
                     mPreviousPagePressed = true;
                 else if (mPageControls->IsButtonPressed(0))
@@ -282,7 +307,7 @@ void CupKnockoutScene::Update(float fDeltaT)
                 return;
             }
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         mBracketButton.HandlePointerEvent(&event);
 #endif
     }
@@ -718,7 +743,7 @@ void CupKnockoutScene::OnBracketPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         FEPageControls* pageControls = mPageControls;
         pageControls->mPadHeld[0] = false;
         pageControls->mPadHeld[1] = false;
@@ -730,6 +755,9 @@ void CupKnockoutScene::OnBracketPointerPress(unsigned int, void* context)
         if (navigation != 0)
             navigation->HideButtons();
         mPresentation->SetActiveSlide("out", true);
+#if defined(VERSION_R4QK01)
+        HideMatchupTimers(mPresentation->GetActiveSlide());
+#endif
         break;
     }
 }

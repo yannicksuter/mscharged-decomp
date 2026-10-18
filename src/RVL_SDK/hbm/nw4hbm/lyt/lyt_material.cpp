@@ -10,11 +10,19 @@
 
 static const GXColorS10 DefaultBlackColor = {0, 0, 0, 0};
 
+#if defined(VERSION_R4QK01)
+static const GXColorS10 DefaultWhiteColor = {255, 255, 255, 255};
+#endif
+
 static inline void SetDefaultWhiteColor(GXColorS10* p) {
+#if defined(VERSION_R4QK01)
+    *p = DefaultWhiteColor;
+#else
     p->r = 255;
     p->g = 255;
     p->b = 255;
     p->a = 255;
+#endif
 }
 
 static inline bool IsDefaultWhiteColor(GXColorS10* p) {
