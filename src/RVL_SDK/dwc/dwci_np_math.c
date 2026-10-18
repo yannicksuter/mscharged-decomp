@@ -3,6 +3,10 @@
 
 #include <string.h>
 
+#if defined(VERSION_R4QK01)
+#include <revolution/net/NETDigest.h>
+#endif
+
 #define ROTL32(value, shift) \
     (((value) << (shift)) | ((value) >> (32 - (shift))))
 
@@ -860,3 +864,14 @@ u32 MATH_CalcCRC32(const MATHCRC32Table* table, const void* data,
     MATHi_CRC32UpdateRev(table, &context, data, dataLength);
     return ~context;
 }
+
+#if defined(VERSION_R4QK01)
+void MATH_CalcMD5(void* digest, const void* data, u32 dataLength)
+{
+    NETMD5Context context;
+
+    NETMD5Init(&context);
+    NETMD5Update(&context, (void*)data, dataLength);
+    NETMD5GetDigest(&context, digest);
+}
+#endif

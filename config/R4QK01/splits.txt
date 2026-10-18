@@ -6291,10 +6291,10 @@ RVL_SDK/dwc/dwc_transport.c:
 	.sbss       start:0x80606548 end:0x80606550
 
 RVL_SDK/dwc/dwci_np_math.c:
-	.text       start:0x80471E10 end:0x80473254
+	.text       start:0x80471E10 end:0x804732D0
 
 RVL_SDK/dwc/dwc_account.c:
-	.text       start:0x804732D0 end:0x80474AE4
+	.text       start:0x804732D0 end:0x80474AE4 align:16
 	.data       start:0x80529BA8 end:0x80529CB8
 	.sdata      start:0x80603A28 end:0x80603A30
 
