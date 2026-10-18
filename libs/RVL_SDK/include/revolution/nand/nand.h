@@ -1,6 +1,7 @@
 #ifndef RVL_SDK_NAND_H
 #define RVL_SDK_NAND_H
 #include <revolution/types.h>
+#include <revolution/nand_fwd.h>
 #include <revolution/nand/NANDBanner.h>
 
 #include <revolution/fs.h>
@@ -11,8 +12,6 @@ extern "C" {
 #define NAND_PAGE_SIZE 2048
 #define NAND_CLUSTER_SIZE (NAND_PAGE_SIZE * 8)
 #define NAND_BLOCK_SIZE (NAND_CLUSTER_SIZE * 8)
-
-#define NAND_MAX_PATH FS_MAX_PATH
 
 // Forward declarations
 typedef struct NANDCommandBlock NANDCommandBlock;

@@ -121,7 +121,11 @@ void ResetTask::Run(float dt)
             OSRestart(0);
             break;
         case RM_REBOOT:
+#if defined(VERSION_R4QK01)
+            OSReturnToMenu();
+#else
             OSRebootSystem();
+#endif
             break;
         case RM_SHUTDOWN:
             OSShutdownSystem();
@@ -129,6 +133,11 @@ void ResetTask::Run(float dt)
         case RM_RETURN_TO_MENU:
             OSReturnToMenu();
             break;
+#if defined(VERSION_R4QK01)
+        case RM_RETURN_TO_DATA_MANAGER:
+            OSReturnToDataManager();
+            break;
+#endif
         }
 
         for (;;)

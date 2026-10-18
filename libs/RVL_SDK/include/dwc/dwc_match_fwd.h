@@ -18,6 +18,14 @@ extern "C"
     typedef void (*DWCStopSCCallback)(void* param);
 #if defined(VERSION_R4QK01)
     typedef int (*DWCReservationCallback)(const void* reservationData, void* param);
+
+    typedef enum DWCSuspendResult
+    {
+        DWC_SUSPEND_SUCCESS = 0,
+        DWC_SUSPEND_TIMEOUT,
+        DWC_SUSPEND_NUM
+    } DWCSuspendResult;
+    typedef void (*DWCSuspendCallback)(DWCSuspendResult result, int suspend, void* param);
 #endif
 
     typedef enum DWCMatchOptType

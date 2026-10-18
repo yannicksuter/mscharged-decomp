@@ -1,4 +1,5 @@
 #include <dwc/dwc_main.h>
+#include <dwc/R4QK01/dwc_main_internal.h>
 #include <dwc/R4QK01/dwc_match_internal.h>
 #include <dwc/dwc_common.h>
 #include <dwc/dwc_error.h>
@@ -47,14 +48,6 @@ typedef struct DWCstControl
     DWCMatchControl matchcnt;
     DWCTransportInfo transinfo;
 } DWCControl;
-
-typedef struct DWCConnectionInfo
-{
-    u8 index;
-    u8 aid;
-    u16 reserve;
-    int profileID;
-} DWCConnectionInfo;
 
 static GT2Connection stGt2ConnectionList[32];
 static DWCConnectionInfo stConnectionInfoList[32];

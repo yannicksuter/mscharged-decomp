@@ -33,7 +33,7 @@ public:
     void SetDraftMessage(NetMessageDraft message) { mDraftMessage = message; }
 
     void OnCountdownTick(FETimer* timer);
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     TLTextInstance* GetPlayerNameText(int machine, bool guest);
     void UpdateTimerText();
 #endif

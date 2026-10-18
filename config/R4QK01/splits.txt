@@ -722,6 +722,7 @@ Game/DB/SaveLoad.cpp:
 	.ctors      start:0x804B08D4 end:0x804B08D8
 	.data       start:0x804D1888 end:0x804D19B8
 	.bss        start:0x805334C0 end:0x805334D0
+	.sdata      start:0x805FFE50 end:0x805FFE80
 	.sbss       start:0x80604620 end:0x80604650
 	.sdata2     start:0x80607C30 end:0x80607C40
 
@@ -859,6 +860,8 @@ Game/Task/ResetTask.cpp:
 	.ctors      start:0x804B0900 end:0x804B0904
 	.data       start:0x804D3F98 end:0x804D3FAC
 	.bss        start:0x80533708 end:0x80533730
+	.sdata      start:0x805FFFB8 end:0x805FFFC0
+	.sbss       start:0x80604730 end:0x80604748
 	.sdata2     start:0x80607D40 end:0x80607D58
 
 Game/main.cpp:
@@ -1969,6 +1972,7 @@ Game/FE/feMusic.cpp:
 	.sbss       start:0x80604F30 end:0x80604F40
 
 Game/SH/SHNetworkStart.cpp:
+	.text       start:0x801FFB80 end:0x80201ED4
 	.data       start:0x804E5910 end:0x804E5B68
 	.sdata      start:0x80601210 end:0x80601258
 	.sbss       start:0x80604F40 end:0x80604F48
@@ -1999,6 +2003,7 @@ Game/Font/FontLoading.cpp:
 	.sdata2     start:0x80608E80 end:0x80608E88
 
 Game/SH/SHCupHub.cpp:
+	.text       start:0x80203E1C end:0x802073FC
 	.data       start:0x804E5E80 end:0x804E6020
 	.sdata      start:0x806012A0 end:0x80601308
 	.sdata2     start:0x80608E88 end:0x80608E98
@@ -2328,8 +2333,9 @@ Game/SH/SHStrikerTimesBase.cpp:
 	.sdata2     start:0x80609248 end:0x80609258
 
 Game/SH/SHOnlineFriendsChooseSides.cpp:
-	.text       start:0x8026FC40 end:0x80273D8C
+	.text       start:0x8026FC40 end:0x80273E80
 	.data       start:0x804EB6C8 end:0x804EB868
+	.sdata      start:0x806024C8 end:0x80602528
 	.sdata2     start:0x80609258 end:0x80609268
 
 Game/MiiManager.cpp:
@@ -4694,6 +4700,7 @@ NL/gc/gcSwizzler.cpp:
 NL/gl/glPlat.cpp:
 	.text       start:0x8036E3E0 end:0x8036EDFC
 	.ctors      start:0x804B0E48 end:0x804B0E4C
+	.data       start:0x804FFD10 end:0x804FFD80
 	.bss        start:0x8054F8C8 end:0x8054F918
 	.sdata      start:0x806031F0 end:0x80603208
 	.sbss       start:0x80605998 end:0x806059B8
@@ -5669,6 +5676,7 @@ RVL_SDK/sp/sp.c:
 RVL_SDK/thp/THPDec.c:
 	.text       start:0x803CB890 end:0x803CED1C
 	.rodata     start:0x804B9520 end:0x804B95B0
+	.data       start:0x80515CF0 end:0x80515D38
 	.bss        start:0x8058B6C0 end:0x8058B80C
 	.sdata      start:0x80603538 end:0x8060353C
 	.sbss       start:0x80606100 end:0x80606224 align:32

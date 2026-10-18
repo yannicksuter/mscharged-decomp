@@ -133,6 +133,11 @@ void glplatInitializeMaterialPrograms()
 
 bool glplatStartup(gl_ScreenInfo* screenInfo)
 {
+    u32 fbSize;
+    u32 totalSize;
+    void* framebufferMemory;
+    GXRenderModeObj* renderMode;
+
     SCInit();
     while (SCCheckStatus() == 1)
     {
@@ -159,7 +164,10 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     screenInfo->FSAA = false;
     glx_CopyDispScaleFactor = 1.0f;
 
-    GXRenderModeObj* renderMode;
+#if defined(VERSION_R4QK01)
+    glx_VideoMode = 0;
+    renderMode = &GXNtsc480IntDf;
+#else
     u32 tvFormat = VIGetTvFormat();
     switch (tvFormat)
     {
@@ -185,6 +193,7 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     }
 
     tvFormat = VIGetTvFormat();
+#endif
     if (SCGetProgressiveMode() == 1 && VIGetDTVStatus() == 1)
     {
         if (glx_VideoMode == 0)
@@ -192,17 +201,23 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
             renderMode = glx_Widescreen ? &GXNtsc480ProgSoft : &GXNtsc480Prog;
             OSReport("Setting Progressive NTSC Mode\n");
         }
+#if defined(VERSION_R4QK01)
+        if (glx_VideoMode == 1)
+#else
         if (glx_VideoMode == 1 || tvFormat == 5)
+#endif
         {
             renderMode = glx_Widescreen ? &GXEurgb60Hz480ProgSoft : &GXEurgb60Hz480Prog;
             OSReport("Setting Progressive EURGB60 Mode\n");
         }
     }
+#if !defined(VERSION_R4QK01)
     else if (tvFormat == 5 || SCGetEuRgb60Mode() == 1)
     {
         renderMode = &GXEurgb60Hz480IntDf;
         OSReport("Setting Interlaced EURGB60 Mode\n");
     }
+#endif
 
     GXAdjustForOverscan(renderMode, &glx_rmode, 0, 16);
     if (glx_VideoMode == 1)
@@ -231,13 +246,13 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     glx_FIFO = GXInit(glx_FIFOMem, glx_FIFOSize);
     GXInitFifoLimits(glx_FIFO, glx_FIFOSize - 0x10000, glx_FIFOSize - 0x40000);
 
-    u32 fbSize = ((glx_rmode.fbWidth + 15) & 0xFFF0) * glx_rmode.xfbHeight * 2;
+    fbSize = ((glx_rmode.fbWidth + 15) & 0xFFF0) * glx_rmode.xfbHeight * 2;
     if (fbSize < 0x9F600)
     {
         fbSize = 0x9F600;
     }
-    u32 totalSize = fbSize * 2;
-    void* framebufferMemory = nlMalloc(totalSize, 32, false);
+    totalSize = fbSize * 2;
+    framebufferMemory = nlMalloc(totalSize, 32, false);
     glx_FrameBuffer[0] = framebufferMemory;
     glx_FrameBuffer[1] = (u8*)framebufferMemory + fbSize;
     glx_FBSize = fbSize;

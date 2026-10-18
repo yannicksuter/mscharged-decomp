@@ -217,7 +217,7 @@ void CupHubScene::Update(float fDeltaT)
         }
         if (mPagingEnabled)
             mPageControls->Update(event, fDeltaT);
-#if !defined(VERSION_R4QJ01)
+#if !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
         if (!mSuppressInput)
             mRulesComponent.HandlePointerEvent(&event);
 #endif
@@ -228,7 +228,7 @@ void CupHubScene::Update(float fDeltaT)
             for (int j = 0; j < 4; ++j)
                 mMatchupComponents[j].Disable();
             mState = CUP_HUB_EXITING_BACK;
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             FEPageControls* pageControls = mPageControls;
             pageControls->mPadHeld[0] = false;
             pageControls->mPadHeld[1] = false;
@@ -259,7 +259,7 @@ void CupHubScene::Update(float fDeltaT)
                 return;
             }
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         if (!mSuppressInput)
             mRulesComponent.HandlePointerEvent(&event);
 #endif
@@ -523,7 +523,7 @@ void CupHubScene::OnRulesPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         FEPageControls* pageControls = mPageControls;
         pageControls->mPadHeld[0] = false;
         pageControls->mPadHeld[1] = false;

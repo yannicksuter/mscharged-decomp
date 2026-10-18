@@ -55,6 +55,7 @@ void OSShutdownSystem(void);
 void OSShutdownSystemForBS(u32 resetCode);
 void OSRestart(u32 resetCode);
 void OSReturnToMenu(void);
+void OSReturnToDataManager(void);
 void __OSReturnToMenuForError(void);
 
 u32 OSGetResetCode(void);

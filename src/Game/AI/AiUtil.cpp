@@ -70,6 +70,49 @@ void MakePerpendicularPlane(const nlVector3& v3Position, const nlVector3& v3Norm
 
 bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlVector3& v3Plane1, const nlVector3& v3Plane2)
 {
+#if defined(VERSION_R4QK01)
+    nlVector3 v3Direction;
+    float dirY = v3Pivot.y - v3Point.y;
+    float dirZ = v3Pivot.z - v3Point.z;
+    float dirX = v3Pivot.x - v3Point.x;
+    nlVec3Set(v3Direction, dirX, dirY, dirZ);
+
+    nlVector3 v3Normal;
+    v3Normal.x = -v3Direction.y;
+    v3Normal.y = v3Direction.x;
+    v3Normal.z = 0.0f;
+
+    nlVector4 v4Plane;
+    MakePerpendicularPlane(v3Pivot, v3Normal, v4Plane, 0.0f);
+    float sideLeft = nlPlaneSide(v3Plane1, v4Plane);
+    float sideRight = nlPlaneSide(v3Plane2, v4Plane);
+
+    if (sideLeft * sideRight < 0.0f)
+    {
+        nlVector3 v3Edge;
+        float edgeZ = v3Plane1.z - v3Plane2.z;
+        float edgeY = v3Plane1.y - v3Plane2.y;
+        float edgeX = v3Plane1.x - v3Plane2.x;
+        nlVec3Set(v3Edge, edgeX, edgeY, edgeZ);
+        v3Normal.x = -v3Edge.y;
+        v3Normal.y = v3Edge.x;
+        v3Normal.z = 0.0f;
+        MakePerpendicularPlane(v3Plane1, v3Normal, v4Plane, 0.0f);
+
+        float pointSide = nlPlaneSide(v3Point, v4Plane);
+        float pivotSide = nlPlaneSide(v3Pivot, v4Plane);
+        if (pointSide * pivotSide < 0.0f)
+        {
+            return true;
+        }
+        if (nlAbs(pointSide) < nlAbs(pivotSide))
+        {
+            return true;
+        }
+    }
+
+    return false;
+#else
     float distSqA = nlVec3DistanceSquared2D(v3Plane1, v3Pivot);
     float distSqP = nlVec3DistanceSquared2D(v3Plane1, v3Point);
 
@@ -102,6 +145,7 @@ bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlV
     }
 
     return false;
+#endif
 }
 
 #undef abs

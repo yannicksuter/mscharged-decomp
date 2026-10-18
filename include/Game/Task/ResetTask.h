@@ -9,6 +9,9 @@ enum RESET_MODE
     RM_REBOOT = 1,
     RM_SHUTDOWN = 2,
     RM_RETURN_TO_MENU = 3,
+#if defined(VERSION_R4QK01)
+    RM_RETURN_TO_DATA_MANAGER = 4,
+#endif
 };
 
 enum RESET_STATE

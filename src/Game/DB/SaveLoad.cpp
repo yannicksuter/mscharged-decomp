@@ -2,6 +2,9 @@
 #include "Game/DB/SaveLoad.h"
 #include <revolution/tpl_fwd.h>
 #include <revolution/nand/NANDBanner.h>
+#if defined(VERSION_R4QK01)
+#include <revolution/nand_fwd.h>
+#endif
 #include "Game/TweakRegistry.h"
 
 #include "Game/GameSceneManager.h"
@@ -34,6 +37,9 @@
 static const char* SaveFileName = "Strikers2";
 static const char* OnlineSaveFileName = "Online";
 static const char* BannerFileName = "banner.bin";
+#if defined(VERSION_R4QK01)
+static const char* TemporaryBannerFileName = "/tmp/banner.bin";
+#endif
 bool SaveEnabled = true;
 static bool RetryEnabled = true;
 
@@ -106,6 +112,15 @@ void OpenBannerDirectoryCallback(long result);
 static inline u32 Align32(u32 size)
 {
     return (size + 0x1F) & ~0x1F;
+}
+
+static inline const char* GetBannerWriteFileName()
+{
+#if defined(VERSION_R4QK01)
+    return TemporaryBannerFileName;
+#else
+    return BannerFileName;
+#endif
 }
 
 static inline u32 SaveFileSize()
@@ -206,7 +221,11 @@ void SaveLoad::ContinueWithoutSaving()
 
 void SaveLoad::BeginReset()
 {
+#if defined(VERSION_R4QK01)
+    ResetTask::s_ResetMode = RM_RETURN_TO_DATA_MANAGER;
+#else
     ResetTask::s_ResetMode = RM_RETURN_TO_MENU;
+#endif
     ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
         ? RS_STARTRESET
         : ResetTask::s_ResetState;
@@ -345,9 +364,14 @@ void SaveLoad::WriteSaveFileCallback(long result)
     else
     {
         nlFlashClose(CloseCallback);
+#if defined(VERSION_R4QK01)
+        ResetTask::s_resetPaused = false;
+#endif
         HandleNANDResult(result);
     }
+#if !defined(VERSION_R4QK01)
     ResetTask::s_resetPaused = false;
+#endif
 }
 
 void SaveLoad::ReadSaveFileCallback(long result)
@@ -439,7 +463,7 @@ void SaveLoad::ContinueAfterCloseCallback(long)
     }
     else
     {
-        HandleNANDResult(nlFlashOpen(BannerFileName, 2, OpenBannerCallback));
+        HandleNANDResult(nlFlashOpen(GetBannerWriteFileName(), 2, OpenBannerCallback));
     }
 }
 
@@ -733,15 +757,19 @@ void SaveLoad::CheckBannerSpaceCallback(long result)
 {
     if (result == 0)
     {
+#if !defined(VERSION_R4QK01)
         if (CheckAnswer == 0)
+#endif
         {
             ResetTask::s_resetPaused = true;
-            HandleNANDResult(nlFlashCreate(BannerFileName, 0x30, CreateBannerCallback));
+            HandleNANDResult(nlFlashCreate(GetBannerWriteFileName(), 0x30, CreateBannerCallback));
         }
+#if !defined(VERSION_R4QK01)
         else
         {
             CheckSpaceAnswer(CheckAnswer, OnlineMode);
         }
+#endif
     }
     else
     {
@@ -754,7 +782,7 @@ void SaveLoad::CreateBannerCallback(long result)
 {
     if (result == -6 || result == 0)
     {
-        HandleNANDResult(nlFlashOpen(BannerFileName, 2, WriteBannerCallback));
+        HandleNANDResult(nlFlashOpen(GetBannerWriteFileName(), 2, WriteBannerCallback));
     }
     else
     {
@@ -898,6 +926,8 @@ void SaveLoad::BannerWriteFinishedCallback(long)
 
     HandleNANDResult(nlFlashClose(FinishOperation));
     ResetTask::s_resetPaused = false;
+#elif defined(VERSION_R4QK01)
+    HandleNANDResult(nlFlashClose(FinishOperation));
 #else
     ResetTask::s_resetPaused = false;
     HandleNANDResult(nlFlashClose(FinishOperation));
@@ -906,6 +936,12 @@ void SaveLoad::BannerWriteFinishedCallback(long)
 
 void SaveLoad::FinishOperation(long)
 {
+#if defined(VERSION_R4QK01)
+    char homeDirectory[NAND_MAX_PATH] = "";
+    NANDGetHomeDir(homeDirectory);
+    HandleNANDResult(NANDMove(GetBannerWriteFileName(), homeDirectory));
+    ResetTask::s_resetPaused = false;
+#endif
     InOperation = false;
 }
 
@@ -1017,7 +1053,7 @@ void SaveLoad::OpenBannerDirectoryCallback(long result)
 {
     if (result == 0)
     {
-        HandleNANDResult(nlFlashOpen(BannerFileName, 2, OpenBannerCallback));
+        HandleNANDResult(nlFlashOpen(GetBannerWriteFileName(), 2, OpenBannerCallback));
     }
     else
     {

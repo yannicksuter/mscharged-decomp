@@ -161,7 +161,9 @@ void NetworkSocket::AcquireLocalAddress()
     }
 
     *(u32*)mLocalAddress = 0;
+#if !defined(VERSION_R4QK01)
     *(u32*)mLocalAddress = SOGetHostID();
+#endif
     if (*(u32*)mLocalAddress != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,

@@ -31,7 +31,7 @@
 
 #include "Game/FE/tlDefault.h"
 
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 #include "Game/BaseSceneHandler.inl"
 #include "Game/FE/tlInstance.inl"
 #include "Game/GameInfo.inl"
@@ -88,7 +88,7 @@ SHOnlineFriendsChooseSides::~SHOnlineFriendsChooseSides()
     }
 }
 
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 TLTextInstance* SHOnlineFriendsChooseSides::GetPlayerNameText(int machine, bool guest)
 {
     int slot = machine * 2;
@@ -162,7 +162,11 @@ void SHOnlineFriendsChooseSides::SceneCreated()
                     guest = true;
                     if (groups == 1)
                     {
+#if defined(VERSION_R4QK01)
+                        nlColourSet(mPlayerColours[i], 238, 218, 86, 255);
+#else
                         nlColourSet(mPlayerColours[i], 237, 0, 12, 255);
+#endif
                     }
                     else
                     {
@@ -190,7 +194,11 @@ void SHOnlineFriendsChooseSides::SceneCreated()
                 ++machine;
                 if (groups == 1)
                 {
+#if defined(VERSION_R4QK01)
+                    nlColourSet(mPlayerColours[i], 238, 218, 86, 255);
+#else
                     nlColourSet(mPlayerColours[i], 237, 0, 12, 255);
+#endif
                 }
                 else
                 {
@@ -352,7 +360,7 @@ void SHOnlineFriendsChooseSides::OnCountdownTick(FETimer* timer)
     }
 }
 
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 void SHOnlineFriendsChooseSides::UpdateTimerText()
 {
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
@@ -884,7 +892,7 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
                 controller->SetActiveSlide("cursor", true, false);
             }
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         GetPlayerNameText((s8)message->mMachineIndex, message->mGuest)->SetVisible(mPlayerSides[index] == -1);
 #else
         char friendName[16];
@@ -962,6 +970,6 @@ void SHOnlineFriendsChooseSides::OnDisconnectPopupClosed()
     GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }
 
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
 #include "Game/FriendManager.inl"
 #endif

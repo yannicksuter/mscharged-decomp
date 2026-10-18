@@ -238,14 +238,14 @@ void StrikerCupAwardsScene::Update(float deltaTime)
         }
 
         mPageControls->Update(event, deltaTime);
-#if !defined(VERSION_R4QJ01)
+#if !defined(VERSION_R4QJ01) && !defined(VERSION_R4QK01)
         mPlayButton.HandlePointerEvent(&event);
 #endif
         mScrollBar.Update(event, deltaTime);
 
         if (mBackButton.UpdateBackButton(event, deltaTime))
         {
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             FEPageControls* pageControls = mPageControls;
             pageControls->mPadHeld[0] = false;
             pageControls->mPadHeld[1] = false;
@@ -278,7 +278,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
             }
             return;
         }
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         mPlayButton.HandlePointerEvent(&event);
 #endif
     }
@@ -443,7 +443,7 @@ void StrikerCupAwardsScene::OnButtonPointerPress(unsigned int, void* context)
     switch ((int)context)
     {
     case 0:
-#if defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
         FEPageControls* pageControls = mPageControls;
         pageControls->mPadHeld[0] = false;
         pageControls->mPadHeld[1] = false;

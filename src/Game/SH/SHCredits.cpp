@@ -28,8 +28,10 @@ enum eCreditsPhase
     CREDITS_NINTENDO_LOGO = 0,
     CREDITS_NLG_INTRO = 1,
     CREDITS_SCROLL = 2,
+#if !defined(VERSION_R4QK01)
     CREDITS_COPYRIGHT = 3,
-    CREDITS_FINISHED = 4,
+#endif
+    CREDITS_FINISHED,
 };
 
 SceneList CreditScene::mNextScene = SCENE_OPTIONS;
@@ -71,10 +73,12 @@ void CreditScene::Update(float fDeltaT)
     case CREDITS_SCROLL:
         UpdateForCredits(fDeltaT);
         break;
+#if !defined(VERSION_R4QK01)
     case CREDITS_COPYRIGHT:
         BaseSceneHandler::Update(fDeltaT);
         UpdateForCopyrightMessage(fDeltaT);
         break;
+#endif
     case CREDITS_NINTENDO_LOGO:
         BaseSceneHandler::Update(fDeltaT);
         UpdateForNintendoLogo(fDeltaT);
@@ -133,11 +137,13 @@ void CreditScene::SetupForPhase()
         SetupForCredits();
         BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
+#if !defined(VERSION_R4QK01)
     case CREDITS_COPYRIGHT:
         mPresentation->SetActiveSlide("COPYRIGHTS", true);
         mPresentation->m_currentSlide->Update(0.0f);
         BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
+#endif
     case CREDITS_FINISHED:
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
         GameSceneManager::Instance()->Push(mNextScene, SCREEN_NOTHING, true);
