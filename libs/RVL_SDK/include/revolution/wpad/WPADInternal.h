@@ -153,6 +153,15 @@ typedef struct WPADExtConfig {
 } WPADExtConfig;
 
 // Offsets below describe R4QE01 and R4QJ01; the EU SDK has a smaller extension command queue.
+#if defined(VERSION_R4QK01)
+typedef enum {
+    WPAD_NZFILTER_ACC,
+    WPAD_NZFILTER_DPD,
+    WPAD_NZFILTER_EXT,
+    WPAD_MAX_NZFILTERS
+} WPADNZFilter;
+
+#endif
 typedef struct WPADCB {
     WPADGameInfo gameInfo; // at 0x0
     s32 gameInfoErr[2];
@@ -161,7 +170,7 @@ typedef struct WPADCB {
     WPADCommandQueue stdCmdQueue;      // at 0x160
     WPADCommand stdCmdQueueList[24];   // at 0x16C
     WPADCommandQueue extCmdQueue;      // at 0x5EC
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
     WPADCommand extCmdQueueList[12];   // at 0x5F8
 #else
     WPADCommand extCmdQueueList[8];    // at 0x5F8
@@ -204,12 +213,17 @@ typedef struct WPADCB {
     BOOL oldFw;                   // at 0x8E0
     OSThreadQueue threadQueue;    // at 0x8E4
     s64 lastControllerDataUpdate; // at 0x8F0
+#if defined(VERSION_R4QK01)
+    u16 filterDiff[WPAD_MAX_NZFILTERS]; // at 0x8F8
+    u16 filterSame[WPAD_MAX_NZFILTERS]; // at 0x8FE
+#else
     u16 filterDiffDpd;            // at 0x8F8
     u16 filterSameDpd;            // at 0x8FA
     u16 filterDiffAcc;            // at 0x8FC
     u16 filterSameAcc;            // at 0x8FE
     u16 filterDiffExt;            // at 0x900
     u16 filterSameExt;            // at 0x902
+#endif
     s64 lastReportSendTime;       // at 0x908
     u8 UNK_0x910;
     u8 calibrated;         // at 0x911
@@ -229,7 +243,18 @@ typedef struct WPADCB {
     u8 lastReportId;        // at 0x987
     WPADCallback getInfoCB; // at 0x988
     u8 getInfoBusy;         // at 0x98C
+#if defined(VERSION_R4QK01)
+    u8 extState;                 // at 0x98D
+    u8 disableContReport;        // at 0x98E
+    u8 blcBattery;               // at 0x98F
+    u8 savedDevType;             // at 0x990
+    u8 extWasDisconnected;       // at 0x991
+    s16 reconnectExtMs;          // at 0x992
+    u8 dpdBusy;                  // at 0x994
+    WPADMemBlock memBlock;       // at 0x998
+#else
     u8 UNK_0x98F[0x9A0 - 0x990];
+#endif
 } ALIGN(32) WPADCB;
 
 typedef WPADCB WPADControlBlock;
@@ -246,7 +271,11 @@ void WPADiCreateKeyFor3rd(s32 chan);
 
 BOOL WPADiSendSetPort(WPADCommandQueue* pQueue, u8 port,
                       WPADCallback pCallback);
+#if defined(VERSION_R4QK01)
+BOOL WPADiSendSetReportType(WPADCommandQueue* pQueue, s32 format, BOOL disableContReport,
+#else
 BOOL WPADiSendSetReportType(WPADCommandQueue* pQueue, s32 format,
+#endif
                             WPADCallback pCallback);
 BOOL WPADiSendEnableDPD(WPADCommandQueue* pQueue, BOOL enable,
                         WPADCallback pCallback);
@@ -275,7 +304,11 @@ u16 _WPADGetStackBufferStatus(s32 chan);
 u16 _WPADGetModuleBufferStatus(s32 chan);
 
 void __WPADShutdown(void);
+#if defined(VERSION_R4QK01)
+void __WPADReconnect(BOOL saveSimpleDevs);
+#else
 void __WPADReconnect(void);
+#endif
 
 #ifdef __cplusplus
 }

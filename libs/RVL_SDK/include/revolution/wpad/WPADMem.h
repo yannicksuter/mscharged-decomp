@@ -38,6 +38,10 @@ typedef struct WPADGameInfo {
 
 typedef WPADGameInfo WPADMEMGameInfo;
 
+#if defined(VERSION_R4QK01)
+void WPADiClearMemBlock(s32 chan);
+
+#endif
 extern WPADMemBlock _wmb[WPAD_MAX_CONTROLLERS];
 
 #ifdef __cplusplus

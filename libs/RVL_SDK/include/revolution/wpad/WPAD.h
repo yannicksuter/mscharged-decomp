@@ -133,6 +133,9 @@ typedef enum {
     WPAD_DEV_CORE,
     WPAD_DEV_FREESTYLE,
     WPAD_DEV_CLASSIC,
+#if defined(VERSION_R4QK01)
+    WPAD_DEV_BALANCE_CHECKER,
+#endif
 
     WPAD_DEV_FUTURE = 251,
     WPAD_DEV_NOT_SUPPORTED = 252,
@@ -159,6 +162,14 @@ typedef enum {
     WPAD_FMT_CLASSIC_BTN_ACC_DPD,
 
     WPAD_FMT_BTN_ACC_DPD_EXTENDED,
+#if defined(VERSION_R4QK01)
+    WPAD_FMT_TRAIN,
+    WPAD_FMT_GUITAR,
+    WPAD_FMT_BALANCE_CHECKER,
+    WPAD_FMT_VSM,
+    WPAD_FMT_14,
+    WPAD_FMT_DRUM,
+#endif
 } WPADDataFormat;
 
 typedef enum {
@@ -288,6 +299,52 @@ typedef struct WPADCLStatus {
     u8 clTriggerR; // at 0x35
 } WPADCLStatus;
 
+#if defined(VERSION_R4QK01)
+
+typedef struct WPADTRStatus {
+    u16 button;
+    s16 accX;
+    s16 accY;
+    s16 accZ;
+    DPDObject obj[WPAD_MAX_DPD_OBJECTS];
+    u8 dev;
+    s8 err;
+    u16 trButton;
+    u8 brake;
+    u8 mascon;
+} WPADTRStatus;
+
+typedef struct WPADBLStatus {
+    u16 button;
+    s16 accX;
+    s16 accY;
+    s16 accZ;
+    DPDObject obj[WPAD_MAX_DPD_OBJECTS];
+    u8 dev;
+    s8 err;
+    u16 press[4];
+    s8 temp;
+    u8 battery;
+} WPADBLStatus;
+
+typedef struct WPADVSStatus {
+    u16 button;
+    s16 accX;
+    s16 accY;
+    s16 accZ;
+    DPDObject obj[WPAD_MAX_DPD_OBJECTS];
+    u8 dev;
+    s8 err;
+    u16 unknown2A[5];
+    u8 unknown34[2];
+    u16 unknown36[5];
+    u8 unknown40[4];
+    u16 unknown44;
+    u8 unknown46;
+    u8 unknown47[3];
+} WPADVSStatus;
+
+#endif
 typedef struct WPADAccGravityUnit {
     s16 x; // at 0x0
     s16 y; // at 0x2

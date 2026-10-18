@@ -53,7 +53,11 @@ typedef BOOL (*WUDFreeFunc)(void* pBlock);
 typedef void (*WUDSyncDeviceCallback)(s32 result, s32 num);
 typedef void (*WUDClearDeviceCallback)(s32 result);
 
+#if defined(VERSION_R4QK01)
+typedef void (*WUDHidConnCallback)(WUDDevInfo* devInfo, u8 open);
+#else
 typedef void (*WUDHidConnCallback)(UINT8 devHandle, u8 open);
+#endif
 typedef void (*WUDHidRecvCallback)(UINT8 devHandle, UINT8* pReport, UINT16 len);
 
 typedef struct WUDDevInfo {
@@ -75,7 +79,16 @@ BOOL WUDInit(void);
 BOOL WUDIsBusy(void);
 void WUDRegisterAllocator(WUDAllocFunc pAllocFunc, WUDFreeFunc pFreeFunc);
 u32 WUDGetAllocatedMemSize(void);
+#if defined(VERSION_R4QK01)
+void WUDShutdown(BOOL saveSimpleDevs);
+void WUDSetDeviceHistory(WUDChannel chan, const BD_ADDR addr);
+BOOL WUDIsLatestDevice(WUDChannel chan, const BD_ADDR addr);
+BOOL WUDCancelSyncDevice(void);
+BOOL WUDIsLinkedWBC(void);
+void WUDUpdateSCSetting(void);
+#else
 void WUDShutdown(void);
+#endif
 
 WUDLibStatus WUDGetStatus(void);
 u8 WUDGetBufferStatus(void);
