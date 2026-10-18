@@ -6201,6 +6201,11 @@ RVL_SDK/hbm/HBMGUIManager.cpp:
 	.data       start:0x80520BE8 end:0x80520E58
 	.bss        start:0x805FB1F8 end:0x805FB200
 
+RVL_SDK/hbm/HBMController.cpp:
+	.text       start:0x8042C8F0 end:0x8042D500 align:16
+	.rodata     start:0x804BE038 end:0x804BE048
+	.bss        start:0x805FB200 end:0x805FB398
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0 align:16
 	.rodata     start:0x804BE400 end:0x804BE410

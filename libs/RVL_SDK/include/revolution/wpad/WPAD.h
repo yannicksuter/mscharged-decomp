@@ -331,6 +331,10 @@ WPADConnectCallback* WPADSetConnectCallback(s32 chan,
 WPADExtensionCallback* WPADSetExtensionCallback(s32 chan,
                                                 WPADExtensionCallback* pCallback);
 
+#if defined(VERSION_R4QK01)
+void WPADSetCallbackByKPAD(BOOL isKPAD);
+#endif
+
 u32 WPADGetDataFormat(s32 chan);
 s32 WPADSetDataFormat(s32 chan, u32 format);
 
