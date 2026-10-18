@@ -1573,6 +1573,7 @@ config.libs = [
 
             # RVL_SDK/hbm
             Object(Matching, "RVL_SDK/hbm/HBMAnmController.cpp", cflags=cflags_rvl_hbm, mw_version="Wii/1.0a" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"] if config.version == "R4QK01" else []),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/HBMAxSound.cpp", cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
             Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/HBMCommon.cpp", source="RVL_SDK/hbm/R4QK01/HBMCommon.cpp", cflags=[*cflags_rvl_hbm, "-DHBM_REVISION=2"], mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/hbm/HBMBase.cpp", source="RVL_SDK/hbm/R4QK01/HBMBase.cpp" if config.version == "R4QK01" else "RVL_SDK/hbm/HBMBase.cpp", cflags=[*cflags_rvl_hbm, "-DHBM_REVISION=2"], mw_version="Wii/1.0a" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/hbm/HBMController.cpp", cflags=cflags_rvl_hbm, mw_version="Wii/1.0a" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"] if config.version == "R4QK01" else []),

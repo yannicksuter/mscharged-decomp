@@ -6227,6 +6227,12 @@ RVL_SDK/hbm/HBMRemoteSpk.cpp:
 	.data       start:0x80520E58 end:0x80520E88
 	.bss        start:0x805FB398 end:0x805FB3A0
 
+RVL_SDK/hbm/HBMAxSound.cpp:
+	.text       start:0x8042DE20 end:0x8042E950 align:16
+	.rodata     start:0x804BE048 end:0x804BE080
+	.data       start:0x80520E88 end:0x805211D8
+	.bss        start:0x805FB3A0 end:0x805FB3A8
+
 RVL_SDK/hbm/HBMCommon.cpp:
 	.text       start:0x8042E950 end:0x8042ECB0 align:16
 	.data       start:0x805211D8 end:0x80521228
