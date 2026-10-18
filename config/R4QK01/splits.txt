@@ -6394,7 +6394,8 @@ RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x8048DAF0 end:0x8048DFA8
 
 RVL_SDK/gamespy/gt2/gt2Message.c:
-	.text       start:0x8048DFB0 end:0x80491320
+	.text       start:0x8048DFB0 end:0x80491320 align:16
+	.bss        start:0x805FD060 end:0x805FE060 align:32
 	.sdata      start:0x80603FC0 end:0x80603FD0
 
 RVL_SDK/gamespy/gt2/gt2Socket.c:
