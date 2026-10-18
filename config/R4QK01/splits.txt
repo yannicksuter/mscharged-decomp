@@ -5708,18 +5708,22 @@ RVL_SDK/vi/vi3in1.c:
 	.data       start:0x805162C0 end:0x805168D0
 	.bss        start:0x8058B980 end:0x8058B99C
 
-RVL_SDK/wpad/WPADEncrypt.c:
-	.data       start:0x80517268 end:0x80518590
-
 RVL_SDK/wenc/wenc.c:
 	.text       start:0x803D3D6C end:0x803D4044
 	.rodata     start:0x804B95B0 end:0x804B95F0
 	.sdata2     start:0x8060AC88 end:0x8060AC90
 
 RVL_SDK/wpad/WPAD.c:
-	.text       start:0x803D4110 end:0x803DBA20
+	.text       start:0x803D4050 end:0x803DBA30 align:16
 	.rodata     start:0x804B95F0 end:0x804B962C
+	.data       start:0x805168D0 end:0x80516CF8
+	.bss        start:0x8058B9A0 end:0x8058F100 align:32
+	.sdata      start:0x80603580 end:0x806035B0
+	.sbss       start:0x806062F8 end:0x80606358
 	.sdata2     start:0x8060AC90 end:0x8060AC98
+
+RVL_SDK/wpad/WPADEncrypt.c:
+	.data       start:0x80517268 end:0x80518590
 
 RVL_SDK/wpad/debug_msg.c:
 	.text       start:0x803E0EC0 end:0x803E0F10

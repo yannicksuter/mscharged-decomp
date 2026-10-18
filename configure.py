@@ -1802,7 +1802,7 @@ config.libs = [
 
             # RVL_SDK/wpad
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wpad/debug_msg.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
+            Object(Matching, "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad, source="RVL_SDK/wpad/R4QK01/WPAD.c" if config.version == "R4QK01" else "RVL_SDK/wpad/WPAD.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADEncrypt.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADHIDParser.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADMem.c"),
