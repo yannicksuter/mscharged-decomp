@@ -127,6 +127,25 @@ static void gpiCallCallback(GPConnection* connection, GPICallbackData* data) {
     // Remove the profile from our local lists AFTER the callback has been
     // called
     gpiDeleteBuddy(connection, arg->profile, GPIFalse);
+#if defined(VERSION_R4QK01)
+  } else if (data->type == GPI_ADD_REVERSE_BUDDIES_LIST) {
+    GPGetReverseBuddiesListResponseArg* arg =
+        (GPGetReverseBuddiesListResponseArg*)data->arg;
+
+    if (arg->matches)
+      freeclear(arg->matches);
+  } else if (data->type == GPI_ADD_BUDDYKEYS) {
+    GPGetBuddyStatusInfoKeysArg* arg = (GPGetBuddyStatusInfoKeysArg*)data->arg;
+    if (arg->numKeys != 0) {
+      int i;
+      for (i = 0; i < arg->numKeys; i++) {
+        freeclear(arg->keys[i]);
+        freeclear(arg->values[i]);
+      }
+      freeclear(arg->keys);
+      freeclear(arg->values);
+    }
+#endif
   }
   freeclear(data->arg);
   freeclear(data);
