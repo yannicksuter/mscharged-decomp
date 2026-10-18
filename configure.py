@@ -1764,7 +1764,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/sc/scsystem.c"),
 
             # RVL_SDK/si
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/si/SIBios.c"),
+            Object(Matching, "RVL_SDK/si/SIBios.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/si/SISamplingRate.c"),
 
             # RVL_SDK/so

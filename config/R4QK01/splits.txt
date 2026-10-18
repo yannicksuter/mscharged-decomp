@@ -5663,6 +5663,7 @@ RVL_SDK/pad/Pad.c:
 
 RVL_SDK/si/SIBios.c:
 	.text       start:0x803C9B20 end:0x803CAF80
+	.data       start:0x80515BE8 end:0x80515C58
 	.bss        start:0x8058B4A0 end:0x8058B6C0
 	.sdata      start:0x80603530 end:0x80603534
 	.sbss       start:0x806060E8 end:0x806060F8
