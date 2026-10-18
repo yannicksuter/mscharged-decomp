@@ -21,7 +21,11 @@ BOOL DWC_GetDateTime(DWCDate* date, DWCTime* time)
         localsec += diff;
     }
 
+#if defined(VERSION_R4QK01)
+    tm = DWCi_Np_UtcToTm(&localsec);
+#else
     tm = DWCi_Np_SecondsToCalendarTime(&localsec);
+#endif
     date->year = tm->tm_year + 1900;
     date->month = tm->tm_mon;
     date->mday = tm->tm_mday;

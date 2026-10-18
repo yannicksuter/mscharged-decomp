@@ -6303,8 +6303,15 @@ RVL_SDK/dwc/dwc_transport.c:
 	.sdata      start:0x80603A10 end:0x80603A20
 	.sbss       start:0x80606548 end:0x80606550
 
+RVL_SDK/dwc/dwc_nonport.c:
+	.text       start:0x804711D0 end:0x80471E10 align:16
+	.data       start:0x80529B18 end:0x80529BA8
+	.bss        start:0x805FC900 end:0x805FC928
+	.sdata      start:0x80603A20 end:0x80603A28
+	.sbss       start:0x80606550 end:0x80606560
+
 RVL_SDK/dwc/dwci_np_math.c:
-	.text       start:0x80471E10 end:0x804732D0
+	.text       start:0x80471E10 end:0x804732D0 align:16
 
 RVL_SDK/dwc/dwc_account.c:
 	.text       start:0x804732D0 end:0x80474AF0 align:16
