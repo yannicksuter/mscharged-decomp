@@ -363,7 +363,11 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection,
 
     // Send back a pong.
     ////////////////////
+#if defined(VERSION_R4QK01)
+    gpiSendBuddyMessage(connection, profileid, GPI_BM_PONG, "1", 0, NULL);
+#else
     gpiSendBuddyMessage(connection, profileid, GPI_BM_PONG, "1", 0);
+#endif
 
     break;
 
@@ -502,6 +506,67 @@ GPResult gpiSendServerBuddyMessage(GPConnection* connection, int profileid,
   return GP_NO_ERROR;
 }
 
+#if defined(VERSION_R4QK01)
+GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
+                             const char* message, int sendOption,
+                             GPIPeerOp* peerOp) {
+  GPIPeer* peer;
+  GPIProfile* profile;
+  // GPIConnection *iconnection = (GPIConnection *)*connection;
+  peer = gpiGetPeerByProfile(connection, profileid);
+  if (!peer) {
+    // Check if we should send this through the server.
+    ////////////////////////////////////////////////////
+    if (!gpiGetProfile(connection, profileid, &profile) ||
+        (!profile->buddyStatusInfo || !profile->buddyStatusInfo->buddyPort)) {
+      if (sendOption == GP_DONT_ROUTE)
+        return GP_NETWORK_ERROR;
+      return gpiSendServerBuddyMessage(connection, profileid, type, message);
+    }
+
+    // Create a new peer connection for this message.
+    /////////////////////////////////////////////////
+    peer = gpiAddPeer(connection, profileid, GPITrue);
+    if (!peer)
+      return GP_MEMORY_ERROR;
+
+    // Check if we need a sig.
+    //////////////////////////
+    if (!profile->peerSig) {
+      // Get the sig.
+      ///////////////
+      CHECK_RESULT(gpiPeerGetSig(connection, peer));
+    } else {
+      // Try to connect to the peer.
+      //////////////////////////////
+      CHECK_RESULT(gpiPeerStartConnect(connection, peer));
+    }
+  } else if (peer->state == GPI_PEER_DISCONNECTED) {
+    if (gpiGetProfile(connection, profileid, &profile)) {
+      // clear the buddy port to prevent future messages from
+      // being sent via UDP layer
+      if (profile->buddyStatusInfo)
+        profile->buddyStatusInfo->buddyPort = 0;
+
+      // send the message through the server
+      if (sendOption == GP_DONT_ROUTE)
+        return GP_NETWORK_ERROR;
+      if (type < 100)
+        return gpiSendServerBuddyMessage(connection, profileid, type, message);
+    }
+  }
+
+  if (peerOp) {
+    gpiPeerAddOp(peer, peerOp);
+  }
+  // Copy the message.
+  ////////////////////
+  CHECK_RESULT(gpiPeerAddMessage(connection, peer, type, message));
+
+  return GP_NO_ERROR;
+}
+
+#else
 GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
                              const char* message, int sendOption) {
   GPIPeer* peer;
@@ -546,6 +611,175 @@ GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
 
 
 
+#endif
+
+#if defined(VERSION_R4QK01)
+GPResult gpiBuddyHandleKeyRequest(GPConnection* connection, GPIPeer* peer) {
+  char* message;
+
+  // get all the keys and put them in the message part of bm
+  //////////////////////////////////////////////////////////
+  CHECK_RESULT(gpiSaveKeysToBuffer(connection, &message));
+
+  // Done in case we haven't set any keys
+  if (message == NULL)
+    message = "";
+
+  CHECK_RESULT(gpiSendBuddyMessage(connection, peer->profile, GPI_BM_KEYS_REPLY,
+                                   message, GP_DONT_ROUTE, NULL));
+
+  if (strcmp(message, "") != 0)
+    freeclear(message);
+  return GP_NO_ERROR;
+}
+
+GPResult gpiBuddyHandleKeyReply(GPConnection* connection, GPIPeer* peer,
+                                char* buffer) {
+  GPIProfile* pProfile;
+
+  // Get the profile object to store the keys internally
+  //////////////////////////////////////////////////////
+
+  if (!gpiGetProfile(connection, peer->profile, &pProfile))
+    Error(connection, GP_PARAMETER_ERROR, "Invalid profile.");
+
+  // calculate the B64Decoded string len
+  if (strcmp(buffer, "") == 0) {
+    GPIPeerOp* anIterator;
+
+    for (anIterator = peer->peerOpQueue.first; anIterator != NULL;
+         anIterator = anIterator->next)
+      if (anIterator->type == GPI_BM_KEYS_REQUEST)
+        break;
+
+    if (!anIterator) {
+      return GP_NO_ERROR;
+    } else if (anIterator->type == GPI_BM_KEYS_REQUEST &&
+               anIterator->callback) {
+      GPGetBuddyStatusInfoKeysArg* arg =
+          (GPGetBuddyStatusInfoKeysArg*)gsimalloc(
+              sizeof(GPGetBuddyStatusInfoKeysArg));
+      GPICallback callback;
+      callback.callback = anIterator->callback;
+      callback.param = anIterator->userData;
+
+      arg->keys = NULL;
+      arg->numKeys = 0;
+      arg->values = NULL;
+      arg->profile = peer->profile;
+      gpiAddCallback(connection, callback, arg, NULL, 0);
+      gpiPeerRemoveOp(peer, anIterator);
+    }
+  } else {
+    int decodedLen = 0, index = 0, numKeys, i;
+    char keyName[512];
+    char keyVal[512];
+    char decodeKey[512];
+    char decodeVal[512];
+    gsi_char** keys;
+    gsi_char** values;
+    GPIPeerOp* anIterator;
+    char* checkKey = NULL;
+
+    // start by getting the number of keys
+    gpiReadKeyAndValue(connection, buffer, &index, keyName, keyVal);
+
+    // do not continue further if the header is missing
+    if (strcmp(keyName, "keys") != 0)
+      CallbackError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                    "Error reading keys reply message");
+
+    numKeys = atoi(keyVal);
+
+    if (numKeys == 0) {
+      GPIPeerOp* anIterator;
+
+      for (anIterator = peer->peerOpQueue.first; anIterator != NULL;
+           anIterator = anIterator->next)
+        if (anIterator->type == GPI_BM_KEYS_REQUEST)
+          break;
+
+      if (!anIterator) {
+        return GP_NO_ERROR;
+      } else if (anIterator->type == GPI_BM_KEYS_REQUEST &&
+                 anIterator->callback) {
+        GPGetBuddyStatusInfoKeysArg* arg =
+            (GPGetBuddyStatusInfoKeysArg*)gsimalloc(
+                sizeof(GPGetBuddyStatusInfoKeysArg));
+        GPICallback callback;
+        callback.callback = anIterator->callback;
+        callback.param = anIterator->userData;
+
+        arg->keys = NULL;
+        arg->numKeys = 0;
+        arg->values = NULL;
+        arg->profile = peer->profile;
+        gpiAddCallback(connection, callback, arg, NULL, 0);
+        gpiPeerRemoveOp(peer, anIterator);
+      }
+    } else {
+      keys = (gsi_char**)gsimalloc(sizeof(gsi_char*) * numKeys);
+      values = (gsi_char**)gsimalloc(sizeof(gsi_char*) * numKeys);
+
+      for (i = 0; i < numKeys; i++) {
+        gpiReadKeyAndValue(connection, buffer, &index, keyName, keyVal);
+        B64Decode(keyName, decodeKey, (int)strlen(keyName), &decodedLen, 2);
+        decodeKey[decodedLen] = '\0';
+        B64Decode(keyVal, decodeVal, (int)strlen(keyVal), &decodedLen, 2);
+        decodeVal[decodedLen] = '\0';
+        keys[i] = goastrdup(decodeKey);
+        values[i] = goastrdup(decodeVal);
+
+        if (gpiStatusInfoCheckKey(connection,
+                                  pProfile->buddyStatusInfo->extendedInfoKeys,
+                                  decodeKey, &checkKey) == GP_NO_ERROR &&
+            checkKey == NULL) {
+          gpiStatusInfoAddKey(connection,
+                              pProfile->buddyStatusInfo->extendedInfoKeys,
+                              decodeKey, decodeVal);
+        } else {
+          gpiStatusInfoSetKey(connection,
+                              pProfile->buddyStatusInfo->extendedInfoKeys,
+                              decodeKey, decodeVal);
+        }
+      }
+
+      for (anIterator = peer->peerOpQueue.first; anIterator != NULL;
+           anIterator = anIterator->next)
+        if (anIterator->type == GPI_BM_KEYS_REQUEST)
+          break;
+
+      if (!anIterator) {
+        return GP_NO_ERROR;
+      } else if (anIterator->type == GPI_BM_KEYS_REQUEST &&
+                 anIterator->callback) {
+        GPICallback callback;
+        GPGetBuddyStatusInfoKeysArg* arg =
+            (GPGetBuddyStatusInfoKeysArg*)gsimalloc(
+                sizeof(GPGetBuddyStatusInfoKeysArg));
+
+        callback.callback = anIterator->callback;
+        callback.param = anIterator->userData;
+
+        // allocate a key array that points to each extended info key for that
+        // player
+        arg->numKeys = numKeys;
+
+        arg->keys = keys;
+        arg->values = values;
+        arg->profile = peer->profile;
+
+        gpiAddCallback(connection, callback, arg, NULL, GPI_ADD_BUDDYKEYS);
+        gpiPeerRemoveOp(peer, anIterator);
+      }
+    }
+  }
+
+  return GP_NO_ERROR;
+}
+
+#endif
+
 GPResult gpiAuthBuddyRequest(GPConnection* connection, GPProfile profile) {
   GPIProfile* pProfile;
   GPIConnection* iconnection = (GPIConnection*)*connection;
@@ -584,6 +818,11 @@ GPIBool gpiFixBuddyIndices(GPConnection* connection, GPIProfile* profile,
 
   if (profile->buddyStatus && (profile->buddyStatus->buddyIndex > baseIndex))
     profile->buddyStatus->buddyIndex--;
+#if defined(VERSION_R4QK01)
+  else if (profile->buddyStatusInfo &&
+           profile->buddyStatusInfo->buddyIndex > baseIndex)
+    profile->buddyStatusInfo->buddyIndex--;
+#endif
   return GPITrue;
 }
 

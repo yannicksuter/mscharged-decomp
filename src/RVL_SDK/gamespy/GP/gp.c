@@ -1317,12 +1317,17 @@ int gpIsBuddyConnectionOpen(GPConnection* connection, GPProfile profile) {
   if (iconnection->simulation)
     return 0;
 
+#if defined(VERSION_R4QK01)
+  aPeer = gpiGetPeerByProfile(connection, profile);
+  return gpiIsPeerConnected(aPeer);
+#else
   aPeer = gpiGetConnectedPeer(connection, profile);
 
   if (aPeer == NULL)
     return 0; // not connected
   else
     return 1; // connected
+#endif
 }
 
 GPResult gpDeleteBuddy(GPConnection* connection, GPProfile profile) {
@@ -1469,7 +1474,11 @@ GPResult gpSendBuddyMessageA(GPConnection* connection, GPProfile profile,
   if (message == NULL)
     Error(connection, GP_PARAMETER_ERROR, "Invalid message.");
 
+#if defined(VERSION_R4QK01)
+  return gpiSendBuddyMessage(connection, profile, GPI_BM_MESSAGE, message, 0, NULL);
+#else
   return gpiSendBuddyMessage(connection, profile, GPI_BM_MESSAGE, message, 0);
+#endif
 }
 
 GPResult gpSendBuddyUTMA(GPConnection* connection, GPProfile profile,
@@ -1501,7 +1510,11 @@ GPResult gpSendBuddyUTMA(GPConnection* connection, GPProfile profile,
   if (message == NULL)
     Error(connection, GP_PARAMETER_ERROR, "Invalid message.");
 
+#if defined(VERSION_R4QK01)
+  return gpiSendBuddyMessage(connection, profile, GPI_BM_UTM, message, sendOption, NULL);
+#else
   return gpiSendBuddyMessage(connection, profile, GPI_BM_UTM, message, sendOption);
+#endif
 }
 
 GPResult gpIsValidEmailA(GPConnection* connection,
@@ -2051,7 +2064,11 @@ GPResult gpSendFilesA(GPConnection* connection, GPTransfer* transfer,
 
   // Ping the receiver.
   /////////////////////
+#if defined(VERSION_R4QK01)
+  result = gpiSendBuddyMessage(connection, profile, GPI_BM_PING, "1", 0, NULL);
+#else
   result = gpiSendBuddyMessage(connection, profile, GPI_BM_PING, "1", 0);
+#endif
   if (result != GP_NO_ERROR) {
     gpiFreeTransfer(connection, pTransfer);
     return result;

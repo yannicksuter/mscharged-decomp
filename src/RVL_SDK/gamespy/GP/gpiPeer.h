@@ -31,7 +31,11 @@ Please see the GameSpy Presence SDK documentation for more information
 
 // Timeout for a peer connection, in milliseconds.
 /////////////////////////////////////////////
+#if defined(VERSION_R4QK01)
+#define GPI_PEER_TIMEOUT (10 * 1000)
+#else
 #define GPI_PEER_TIMEOUT (5 * 60)
+#endif
 
 // Timeout for a peer operation, in milliseconds
 ////////////////////////////////////////////
@@ -75,13 +79,21 @@ typedef struct _GPIPeerOpQueue {
 typedef struct GPIPeer_s {
   int state;
   GPIBool initiated;
+#if defined(VERSION_R4QK01)
+  unsigned int ip;
+  unsigned short port;
+#else
   SOCKET sock;
+#endif
   GPProfile profile;
   time_t timeout;
   int nackCount;
   GPIBuffer inputBuffer;
   GPIBuffer outputBuffer;
   DArray messages;
+#if defined(VERSION_R4QK01)
+  GPIPeerOpQueue peerOpQueue;
+#endif
   struct GPIPeer_s* pnext;
 } GPIPeer;
 
@@ -94,7 +106,14 @@ GPResult gpiPeerGetSig(GPConnection* connection, GPIPeer* peer);
 GPResult gpiPeerStartConnect(GPConnection* connection, GPIPeer* peer);
 
 // NOTE: use this function when in a gp function
+#if defined(VERSION_R4QK01)
+GPIPeer* gpiGetPeerByProfile(const GPConnection* connection, int profileid);
+GPIPeer* gpiGetPeerByAddr(const GPConnection* connection, unsigned int ip,
+                         unsigned short port);
+gsi_bool gpiIsPeerConnected(GPIPeer* peer);
+#else
 GPIPeer* gpiGetConnectedPeer(const GPConnection* connection, int profileid);
+#endif
 
 GPIPeer* gpiAddPeer(GPConnection* connection, int profileid, GPIBool initiate);
 

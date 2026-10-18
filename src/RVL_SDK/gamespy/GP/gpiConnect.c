@@ -53,10 +53,46 @@ static GPResult gpiStartConnect(GPConnection* connection,
                                 GPIOperation* operation) {
   struct sockaddr_in address;
   int rcode;
+#if !defined(VERSION_R4QK01)
   int len;
+#endif
   GPIConnection* iconnection = (GPIConnection*)*connection;
   struct hostent* host;
 
+#if defined(VERSION_R4QK01)
+  GSUdpErrorCode anError;
+  strncpy(iconnection->mHeader, GPI_UDP_HEADER, GS_UDP_MSG_HEADER_LEN);
+
+  if (!gsUdpEngineIsInitialized()) {
+    unsigned short peerPort = GPI_PEER_PORT;
+    anError = gsUdpEngineInitialize(peerPort, 0, 0, NULL, NULL, NULL, NULL,
+                                   NULL, NULL, NULL, NULL);
+    if (anError != GS_UDP_NO_ERROR) {
+      while (anError != GS_UDP_NO_ERROR && peerPort < GPI_PEER_PORT + 100) {
+        anError = gsUdpEngineInitialize(++peerPort, 0, 0, NULL, NULL, NULL,
+                                       NULL, NULL, NULL, NULL, NULL);
+      }
+      if (anError != GS_UDP_NO_ERROR) {
+        CallbackFatalError(connection, GP_NETWORK_ERROR, GP_UDP_LAYER,
+                           "There was error starting the UDP layer.");
+      }
+    }
+    if (!iconnection->firewall)
+      iconnection->peerPort = peerPort;
+  } else {
+    iconnection->peerPort = gsUdpEngineGetLocalPort();
+  }
+  anError = gsUdpEngineAddMsgHandler(
+      iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback,
+      gpiPeerLeftCallback, gpiPeerPingReplyCallback, gpiPeerMessageCallback,
+      connection);
+  if (anError != GS_UDP_NO_ERROR) {
+    CallbackFatalError(connection, GP_NETWORK_ERROR, GP_UDP_LAYER,
+                       "There was an error starting the UDP Layer.");
+  }
+  if (iconnection->firewall)
+    iconnection->peerPort = 0;
+#else
   if (!iconnection->firewall) {
     // Create the peer listening socket.
     ////////////////////////////////////
@@ -104,6 +140,7 @@ static GPResult gpiStartConnect(GPConnection* connection,
     iconnection->peerSocket = INVALID_SOCKET;
     iconnection->peerPort = 0;
   }
+#endif
 
   // Create the cm socket.
   ////////////////////////
@@ -812,11 +849,19 @@ void gpiDisconnect(GPConnection* connection, GPIBool tellServer) {
       iconnection->cmSocket = INVALID_SOCKET;
     }
 
+#if defined(VERSION_R4QK01)
+    if (gsUdpEngineIsInitialized()) {
+      gsUdpEngineRemoveMsgHandler(iconnection->mHeader);
+      if (gsUdpEngineNoMoreMsgHandlers() && gsUdpEngineNoApp())
+        gsUdpEngineShutdown();
+    }
+#else
     if (iconnection->peerSocket != INVALID_SOCKET) {
       shutdown(iconnection->peerSocket, 2);
       closesocket(iconnection->peerSocket);
       iconnection->peerSocket = INVALID_SOCKET;
     }
+#endif
 
     // We're disconnected.
     //////////////////////

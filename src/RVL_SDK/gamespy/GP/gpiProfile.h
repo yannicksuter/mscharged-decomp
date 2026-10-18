@@ -86,6 +86,9 @@ typedef struct {
   HashTable profileTable;
   int num;
   int numBuddies;
+#if defined(VERSION_R4QK01)
+  int numBlocked;
+#endif
 } GPIProfileList;
 
 // FUNCTIONS

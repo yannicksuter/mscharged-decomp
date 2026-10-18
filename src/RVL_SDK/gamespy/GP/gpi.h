@@ -86,12 +86,30 @@ typedef struct {
   char* inputBuffer;
   int inputBufferSize;
   GPIBuffer outputBuffer;
+#if defined(VERSION_R4QK01)
+  char mHeader[GS_UDP_MSG_HEADER_LEN];
+  unsigned short peerPort;
+#else
   SOCKET peerSocket;
   unsigned int peerPort;
+#endif
   int nextOperationID;
   int numSearches;
 
   GPEnum lastStatusState;
+
+#if defined(VERSION_R4QK01)
+  unsigned int hostIp;
+  unsigned int hostPrivateIp;
+  unsigned short queryPort;
+  unsigned short hostPort;
+  unsigned int sessionFlags;
+  char richStatus[GP_RICH_STATUS_LEN];
+  char gameType[GP_STATUS_BASIC_STR_LEN];
+  char gameVariant[GP_STATUS_BASIC_STR_LEN];
+  char gameMapName[GP_STATUS_BASIC_STR_LEN];
+  DArray extendedInfoKeys;
+#endif
 
   char lastStatusString[GP_STATUS_STRING_LEN];
   char lastLocationString[GP_LOCATION_STRING_LEN];
@@ -111,6 +129,10 @@ typedef struct {
   int productID;
   int namespaceID;
   char loginTicket[GP_LOGIN_TICKET_LEN];
+#if defined(VERSION_R4QK01)
+  GPEnum quietModeFlags;
+  gsi_time kaTransmit;
+#endif
 } GPIConnection;
 
 // FUNCTIONS

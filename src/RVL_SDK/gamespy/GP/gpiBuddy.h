@@ -56,8 +56,17 @@ GPResult gpiProcessRecvBuddyList(GPConnection* connection, const char* input);
 GPResult gpiSendServerBuddyMessage(GPConnection* connection, int profileid,
                                    int type, const char* message);
 
+#if defined(VERSION_R4QK01)
+GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
+                             const char* message, int sendOptions,
+                             GPIPeerOp* peerOp);
+GPResult gpiBuddyHandleKeyRequest(GPConnection* connection, GPIPeer* peer);
+GPResult gpiBuddyHandleKeyReply(GPConnection* connection, GPIPeer* peer,
+                                char* buffer);
+#else
 GPResult gpiSendBuddyMessage(GPConnection* connection, int profileid, int type,
                              const char* message, int sendOptions);
+#endif
 
 
 GPResult gpiAuthBuddyRequest(GPConnection* connection, GPProfile profile);

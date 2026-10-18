@@ -6332,6 +6332,7 @@ RVL_SDK/gamespy/GP/gpiBuddy.c:
 RVL_SDK/gamespy/GP/gpiBuffer.c:
 	.text       start:0x80481A10 end:0x80482490
 	.data       start:0x8052ABB0 end:0x8052AC18
+	.sdata      start:0x80603CA0 end:0x80603CB8
 
 RVL_SDK/gamespy/GP/gpiCallback.c:
 	.text       start:0x80482490 end:0x804829D0
@@ -6342,19 +6343,21 @@ RVL_SDK/gamespy/GP/gpiConnect.c:
 	.sdata      start:0x80603CB8 end:0x80603D50
 
 RVL_SDK/gamespy/GP/gpiInfo.c:
-	.text       start:0x80484030 end:0x804864F4
+	.text       start:0x80484030 end:0x80486500
 	.data       start:0x8052B010 end:0x8052B368
-	.sdata      start:0x80603D50 end:0x80603E10
+	.sdata      start:0x80603D50 end:0x80603E08
 	.sdata2     start:0x8060AD68 end:0x8060AD6C
-
-RVL_SDK/gamespy/GP/gpiPeer.c:
-	.sdata      start:0x80603E10 end:0x80603E70
 
 RVL_SDK/gamespy/GP/gpiOperation.c:
 	.data       start:0x8052B368 end:0x8052B3C0
 
+RVL_SDK/gamespy/GP/gpiPeer.c:
+	.text       start:0x804872D0 end:0x80488A00
+	.data       start:0x8052B3C0 end:0x8052B490
+	.sdata      start:0x80603E10 end:0x80603E70
+
 RVL_SDK/gamespy/GP/gpiProfile.c:
-	.text       start:0x80488A00 end:0x804893C8
+	.text       start:0x80488A00 end:0x804893C8 align:16
 	.data       start:0x8052B490 end:0x8052B678
 	.sdata      start:0x80603E70 end:0x80603E98
 
