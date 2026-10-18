@@ -742,7 +742,14 @@ GHTTPBool ghiPostInitState(struct GHIConnection* connection) {
 
   // Wait for continue before posting.
   ////////////////////////////////////
+#if defined(VERSION_R4QK01)
+  if (connection->post->hasSoap == GHTTPTrue)
+    connection->postingState.waitPostContinue = GHTTPTrue;
+  else
+    connection->postingState.waitPostContinue = GHTTPFalse;
+#else
   connection->postingState.waitPostContinue = GHTTPTrue;
+#endif
 
   return GHTTPTrue;
 }
@@ -873,6 +880,48 @@ static GHIPostingResult ghiPostXmlStateDoPosting(GHIPostState* state,
       padlen = 0;
   }
 
+#if defined(VERSION_R4QK01)
+  if (connection->encryptor.mEngine != GHTTPEncryptionEngine_None &&
+      connection->encryptor.mEncryptOnBuffer == GHTTPTrue) {
+    // Copy to encode buffer before encrypting
+    GS_ASSERT(connection->encodeBuffer.len >=
+              0); // there must be a header for this soap data!
+    if (!ghiAppendDataToBuffer(&connection->encodeBuffer,
+                               gsXmlWriterGetData(xml),
+                               gsXmlWriterGetDataLength(xml)) ||
+        !ghiAppendDataToBuffer(&connection->encodeBuffer, pad, padlen) ||
+        !ghiEncryptDataToBuffer(&connection->sendBuffer,
+                                connection->encodeBuffer.data,
+                                connection->encodeBuffer.len)) {
+      return GHIPostingError;
+    }
+
+    // Clear out our temporary buffer
+    ghiResetBuffer(&connection->encodeBuffer);
+
+    // Send what we can now
+    if (GHTTPFalse == ghiSendBufferedData(connection))
+      return GHIPostingError;
+
+    // is there more to send?
+    if (connection->sendBuffer.pos == connection->sendBuffer.len)
+      ghiResetBuffer(&connection->sendBuffer);
+
+    return GHIPostingDone;
+  } else {
+    GHITrySendResult result;
+
+    // plain text - send immediately
+    result = ghiTrySendThenBuffer(connection, gsXmlWriterGetData(xml),
+                                  gsXmlWriterGetDataLength(xml));
+    if (result == GHITrySendError)
+      return GHIPostingError;
+    result = ghiTrySendThenBuffer(connection, pad, padlen);
+    if (result == GHITrySendError)
+      return GHIPostingError;
+    return GHIPostingDone;
+  }
+#else
   if (connection->encryptor.mEngine == GHTTPEncryptionEngine_None) {
     GHITrySendResult result;
 
@@ -912,6 +961,7 @@ static GHIPostingResult ghiPostXmlStateDoPosting(GHIPostState* state,
 
     return GHIPostingDone;
   }
+#endif
 }
 
 static GHIPostingResult
@@ -990,14 +1040,27 @@ ghiPostFileMemoryStateDoPosting(GHIPostState* state,
 
   // Send what we can.
   ////////////////////
-  if (connection->encryptor.mEngine == GHTTPEncryptionEngine_None) {
+  if (connection->encryptor.mEngine == GHTTPEncryptionEngine_None
+#if defined(VERSION_R4QK01)
+      || connection->encryptor.mEncryptOnBuffer == GHTTPFalse
+#endif
+  ) {
     // Plain text: Send directly from memory
     do {
       len = (state->data->data.fileMemory.len - state->pos);
       rcode = ghiDoSend(connection,
                         state->data->data.fileMemory.buffer + state->pos, len);
+#if defined(VERSION_R4QK01)
+      switch (rcode) {
+      case -1:
+        return GHIPostingError;
+      case -2:
+        return GHIPostingPosting;
+      }
+#else
       if (rcode == -1)
         return GHIPostingError;
+#endif
 
       // Update the pos.
       //////////////////
@@ -1210,6 +1273,44 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState* state,
       }
     }
 
+#if defined(VERSION_R4QK01)
+    // SSL: encrypt and send
+    if (connection->encryptor.mEngine != GHTTPEncryptionEngine_None &&
+        connection->encryptor.mEncryptOnBuffer == GHTTPTrue) {
+      if (len == 0)
+        len = (int)strlen(buffer);
+      if (GHTTPFalse ==
+          ghiEncryptDataToBuffer(&connection->sendBuffer, buffer, len))
+        return GHIPostingError;
+      if (GHTTPFalse == ghiSendBufferedData(connection))
+        return GHIPostingError;
+
+      // any data remaining?
+      if (connection->sendBuffer.pos < connection->sendBuffer.len)
+        return GHIPostingPosting;
+
+      // We sent everything, reset the send buffer to conserve space
+      ghiResetBuffer(&connection->sendBuffer);
+    }
+    // If sending plain text, send right away
+    else {
+      // Try sending. (the one-time header)
+      /////////////////////////////////////
+      if (len == 0)
+        len = (int)strlen(buffer);
+      result = ghiTrySendThenBuffer(connection, buffer, len);
+      if (result == GHITrySendError)
+        return GHIPostingError;
+
+      // If it was buffered, don't try anymore.
+      /////////////////////////////////////////
+      if (result == GHITrySendBuffered)
+        return GHIPostingPosting;
+
+      // We sent everything, reset the send buffer to conserve space
+      ghiResetBuffer(&connection->sendBuffer);
+    }
+#else
     // If sending plain text, send right away
     if (connection->encryptor.mEngine == GHTTPEncryptionEngine_None) {
       // Try sending. (the one-time header)
@@ -1245,6 +1346,7 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState* state,
       // We sent everything, reset the send buffer to conserve space
       ghiResetBuffer(&connection->sendBuffer);
     }
+#endif
   }
 
   // Post based on type.

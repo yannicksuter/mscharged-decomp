@@ -79,7 +79,9 @@ MiiManager::MiiManager()
     InitializeIconTextures(*this);
 
     mMiddleDBBuffer = VirtualAllocator.Allocate(RFLGetMiddleDBBufferSize(1), 32, false);
+#if !defined(VERSION_R4QK01)
     RFLInitMiddleDB(&mMiddleDB, RFLMiddleDBType_UserSet, mMiddleDBBuffer, 1);
+#endif
 }
 
 MiiManager::~MiiManager()
@@ -134,7 +136,11 @@ bool MiiManager::CreateIcon(int officialIndex, int iconSlot, RFLExpression expre
 
 bool MiiManager::CreateIcon(const RFLStoreData* data, int iconSlot, RFLExpression expression)
 {
+#if defined(VERSION_R4QK01)
+    RFLInitMiddleDB(&mMiddleDB, RFLMiddleDBType_UserSet, mMiddleDBBuffer, 1);
+#else
     RFLUpdateMiddleDBAsync(&mMiddleDB);
+#endif
     if (RFLAddMiddleDBStoreData(&mMiddleDB, data) == RFLErrcode_Success)
     {
         gxInit();

@@ -1,6 +1,10 @@
 #ifndef HOMEBUTTON_BASE_H
 #define HOMEBUTTON_BASE_H
 
+#if defined(VERSION_R4QK01)
+#include "revolution/hbm/homebutton/R4QK01/HBMBase.hpp"
+#else
+
 #include "revolution/ax.h"
 #include "revolution/axfx.h"
 #include "revolution/hbm/homebutton/HBMCommon.hpp"
@@ -299,5 +303,7 @@ private:
 }; // size = 0x768
 
 } // namespace homebutton
+
+#endif
 
 #endif

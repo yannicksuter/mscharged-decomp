@@ -176,5 +176,8 @@ void DWCi_FreeNegotiateList(void);
 DWCNodeInfo* DWCi_GetFirstNode(void);
 BOOL DWCi_RemoveNodeByAID(u8 aid);
 BOOL DWCi_IsBackupMine(void);
+BOOL DWCi_IsServerChanging(void);
+int DWCi_SendServerPolling(BOOL force);
+void DWCi_HandleGT2UnreliableMatchCommandMessage(const void* data, u32 len);
 BOOL fn_8046F180(void);
 BOOL fn_8046F8A0(void);

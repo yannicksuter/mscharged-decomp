@@ -5,6 +5,9 @@
 #include <dwc/dwc_nonport.h>
 #include <dwc/dwc_report.h>
 #include <nitro/math/crc.h>
+#if defined(VERSION_R4QK01)
+#include <nitro/math/dgt.h>
+#endif
 #include <nitro/math/rand.h>
 #include <revolution/os/OSTime.h>
 #include <stdio.h>
@@ -247,6 +250,40 @@ void DWC_ClearBuddyFlagFriendData(DWCAccFriendData* frienddata)
     }
 }
 
+#if defined(VERSION_R4QK01)
+u64 DWC_Acc_CreateFriendKey(int gs_profile_id,
+    u32 gamecode,
+    DWCiFriendKeyGenerator method)
+{
+    u32 code[2];
+    int hash;
+    u32 reversed[2];
+
+    code[0] = (u32)gs_profile_id;
+    code[1] = gamecode;
+    DWCi_Np_ToLE(code, reversed, sizeof(code));
+
+    switch (method)
+    {
+    case DWCi_FRIENDKEY_GENERATOR_CRC:
+    {
+        MATHCRC8Table table;
+        MATH_CRC8InitTable(&table);
+        hash = MATH_CalcCRC8(&table, reversed, sizeof(reversed)) & 0x7f;
+        break;
+    }
+    case DWCi_FRIENDKEY_GENERATOR_MD5:
+    {
+        u8 digest[16];
+        MATH_CalcMD5(digest, reversed, sizeof(reversed));
+        hash = digest[0] >> 1;
+        break;
+    }
+    }
+
+    return (((u64)hash << 32) | (u32)gs_profile_id);
+}
+#else
 u64 DWC_Acc_CreateFriendKey(int gs_profile_id,
     u32 gamecode)
 {
@@ -263,12 +300,32 @@ u64 DWC_Acc_CreateFriendKey(int gs_profile_id,
 
     return (((u64)crc << 32) | (u32)gs_profile_id);
 }
+#endif
 
 BOOL DWC_CheckFriendKey(const DWCAccUserData* userdata, u64 friendkey)
 {
+#if defined(VERSION_R4QK01)
+    return DWC_Acc_CheckFriendKey(friendkey, userdata->gamecode, DWCi_FRIENDKEY_GENERATOR_MD5);
+#else
     return DWC_Acc_CheckFriendKey(friendkey, userdata->gamecode);
+#endif
 }
 
+#if defined(VERSION_R4QK01)
+BOOL DWC_Acc_CheckFriendKey(u64 friendkey,
+    u32 gamecode,
+    DWCiFriendKeyGenerator method)
+{
+    int pid = (int)friendkey;
+
+    if (pid <= 0)
+    {
+        return FALSE;
+    }
+
+    return DWC_Acc_CreateFriendKey(pid, gamecode, method) == friendkey;
+}
+#else
 BOOL DWC_Acc_CheckFriendKey(u64 friendkey,
     u32 gamecode)
 {
@@ -294,16 +351,31 @@ BOOL DWC_Acc_CheckFriendKey(u64 friendkey,
 
     return TRUE;
 }
+#endif
 
 int DWC_Acc_FriendKeyToGsProfileId(u64 friendkey,
     u32 gamecode)
 {
+#if defined(VERSION_R4QK01)
+    int i;
+
+    for (i = 0; i < DWCi_FRIENDKEY_GENERATOR_NUM; ++i)
+    {
+        if (DWC_Acc_CheckFriendKey(friendkey, gamecode, (DWCiFriendKeyGenerator)i))
+        {
+            return (int)(friendkey & 0xffffffff);
+        }
+    }
+
+    return 0;
+#else
     if (!DWC_Acc_CheckFriendKey(friendkey, gamecode))
     {
         return 0;
     }
 
     return (int)(friendkey & 0xffffffff);
+#endif
 }
 
 void DWC_Acc_FriendKeyToNumericKey(u64 friendkey,
@@ -328,7 +400,10 @@ u64 DWC_Acc_NumericKeyToFriendKey(const char* numerickey)
     return result;
 }
 
-static void
+#if !defined(VERSION_R4QK01)
+static
+#endif
+void
 DWCi_Acc_U64ToString32(u64 num,
     int bitnum,
     char* result)
@@ -568,12 +643,16 @@ int DWC_GetGsProfileId(const DWCAccUserData* userdata,
     {
         u64 friend_key = DWCi_Acc_GetFriendKey(&frienddata->friend_key);
 
+#if defined(VERSION_R4QK01)
+        return DWC_Acc_FriendKeyToGsProfileId(friend_key, userdata->gamecode);
+#else
         if (DWC_Acc_CheckFriendKey(friend_key, userdata->gamecode))
         {
             return DWC_Acc_FriendKeyToGsProfileId(friend_key, userdata->gamecode);
         }
 
         return 0;
+#endif
     }
     // NOT REACH HERE
     break;
@@ -600,7 +679,11 @@ u64 DWC_CreateFriendKey(const DWCAccUserData* userdata)
 
     if (userdata->gs_profile_id != 0)
     {
+#if defined(VERSION_R4QK01)
+        ret = DWC_Acc_CreateFriendKey(userdata->gs_profile_id, userdata->gamecode, DWCi_FRIENDKEY_GENERATOR_MD5);
+#else
         ret = DWC_Acc_CreateFriendKey(userdata->gs_profile_id, userdata->gamecode);
+#endif
     }
 
     return ret;

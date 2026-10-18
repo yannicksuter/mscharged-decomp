@@ -12,7 +12,13 @@ extern "C" {
 #endif
 
 s64 DWCi_Np_GetTimeInSeconds(void);
+#if defined(VERSION_R4QK01)
+struct tm* DWCi_Np_UtcToTm(s64* theTime);
+const char* DWCi_Np_GetConsoleName(void);
+const char* DWCi_Np_GetAppGameName(void);
+#else
 struct tm* DWCi_Np_SecondsToCalendarTime(s64* theTime);
+#endif
 u64 DWCi_Np_GetConsoleId(void);
 #if defined(VERSION_R4QK01)
 void DWCi_Np_CPUCopyFast(void* destination, const void* source, u32 size);

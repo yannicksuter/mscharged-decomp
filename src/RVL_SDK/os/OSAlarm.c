@@ -2,6 +2,10 @@
 #include <revolution/dvd.h>
 #include <revolution/os.h>
 
+#if defined(VERSION_R4QK01)
+#include <private/os/OSAlarm.h>
+#endif
+
 static BOOL OnReset(BOOL final, u32 event);
 static void DecrementerExceptionHandler(u8 type, OSContext* ctx);
 
@@ -252,3 +256,37 @@ void OSSetAlarmUserData(OSAlarm* alarm, void* userData) {
 void* OSGetAlarmUserData(const OSAlarm* alarm) {
     return alarm->userData;
 }
+
+#if defined(VERSION_R4QK01)
+void __OSSetInternalAlarmUserData(OSAlarm* alarm, void* userData) {
+    alarm->userData = userData;
+    alarm->tag = -1;
+}
+
+void __OSCancelInternalAlarms(OSThread* thread) {
+    BOOL enabled = OSDisableInterrupts();
+    OSAlarm* head = AlarmQueue.head;
+    OSAlarm* next;
+
+    if (head != NULL) {
+        next = head->next;
+    } else {
+        next = NULL;
+    }
+
+    while (head != NULL) {
+        if (head->tag == -1 && (OSThread*)head->userData == thread) {
+            OSCancelAlarm(head);
+        }
+
+        head = next;
+        if (next != NULL) {
+            next = next->next;
+        } else {
+            next = NULL;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+}
+#endif

@@ -48,6 +48,8 @@ extern "C"
         DWCMatchedSCCallback matchedCallback, void* matchedParam,
         DWCNewClientCallback newClientCallback, void* newClientParam,
         DWCReservationCallback reservationCallback, const void* reservationData, void* reservationParam);
+    BOOL DWC_IsServerMyself(void);
+    u8 DWCi_GetServerOrSubServerAID(void);
     int DWCi_CloseConnectionHard(u8 aid);
     int DWCi_CloseConnectionHardBitmap(u32* bitmap);
 #else

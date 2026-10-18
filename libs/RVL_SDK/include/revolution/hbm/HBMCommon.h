@@ -46,9 +46,11 @@ void HBMCreateSound(const char* soundData, void* memBuf, u32 memSize);
 void HBMDeleteSound(void);
 void HBMUpdateSound(void);
 
+#if !defined(VERSION_R4QK01)
 void HBMUpdateSoundArchivePlayer(void);
 void HBMPlaySound(int num);
 void HBMStopSound(void);
+#endif
 
 #ifdef __cplusplus
 }

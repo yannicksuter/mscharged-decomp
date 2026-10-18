@@ -145,7 +145,9 @@ static const eGameRegion sDefaultRegion = GAME_REGION_US;
 
 volatile int g_Region = GAME_REGION_DEFAULT;
 
+#if !defined(VERSION_R4QK01)
 static u32 sCountryCode;
+#endif
 GameAudio* g_pGameAudio;
 bool g_e3_Build;
 bool lbl_806E1091;
@@ -245,6 +247,9 @@ int GetOnlineRegion()
 
 bool IsAlternateOnlineCountryGroup()
 {
+#if defined(VERSION_R4QK01)
+    return false;
+#else
     int country;
     if (sCountryCode != 0)
     {
@@ -269,6 +274,7 @@ bool IsAlternateOnlineCountryGroup()
         return true;
     }
     return false;
+#endif
 }
 
 void MemCheckTask::Run(float)
@@ -468,6 +474,11 @@ static void Initialize()
     case GAME_REGION_JAPAN:
         g_Language = nlLocalization::LangJapanese;
         break;
+#if defined(VERSION_R4QK01)
+    case GAME_REGION_KOREA:
+        g_Language = nlLocalization::LangKorean;
+        break;
+#endif
     }
 
     nlInit();
@@ -563,6 +574,7 @@ static void Initialize()
         FESceneManager::s_pInstance = new (8, false) FESceneManager;
     }
 
+#if !defined(VERSION_R4QK01)
     int countryCode;
     if (sCountryCode != 0)
     {
@@ -582,6 +594,7 @@ static void Initialize()
         }
     }
     tDebugPrintManager::Print(DC_NETWORK, "CountryCode = %d\n", countryCode);
+#endif
 
     if (GameInfoManager::s_pInstance == 0)
     {
@@ -656,7 +669,12 @@ static void AddTasks()
     nlTaskManager::AddTask(&endFrameTask, 16, (u32)-1);
     nlTaskManager::AddTask(&gTransitionTask, 1, (u32)-1);
     nlTaskManager::AddTask(&networkUpdateTask, 17, (u32)-1);
+#if defined(VERSION_R4QK01)
+    nlTaskManager::AddTask(&feDPDTask, 13,
+        TASK_PAUSED | TASK_FRONTEND | TASK_HOME_BUTTON_MENU);
+#else
     nlTaskManager::AddTask(&feDPDTask, 13, 5);
+#endif
     nlTaskManager::AddTask(
         &flashMemoryTask, 13, (u32)-1);
     nlTaskManager::AddTask(nlGetFileCache(), 3, (u32)-1);

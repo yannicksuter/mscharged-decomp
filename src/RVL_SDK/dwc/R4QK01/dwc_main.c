@@ -853,7 +853,7 @@ static inline u8 DWC_GetServerAID(void)
     return aid;
 }
 
-BOOL fn_80454BB0(void)
+BOOL DWC_IsServerMyself(void)
 {
     if (!stpDwcCnt)
         return FALSE;
@@ -1475,7 +1475,7 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
             stGt2ConnectionList[conninfo->index] = NULL;
     }
 
-    if (stpDwcCnt->matchcnt._8F4 == 1 && fn_80454BB0())
+    if (stpDwcCnt->matchcnt._8F4 == 1 && DWC_IsServerMyself())
         stpDwcCnt->matchcnt._8F4 = 1;
     else if (stpDwcCnt->matchcnt.qr2MatchType == DWC_MATCH_TYPE_SC_CL
         || stpDwcCnt->matchcnt.qr2MatchType == DWC_MATCH_TYPE_SC_SV)
@@ -1512,7 +1512,7 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
             stpDwcCnt->matchcnt.serverDownBaseBitmap);
     }
 
-    if (reason != GT2LocalClose && fn_80454BB0() == TRUE)
+    if (reason != GT2LocalClose && DWC_IsServerMyself() == TRUE)
     {
         stpDwcCnt->matchcnt._8D0 = 0;
         if (fn_8046F8A0()
@@ -1622,7 +1622,7 @@ static void DWCi_GT2SocketErrorCallback(GT2Socket socket)
     stpDwcCnt->gt2Socket = NULL;
 }
 
-u8 fn_804568A0(void)
+u8 DWCi_GetServerOrSubServerAID(void)
 {
     u8 aid = DWC_GetServerAID();
     if (aid == 0xFF)
