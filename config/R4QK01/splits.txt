@@ -6311,8 +6311,12 @@ RVL_SDK/gamespy/common/gsAvailable.c:
 	.sdata      start:0x80603B90 end:0x80603B94
 	.sbss       start:0x80606598 end:0x8060659C
 
+RVL_SDK/gamespy/common/gsUdpEngine.c:
+	.text       start:0x8047CE20 end:0x8047E070 align:16
+	.bss        start:0x805FD008 end:0x805FD060
+
 RVL_SDK/gamespy/common/gsXML.c:
-	.text       start:0x8047E070 end:0x8047E088
+	.text       start:0x8047E070 end:0x8047E088 align:16
 
 RVL_SDK/gamespy/GP/gp.c:
 	.text       start:0x8047E090 end:0x8047EF2C

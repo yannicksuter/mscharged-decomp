@@ -1511,6 +1511,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsRC4.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsSHA1.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsSSL.c", cflags=cflags_rvl_spy),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/gamespy/common/gsUdpEngine.c", cflags=cflags_rvl_spy, mw_version="Wii/1.0", extra_cflags=["-func_align 16"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/common/gsXML.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/ghttp/ghttpBuffer.c", cflags=cflags_rvl_spy),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gamespy/ghttp/ghttpCallbacks.c", cflags=cflags_rvl_spy),
