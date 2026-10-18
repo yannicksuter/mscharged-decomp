@@ -1,5 +1,9 @@
 #include <revolution/os.h>
 
+#if defined(VERSION_R4QK01)
+#include <private/os/OSAlarm.h>
+#endif
+
 static void DefaultSwitchThreadCallback(OSThread* currThread,
                                         OSThread* newThread);
 
@@ -190,10 +194,14 @@ static void SetRun(OSThread* thread) {
     RunQueueHint = TRUE;
 }
 
-static void UnsetRun(OSThread* thread) DECOMP_DONT_INLINE {
+static void UnsetRun(OSThread* thread) {
     OSThreadQueue* queue;
     OSThread* next;
     OSThread* prev;
+
+    ASSERTLINE(thread->state == OS_THREAD_STATE_READY, __LINE__);
+    ASSERTLINE(OS_PRIORITY_MIN <= thread->priority && thread->priority <= OS_PRIORITY_MAX, __LINE__);
+    ASSERTLINE(thread->queue == &RunQueue[thread->priority], __LINE__);
 
     next = thread->next;
     queue = thread->queue;
@@ -441,7 +449,7 @@ BOOL OSCreateThread(OSThread* thread, OSThreadFunc func, void* funcArg,
     OSThread* tail;
     void* sp;
 
-    if (prio < OS_PRIORITY_MIN || prio > OS_PRIORITY_MAX) {
+    if (prio < OS_PRIORITY_MIN || OS_PRIORITY_MAX < prio) {
         return FALSE;
     }
 
@@ -546,6 +554,9 @@ void OSCancelThread(OSThread* thread) {
     OSThread* prev;
 
     enabled = OSDisableInterrupts();
+#if defined(VERSION_R4QK01)
+    __OSCancelInternalAlarms(thread);
+#endif
 
     switch (thread->state) {
     case OS_THREAD_STATE_READY:
@@ -907,7 +918,7 @@ void OSWakeupThread(OSThreadQueue* queue) {
 BOOL OSSetThreadPriority(OSThread* thread, s32 prio) {
     BOOL enabled;
 
-    if (prio < OS_PRIORITY_MIN || prio > OS_PRIORITY_MAX) {
+    if (prio < OS_PRIORITY_MIN || OS_PRIORITY_MAX < prio) {
         return FALSE;
     }
 
@@ -923,10 +934,31 @@ BOOL OSSetThreadPriority(OSThread* thread, s32 prio) {
     return TRUE;
 }
 
+OSThread* OSSetIdleFunction(OSIdleFunction idleFunction, void* param,
+                            void* stack, u32 stackSize) {
+    if (idleFunction != NULL) {
+        if (IdleThread.state == OS_THREAD_STATE_EXITED) {
+            OSCreateThread(&IdleThread, (OSThreadFunc)idleFunction, param, stack,
+                           stackSize, OS_PRIORITY_MAX, OS_THREAD_DETACHED);
+            OSResumeThread(&IdleThread);
+            return &IdleThread;
+        }
+    } else if (IdleThread.state != OS_THREAD_STATE_EXITED) {
+        OSCancelThread(&IdleThread);
+    }
+    return NULL;
+}
+
 static void SleepAlarmHandler(OSAlarm* alarm, OSContext* ctx) {
 #pragma unused(ctx)
 
+#if defined(VERSION_R4QK01)
+    if (__OSIsThreadActive((OSThread*)OSGetAlarmUserData(alarm))) {
+        OSResumeThread((OSThread*)OSGetAlarmUserData(alarm));
+    }
+#else
     OSResumeThread((OSThread*)OSGetAlarmUserData(alarm));
+#endif
 }
 
 void OSSleepTicks(s64 ticks) {
@@ -943,13 +975,15 @@ void OSSleepTicks(s64 ticks) {
     }
 
     OSCreateAlarm(&alarm);
+#if defined(VERSION_R4QK01)
+    __OSSetInternalAlarmUserData(&alarm, thread);
+#else
     OSSetAlarmTag(&alarm, (u32)thread);
     OSSetAlarmUserData(&alarm, thread);
+#endif
     OSSetAlarm(&alarm, ticks, SleepAlarmHandler);
 
     OSSuspendThread(thread);
     OSCancelAlarm(&alarm);
     OSRestoreInterrupts(enabled);
 }
-
-DECOMP_FORCEACTIVE(OSThread_c, IdleThread);
