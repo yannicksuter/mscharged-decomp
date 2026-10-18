@@ -1493,7 +1493,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/euart/euart.c"),
 
             # RVL_SDK/exi
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/exi/EXIBios.c", extra_cflags=["-schedule off"]),
+            Object(Matching, "RVL_SDK/exi/EXIBios.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-schedule off"] + (["-func_align 16"] if config.version == "R4QK01" else [])),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/exi/EXICommon.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/exi/EXIUart.c"),
 
