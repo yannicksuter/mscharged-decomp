@@ -160,6 +160,10 @@ typedef struct SCBtCmpDevInfoArray {
 BOOL SCGetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
 BOOL SCSetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
 
+#if defined(VERSION_R4QK01)
+s8 SCGetProductGameRegion(void);
+#endif
+
 u32 SCGetBtDpdSensibility(void);
 BOOL SCSetBtDpdSensibility(u32 dpdSensibility);
 

@@ -1809,7 +1809,7 @@ config.libs = [
 
             # RVL_SDK/wud
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wud/debug_msg.c", cflags=cflags_rvl_wud),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud),
+            Object(Matching, "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud, source="RVL_SDK/wud/R4QK01/WUD.c" if config.version == "R4QK01" else "RVL_SDK/wud/WUD.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wud/WUDHidHost.c", cflags=cflags_rvl_wud),
         ],
     },

@@ -70,7 +70,11 @@ void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData) {
                 WUDSetSniffMode(pInfo->devAddr, 8);
 
                 if (p->hidConnCB != NULL) {
+#if defined(VERSION_R4QK01)
+                    p->hidConnCB(pInfo, TRUE);
+#else
                     p->hidConnCB(pConn->handle, TRUE);
+#endif
                 }
             } else {
                 DEBUGPrint("error code: %d\n", pConn->status);
@@ -113,7 +117,11 @@ void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData) {
             _dev_handle_notack_num[pCbData->handle] = 0;
 
             if (p->hidConnCB != NULL) {
+#if defined(VERSION_R4QK01)
+                p->hidConnCB(pInfo, FALSE);
+#else
                 p->hidConnCB(pCbData->handle, FALSE);
+#endif
             }
             break;
         }

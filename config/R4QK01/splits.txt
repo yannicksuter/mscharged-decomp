@@ -5729,8 +5729,11 @@ RVL_SDK/wpad/debug_msg.c:
 	.text       start:0x803E0EC0 end:0x803E0F10
 
 RVL_SDK/wud/WUD.c:
-	.text       start:0x803E0F20 end:0x803E714C
-	.sdata      start:0x806035C0 end:0x806035C8
+	.text       start:0x803E0F10 end:0x803E7310 align:16
+	.data       start:0x80518590 end:0x80519738
+	.bss        start:0x8058F180 end:0x80591328 align:32
+	.sdata      start:0x806035B0 end:0x806035C8
+	.sbss       start:0x80606378 end:0x806063B0
 	.sdata2     start:0x8060ACF8 end:0x8060AD00
 
 RVL_SDK/bte/hcisu_h2.c:

@@ -16,7 +16,11 @@ void WUDRegisterAllocator(WUDAllocFunc pAllocFunc, WUDFreeFunc pFreeFunc);
 void* App_MEMalloc(u32 size);
 BOOL App_MEMfree(void* pBlock);
 u32 WUDGetAllocatedMemSize();
+#if defined(VERSION_R4QK01)
+void WUDShutdown(BOOL saveSimpleDevs);
+#else
 void WUDShutdown(void);
+#endif
 
 WUDLibStatus WUDGetStatus();
 u8 WUDGetBufferStatus();
