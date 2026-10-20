@@ -12,6 +12,7 @@ extern "C" {
 typedef struct DVDDiskID DVDDiskID;
 typedef struct DVDDriveInfo DVDDriveInfo;
 typedef struct ESPTicket ESPTicket;
+typedef struct ESPTicketView ESPTicketView;
 typedef struct ESPTmd ESPTmd;
 typedef struct OSAlarm OSAlarm;
 
@@ -78,6 +79,31 @@ BOOL DVDLowReadDiskID(DVDDiskID* out, DVDLowCallback callback);
 BOOL DVDLowOpenPartition(u32 offset, const ESPTicket* ticket, u32 certsSize,
                          const void* certs, ESPTmd* tmd,
                          DVDLowCallback callback);
+#if defined(VERSION_R4QK01)
+BOOL DVDLowFinalize(void);
+BOOL DVDLowOpenPartitionWithTmdAndTicketView(u32 offset,
+                                           const ESPTicketView* ticketView,
+                                           u32 numTmdBytes, const ESPTmd* tmd,
+                                           u32 numCertBytes, const u8* certificates,
+                                           DVDLowCallback callback);
+BOOL DVDLowGetNoDiscBufferSizes(u32 offset, u32* numTmdBytes, u32* numCertBytes,
+                               DVDLowCallback callback);
+BOOL DVDLowGetNoDiscOpenPartitionParams(u32 offset, ESPTicket* ticket,
+                                       u32* numTmdBytes, ESPTmd* tmd,
+                                       u32* numCertBytes, u8* certificates,
+                                       u32* dataWordOffset, u8* h3Hash,
+                                       DVDLowCallback callback);
+BOOL DVDLowNoDiscOpenPartition(u32 dataWordOffset, const ESPTicket* ticket,
+                              u32 numTmdBytes, const ESPTmd* tmd,
+                              u32 numCertBytes, const u8* certificates,
+                              const u8* h3Hash, DVDLowCallback callback);
+BOOL DVDLowReportKey(DVDVideoReportKey* reportKey, u32 format, u32 lsn,
+                    DVDLowCallback callback);
+u32 DVDLowGetStatusRegister(void);
+u32 DVDLowGetControlRegister(void);
+BOOL DVDLowPrepareStatusRegister(DVDLowCallback callback);
+BOOL DVDLowPrepareControlRegister(DVDLowCallback callback);
+#endif
 BOOL DVDLowClosePartition(DVDLowCallback callback);
 BOOL DVDLowUnencryptedRead(void* dst, u32 size, u32 offset,
                            DVDLowCallback callback);
