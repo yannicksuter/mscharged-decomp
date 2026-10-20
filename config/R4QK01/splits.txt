@@ -6532,6 +6532,10 @@ RVL_SDK/gamespy/ghttp/ghttpConnection.c:
 RVL_SDK/gamespy/ghttp/ghttpMain.c:
 	.sbss       start:0x806065C8 end:0x806065CC
 
+RVL_SDK/gamespy/ghttp/ghttpEncryption.c:
+	.text       start:0x804963B0 end:0x804967E8 align:16
+	.data       start:0x8052CEF0 end:0x8052CF00
+
 RVL_SDK/gamespy/ghttp/ghttpPost.c:
 	.text       start:0x80496E00 end:0x8049857C
 	.data       start:0x8052CF00 end:0x8052D13C
