@@ -2,6 +2,9 @@
 #include "qr2regkeys.h"
 
 #include "../common/gsDebug.h"
+#if defined(VERSION_R4QK01)
+#include "../common/gsStringUtil.h"
+#endif
 
 #ifdef __CWCC__ // CodeWarrior requires prototypes
 void qr2_register_keyW(int keyid, const unsigned short* key);
@@ -40,7 +43,21 @@ const char* qr2_registered_key_list[MAX_REGISTERED_KEYS] = {
     "team_t",        // 28
     "score_t",       // 29
     "nn_groupid",    // 30
+#if defined(VERSION_R4QK01)
+    "country",       // 31: queried from the master server only
+    "region",        // 32: queried from the master server only
+#endif
 };
+
+#if defined(VERSION_R4QK01)
+gsi_bool qr2_internal_is_master_only_key(const char* keyname) {
+  if (strcmp(keyname, qr2_registered_key_list[COUNTRY_KEY]) == 0 ||
+      strcmp(keyname, qr2_registered_key_list[REGION_KEY]) == 0)
+    return gsi_true;
+
+  return gsi_false;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

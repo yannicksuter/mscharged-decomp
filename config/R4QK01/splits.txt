@@ -6509,6 +6509,7 @@ RVL_SDK/gamespy/qr2/qr2.c:
 	.sdata2     start:0x8060AD70 end:0x8060AD78
 
 RVL_SDK/gamespy/qr2/qr2regkeys.c:
+	.text       start:0x80494B50 end:0x80494BE0 align:16
 	.data       start:0x8052CA08 end:0x8052CEE0
 	.sdata      start:0x80604018 end:0x80604090
 
