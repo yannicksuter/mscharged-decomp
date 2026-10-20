@@ -6475,7 +6475,7 @@ RVL_SDK/gamespy/gt2/gt2Auth.c:
 	.data       start:0x8052BAD8 end:0x8052BB00
 
 RVL_SDK/gamespy/gt2/gt2Buffer.c:
-	.text       start:0x8048C950 end:0x8048CB0C
+	.text       start:0x8048C950 end:0x8048CB0C align:16
 
 RVL_SDK/gamespy/gt2/gt2Callback.c:
 	.text       start:0x8048CB10 end:0x8048D3CC align:16
