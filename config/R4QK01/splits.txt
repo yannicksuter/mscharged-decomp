@@ -6478,7 +6478,7 @@ RVL_SDK/gamespy/gt2/gt2Buffer.c:
 	.text       start:0x8048C950 end:0x8048CB0C
 
 RVL_SDK/gamespy/gt2/gt2Callback.c:
-	.text       start:0x8048CB10 end:0x8048D3CC
+	.text       start:0x8048CB10 end:0x8048D3CC align:16
 
 RVL_SDK/gamespy/gt2/gt2Connection.c:
 	.text       start:0x8048D3D0 end:0x8048DAE4
