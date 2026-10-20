@@ -56,7 +56,11 @@ typedef BOOL (*WUDFreeFunc)(void* pBlock);
 typedef void (*WUDSyncDeviceCallback)(s32 result, s32 num);
 typedef void (*WUDClearDeviceCallback)(s32 result);
 
+#if defined(VERSION_R4QK01)
+typedef void (*WUDHidConnCallback)(WUDDevInfo* devInfo, u8 open);
+#else
 typedef void (*WUDHidConnCallback)(UINT8 devHandle, u8 open);
+#endif
 typedef void (*WUDHidRecvCallback)(UINT8 devHandle, UINT8* pReport, UINT16 len);
 
 struct WUDDevInfo {

@@ -1,7 +1,7 @@
 #ifndef HOMEBUTTON_AX_SOUND_HPP
 #define HOMEBUTTON_AX_SOUND_HPP
 
-#include "revolution/types.h"
+#include "revolution/hbm/sound/mix.h"
 
 namespace homebutton
 {
@@ -11,7 +11,7 @@ void ShutdownAxSound();
 void AxSoundMain();
 void StopAllSeq();
 void SetVolumeAllSeq(f32 volume);
-void SetSoundMode(u32 mode);
+void SetSoundMode(HBMMIXSoundMode mode);
 } // namespace homebutton
 
 #endif

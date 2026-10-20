@@ -2176,6 +2176,7 @@ Game/SH/SHOnlineHub.cpp:
 	.sdata2     start:0x80609088 end:0x80609098
 
 Game/SH/SHOnlineFriends.cpp:
+	.text       start:0x80243B60 end:0x80247BFC
 	.rodata     start:0x804B5400 end:0x804B5430
 	.data       start:0x804E8AE0 end:0x804E8CA0
 	.sdata      start:0x80601C70 end:0x80601D00
@@ -5399,6 +5400,7 @@ RVL_SDK/euart/euart.c:
 
 RVL_SDK/exi/EXIBios.c:
 	.text       start:0x803A47A0 end:0x803A6098
+	.data       start:0x80506A38 end:0x80506A80
 	.bss        start:0x805837E0 end:0x805838A0
 	.sdata      start:0x80603388 end:0x8060338C
 	.sbss       start:0x80605E70 end:0x80605E74
@@ -5729,8 +5731,11 @@ RVL_SDK/wpad/debug_msg.c:
 	.text       start:0x803E0EC0 end:0x803E0F10
 
 RVL_SDK/wud/WUD.c:
-	.text       start:0x803E0F20 end:0x803E714C
-	.sdata      start:0x806035C0 end:0x806035C8
+	.text       start:0x803E0F10 end:0x803E7310 align:16
+	.data       start:0x80518590 end:0x80519738
+	.bss        start:0x8058F180 end:0x80591328 align:32
+	.sdata      start:0x806035B0 end:0x806035C8
+	.sbss       start:0x80606378 end:0x806063B0
 	.sdata2     start:0x8060ACF8 end:0x8060AD00
 
 RVL_SDK/bte/hcisu_h2.c:
@@ -5750,8 +5755,12 @@ RVL_SDK/bte/bta_sys_cfg.c:
 	.sdata      start:0x80603600 end:0x80603604
 	.sdata2     start:0x8060AD10 end:0x8060AD18
 
+RVL_SDK/wud/WUDHidHost.c:
+	.text       start:0x803E7310 end:0x803E7900 align:16
+	.data       start:0x80519738 end:0x805199D0
+
 RVL_SDK/wud/debug_msg.c:
-	.text       start:0x803E7900 end:0x803E7950
+	.text       start:0x803E7900 end:0x803E7950 align:16
 
 RVL_SDK/bte/gki_buffer.c:
 	.text       start:0x803E7950 end:0x803E8DE8
@@ -6218,6 +6227,12 @@ RVL_SDK/hbm/HBMRemoteSpk.cpp:
 	.data       start:0x80520E58 end:0x80520E88
 	.bss        start:0x805FB398 end:0x805FB3A0
 
+RVL_SDK/hbm/HBMAxSound.cpp:
+	.text       start:0x8042DE20 end:0x8042E950 align:16
+	.rodata     start:0x804BE048 end:0x804BE080
+	.data       start:0x80520E88 end:0x805211D8
+	.bss        start:0x805FB3A0 end:0x805FB3A8
+
 RVL_SDK/hbm/HBMCommon.cpp:
 	.text       start:0x8042E950 end:0x8042ECB0 align:16
 	.data       start:0x805211D8 end:0x80521228
@@ -6280,11 +6295,13 @@ RVL_SDK/dwc/dwc_common.c:
 	.bss        start:0x805FC010 end:0x805FC028
 
 RVL_SDK/dwc/dwc_friend.c:
-	.text       start:0x8044FD00 end:0x80451FE4
+	.text       start:0x8044FD00 end:0x80452290
 	.data       start:0x805251E8 end:0x805257A0
+	.sdata      start:0x806038E8 end:0x806038F1
+	.sbss       start:0x80606500 end:0x80606510
 
 RVL_SDK/dwc/dwc_login.c:
-	.text       start:0x80452290 end:0x80453168
+	.text       start:0x80452290 end:0x80453168 align:16
 	.data       start:0x805257A0 end:0x80525C18
 	.sbss       start:0x80606510 end:0x80606518
 

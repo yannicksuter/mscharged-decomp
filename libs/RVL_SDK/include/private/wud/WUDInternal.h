@@ -32,6 +32,15 @@ typedef enum {
     WUD_STATE_ERROR = 255,
 } WUDState;
 
+#if defined(VERSION_R4QK01)
+typedef enum {
+    WUD_STATE_WII_FIT_OPEN = 100,
+    WUD_STATE_WII_FIT_SEEK = 101,
+    WUD_STATE_WII_FIT_UPDATE = 102,
+    WUD_STATE_WII_FIT_CLOSE = 103,
+} WUDWiiFitState;
+#endif
+
 typedef enum {
     WUD_STATE_SYNC_START = 0,
     WUD_STATE_SYNC_PREPARE_SEARCH = 1,
@@ -61,7 +70,13 @@ typedef enum {
     WUD_STATE_SYNC_CANCEL_SEARCH = 26,
     WUD_STATE_SYNC_WAIT_FOR_START_SEARCH = 29,
     WUD_STATE_SYNC_ERROR = 255,
-} WUDSyncState;
+} WUDSyncStateValues;
+
+#if defined(VERSION_R4QK01)
+typedef u8 WUDSyncState;
+#else
+typedef WUDSyncStateValues WUDSyncState;
+#endif
 
 typedef enum {
     WUD_STATE_DELETE_START = 0,
@@ -97,6 +112,18 @@ typedef enum {
     WUD_STATE_STACK_ERROR = 255,
 } WUDStackState;
 
+#if defined(VERSION_R4QK01)
+typedef enum {
+    WUD_STATE_INIT_START = 0,
+    WUD_STATE_INIT_WAIT_FOR_INITIALIZATION = 1,
+    WUD_STATE_INIT_GET_DEV_INFO_FROM_WII_FIT = 2,
+    WUD_STATE_INIT_GET_DEV_INFO = 3,
+    WUD_STATE_INIT_UNK5 = 4,
+    WUD_STATE_INIT_DONE = 5,
+    WUD_STATE_INIT_INITIALIZED = 6,
+    WUD_STATE_INIT_ERROR = 255,
+} WUDInitState;
+#else
 typedef enum {
     WUD_STATE_INIT_START = 0,
     WUD_STATE_INIT_WAIT_FOR_INITIALIZATION = 1,
@@ -106,6 +133,7 @@ typedef enum {
     WUD_STATE_INIT_UNK5 = 5,
     WUD_STATE_INIT_ERROR = 255,
 } WUDInitState;
+#endif
 
 typedef enum {
     WUD_STATE_SHUTDOWN_START = 0,
@@ -203,6 +231,10 @@ typedef struct WUDCB {
 
     u16 bufferStatus0;  // 0x744
     u16 bufferStatus1;  // 0x746
+#if defined(VERSION_R4QK01)
+    s16 waitStartSearchFrames;  // 0x748
+    s16 waitIncomingFrames;     // 0x74A
+#endif
 } WUDCB;
 
 extern WUDCB _wcb;

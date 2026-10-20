@@ -4,7 +4,11 @@
 #include <mem.h>
 
 const char* __EXIVersion =
+#if defined(VERSION_R4QK01)
+    "<< RVL_SDK - EXI \trelease build: Feb 27 2009 10:02:03 (0x4302_145) >>";
+#else
     "<< RVL_SDK - EXI \trelease build: Nov 30 2006 03:26:56 (0x4199_60831) >>";
+#endif
 
 static EXIData Ecb[EXI_MAX_CHAN];
 static u32 IDSerialPort1;

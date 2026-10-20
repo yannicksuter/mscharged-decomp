@@ -105,6 +105,7 @@ long labs(long n);
     double atan2(double y, double x);
     double tan(double x);
     double ceil(double x);
+    double log10(double x);
 
     _MATH_INLINE float fmaxf(float x, float y)
     {

@@ -16,7 +16,17 @@ void WUDRegisterAllocator(WUDAllocFunc pAllocFunc, WUDFreeFunc pFreeFunc);
 void* App_MEMalloc(u32 size);
 BOOL App_MEMfree(void* pBlock);
 u32 WUDGetAllocatedMemSize();
+#if defined(VERSION_R4QK01)
+void WUDShutdown(BOOL saveSimpleDevs);
+BOOL WUDIsLinkedWBC(void);
+WUDDevInfo* WUDiGetDiscoverDevice(void);
+void WUDiSetDevAddrForHandle(UINT8 handle, BD_ADDR addr);
+BD_ADDR_PTR WUDiGetDevAddrForHandle(UINT8 handle);
+void WUDiSetQueueSizeForHandle(UINT8 handle, u16 size);
+void WUDiSetNotAckNumForHandle(UINT8 handle, u16 count);
+#else
 void WUDShutdown(void);
+#endif
 
 WUDLibStatus WUDGetStatus();
 u8 WUDGetBufferStatus();
