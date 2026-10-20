@@ -165,10 +165,6 @@ ghiInitReadOnlyBuffer(struct GHIConnection* connection, // The connection.
   // Start with user supplied data
   //////////////////////////////
   buffer->len = size;
-  buffer->len = size;
-  buffer->len = size;
-  buffer->len = size;
-  buffer->len = size;
 
   return GHTTPTrue;
 }
@@ -389,33 +385,49 @@ GHTTPBool ghiSendBufferedData(struct GHIConnection* connection) {
   int exceptFlag;
 
   do {
-    // Check if the socket is writeable.
-    ////////////////////////////////////
-    rcode = GSISocketSelect(connection->socket, NULL, &writeFlag, &exceptFlag);
-    if ((rcode == -1) || ((rcode == 1) && exceptFlag)) {
-      // There was an error.
-      //////////////////////
-      connection->completed = GHTTPTrue;
-      connection->result = GHTTPSocketFailed;
-      if (rcode == -1)
-        connection->socketError = GOAGetLastError(connection->socket);
-      else
-        connection->socketError = 0;
-      return GHTTPFalse;
-    }
+#if defined(VERSION_R4QK01)
+    if (connection->encryptor.mEngine == GHTTPEncryptionEngine_None ||
+        connection->encryptor.mEncryptOnBuffer == GHTTPTrue) {
+#endif
+      // Check if the socket is writeable.
+      ////////////////////////////////////
+      rcode = GSISocketSelect(connection->socket, NULL, &writeFlag, &exceptFlag);
+      if ((rcode == -1) || ((rcode == 1) && exceptFlag)) {
+        // There was an error.
+        //////////////////////
+        connection->completed = GHTTPTrue;
+        connection->result = GHTTPSocketFailed;
+        if (rcode == -1)
+          connection->socketError = GOAGetLastError(connection->socket);
+        else
+          connection->socketError = 0;
+        return GHTTPFalse;
+      }
 
-    // Can we send?
-    ///////////////
-    if ((rcode < 1) || !writeFlag)
-      return GHTTPTrue;
+      // Can we send?
+      ///////////////
+      if ((rcode < 1) || !writeFlag)
+        return GHTTPTrue;
+#if defined(VERSION_R4QK01)
+    }
+#endif
 
     // Send what we can.
     ////////////////////
     rcode = ghiDoSend(connection,
                       connection->sendBuffer.data + connection->sendBuffer.pos,
                       connection->sendBuffer.len - connection->sendBuffer.pos);
+#if defined(VERSION_R4QK01)
+    switch (rcode) {
+    case -1:
+      return GHTTPFalse;
+    case -2:
+      return GHTTPTrue;
+    }
+#else
     if (rcode == -1)
       return GHTTPFalse;
+#endif
 
     // Update the position.
     ///////////////////////

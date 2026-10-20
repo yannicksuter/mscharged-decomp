@@ -6513,6 +6513,7 @@ RVL_SDK/gamespy/qr2/qr2regkeys.c:
 	.sdata      start:0x80604018 end:0x80604090
 
 RVL_SDK/gamespy/ghttp/ghttpBuffer.c:
+	.text       start:0x80494BE0 end:0x80495520 align:16
 	.sdata      start:0x80604090 end:0x806040A0
 
 RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
