@@ -6254,14 +6254,16 @@ RVL_SDK/hbm/nw4hbm/lyt/lyt_material.cpp:
 	.rodata     start:0x804BE420 end:0x804BE450
 	.data       start:0x805221A8 end:0x80522230
 
-RVL_SDK/dwc/dwc_base64.c:
-	.data       start:0x80524DF0 end:0x80524E38
-
-RVL_SDK/hbm/nw4hbm/snd/snd_SeqTrack.cpp:
-	.rodata     start:0x804BE474 end:0x804BE4FC align:4
-
 RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
 	.text       start:0x8043E830 end:0x8043E888
+
+RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
+	.text       start:0x804421E0 end:0x80442490 align:16
+	.rodata     start:0x804BE4A8 end:0x804BE4D0
+	.data       start:0x805224E8 end:0x80523600
+
+RVL_SDK/dwc/dwc_base64.c:
+	.data       start:0x80524DF0 end:0x80524E38
 
 RVL_SDK/dwc/dwc_error.c:
 	.text       start:0x8044E8D0 end:0x8044E9D8
