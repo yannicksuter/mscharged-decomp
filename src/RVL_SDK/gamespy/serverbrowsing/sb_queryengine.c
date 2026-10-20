@@ -420,8 +420,12 @@ static void ParseSingleQR2Reply(SBQueryEngine* engine, SBServer server,
       dlen = NTSLengthSB(data, len);
       if (dlen < 0)
         break;
-      SBServerAddKeyValue(
-          server, qr2_registered_key_list[engine->serverkeys[i]], data);
+#if defined(VERSION_R4QK01)
+      if (!qr2_internal_is_master_only_key(
+              qr2_registered_key_list[engine->serverkeys[i]]))
+#endif
+        SBServerAddKeyValue(
+            server, qr2_registered_key_list[engine->serverkeys[i]], data);
       data += dlen;
       len -= dlen;
     }
@@ -560,7 +564,11 @@ static void ProcessIncomingICMPReplies(SBQueryEngine* engine) {
 
 static void ProcessIncomingReplies(SBQueryEngine* engine, SBBool icmpSocket) {
   int i;
+#if defined(VERSION_R4QK01)
+  __attribute__((aligned(32))) char indata[MAX_RECVFROM_SIZE];
+#else
   char indata[MAX_RECVFROM_SIZE];
+#endif
   struct sockaddr_in saddr;
   int saddrlen = sizeof(saddr);
   SBServer server;
