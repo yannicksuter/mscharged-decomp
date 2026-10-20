@@ -111,7 +111,7 @@ typedef int GHTTPRequest;
 
 // Invalid GHTTPRequest values represent an error
 ///////////////////////////////////
-#ifdef GHTTP_EXTENDEDERROR
+#if defined(GHTTP_EXTENDEDERROR) || defined(VERSION_R4QK01)
 typedef enum {
   GHTTPErrorStart = -8,
   GHTTPFailedToOpenFile,

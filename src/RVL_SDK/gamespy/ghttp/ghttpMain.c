@@ -712,6 +712,14 @@ void ghttpCancelRequest(GHTTPRequest request) {
   if (!connection)
     return;
 
+#if defined(VERSION_R4QK01)
+  // Wait for a pending hostname lookup before releasing the connection.
+  while (ghttpGetState(request) == GHTTPLookupPending) {
+    ghttpRequestThink(request);
+    msleep(10);
+  }
+#endif
+
   // Free it.
   ///////////
   ghiFreeConnection(connection);
