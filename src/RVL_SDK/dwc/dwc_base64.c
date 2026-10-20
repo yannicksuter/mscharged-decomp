@@ -1,4 +1,5 @@
 #include <dwc/dwc_base64.h>
+#include <dwc/dwc_nonport.h>
 
 #include <string.h>
 
@@ -33,7 +34,7 @@ int DWC_Base64Encode(const char* src, u32 srclen, char* dst, u32 dstlen) {
     copySize = remain < 3 ? remain : 3;
 
     memset(work, 0, sizeof(work));
-    memcpy(work, srcPos, copySize);
+    DWCi_Np_CpuCopy8(srcPos, work, copySize);
 
     dstPos[0] = sBase64EncodeAlphabet[work[0] >> 2];
     if (encodeCount >= 2)
@@ -86,7 +87,9 @@ int DWC_Base64Decode(const char* src, u32 srclen, char* dst, u32 dstlen) {
     return -1;
 
   if (srclen == 0) {
+#if !defined(VERSION_R4QK01)
     *dst = '\0';
+#endif
     return 0;
   }
 

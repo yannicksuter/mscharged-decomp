@@ -176,6 +176,9 @@ void OutputMapping(const AddressMapping * theMap)
 
 static int Think(SOCKET sock, NAT * nat)
 {
+#if defined(VERSION_R4QK01)
+	__attribute__((aligned(32)))
+#endif
 	static char data[NNINBUF_LEN];
 	int length;
 	unsigned char ptype;
@@ -195,12 +198,18 @@ static int Think(SOCKET sock, NAT * nat)
 	if(sock != INVALID_SOCKET)
 	{
 		// Check if there is data.
+#if defined(VERSION_R4QK01)
+		while(CanReceiveOnSocket(sock))
+#else
 		while(TRUE /*CanReceiveOnSocket(sock)*/)
+#endif
 		{
+#if !defined(VERSION_R4QK01)
 			// 
 			if (!CanReceiveOnSocket(sock)) {
 				break;
 			}
+#endif
 			length = recvfrom(sock, data, NNINBUF_LEN, 0, (struct sockaddr *)&saddr, &saddrlen);
 
 			if (gsiSocketIsError(length))

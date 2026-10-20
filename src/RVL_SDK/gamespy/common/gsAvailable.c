@@ -134,6 +134,9 @@ static int HandlePacket(char* packet, int len, SOCKADDR_IN* address,
 }
 
 GSIACResult GSIAvailableCheckThink(void) {
+#if defined(VERSION_R4QK01)
+  __attribute__((aligned(32)))
+#endif
   char packet[64];
   SOCKADDR_IN address;
   int len = sizeof(address);
@@ -197,4 +200,3 @@ void GSICancelAvailableCheck(void) {
     __GSIACResult = GSIACWaiting;
   }
 }
-

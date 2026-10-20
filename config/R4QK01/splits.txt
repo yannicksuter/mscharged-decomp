@@ -6274,7 +6274,9 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 	.data       start:0x805224E8 end:0x80523600
 
 RVL_SDK/dwc/dwc_base64.c:
+	.text       start:0x8044E560 end:0x8044E8D0 align:16
 	.data       start:0x80524DF0 end:0x80524E38
+	.sdata      start:0x806038D0 end:0x806038D8
 
 RVL_SDK/dwc/dwc_error.c:
 	.text       start:0x8044E8D0 end:0x8044E9D8
@@ -6374,14 +6376,16 @@ RVL_SDK/dwc/dwc_ranksession.c:
 	.text       start:0x80478CA0 end:0x80479188
 	.data       start:0x8052A6C0 end:0x8052A720
 
-RVL_SDK/gamespy/md5c.c:
-	.data       start:0x8052A720 end:0x8052A760
-
 RVL_SDK/gamespy/darray.c:
 	.text       start:0x80479190 end:0x80479C24
 
 RVL_SDK/gamespy/hashtable.c:
 	.text       start:0x80479C30 end:0x8047A0FC
+
+RVL_SDK/gamespy/md5c.c:
+	.text       start:0x8047A100 end:0x8047B040 align:16
+	.rodata     start:0x804BE5B0 end:0x804BE5C8
+	.data       start:0x8052A720 end:0x8052A760
 
 RVL_SDK/gamespy/nonport.c:
 	.text       start:0x8047B040 end:0x8047CAC0 align:16
@@ -6392,7 +6396,9 @@ RVL_SDK/gamespy/nonport.c:
 	.sdata2     start:0x8060AD58 end:0x8060AD64
 
 RVL_SDK/gamespy/common/gsAvailable.c:
+	.text       start:0x8047CAC0 end:0x8047CE20 align:16
 	.data       start:0x8052A770 end:0x8052A798
+	.bss        start:0x805FCF30 end:0x805FD008
 	.sdata      start:0x80603B90 end:0x80603B94
 	.sbss       start:0x80606598 end:0x8060659C
 
@@ -6444,6 +6450,7 @@ RVL_SDK/gamespy/GP/gpiKeys.c:
 	.sdata      start:0x80603E08 end:0x80603E10
 
 RVL_SDK/gamespy/GP/gpiOperation.c:
+	.text       start:0x80486B90 end:0x804872D0 align:16
 	.data       start:0x8052B3B0 end:0x8052B3C0
 
 RVL_SDK/gamespy/GP/gpiPeer.c:
@@ -6467,6 +6474,7 @@ RVL_SDK/gamespy/GP/gpiTransfer.c:
 	.sdata      start:0x80603F88 end:0x80603F98
 
 RVL_SDK/gamespy/GP/gpiUnique.c:
+	.text       start:0x8048BC30 end:0x8048BE90 align:16
 	.data       start:0x8052BA40 end:0x8052BA80
 	.sdata      start:0x80603F98 end:0x80603FA8
 
@@ -6570,7 +6578,8 @@ RVL_SDK/gamespy/gstats/gstats.c:
 	.sbss       start:0x80606600 end:0x80606620
 
 RVL_SDK/gamespy/natneg/NATify.c:
-	.text       start:0x8049D9E0 end:0x8049E130
+	.text       start:0x8049D9E0 end:0x8049E130 align:16
+	.bss        start:0x805FE600 end:0x805FE840 align:32
 	.sdata      start:0x80604188 end:0x80604198
 	.sbss       start:0x80606620 end:0x80606640
 

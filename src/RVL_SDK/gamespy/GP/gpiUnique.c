@@ -113,3 +113,36 @@ GPResult gpiProcessRegisterUniqueNick(
 
     return GP_NO_ERROR;
 }
+
+#if defined(VERSION_R4QK01)
+GPResult gpiProcessRegisterCdKey(
+    GPConnection* connection,
+    GPIOperation* operation,
+    const char* input)
+{
+    GPICallback callback;
+
+    if (gpiCheckForError(connection, input, GPITrue))
+        return GP_SERVER_ERROR;
+
+    if (strncmp(input, "\\rc\\", 4) != 0)
+        CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE, "Unexpected data was received from the server.");
+
+    callback = operation->callback;
+    if (callback.callback != NULL)
+    {
+        GPRegisterCdKeyResponseArg* arg;
+        arg = (GPRegisterCdKeyResponseArg*)gsimalloc(sizeof(GPRegisterCdKeyResponseArg));
+        if (arg == NULL)
+            Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+
+        arg->result = GP_NO_ERROR;
+
+        CHECK_RESULT(gpiAddCallback(connection, callback, arg, operation, 0));
+    }
+
+    gpiRemoveOperation(connection, operation);
+
+    return GP_NO_ERROR;
+}
+#endif
