@@ -26,6 +26,17 @@ typedef struct ESPTmd {
     u8 dummy[0x49E4];
 } ESPTmd;
 
+#if defined(VERSION_R4QK01)
+typedef struct ESPTicketView {
+    u8 dummy[0xD8];
+} ESPTicketView;
+
+s32 ESP_InitLib(void);
+s32 ESP_CloseLib(void);
+s32 ESP_DiGetTicketView(const ESPTicket* ticket, ESPTicketView* ticketView);
+s32 ESP_DiGetTmd(ESPTmd* tmd, u32* numTmdBytes);
+#endif
+
 s32 ESP_ReadContentFile(s32 fd, void* dst, u32 len);
 s32 ESP_SeekContentFile(s32 fd, s32 offset, s32 origin);
 

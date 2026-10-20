@@ -12,6 +12,7 @@ extern "C" {
 typedef struct DVDDiskID DVDDiskID;
 typedef struct DVDDriveInfo DVDDriveInfo;
 typedef struct ESPTicket ESPTicket;
+typedef struct ESPTicketView ESPTicketView;
 typedef struct ESPTmd ESPTmd;
 typedef struct OSAlarm OSAlarm;
 
@@ -78,6 +79,20 @@ BOOL DVDLowReadDiskID(DVDDiskID* out, DVDLowCallback callback);
 BOOL DVDLowOpenPartition(u32 offset, const ESPTicket* ticket, u32 certsSize,
                          const void* certs, ESPTmd* tmd,
                          DVDLowCallback callback);
+#if defined(VERSION_R4QK01)
+BOOL DVDLowOpenPartitionWithTmdAndTicketView(u32 offset,
+                                           const ESPTicketView* ticketView,
+                                           u32 numTmdBytes, const ESPTmd* tmd,
+                                           u32 numCertBytes, const u8* certificates,
+                                           DVDLowCallback callback);
+BOOL DVDLowGetNoDiscBufferSizes(u32 offset, u32* numTmdBytes, u32* numCertBytes,
+                               DVDLowCallback callback);
+BOOL DVDLowGetNoDiscOpenPartitionParams(u32 offset, ESPTicket* ticket,
+                                       u32* numTmdBytes, ESPTmd* tmd,
+                                       u32* numCertBytes, u8* certificates,
+                                       u32* dataWordOffset, u8* h3Hash,
+                                       DVDLowCallback callback);
+#endif
 BOOL DVDLowClosePartition(DVDLowCallback callback);
 BOOL DVDLowUnencryptedRead(void* dst, u32 size, u32 offset,
                            DVDLowCallback callback);

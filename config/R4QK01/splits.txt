@@ -5375,7 +5375,9 @@ RVL_SDK/dvd/dvdfs.c:
 RVL_SDK/dvd/dvd.c:
 	.text       start:0x8039B9F0 end:0x803A05B4
 	.data       start:0x80504D90 end:0x805051A0
-	.sdata      start:0x80603340 end:0x80603368
+	.bss        start:0x8057E6C0 end:0x80583370
+	.sdata      start:0x80603340 end:0x80603358
+	.sbss       start:0x80605D80 end:0x80605E18
 
 RVL_SDK/dvd/dvdqueue.c:
 	.text       start:0x803A05C0 end:0x803A0840
