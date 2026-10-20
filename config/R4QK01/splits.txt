@@ -6563,6 +6563,7 @@ RVL_SDK/gamespy/natneg/NATify.c:
 RVL_SDK/gamespy/natneg/natneg.c:
 	.text       start:0x8049E130 end:0x8049FA98
 	.data       start:0x8052D320 end:0x8052D440
+	.bss        start:0x805FE840 end:0x805FEB20
 	.sdata      start:0x80604198 end:0x806041B8
 	.sbss       start:0x80606640 end:0x8060666C
 

@@ -499,7 +499,10 @@ void NNCancel(int cookie)
 static void NegotiateThink(NATNegotiator neg)
 {
 	//check for any incoming data
-	static char indata[NNINBUF_LEN]; //256 byte input buffer
+#if defined(VERSION_R4QK01)
+	__attribute__((aligned(32)))
+#endif
+	static char indata[NNINBUF_LEN];
 	struct sockaddr_in saddr;
 	int saddrlen = sizeof(struct sockaddr_in);
 	int error;
@@ -524,11 +527,17 @@ static void NegotiateThink(NATNegotiator neg)
 	if (neg->negotiateSock != INVALID_SOCKET)
 	{
 		//first, socket processing
+#if defined(VERSION_R4QK01)
+		while (CanReceiveOnSocket(neg->negotiateSock))
+#else
 		while (TRUE /*CanReceiveOnSocket(neg->negotiateSock)*/)
+#endif
 		{
+#if !defined(VERSION_R4QK01)
 			if (!CanReceiveOnSocket(neg->negotiateSock)) {
 				break;
 			}
+#endif
 			error = recvfrom(neg->negotiateSock, indata, NNINBUF_LEN, 0, (struct sockaddr *)&saddr, &saddrlen);
 
 			if (gsiSocketIsError(error))
@@ -574,7 +583,11 @@ static void NegotiateThink(NATNegotiator neg)
 		}
 	}
 
+#if defined(VERSION_R4QK01)
+	if (neg->state == ns_finished && current_time() > neg->retryTime)
+#else
 	if (neg->state == ns_finished && current_time() > neg->retryTime && neg->gameSock == INVALID_SOCKET) //check if it is ready to be removed
+#endif
 	{
 		struct sockaddr_in saddr;
 		saddr.sin_family = AF_INET;
@@ -582,10 +595,14 @@ static void NegotiateThink(NATNegotiator neg)
 		saddr.sin_addr.s_addr = neg->guessedIP;
 			
 		// now that we've finished processing, send off the report
-		/*if (neg->gameSock == INVALID_SOCKET)*/
+#if defined(VERSION_R4QK01)
+		if (neg->gameSock == INVALID_SOCKET)
+#endif
 			StartReport(neg, nr_success, neg->negotiateSock, (struct sockaddr_in *)&saddr);
-		/*else
-			StartReport(neg, nr_success, neg->gameSock, (struct sockaddr_in *)&saddr);*/
+#if defined(VERSION_R4QK01)
+		else
+			StartReport(neg, nr_success, neg->gameSock, (struct sockaddr_in *)&saddr);
+#endif
 	}
 
 	if (neg->state == ns_initack && current_time() > neg->retryTime) //see if the partner has timed out
@@ -714,9 +731,11 @@ static void ProcessPingPacket(NATNegotiator neg, NatNegPacket *p, struct sockadd
 			neg->state = ns_finished;
 			neg->retryTime = current_time() + FINISHED_IDLE_TIME;
 
+#if !defined(VERSION_R4QK01)
 			if (neg->gameSock != INVALID_SOCKET) {
 				StartReport(neg, nr_success, neg->gameSock, fromaddr);
 			}
+#endif
 		} else if (!p->Packet.Connect.finished)
 			SendPingPacket(neg);
 	}
