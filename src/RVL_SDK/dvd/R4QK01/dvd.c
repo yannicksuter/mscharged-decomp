@@ -245,8 +245,6 @@ static void stateReadingPartitionInfo(DVDCommandBlock* block);
 static void stateOpenPartition(DVDCommandBlock* block);
 static void stateOpenPartition2(DVDCommandBlock* block);
 static void stateCheckID2(DVDCommandBlock* block);
-static void stateCheckID2a(DVDCommandBlock* block);
-static void stateCheckID3(DVDCommandBlock* block);
 static void stateCoverClosed(void);
 static void stateDownRotation(DVDCommandBlock* block);
 static void stateCoverClosed_CMD(DVDCommandBlock* block);
@@ -266,8 +264,6 @@ static void cbForStateGoToRetry(u32 intType);
 static void cbForStateOpenPartition(u32 intType);
 static void cbForStateCheckID1(u32 intType);
 static void cbForStateCheckID2(u32 intType);
-static void cbForStateCheckID2a(u32 intType);
-static void cbForStateCheckID3(u32 intType);
 static void cbForStateReset(u32 intType);
 static void cbForStateDownRotation(u32 intType);
 static void cbForStateCoverClosed(u32 intType);
@@ -873,41 +869,6 @@ static void stateCheckID(void)
     }
 }
 
-static void stateCheckID3(DVDCommandBlock* block)
-{
-    StampCommand(COMMAND_AUDIO_BUFFER_CONFIG, IDShouldBe->strmEnable, 10);
-    DVDLowAudioBufferConfig((BOOL)IDShouldBe->strmEnable, 10, cbForStateCheckID3);
-}
-
-static void stateCheckID2a(DVDCommandBlock* block)
-{
-    StampCommand(COMMAND_AUDIO_BUFFER_CONFIG, IDShouldBe->strmEnable, 10);
-    DVDLowAudioBufferConfig((BOOL)IDShouldBe->strmEnable, 10, cbForStateCheckID2a);
-}
-
-static void cbForStateCheckID2a(u32 intType)
-{
-    StampIntType(intType);
-
-    if (intType == DVD_INTTYPE_TIME)
-    {
-        stateTimeout();
-    }
-    else if (intType == DVD_INTTYPE_SERR)
-    {
-        stateSecurityError();
-    }
-    else if (intType & DVD_INTTYPE_TC)
-    {
-        NumInternalRetry = 0;
-        stateCheckID2(executing);
-    }
-    else
-    {
-        stateGettingError();
-    }
-}
-
 static void cbForStateReadingTOC(u32 intType)
 {
     StampIntType(intType);
@@ -1155,34 +1116,6 @@ static void cbForStateCheckID2(u32 intType)
     {
         NumInternalRetry = 0;
         stateReadingFST();
-    }
-    else
-    {
-        stateGettingError();
-    }
-}
-
-static void cbForStateCheckID3(u32 intType)
-{
-    StampIntType(intType);
-
-    if (intType == DVD_INTTYPE_TIME)
-    {
-        stateTimeout();
-    }
-    else if (intType == DVD_INTTYPE_SERR)
-    {
-        stateSecurityError();
-    }
-    else if (intType & DVD_INTTYPE_TC)
-    {
-        NumInternalRetry = 0;
-
-        if (!CheckCancel(RESUME_POINT_NONE))
-        {
-            executing->state = DVD_STATE_BUSY;
-            stateBusy(executing);
-        }
     }
     else
     {
@@ -2561,18 +2494,6 @@ u32 __DVDGetCoverStatus(void)
     }
 
     return DVD_COVER_CLOSED;
-}
-
-void __DVDResetWithNoSpinup(void)
-{
-    __BS2DVDLowIntType = 0;
-    DVDLowSetSpinupFlag(FALSE);
-    DVDLowReset(__BS2DVDLowCallback);
-
-    while (!__BS2DVDLowIntType)
-    {
-        ;
-    }
 }
 
 void __DVDPrepareResetAsync(DVDCommandCallback callback)
