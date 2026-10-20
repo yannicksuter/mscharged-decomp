@@ -6537,7 +6537,8 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 	.sdata2     start:0x8060AD78 end:0x8060AD7C
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
-	.rodata     start:0x804BE5C8 end:0x804BE6E8
+	.text       start:0x80498580 end:0x80499FF0
+	.rodata     start:0x804BE5C8 end:0x804BE5D4
 	.data       start:0x8052D140 end:0x8052D210
 	.sdata      start:0x806040C8 end:0x80604120
 
