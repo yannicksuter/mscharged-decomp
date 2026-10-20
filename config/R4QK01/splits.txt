@@ -6471,7 +6471,7 @@ RVL_SDK/gamespy/GP/gpiUtility.c:
 	.sdata      start:0x80603FA8 end:0x80603FC0
 
 RVL_SDK/gamespy/gt2/gt2Auth.c:
-	.text       start:0x8048C580 end:0x8048C948
+	.text       start:0x8048C580 end:0x8048C948 align:16
 	.data       start:0x8052BAD8 end:0x8052BB00
 
 RVL_SDK/gamespy/gt2/gt2Buffer.c:
