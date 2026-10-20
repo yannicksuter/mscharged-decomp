@@ -6438,8 +6438,13 @@ RVL_SDK/gamespy/GP/gpiInfo.c:
 	.sdata      start:0x80603D50 end:0x80603E08
 	.sdata2     start:0x8060AD68 end:0x8060AD6C
 
+RVL_SDK/gamespy/GP/gpiKeys.c:
+	.text       start:0x80486500 end:0x80486B90 align:16
+	.data       start:0x8052B368 end:0x8052B3B0
+	.sdata      start:0x80603E08 end:0x80603E10
+
 RVL_SDK/gamespy/GP/gpiOperation.c:
-	.data       start:0x8052B368 end:0x8052B3C0
+	.data       start:0x8052B3B0 end:0x8052B3C0
 
 RVL_SDK/gamespy/GP/gpiPeer.c:
 	.text       start:0x804872D0 end:0x80488A00
