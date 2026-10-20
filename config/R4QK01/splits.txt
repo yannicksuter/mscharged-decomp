@@ -6577,7 +6577,7 @@ RVL_SDK/gamespy/natneg/natneg.c:
 	.sbss       start:0x80606640 end:0x8060666C
 
 RVL_SDK/gamespy/serverbrowsing/sb_crypt.c:
-	.text       start:0x8049FAA0 end:0x8049FEE0
+	.text       start:0x8049FAA0 end:0x8049FEE0 align:16
 
 RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c:
 	.text       start:0x8049FEE0 end:0x804A0A00 align:16
