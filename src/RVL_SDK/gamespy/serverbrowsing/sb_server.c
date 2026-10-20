@@ -135,7 +135,11 @@ const char* SBServerGetStringValueA(SBServer server, const char* keyname,
     return NULL;
   kv.key = keyname;
   ptr = (SBKeyValuePair*)TableLookup(server->keyvals, &kv);
+#if defined(VERSION_R4QK01)
+  if (ptr == NULL || strlen(ptr->value) == 0)
+#else
   if (ptr == NULL)
+#endif
     return def;
   return ptr->value;
 }
@@ -322,7 +326,10 @@ void SBServerParseKeyVals(SBServer server, char* keyvals) {
     if (v == NULL)
       v = "";
     if (CheckValidKey(k)) {
-      SBServerAddKeyValue(server, k, v);
+#if defined(VERSION_R4QK01)
+      if (!qr2_internal_is_master_only_key(k))
+#endif
+        SBServerAddKeyValue(server, k, v);
     }
     k = mytok(NULL, '\\');
   }
@@ -377,7 +384,10 @@ void SBServerParseQR2FullKeysSingle(SBServer server, char* data, int len) {
     data += dlen;
     len -= dlen;
 
-    SBServerAddKeyValue(server, k, v);
+#if defined(VERSION_R4QK01)
+    if (!qr2_internal_is_master_only_key(k))
+#endif
+      SBServerAddKeyValue(server, k, v);
   }
   // skip the NUL
   data++;
@@ -520,7 +530,10 @@ void SBServerParseQR2FullKeysSplit(SBServer server, char* data, int len) {
         data += dlen;
         len -= dlen;
 
-        SBServerAddKeyValue(server, k, v);
+#if defined(VERSION_R4QK01)
+        if (!qr2_internal_is_master_only_key(k))
+#endif
+          SBServerAddKeyValue(server, k, v);
       } else {
         char tempkey[128];
 

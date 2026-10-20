@@ -76,10 +76,14 @@ GPResult gpiInitialize(GPConnection* connection, int productID, int namespaceID,
   ///////////////////////////////////
   result = gpiReset((GPConnection*)&iconnection);
   if (result != GP_NO_ERROR) {
+#if defined(VERSION_R4QK01)
+    gpiDestroy((GPConnection*)&iconnection);
+#else
     GPIConnection* connectionToFree = iconnection;
     gpiDisconnect((GPConnection*)&iconnection, GPITrue);
     TableFree(connectionToFree->profileList.profileTable);
     gsifree(connectionToFree);
+#endif
     return result;
   }
 
@@ -122,6 +126,9 @@ void gpiDestroy(GPConnection* connection) {
   // Cleanup connection-specific stuff.
   /////////////////////////////////////
   gpiDisconnect(connection, GPITrue);
+#if defined(VERSION_R4QK01)
+  gpiStatusInfoKeysDestroy(connection);
+#endif
 
 #ifndef NOFILE
   // Write the profile info to disk.
@@ -161,9 +168,16 @@ static GPIBool gpiResetProfile(GPConnection* connection, GPIProfile* profile,
   GSI_UNUSED(data);
 
   profile->buddyStatus = NULL;
+#if defined(VERSION_R4QK01)
+  profile->buddyStatusInfo = NULL;
+#endif
   profile->authSig = NULL;
   profile->requestCount = 0;
   profile->peerSig = NULL;
+#if defined(VERSION_R4QK01)
+  profile->blocked = gsi_false;
+  profile->buddyOrBlockCache = gsi_false;
+#endif
 
   return GPITrue;
 }
@@ -204,7 +218,14 @@ GPResult gpiReset(GPConnection* connection) {
   iconnection->updateuiBuffer.size = 0;
   freeclear(iconnection->updateuiBuffer.buffer);
   iconnection->updateuiBuffer.buffer = NULL;
-#if !defined(VERSION_R4QK01)
+#if defined(VERSION_R4QK01)
+  gpiStatusInfoKeysDestroy(connection);
+  result = gpiStatusInfoKeysInit((GPConnection*)&iconnection);
+  if (result != GP_NO_ERROR) {
+    gpiDestroy((GPConnection*)&iconnection);
+    return result;
+  }
+#else
   iconnection->peerSocket = INVALID_SOCKET;
 #endif
   iconnection->nextOperationID = 2;
@@ -212,6 +233,9 @@ GPResult gpiReset(GPConnection* connection) {
     gpiRemoveOperation(connection, iconnection->operationList);
   iconnection->operationList = NULL;
   iconnection->profileList.numBuddies = 0;
+#if defined(VERSION_R4QK01)
+  iconnection->profileList.numBlocked = 0;
+#endif
   gpiProfileMap(connection, gpiResetProfile, NULL);
   iconnection->userid = 0;
   iconnection->profileid = 0;
@@ -222,6 +246,9 @@ GPResult gpiReset(GPConnection* connection) {
   iconnection->lastStatusState = (GPEnum)-1;
   iconnection->lastStatusString[0] = '\0';
   iconnection->lastLocationString[0] = '\0';
+#if defined(VERSION_R4QK01)
+  iconnection->kaTransmit = 0;
+#endif
 
   return GP_NO_ERROR;
 }
@@ -237,6 +264,9 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
   GPIConnection* iconnection = (GPIConnection*)*connection;
   GPResult result;
   GPIBool loop;
+#if defined(VERSION_R4QK01)
+  gsi_time now = current_time();
+#endif
 
   // Loop through the rest while waiting for any blocking operations.
   ///////////////////////////////////////////////////////////////////
@@ -247,6 +277,10 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
 
     // Send anything that needs to be sent.
     ///////////////////////////////////////
+#if defined(VERSION_R4QK01)
+    if (iconnection->outputBuffer.len > 0)
+      iconnection->kaTransmit = now;
+#endif
     CHECK_RESULT(gpiSendFromBuffer(connection, iconnection->cmSocket,
                                    &iconnection->outputBuffer, &connClosed,
                                    GPITrue, "CM"));
@@ -268,6 +302,9 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
     ////////////////////////////////////////
     while ((next = strstr(iconnection->socketBuffer.buffer, "\\final\\")) !=
            NULL) {
+#if defined(VERSION_R4QK01)
+      iconnection->kaTransmit = now;
+#endif
       // NUL terminate the command.
       /////////////////////////////
       next[0] = '\0';
@@ -341,6 +378,17 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
           gpiValueForKey(iconnection->inputBuffer, "\\lt\\",
                          iconnection->loginTicket,
                          sizeof(iconnection->loginTicket));
+#if defined(VERSION_R4QK01)
+        } else if (strncmp(iconnection->inputBuffer, "\\bsi\\", 5) == 0) {
+          CHECK_RESULT(gpiProcessRecvBuddyStatusInfo(connection,
+                                                     iconnection->inputBuffer));
+        } else if (strncmp(iconnection->inputBuffer, "\\bdy\\", 5) == 0) {
+          CHECK_RESULT(gpiProcessRecvBuddyList(connection,
+                                               iconnection->inputBuffer));
+        } else if (strncmp(iconnection->inputBuffer, "\\blk\\", 5) == 0) {
+          CHECK_RESULT(gpiProcessRecvBlockedList(connection,
+                                                 iconnection->inputBuffer));
+#endif
         } else {
           // This is an unrecognized message.
           ///////////////////////////////////
@@ -356,7 +404,9 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
     if (connClosed && iconnection->connectState != GPI_PROFILE_DELETING) {
       // We've been disconnected.
       ///////////////////////////
+#if !defined(VERSION_R4QK01)
       iconnection->connectState = GPI_DISCONNECTED;
+#endif
       gpiSetError(connection, GP_CONNECTION_CLOSED,
                   "The server has closed the connection.");
       gpiCallErrorCallback(connection, GP_NETWORK_ERROR, GP_FATAL);
@@ -370,6 +420,14 @@ GPResult gpiProcessConnectionManager(GPConnection* connection) {
     if (loop)
       msleep(10);
   } while (loop);
+
+#if defined(VERSION_R4QK01)
+  if (now - iconnection->kaTransmit > KEEPALIVE_TIMEOUT) {
+    gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
+                            "\\ka\\\\final\\");
+    iconnection->kaTransmit = now;
+  }
+#endif
 
   return GP_NO_ERROR;
 }

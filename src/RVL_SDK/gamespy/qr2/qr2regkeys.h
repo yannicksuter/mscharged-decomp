@@ -40,10 +40,20 @@ extern "C" {
 #define SCORE_T_KEY 29
 #define NN_GROUP_ID_KEY 30
 
+#if defined(VERSION_R4QK01)
+// These keys are queried from the master server only.
+#define COUNTRY_KEY 31
+#define REGION_KEY 32
+#endif
+
 #define qr2_register_key qr2_register_keyA
 
 extern const char* qr2_registered_key_list[];
 void qr2_register_key(int keyid, const gsi_char* key);
+
+#if defined(VERSION_R4QK01)
+gsi_bool qr2_internal_is_master_only_key(const char* keyname);
+#endif
 
 // Always define for direct access
 void qr2_register_keyA(int keyid, const char* key);
