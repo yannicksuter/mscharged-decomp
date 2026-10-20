@@ -6538,7 +6538,7 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
 	.text       start:0x80498580 end:0x80499FF0
-	.rodata     start:0x804BE5C8 end:0x804BE5D4
+	.rodata     start:0x804BE5C8 end:0x804BE5D8
 	.data       start:0x8052D140 end:0x8052D210
 	.sdata      start:0x806040C8 end:0x80604120
 
@@ -6548,6 +6548,10 @@ RVL_SDK/gamespy/gstats/gbucket.c:
 	.sdata2     start:0x8060AD80 end:0x8060AD88
 
 RVL_SDK/gamespy/gstats/gstats.c:
+	.text       start:0x8049B1D0 end:0x8049D9DC
+	.rodata     start:0x804BE5D8 end:0x804BE6E8
+	.data       start:0x8052D210 end:0x8052D320
+	.bss        start:0x805FE200 end:0x805FE600
 	.sdata      start:0x80604120 end:0x80604188
 	.sbss       start:0x80606600 end:0x80606620
 
