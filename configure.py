@@ -1460,7 +1460,8 @@ config.libs = [
 
             # RVL_SDK/dvd
             Object(Matching, "RVL_SDK/dvd/dvd.c", source="RVL_SDK/dvd/R4QK01/dvd.c" if config.version == "R4QK01" else "RVL_SDK/dvd/dvd.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dvd/dvd_broadway.c"),
+            Object(Matching, "RVL_SDK/dvd/dvd_broadway.c", source="RVL_SDK/dvd/R4QK01/dvd_broadway.c" if config.version == "R4QK01" else "RVL_SDK/dvd/dvd_broadway.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/dvd/dvdDeviceError.c", mw_version="Wii/1.0", extra_cflags=["-func_align", "16"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dvd/dvderror.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dvd/dvdFatal.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dvd/dvdfs.c"),

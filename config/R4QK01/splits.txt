@@ -5258,6 +5258,9 @@ Runtime/GCN_mem_alloc.c:
 	.text       start:0x80392CF4 end:0x80392E64
 	.rodata     start:0x804B9458 end:0x804B94C8
 
+RVL_SDK/dvd/dvdFatal.c:
+	.rodata     start:0x804B94C8 end:0x804B9500
+
 RVL_SDK/ai/ai.c:
 	.text       start:0x80392E70 end:0x8039343C
 	.sdata      start:0x80603300 end:0x80603304
@@ -5338,10 +5341,6 @@ RVL_SDK/axfx/AXFXDelayExpDpl2.c:
 	.text       start:0x80399F40 end:0x8039A654
 	.sdata2     start:0x8060AA58 end:0x8060AA70
 
-RVL_SDK/dvd/dvdFatal.c:
-	.rodata     start:0x804B94C8 end:0x804B951C
-	.sdata2     start:0x8060AA70 end:0x8060AA74
-
 RVL_SDK/axfx/AXFXHooks.c:
 	.text       start:0x8039A660 end:0x8039A6A4
 	.sdata      start:0x80603320 end:0x80603328
@@ -5391,10 +5390,20 @@ RVL_SDK/dvd/dvderror.c:
 RVL_SDK/dvd/dvdidutils.c:
 	.text       start:0x803A1260 end:0x803A1350
 
+RVL_SDK/dvd/dvdDeviceError.c:
+	.text       start:0x803A14C0 end:0x803A174C
+	.rodata     start:0x804B9500 end:0x804B951C
+	.data       start:0x80505998 end:0x80505B30
+	.bss        start:0x80583600 end:0x80583620
+	.sdata      start:0x80603360 end:0x80603364
+	.sbss       start:0x80605E30 end:0x80605E34
+	.sdata2     start:0x8060AA70 end:0x8060AA74
+
 RVL_SDK/dvd/dvd_broadway.c:
-	.text       start:0x803A14D0 end:0x803A3DF8
+	.text       start:0x803A1750 end:0x803A3DF8
 	.data       start:0x80505B30 end:0x80506A38
-	.sdata      start:0x80603368 end:0x80603388
+	.bss        start:0x80583620 end:0x805837E0
+	.sdata      start:0x80603368 end:0x80603378
 	.sbss       start:0x80605E38 end:0x80605E60
 
 RVL_SDK/euart/euart.c:
