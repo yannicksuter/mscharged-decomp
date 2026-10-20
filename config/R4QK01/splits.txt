@@ -5753,8 +5753,12 @@ RVL_SDK/bte/bta_sys_cfg.c:
 	.sdata      start:0x80603600 end:0x80603604
 	.sdata2     start:0x8060AD10 end:0x8060AD18
 
+RVL_SDK/wud/WUDHidHost.c:
+	.text       start:0x803E7310 end:0x803E7900 align:16
+	.data       start:0x80519738 end:0x805199D0
+
 RVL_SDK/wud/debug_msg.c:
-	.text       start:0x803E7900 end:0x803E7950
+	.text       start:0x803E7900 end:0x803E7950 align:16
 
 RVL_SDK/bte/gki_buffer.c:
 	.text       start:0x803E7950 end:0x803E8DE8
