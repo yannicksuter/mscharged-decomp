@@ -136,7 +136,11 @@ GT2Result gti2CreateSocket(GT2Socket* sock, const char* localAddress,
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = ip;
   address.sin_port = htons(port);
+#if defined(VERSION_R4QK01)
+  if (type != GTI2AdHocProtocol) {
+#else
   if (type != GTI2AdHocProtocol)
+#endif
     rcode = bind(socketTemp->socket, (SOCKADDR*)&address, sizeof(SOCKADDR_IN));
   if (gsiSocketIsError(rcode)) {
     closesocket(socketTemp->socket);
@@ -145,6 +149,9 @@ GT2Result gti2CreateSocket(GT2Socket* sock, const char* localAddress,
     gsifree(socketTemp);
     return GT2NetworkError;
   }
+#if defined(VERSION_R4QK01)
+  }
+#endif
 
   len = sizeof(SOCKADDR_IN);
   getsockname(socketTemp->socket, (SOCKADDR*)&address, &len);
