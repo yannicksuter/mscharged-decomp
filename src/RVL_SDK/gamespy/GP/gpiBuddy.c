@@ -218,6 +218,11 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection,
     if (!profile)
       Error(connection, GP_MEMORY_ERROR, "Out of memory.");
 
+#if defined(VERSION_R4QK01)
+    if (profile->blocked)
+      break;
+#endif
+
     // This is a buddy.
     ///////////////////
     if (!profile->buddyStatus) {
@@ -225,7 +230,14 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection,
       if (!profile->buddyStatus)
         Error(connection, GP_MEMORY_ERROR, "Out of memory.");
       memset(profile->buddyStatus, 0, sizeof(GPIBuddyStatus));
-      profile->buddyStatus->buddyIndex = iconnection->profileList.numBuddies++;
+#if defined(VERSION_R4QK01)
+      if (profile->buddyStatusInfo) {
+        profile->buddyStatus->buddyIndex = profile->buddyStatusInfo->buddyIndex;
+        gpiRemoveBuddyStatusInfo(profile->buddyStatusInfo);
+        profile->buddyStatusInfo = NULL;
+      } else
+#endif
+        profile->buddyStatus->buddyIndex = iconnection->profileList.numBuddies++;
     }
 
     // Get the buddy status.
@@ -384,6 +396,156 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection,
   return GP_NO_ERROR;
 }
 
+
+#if defined(VERSION_R4QK01)
+GPResult gpiProcessRecvBuddyStatusInfo(GPConnection* connection,
+                                       const char* input) {
+  char buffer[1024];
+  int profileid;
+  time_t date;
+  GPICallback callback;
+  GPIProfile* profile;
+  GPIBuddyStatusInfo* buddyStatusInfo;
+  GPIConnection* iconnection = (GPIConnection*)*connection;
+
+  // This is what the message should look like.  Its broken up for easy viewing.
+  //
+  // "\bsi\\state\\profile\\bip\\bport\\hostip\\hprivip\"
+  // "\qport\\hport\\sessflags\\rstatus\\gameType\"
+  // "\gameVnt\\gameMn\\product\\qmodeflags\"
+  ////////////////////////////////
+  date = time(NULL);
+  // Get the buddy's profile
+  ////////////////////////////////
+  if (!gpiValueForKey(input, "\\profile\\", buffer, sizeof(buffer)))
+    CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                       "Unexpected data was received from the server.");
+  profileid = atoi(buffer);
+
+  // Get the profile from the SDK's list, adding it if needed.
+  /////////////////////////////////////
+  profile = gpiProfileListAdd(connection, profileid);
+  if (!profile)
+    Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+
+  if (!profile->blocked) {
+    // This is a buddy.
+    ///////////////////
+    if (!profile->buddyStatusInfo) {
+      profile->buddyStatusInfo =
+          (GPIBuddyStatusInfo*)gsimalloc(sizeof(GPIBuddyStatusInfo));
+      if (!profile->buddyStatusInfo)
+        Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+      memset(profile->buddyStatusInfo, 0, sizeof(GPIBuddyStatusInfo));
+      if (profile->buddyStatus) {
+        profile->buddyStatusInfo->buddyIndex = profile->buddyStatus->buddyIndex;
+        gpiRemoveBuddyStatus(profile->buddyStatus);
+        profile->buddyStatus = NULL;
+      } else
+        profile->buddyStatusInfo->buddyIndex =
+            iconnection->profileList.numBuddies++;
+      profile->buddyStatusInfo->extendedInfoKeys =
+          ArrayNew(sizeof(GPIKey), GPI_INITIAL_NUM_KEYS, gpiStatusInfoKeyFree);
+      if (!profile->buddyStatusInfo->extendedInfoKeys)
+        Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+    }
+
+    // extract the buddy status information and
+    // fill in appropriate information.
+    /////////////////////////////////////////////
+    buddyStatusInfo = profile->buddyStatusInfo;
+
+    if (!gpiValueForKey(input, "\\state\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->statusState = (GPEnum)atoi(buffer);
+
+    if (!gpiValueForKey(input, "\\bip\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->buddyIp = htonl((unsigned int)atoi(buffer));
+
+    if (!gpiValueForKey(input, "\\bport\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->buddyPort = (unsigned short)atoi(buffer);
+
+    if (!gpiValueForKey(input, "\\hostip\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->hostIp = htonl((unsigned int)atoi(buffer));
+
+    if (!gpiValueForKey(input, "\\hprivip\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->hostPrivateIp = htonl((unsigned int)atoi(buffer));
+
+    if (!gpiValueForKey(input, "\\qport\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->queryPort = (unsigned short)atoi(buffer);
+
+    if (!gpiValueForKey(input, "\\hport\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->hostPort = (unsigned short)atoi(buffer);
+
+    if (!gpiValueForKey(input, "\\sessflags\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->sessionFlags = (unsigned int)atoi(buffer);
+
+    freeclear(buddyStatusInfo->richStatus);
+    if (!gpiValueForKey(input, "\\rstatus\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->richStatus = goastrdup(buffer);
+
+    freeclear(buddyStatusInfo->gameType);
+    if (!gpiValueForKey(input, "\\gameType\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->gameType = goastrdup(buffer);
+
+    freeclear(buddyStatusInfo->gameVariant);
+    if (!gpiValueForKey(input, "\\gameVnt\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->gameVariant = goastrdup(buffer);
+
+    freeclear(buddyStatusInfo->gameMapName);
+    if (!gpiValueForKey(input, "\\gameMn\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->gameMapName = goastrdup(buffer);
+
+    if (!gpiValueForKey(input, "\\product\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->productId = (int)atoi(buffer);
+
+    if (!gpiValueForKey(input, "\\qmodeflags\\", buffer, sizeof(buffer)))
+      CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                         "Unexpected data was received from the server.");
+    buddyStatusInfo->quietModeFlags = (GPEnum)atoi(buffer);
+
+    callback = iconnection->callbacks[GPI_RECV_BUDDY_STATUS];
+    if (callback.callback != NULL) {
+      GPRecvBuddyStatusArg* anArg;
+      anArg = (GPRecvBuddyStatusArg*)gsimalloc(sizeof(GPRecvBuddyStatusArg));
+      if (anArg == NULL)
+        Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+
+      anArg->date = (unsigned int)date;
+      anArg->index = buddyStatusInfo->buddyIndex;
+      anArg->profile = profileid;
+
+      CHECK_RESULT(gpiAddCallback(connection, callback, anArg, NULL, 0));
+    }
+  }
+  return GP_NO_ERROR;
+}
+#endif
 
 GPResult gpiProcessRecvBuddyList(GPConnection* connection, const char* input) {
   int i = 0, j = 0;
@@ -875,5 +1037,26 @@ GPResult gpiDeleteBuddy(GPConnection* connection, GPProfile profile,
     assert(iconnection->profileList.numBuddies >= 0);
     gpiProfileMap(connection, gpiFixBuddyIndices, (void*)(unsigned long)index);
   }
+#if defined(VERSION_R4QK01)
+  if (pProfile->buddyStatusInfo) {
+    index = pProfile->buddyStatusInfo->buddyIndex;
+    assert(index >= 0);
+    freeclear(pProfile->buddyStatusInfo->richStatus);
+    freeclear(pProfile->buddyStatusInfo->gameType);
+    freeclear(pProfile->buddyStatusInfo->gameVariant);
+    freeclear(pProfile->buddyStatusInfo->gameMapName);
+    freeclear(pProfile->buddyStatusInfo);
+    if (pProfile->buddyStatusInfo->extendedInfoKeys) {
+      ArrayFree(pProfile->buddyStatusInfo->extendedInfoKeys);
+      pProfile->buddyStatusInfo->extendedInfoKeys = NULL;
+    }
+
+    if (gpiCanFreeProfile(pProfile))
+      gpiRemoveProfile(connection, pProfile);
+    iconnection->profileList.numBuddies--;
+    assert(iconnection->profileList.numBuddies >= 0);
+    gpiProfileMap(connection, gpiFixBuddyIndices, (void*)(unsigned long)index);
+  }
+#endif
   return GP_NO_ERROR;
 }

@@ -136,6 +136,9 @@ GPIBool gpiProfileMap(GPConnection* connection, gpiProfileMapFunc func,
 GPIProfile* gpiFindBuddy(GPConnection* connection, int buddyIndex);
 
 void gpiRemoveBuddyStatus(GPIBuddyStatus* buddyStatus);
+#if defined(VERSION_R4QK01)
+void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo* buddyStatusInfo);
+#endif
 
 GPIBool gpiCanFreeProfile(GPIProfile* profile);
 
