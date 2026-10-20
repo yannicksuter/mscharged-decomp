@@ -6404,7 +6404,7 @@ RVL_SDK/gamespy/common/gsXML.c:
 	.text       start:0x8047E070 end:0x8047E088 align:16
 
 RVL_SDK/gamespy/GP/gp.c:
-	.text       start:0x8047E090 end:0x8047EF2C
+	.text       start:0x8047E090 end:0x8047F008 align:16
 	.data       start:0x8052A798 end:0x8052A9E8
 	.sdata      start:0x80603B98 end:0x80603BA8
 
