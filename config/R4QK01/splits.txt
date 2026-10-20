@@ -6519,7 +6519,8 @@ RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
 	.text       start:0x80495520 end:0x80495650
 
 RVL_SDK/gamespy/ghttp/ghttpCommon.c:
-	.text       start:0x80495650 end:0x80495C28
+	.text       start:0x80495650 end:0x80495C28 align:16
+	.sdata      start:0x806040A0 end:0x806040A8
 	.sbss       start:0x806065B0 end:0x806065B8
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:

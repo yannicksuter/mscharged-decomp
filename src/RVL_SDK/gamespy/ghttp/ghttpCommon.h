@@ -81,6 +81,7 @@ GHIRecvResult ghiDoReceive(GHIConnection* connection, char buffer[],
 // Do a send on the connection's socket.
 // Returns number of bytes sent (0 or more).
 // If error, returns  (-1).
+// Korean SSL sends return (-2) when the socket would block.
 ////////////////////////////////////////////
 int ghiDoSend(GHIConnection* connection, const char* buffer, int len);
 
