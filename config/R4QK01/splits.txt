@@ -6471,17 +6471,17 @@ RVL_SDK/gamespy/GP/gpiUtility.c:
 	.sdata      start:0x80603FA8 end:0x80603FC0
 
 RVL_SDK/gamespy/gt2/gt2Auth.c:
-	.text       start:0x8048C580 end:0x8048C948
+	.text       start:0x8048C580 end:0x8048C948 align:16
 	.data       start:0x8052BAD8 end:0x8052BB00
 
 RVL_SDK/gamespy/gt2/gt2Buffer.c:
-	.text       start:0x8048C950 end:0x8048CB0C
+	.text       start:0x8048C950 end:0x8048CB0C align:16
 
 RVL_SDK/gamespy/gt2/gt2Callback.c:
-	.text       start:0x8048CB10 end:0x8048D3CC
+	.text       start:0x8048CB10 end:0x8048D3CC align:16
 
 RVL_SDK/gamespy/gt2/gt2Connection.c:
-	.text       start:0x8048D3D0 end:0x8048DAE4
+	.text       start:0x8048D3D0 end:0x8048DAE4 align:16
 
 RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x8048DAF0 end:0x8048DFA8
@@ -6495,7 +6495,8 @@ RVL_SDK/gamespy/gt2/gt2Socket.c:
 	.text       start:0x80491320 end:0x80491F00
 
 RVL_SDK/gamespy/gt2/gt2Utility.c:
-	.text       start:0x80491F00 end:0x804921E4
+	.text       start:0x80491F00 end:0x804921E4 align:16
+	.bss        start:0x805FE060 end:0x805FE08C
 	.sdata      start:0x80603FD0 end:0x80603FE4
 	.sbss       start:0x806065A0 end:0x806065A4
 
@@ -6512,22 +6513,28 @@ RVL_SDK/gamespy/qr2/qr2regkeys.c:
 	.sdata      start:0x80604018 end:0x80604090
 
 RVL_SDK/gamespy/ghttp/ghttpBuffer.c:
+	.text       start:0x80494BE0 end:0x80495520 align:16
 	.sdata      start:0x80604090 end:0x806040A0
 
 RVL_SDK/gamespy/ghttp/ghttpCallbacks.c:
 	.text       start:0x80495520 end:0x80495650
 
 RVL_SDK/gamespy/ghttp/ghttpCommon.c:
-	.text       start:0x80495650 end:0x80495C28
+	.text       start:0x80495650 end:0x80495C28 align:16
+	.sdata      start:0x806040A0 end:0x806040A8
 	.sbss       start:0x806065B0 end:0x806065B8
 
 RVL_SDK/gamespy/ghttp/ghttpConnection.c:
-	.text       start:0x80495C30 end:0x804963A8
+	.text       start:0x80495C30 end:0x804963A8 align:16
 	.data       start:0x8052CEE0 end:0x8052CEF0
 	.sbss       start:0x806065B8 end:0x806065C8
 
 RVL_SDK/gamespy/ghttp/ghttpMain.c:
 	.sbss       start:0x806065C8 end:0x806065CC
+
+RVL_SDK/gamespy/ghttp/ghttpEncryption.c:
+	.text       start:0x804963B0 end:0x804967E8 align:16
+	.data       start:0x8052CEF0 end:0x8052CF00
 
 RVL_SDK/gamespy/ghttp/ghttpPost.c:
 	.text       start:0x80496E00 end:0x8049857C

@@ -147,37 +147,62 @@ GHIRecvResult ghiDoReceive(GHIConnection* connection, char buffer[],
 
   // Receive some data.
   /////////////////////
-  rcode = recv(connection->socket, buffer, len, 0);
+#if defined(VERSION_R4QK01)
+  if (connection->encryptor.mEngine != GHTTPEncryptionEngine_None &&
+      connection->encryptor.mSessionEstablished == GHTTPTrue &&
+      connection->encryptor.mEncryptOnSend == GHTTPTrue) {
+    GHIEncryptionResult result;
+    int recvLength = len;
 
-  // There was an error.
-  //////////////////////
-  if (gsiSocketIsError(rcode)) {
-    // Get the error code.
-    //////////////////////
-    socketError = GOAGetLastError(connection->socket);
-
-    // Check for a closed connection.
-    /////////////////////////////////
-    if (socketError == WSAENOTCONN) {
+    result = ghiEncryptorSslDecryptRecv(connection, &connection->encryptor,
+                                       buffer, &recvLength);
+    if (result == GHIEncryptionResult_Success) {
+      if (recvLength == -1)
+        return GHINoData;
+      rcode = recvLength;
+    } else {
+      connection->completed = GHTTPTrue;
+      connection->result = GHTTPSocketFailed;
+      connection->socketError = 0;
       connection->connectionClosed = GHTTPTrue;
-      return GHIConnClosed;
+      return GHIError;
     }
+  } else {
+#endif
+    rcode = recv(connection->socket, buffer, len, 0);
 
-    // Check for nothing waiting.
-    /////////////////////////////
-    if ((socketError == WSAEWOULDBLOCK) || (socketError == WSAEINPROGRESS) ||
-        (socketError == WSAETIMEDOUT))
-      return GHINoData;
+    // There was an error.
+    //////////////////////
+    if (gsiSocketIsError(rcode)) {
+      // Get the error code.
+      //////////////////////
+      socketError = GOAGetLastError(connection->socket);
 
-    // There was a real error.
-    //////////////////////////
-    connection->completed = GHTTPTrue;
-    connection->result = GHTTPSocketFailed;
-    connection->socketError = socketError;
-    connection->connectionClosed = GHTTPTrue;
+      // Check for a closed connection.
+      /////////////////////////////////
+      if (socketError == WSAENOTCONN) {
+        connection->connectionClosed = GHTTPTrue;
+        return GHIConnClosed;
+      }
 
-    return GHIError;
+      // Check for nothing waiting.
+      /////////////////////////////
+      if ((socketError == WSAEWOULDBLOCK) || (socketError == WSAEINPROGRESS) ||
+          (socketError == WSAETIMEDOUT))
+        return GHINoData;
+
+      // There was a real error.
+      //////////////////////////
+      connection->completed = GHTTPTrue;
+      connection->result = GHTTPSocketFailed;
+      connection->socketError = socketError;
+      connection->connectionClosed = GHTTPTrue;
+
+      return GHIError;
+    }
+#if defined(VERSION_R4QK01)
   }
+#endif
 
   // The connection was closed.
   /////////////////////////////
@@ -207,29 +232,53 @@ int ghiDoSend(struct GHIConnection* connection, const char* buffer, int len) {
 
   // Send.
   ////////
-  rcode = send(connection->socket, buffer, len, 0);
+#if defined(VERSION_R4QK01)
+  if (connection->encryptor.mEngine != GHTTPEncryptionEngine_None &&
+      connection->encryptor.mSessionEstablished == GHTTPTrue &&
+      connection->encryptor.mEncryptOnSend == GHTTPTrue) {
+    int bytesSent = 0;
+    GHIEncryptionResult result;
 
-  // Check for an error.
-  //////////////////////
-  if (gsiSocketIsError(rcode)) {
-    // Get the error code.
+    result = ghiEncryptorSslEncryptSend(connection, &connection->encryptor,
+                                       buffer, len, &bytesSent);
+    if (result == GHIEncryptionResult_Success) {
+      if (bytesSent == -1)
+        return -2;
+      rcode = bytesSent;
+    } else {
+      connection->completed = GHTTPTrue;
+      connection->result = GHTTPSocketFailed;
+      connection->socketError = 0;
+      return -1;
+    }
+  } else {
+#endif
+    rcode = send(connection->socket, buffer, len, 0);
+
+    // Check for an error.
     //////////////////////
-    rcode = GOAGetLastError(connection->socket);
+    if (gsiSocketIsError(rcode)) {
+      // Get the error code.
+      //////////////////////
+      rcode = GOAGetLastError(connection->socket);
 
-    // Check for nothing sent.
-    //////////////////////////
-    if ((rcode == WSAEWOULDBLOCK) || (rcode == WSAEINPROGRESS) ||
-        (rcode == WSAETIMEDOUT))
-      return 0;
+      // Check for nothing sent.
+      //////////////////////////
+      if ((rcode == WSAEWOULDBLOCK) || (rcode == WSAEINPROGRESS) ||
+          (rcode == WSAETIMEDOUT))
+        return 0;
 
-    // There was a real error.
-    //////////////////////////
-    connection->socketError = rcode;
-    connection->completed = GHTTPTrue;
-    connection->result = GHTTPSocketFailed;
+      // There was a real error.
+      //////////////////////////
+      connection->socketError = rcode;
+      connection->completed = GHTTPTrue;
+      connection->result = GHTTPSocketFailed;
 
-    return -1;
+      return -1;
+    }
+#if defined(VERSION_R4QK01)
   }
+#endif
 
   // Track posting progress.
   //////////////////////////
@@ -247,7 +296,11 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection* connection,
   // If the session is encrypted, append to the buffer and send from there.
   /////////////////////////////////////////////////////////////////////////
   if ((connection->encryptor.mEngine != GHTTPEncryptionEngine_None) &&
-      (connection->encryptor.mSessionEstablished == GHTTPTrue)) {
+      (connection->encryptor.mSessionEstablished == GHTTPTrue)
+#if defined(VERSION_R4QK01)
+      && (connection->encryptor.mEncryptOnBuffer == GHTTPTrue)
+#endif
+  ) {
     if (!ghiEncryptDataToBuffer(&connection->sendBuffer, buffer, len))
       return GHITrySendError;
     if (!ghiSendBufferedData(connection))
@@ -263,8 +316,18 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection* connection,
   ///////////////////////////////////////////////////////
   if (connection->sendBuffer.pos >= connection->sendBuffer.len) {
     rcode = ghiDoSend(connection, buffer, len);
+#if defined(VERSION_R4QK01)
+    switch (rcode) {
+    case -1:
+      return GHITrySendError;
+    case -2:
+      rcode = 0;
+      break;
+    }
+#else
     if (rcode == -1)
       return GHITrySendError;
+#endif
     if (rcode == len)
       return GHITrySendSent;
   }

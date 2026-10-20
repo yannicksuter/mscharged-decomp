@@ -15,6 +15,12 @@ extern "C"
 #define SSL_RESULT_OK      0
 #define SSL_RESULT_INVALID -1
 
+#if defined(VERSION_R4QK01)
+#define SSL_EWANT_READ   -2
+#define SSL_EWANT_WRITE  -3
+#define SSL_EZERO_RETURN -6
+#endif
+
 #define SSL_MAX 8
 
 #define SSL_CLIENT_CERT_LENGTH 4096
@@ -35,6 +41,10 @@ extern "C"
     SSLResult SSLSetClientCertDefault(SSLId sslId);
     SSLResult SSLSetRootCA(SSLId sslId, const char* rootCAData, u32 rootCASize);
     SSLResult SSLSetRootCADefault(SSLId sslId);
+#if defined(VERSION_R4QK01)
+    SSLResult SSLSetBuiltinRootCA(SSLId sslId, u32 rootCAId);
+    SSLResult SSLSetBuiltinClientCert(SSLId sslId, u32 clientCertId);
+#endif
 
 #ifdef __cplusplus
 }

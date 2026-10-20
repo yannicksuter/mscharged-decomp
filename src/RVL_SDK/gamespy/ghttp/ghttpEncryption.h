@@ -111,5 +111,14 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(
     const char* theEncryptedBuffer, int* theEncryptedLength,
     char* theDecryptedBuffer, int* theDecryptedLength);
 
+#if defined(VERSION_R4QK01)
+GHIEncryptionResult ghiEncryptorSslEncryptSend(
+    struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
+    const char* thePlainTextBuffer, int thePlainTextLength, int* theBytesSent);
+GHIEncryptionResult ghiEncryptorSslDecryptRecv(
+    struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
+    char* theDecryptedBuffer, int* theDecryptedLength);
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
