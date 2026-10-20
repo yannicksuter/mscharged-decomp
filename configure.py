@@ -1705,7 +1705,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nand/NANDOpenClose.c"),
 
             # RVL_SDK/ncd
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ncd/ncdsystem.c"),
+            Object(Matching, "RVL_SDK/ncd/ncdsystem.c"),
 
             # RVL_SDK/ndev
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ndev/DebuggerDriver.c"),
@@ -1927,8 +1927,8 @@ config.libs = [
         ],
     },
     {
-        # NHTTP ships as its own library package without a banner. Its retail
-        # code keeps the older compiler's constant order and saved-register
+        # NHTTP ships as its own library package without a banner. Earlier
+        # releases keep the older compiler's constant order and saved-register
         # zeros (NHTTPi_strnicmp, NHTTPi_compareToken, NHTTPi_ThreadParseHeaderProc),
         # exact under GC/3.0a5 only.
         "lib": "NHTTP",
@@ -1938,18 +1938,18 @@ config.libs = [
         "objects": [
             # RVL_SDK/nhttp
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/d_nhttp.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/d_nhttp_common.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/d_nhttp_private.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_bgnend.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_control.c"),
+            Object(Matching, "RVL_SDK/nhttp/d_nhttp_common.c"),
+            Object(Matching, "RVL_SDK/nhttp/d_nhttp_private.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_bgnend.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_control.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nhttp/NHTTP_list.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nhttp/NHTTP_os_RVL.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_recvbuf.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_request.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_response.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_recvbuf.c", mw_version="GC/3.0a5.2" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_request.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_response.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c", mw_version="GC/3.0a5.2" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp, mw_version="GC/3.0a5.2" if config.version == "R4QK01" else None),
         ],
     },
     {

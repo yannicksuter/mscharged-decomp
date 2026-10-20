@@ -6,19 +6,6 @@
 
 #include <stdio.h>
 
-typedef struct NHTTPBgnEndInfo
-{
-    NCDIpConfig ipConfig;
-    NHTTPAlloc alloc;
-    NHTTPFree free;
-    BOOL started;
-    s32 socket;
-    s32 sslError;
-    NHTTPErr error;
-    u32 _unk7DC;
-    void* threadStack;
-} NHTTPBgnEndInfo;
-
 void NHTTPi_initLockReqList(void* mutexInfo);
 void NHTTPi_exitLockReqList(void);
 BOOL NHTTPi_createCommThread(void* threadInfo, u32 priority, void* stack);
@@ -36,6 +23,9 @@ void NHTTPi_InitBgnEndInfo(NHTTPBgnEndInfo* info)
     info->socket = -1;
     info->_unk7DC = 0;
     info->threadStack = NULL;
+#if defined(VERSION_R4QK01)
+    info->sslCallback = NULL;
+#endif
 }
 
 void* NHTTPi_alloc(u32 size, int align)
@@ -94,6 +84,9 @@ BOOL NHTTPi_Startup(void* systemInfo, NHTTPAlloc alloc, NHTTPFree free,
     NHTTPi_InitListInfo(listInfo);
     NHTTPi_InitRequestInfo(reqInfo);
     NHTTPi_initLockReqList(mutexInfo);
+#if defined(VERSION_R4QK01)
+    NHTTPi_InitConnectionList();
+#endif
     bgnEndInfo->socket = -1;
 
     stack = NHTTPi_alloc(0x2000, 8);
@@ -118,7 +111,11 @@ BOOL NHTTPi_Startup(void* systemInfo, NHTTPAlloc alloc, NHTTPFree free,
     if (result < 0)
     {
         OSReport("NCDGetCurrentIpConfig err = %d\n", result);
+#if defined(VERSION_R4QK01)
+        OSPanic("NHTTP_bgnend.c", 230, "NCDGetCurrentIpConfig");
+#else
         OSPanic("NHTTP_bgnend.c", 227, "NCDGetCurrentIpConfig");
+#endif
     }
 
     bgnEndInfo->started = TRUE;

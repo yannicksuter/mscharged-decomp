@@ -6078,19 +6078,19 @@ RVL_SDK/nand/NANDCore.c:
 	.data       start:0x8051FC80 end:0x8051FDD0 align:32
 	.sdata      start:0x806037C8 end:0x806037E8
 
-RVL_SDK/nwc24/NWC24SecretFList.c:
-	.sdata      start:0x80603800 end:0x80603804
-
-RVL_SDK/nwc24/NWC24Download.c:
-	.sdata      start:0x80603808 end:0x8060380C
-
 RVL_SDK/nand/NANDCheck.c:
 	.text       start:0x8041BE30 end:0x8041C2E4
 	.data       start:0x8051FDD0 end:0x8051FF00
 
 RVL_SDK/ncd/ncdsystem.c:
 	.text       start:0x8041C8D4 end:0x8041D150
-	.bss        start:0x805CE3C0 end:0x805CE420
+	.data       start:0x8051FF00 end:0x8051FFF0
+	.bss        start:0x805CE3C0 end:0x805CE420 align:32
+	.sdata      start:0x80603800 end:0x80603804
+	.sbss       start:0x80606430 end:0x80606438
+
+RVL_SDK/nwc24/NWC24Download.c:
+	.sdata      start:0x80603808 end:0x8060380C
 
 RVL_SDK/nwc24/NWC24Schedule.c:
 	.text       start:0x8041D3CC end:0x8041DAA8
@@ -6129,21 +6129,6 @@ RVL_SDK/so/soBasic.c:
 	.sdata      start:0x80603820 end:0x80603828
 	.sbss       start:0x80606488 end:0x80606490
 
-RVL_SDK/vf/pf_filelock.c:
-	.sbss       start:0x806064A8 end:0x806064AC
-
-RVL_SDK/vf/d_vf.c:
-	.sbss       start:0x806064B0 end:0x806064B8
-
-RVL_SDK/vf/d_vf_sys.c:
-	.sbss       start:0x806064B8 end:0x806064D0
-
-RVL_SDK/nhttp/d_nhttp_common.c:
-	.bss        start:0x805CE760 end:0x805CF400
-
-RVL_SDK/ssl/ssl_api.c:
-	.bss        start:0x805CF400 end:0x805D2420
-
 RVL_SDK/so/SOInformation.c:
 	.text       start:0x80420270 end:0x80420770
 
@@ -6152,10 +6137,11 @@ RVL_SDK/so/SOOption.c:
 
 RVL_SDK/nhttp/NHTTP_bgnend.c:
 	.text       start:0x80420A50 end:0x80420DB8
-	.data       start:0x80520330 end:0x80520410
+	.data       start:0x80520330 end:0x805203B8
 
 RVL_SDK/nhttp/NHTTP_control.c:
 	.text       start:0x80420DB8 end:0x804210E8
+	.data       start:0x805203B8 end:0x80520410
 
 RVL_SDK/nhttp/NHTTP_list.c:
 	.text       start:0x804210E8 end:0x80421338
@@ -6178,7 +6164,7 @@ RVL_SDK/nhttp/NHTTP_response.c:
 	.text       start:0x80422634 end:0x80422834
 
 RVL_SDK/nhttp/NHTTP_socket_RVL.c:
-	.text       start:0x8042288C end:0x80423130
+	.text       start:0x80422834 end:0x80423130
 
 RVL_SDK/nhttp/NHTTP_stdlib_RVL.c:
 	.text       start:0x80423130 end:0x80423AA4
@@ -6186,15 +6172,40 @@ RVL_SDK/nhttp/NHTTP_stdlib_RVL.c:
 	.data       start:0x80520460 end:0x805204A8
 
 RVL_SDK/nhttp/NHTTP_thread.c:
-	.data       start:0x805204A8 end:0x805207E0
-	.sdata      start:0x80603838 end:0x806038A0
-
-RVL_SDK/nhttp/d_nhttp.c:
-	.data       start:0x805207E0 end:0x805208F8
-	.sdata      start:0x806038A0 end:0x806038A4
+	.text       start:0x80423AA4 end:0x80426648
+	.rodata     start:0x804B9CB0 end:0x804B9D88
+	.data       start:0x805204A8 end:0x80520578
+	.sdata      start:0x80603838 end:0x80603898
 
 RVL_SDK/vf/pf_cp932.c:
 	.rodata     start:0x804B9D88 end:0x804BDFFC
+
+RVL_SDK/nhttp/d_nhttp_private.c:
+	.text       start:0x80426648 end:0x80426978
+
+RVL_SDK/nhttp/d_nhttp.c:
+	.text       start:0x80426978 end:0x804274C8
+	.data       start:0x80520578 end:0x80520870
+	.sdata      start:0x80603898 end:0x806038A4
+	.sbss       start:0x80606490 end:0x80606498
+
+RVL_SDK/nhttp/d_nhttp_common.c:
+	.text       start:0x804274C8 end:0x80427C68
+	.data       start:0x80520870 end:0x805208B0
+	.bss        start:0x805CE720 end:0x805CF400
+	.sbss       start:0x80606498 end:0x806064A0
+
+RVL_SDK/vf/pf_filelock.c:
+	.sbss       start:0x806064A8 end:0x806064AC
+
+RVL_SDK/vf/d_vf.c:
+	.sbss       start:0x806064B0 end:0x806064B8
+
+RVL_SDK/vf/d_vf_sys.c:
+	.sbss       start:0x806064B8 end:0x806064D0
+
+RVL_SDK/ssl/ssl_api.c:
+	.bss        start:0x805CF400 end:0x805D2420
 
 RVL_SDK/ssl/ssl_mutex.c:
 	.text       start:0x804289B4 end:0x804289C0

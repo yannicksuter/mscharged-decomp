@@ -1,5 +1,9 @@
 #include <private/nhttp.h>
 
+#if defined(VERSION_R4QK01)
+#include <stdio.h>
+#endif
+
 struct NHTTPSysInfo
 {
     u8 bgnEndInfo[0x800];
@@ -10,7 +14,38 @@ struct NHTTPSysInfo
 };
 
 static NHTTPConnectionInfo* sConnectionList = NULL;
+#if defined(VERSION_R4QK01)
+static struct NHTTPCompletionInfo
+{
+    BOOL initialized;
+    OSMutex mutex;
+    OSCond cond;
+} NHTTPiStaticResource;
+static NHTTPSysInfo sysInfo ATTRIBUTE_ALIGN(32);
+#else
 static NHTTPSysInfo sysInfo;
+#endif
+#if defined(VERSION_R4QK01)
+static NHTTPSysInfo* sysInfo_p = NULL;
+#endif
+
+#if defined(VERSION_R4QK01)
+void NHTTPi_NotifyCompletion(NHTTPConnectionInfo* connection)
+{
+    struct NHTTPCompletionInfo* info = &NHTTPiStaticResource;
+
+    if (!info->initialized)
+    {
+        OSInitMutex(&info->mutex);
+        OSInitCond(&info->cond);
+        info->initialized = TRUE;
+    }
+    OSLockMutex(&info->mutex);
+    connection->inProgress = FALSE;
+    OSSignalCond(&info->cond);
+    OSUnlockMutex(&info->mutex);
+}
+#endif
 
 NHTTPConnectionInfo* NHTTPi_ControlConnectionList(void* mutexInfo,
     void* handle, u32 mode)
@@ -293,7 +328,9 @@ static void NHTTPi_InitSystemInfo(NHTTPSysInfo* sysInfo_p)
 
 NHTTPSysInfo* NHTTPi_GetSystemInfoP(void)
 {
+#if !defined(VERSION_R4QK01)
     static NHTTPSysInfo* sysInfo_p = NULL;
+#endif
 
     if (sysInfo_p == NULL)
     {
@@ -341,3 +378,19 @@ u32 NHTTPi_GetVirtualContentLength(NHTTPConnectionInfo* connection)
 {
     return connection != NULL ? connection->virtualContentLength : 0;
 }
+
+#if defined(VERSION_R4QK01)
+void NHTTPi_InitConnectionList(void)
+{
+    if (sConnectionList != NULL)
+    {
+        s32 connectionCount = NHTTPi_GetConnectionListLength();
+        if (connectionCount != 0)
+        {
+            printf("*warning: %d connections rests! Please free connections.\n",
+                connectionCount);
+        }
+    }
+    sConnectionList = NULL;
+}
+#endif

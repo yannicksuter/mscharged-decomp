@@ -32,7 +32,12 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* bgnEndInfo_p,
     int port;
     int decode_urllen;
 
+#if defined(VERSION_R4QK01)
+    char a_url_buf[LEN_URLBUF];
+    char* a_url = a_url_buf;
+#else
     char a_url[LEN_URLBUF];
+#endif
     char* prefix_p;
     NHTTPRequestInfo* req_p = NULL;
 
@@ -69,6 +74,17 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* bgnEndInfo_p,
         goto errend;
     }
 
+#if defined(VERSION_R4QK01)
+    if (urllen + 1 > LEN_URLBUF)
+    {
+        a_url = NHTTPi_alloc(urllen + 1, 4);
+        if (!a_url)
+        {
+            NHTTPi_SetError(bgnEndInfo_p, NHTTP_ERROR_DNS);
+            goto errend;
+        }
+    }
+#endif
     NHTTPi_memclr(a_url, urllen);
     NHTTPi_memcpy(a_url, url_p, urllen);
 
@@ -252,9 +268,19 @@ NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* bgnEndInfo_p,
     req_p->rootCASize = 0;
     req_p->clientCertDefault = FALSE;
     req_p->verifyOption = 0;
+#if defined(VERSION_R4QK01)
+    req_p->sslCallbackParam = NULL;
+#endif
     req_p->response->param_p = param_p;
     req_p->proxyEnabled = FALSE;
     req_p->recvBufferSize = 0;
+#if defined(VERSION_R4QK01)
+    req_p->sendBufferSize = 0;
+    if (a_url != NULL && a_url != a_url_buf)
+    {
+        NHTTPi_free(a_url);
+    }
+#endif
     return req_p;
 
 errend:
@@ -274,6 +300,12 @@ errend:
         }
         NHTTPi_free(req_p);
     }
+#if defined(VERSION_R4QK01)
+    if (a_url != NULL && a_url != a_url_buf)
+    {
+        NHTTPi_free(a_url);
+    }
+#endif
     return NULL;
 }
 

@@ -1,8 +1,10 @@
 #include <private/nhttp.h>
 
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
+#if !defined(VERSION_R4QK01)
 int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
     char* buf_p, const int len, const int flags);
+#endif
 
 s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
     s32 end, s32* separator, s32* lineBreakLength)
@@ -302,15 +304,27 @@ int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos)
     return res_p->recvBufLen <= (unsigned long)pos;
 }
 
-s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
+s32 NHTTPi_RecvBuf(
+#if defined(VERSION_R4QK01)
+    void* mutexInfo,
+#endif
+    NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags)
 {
     NHTTPResponseInfo* response = request->response;
-    return NHTTPi_SocRecv(request, socket, &response->recvBuf_p[offset],
+    return NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+        mutexInfo,
+#endif
+        request, socket, &response->recvBuf_p[offset],
         response->recvBufLen - offset, flags);
 }
 
-int NHTTPi_RecvBufN(NHTTPRequestInfo* req_p, const int socket, const int pos,
+int NHTTPi_RecvBufN(
+#if defined(VERSION_R4QK01)
+    void* mutexInfo,
+#endif
+    NHTTPRequestInfo* req_p, const int socket, const int pos,
     int len, const int flags)
 {
     NHTTPResponseInfo* res_p = req_p->response;
@@ -325,5 +339,8 @@ int NHTTPi_RecvBufN(NHTTPRequestInfo* req_p, const int socket, const int pos,
         : len;
 
     return NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+        mutexInfo,
+#endif
         req_p, socket, &res_p->recvBuf_p[pos], len, flags);
 }

@@ -9,19 +9,6 @@ typedef struct NHTTPMutexInfo
     BOOL initialized;
 } NHTTPMutexInfo;
 
-typedef struct NHTTPBgnEndInfo
-{
-    NCDIpConfig ipConfig;
-    NHTTPAlloc alloc;
-    NHTTPFree free;
-    BOOL started;
-    s32 socket;
-    s32 sslError;
-    NHTTPErr error;
-    u32 _unk7DC;
-    void* threadStack;
-} NHTTPBgnEndInfo;
-
 typedef struct NHTTPThreadInfo
 {
     OSMessageQueue messageQueue;

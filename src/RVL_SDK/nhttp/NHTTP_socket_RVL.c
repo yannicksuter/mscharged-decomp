@@ -10,13 +10,36 @@ void* NHTTPi_memclr(void* destination, u32 size);
 s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* bgnEndInfo_p, void* mutexInfo_p,
     NHTTPRequestInfo* req_p, const s32 socket);
 
+#if defined(VERSION_R4QK01)
+s32 NHTTPi_SocCheckKeepAlive(s32 socket)
+{
+    char buffer[1];
+    s32 result = 0;
+    if (socket == -1)
+    {
+        result = -1;
+    }
+    else if (SORecv(socket, buffer, sizeof(buffer), 4) != SO_EAGAIN)
+    {
+        result = -1;
+    }
+    return result;
+}
+#endif
+
 s32 NHTTPi_SocOpen(NHTTPRequestInfo* request)
 {
     s32 socket;
     s32 recvBufferSize;
+#if defined(VERSION_R4QK01)
+    s32 sendBufferSize;
+#endif
 
     socket = SOSocket2(SO_PF_INET, SO_SOCK_STREAM, 0);
     recvBufferSize = 0;
+#if defined(VERSION_R4QK01)
+    sendBufferSize = 0;
+#endif
     if (request != NULL)
     {
         recvBufferSize = request->recvBufferSize;
@@ -25,6 +48,16 @@ s32 NHTTPi_SocOpen(NHTTPRequestInfo* request)
     {
         SOSetSockOpt(socket, SO_SOL_SOCKET, SO_SO_RCVBUF, &recvBufferSize, sizeof(recvBufferSize));
     }
+#if defined(VERSION_R4QK01)
+    if (request != NULL)
+    {
+        sendBufferSize = request->sendBufferSize;
+    }
+    if (socket >= 0 && sendBufferSize != 0)
+    {
+        SOSetSockOpt(socket, SO_SOL_SOCKET, SO_SO_SNDBUF, &sendBufferSize, sizeof(sendBufferSize));
+    }
+#endif
     return socket;
 }
 
@@ -76,23 +109,59 @@ s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* bgnEndInfo_p, void* mutexInfo_p,
     BOOL done = FALSE;
 
     req_p->sslId = SSLNew(req_p->verifyOption, req_p->host);
+#if defined(VERSION_R4QK01)
+    if (bgnEndInfo_p->sslCallback != NULL && req_p->sslCallbackParam != NULL)
+    {
+        bgnEndInfo_p->sslCallback(req_p->sslId, req_p->sslCallbackParam);
+    }
+#endif
     if (req_p->clientCertDefault == TRUE)
     {
+#if defined(VERSION_R4QK01)
+        if (SSLSetBuiltinClientCert(req_p->sslId, req_p->builtinClientCert) != 0)
+        {
+            return -1005;
+        }
+#else
         SSLSetClientCertDefault(req_p->sslId);
+#endif
     }
     else if (req_p->clientCertData != NULL && req_p->privateKeyData != NULL)
     {
+#if defined(VERSION_R4QK01)
+        if (SSLSetClientCert(req_p->sslId, req_p->clientCertData,
+                req_p->clientCertSize, req_p->privateKeyData,
+                req_p->privateKeySize) != 0)
+        {
+            return -1005;
+        }
+#else
         SSLSetClientCert(req_p->sslId, req_p->clientCertData,
             req_p->clientCertSize, req_p->privateKeyData,
             req_p->privateKeySize);
+#endif
     }
     if (req_p->rootCAData != NULL)
     {
+#if defined(VERSION_R4QK01)
+        if (SSLSetRootCA(req_p->sslId, req_p->rootCAData, req_p->rootCASize) != 0)
+        {
+            return -1004;
+        }
+#else
         SSLSetRootCA(req_p->sslId, req_p->rootCAData, req_p->rootCASize);
+#endif
     }
     else
     {
+#if defined(VERSION_R4QK01)
+        if (SSLSetBuiltinRootCA(req_p->sslId, req_p->builtinRootCA) != 0)
+        {
+            return -1004;
+        }
+#else
         SSLSetRootCADefault(req_p->sslId);
+#endif
     }
     if (SSLConnect(req_p->sslId, socket) < -1)
     {
@@ -126,6 +195,47 @@ s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* bgnEndInfo_p, void* mutexInfo_p,
     return 0;
 }
 
+#if defined(VERSION_R4QK01)
+s32 NHTTPi_SocRecv_sub(NHTTPConnectionInfo* connection, s32 socket,
+    char* buffer, s32 length, s32 flags)
+{
+    char* recvBuffer = connection->recvBuffer;
+    s32 received = 0;
+    if (length > 0)
+    {
+        if (connection->recvBufferRemaining == 0)
+        {
+            s32 result = SORecv(socket, recvBuffer, sizeof(connection->recvBuffer), flags);
+            if (result > 0)
+            {
+                connection->recvBufferRemaining = result;
+                connection->recvBufferOffset = 0;
+            }
+            else
+            {
+                return result;
+            }
+        }
+        if (connection->recvBufferRemaining != 0)
+        {
+            length = MIN(length, connection->recvBufferRemaining);
+            NHTTPi_memcpy(buffer, recvBuffer + connection->recvBufferOffset, length);
+            connection->recvBufferRemaining -= length;
+            if (connection->recvBufferRemaining == 0)
+            {
+                NHTTPi_memclr(recvBuffer, sizeof(connection->recvBuffer));
+                connection->recvBufferOffset = 0;
+            }
+            else
+            {
+                connection->recvBufferOffset += length;
+            }
+            received = length;
+        }
+    }
+    return received;
+}
+#else
 s32 NHTTPi_SocRecv_sub(s32 socket, char* o_buf, u32 i_bufSize, s32 flags)
 {
     char tmp[32] ALIGN(32);
@@ -227,8 +337,15 @@ s32 NHTTPi_SocRecv_sub(s32 socket, char* o_buf, u32 i_bufSize, s32 flags)
     return total_read;
 }
 
+#endif
+
+#if defined(VERSION_R4QK01)
+int NHTTPi_SocRecv(void* mutexInfo, NHTTPRequestInfo* req_p, const int socket,
+    char* buf_p, const int len, const int flags)
+#else
 int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket, char* buf_p,
     const int len, const int flags)
+#endif
 {
     int error;
 
@@ -238,7 +355,19 @@ int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket, char* buf_p,
     }
     else
     {
+#if defined(VERSION_R4QK01)
+        NHTTPConnectionInfo* connection = NHTTPi_Request2Connection(mutexInfo, req_p);
+        if (connection != NULL)
+        {
+            error = NHTTPi_SocRecv_sub(connection, socket, buf_p, len, flags);
+        }
+        else
+        {
+            return -1001;
+        }
+#else
         error = NHTTPi_SocRecv_sub(socket, buf_p, len, flags);
+#endif
     }
     if (error < 0)
     {

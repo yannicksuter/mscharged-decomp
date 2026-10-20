@@ -4,10 +4,16 @@
 
 #include <string.h>
 
-struct NHTTPBgnEndInfo
-{
-    NCDIpConfig ipConfig;
-};
+#if defined(VERSION_R4QK01)
+#include <stdio.h>
+
+const char* __NHTTPVersion =
+    "<< RVL_SDK - NHTTP \trelease build: May 12 2009 11:01:00 (0x4199_60831) >>";
+const char* __NHTTPUnofficialVersion =
+    "<< RVL_SDK - NHTTP \trelease build: May 12 2009 11:01:00 (0x4199_60831) UNOFFICIAL >>";
+const char* __NHTTPCREATEVersion =
+    "<< RVL_SDK - NHTTPCREATE \trelease build: May 12 2009 11:01:00 (0x4199_60831) >>";
+#endif
 
 typedef s32 (*NHTTPPostSend)(const char* label, char** value_p,
     u32* length_p, s32 offset, void* userParam);
@@ -34,9 +40,20 @@ void NHTTP_DestroyResponse(void* mutexInfo, NHTTPResponseInfo* response);
 
 s32 NHTTPStartup(NHTTPAlloc alloc, NHTTPFree free, u32 priority)
 {
+#if defined(VERSION_R4QK01)
+    static BOOL registered = FALSE;
+    void* systemInfo = NHTTPi_GetSystemInfoP();
+    if (!registered)
+    {
+        OSRegisterVersion(__NHTTPVersion);
+        registered = TRUE;
+    }
+    return NHTTPi_Startup(systemInfo, alloc, free, priority) ? 0 : -1;
+#else
     return NHTTPi_Startup(NHTTPi_GetSystemInfoP(), alloc, free, priority)
              ? 0
              : -1;
+#endif
 }
 
 void NHTTPCleanupAsync(NHTTPCleanupCallback callback)
@@ -152,11 +169,13 @@ s32 NHTTPi_TemplateConnectionCallback(NHTTPConnectionInfo* handle,
     return ret;
 }
 
+#if !defined(VERSION_R4QK01)
 NHTTPRequest* NHTTPCreateRequest(const char* url, NHTTPReqMethod method,
     void* buffer, u32 bufferSize, NHTTPReqCallback callback, void* userParam)
 {
     return NHTTPCreateRequestEx(url, method, buffer, bufferSize, callback, userParam, NULL, NULL);
 }
+#endif
 
 NHTTPRequest* NHTTPCreateRequestEx(const char* url, NHTTPReqMethod method,
     void* buffer, u32 bufferSize, NHTTPReqCallback callback, void* userParam,
@@ -196,6 +215,20 @@ NHTTPRequest* NHTTPCreateRequestEx(const char* url, NHTTPReqMethod method,
     return request;
 }
 
+#if defined(VERSION_R4QK01)
+NHTTPRequest* NHTTPCreateRequest(const char* url, NHTTPReqMethod method,
+    void* buffer, u32 bufferSize, NHTTPReqCallback callback, void* userParam)
+{
+    static BOOL registered = FALSE;
+    if (!registered)
+    {
+        OSRegisterVersion(__NHTTPCREATEVersion);
+        registered = TRUE;
+    }
+    return NHTTPCreateRequestEx(url, method, buffer, bufferSize, callback, userParam, NULL, NULL);
+}
+#endif
+
 s32 NHTTPAddHeaderField(NHTTPRequest* handle, const char* name,
     const char* value)
 {
@@ -205,6 +238,19 @@ s32 NHTTPAddHeaderField(NHTTPRequest* handle, const char* name,
 
     systemInfo = NHTTPi_GetSystemInfoP();
     request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(systemInfo), handle);
+#if defined(VERSION_R4QK01)
+    {
+        NHTTPBgnEndInfo* bgnEndInfo = NHTTPi_GetBgnEndInfoP(systemInfo);
+        if (request == NULL)
+            return -1;
+        if (request->state != 0)
+        {
+            printf("%s can be called before NHTTPStartConnection()\n", __FUNCTION__);
+            return -1;
+        }
+        result = NHTTP_AddHeaderField(request, bgnEndInfo, name, value) ? 0 : -1;
+    }
+#else
     if (request != NULL)
     {
         result = NHTTP_AddHeaderField(request,
@@ -218,6 +264,7 @@ s32 NHTTPAddHeaderField(NHTTPRequest* handle, const char* name,
     {
         result = -1;
     }
+#endif
     return result;
 }
 
@@ -230,6 +277,19 @@ s32 NHTTPAddPostDataAscii(NHTTPRequest* handle, const char* name,
 
     systemInfo = NHTTPi_GetSystemInfoP();
     request = NHTTPi_GetRequest(NHTTPi_GetMutexInfoP(systemInfo), handle);
+#if defined(VERSION_R4QK01)
+    {
+        NHTTPBgnEndInfo* bgnEndInfo = NHTTPi_GetBgnEndInfoP(systemInfo);
+        if (request == NULL)
+            return -1;
+        if (request->state != 0)
+        {
+            printf("%s can be called before NHTTPStartConnection()\n", __FUNCTION__);
+            return -1;
+        }
+        result = NHTTP_AddPostDataAscii(request, bgnEndInfo, name, value) ? 0 : -1;
+    }
+#else
     if (request != NULL)
     {
         result = NHTTP_AddPostDataAscii(request,
@@ -243,6 +303,7 @@ s32 NHTTPAddPostDataAscii(NHTTPRequest* handle, const char* name,
     {
         result = -1;
     }
+#endif
     return result;
 }
 
@@ -356,6 +417,9 @@ s32 NHTTPSetProxy(NHTTPRequest* handle, const char* proxy_p, u16 port,
     proxyLen = NHTTPi_strlen(proxy_p);
     if (proxyLen > 0x100)
     {
+#if defined(VERSION_R4QK01)
+        printf("proxy-address exceeded 256 characters\n");
+#endif
         return -1;
     }
     NHTTPi_memcpy(req_p->proxyServer, proxy_p, proxyLen);
@@ -368,7 +432,20 @@ s32 NHTTPSetProxy(NHTTPRequest* handle, const char* proxy_p, u16 port,
 
         username_len = NHTTPi_strlen(username_p);
         password_len = NHTTPi_strlen(password_p);
+#if defined(VERSION_R4QK01)
+        if (username_len > 0x20)
+        {
+            printf("username exceeded 32 characters\n");
+            return -1;
+        }
+        if (password_len > 0x20)
+        {
+            printf("password exceeded 32 characters\n");
+            return -1;
+        }
+#else
         if (username_len <= 0x20 && password_len <= 0x20)
+#endif
         {
             char tmpbuf[0x41];
             NHTTPi_memclr(tmpbuf, sizeof(tmpbuf));
@@ -379,10 +456,12 @@ s32 NHTTPSetProxy(NHTTPRequest* handle, const char* proxy_p, u16 port,
             req_p->proxyAuthorizationLength =
                 NHTTPi_Base64Encode(req_p->proxyAuthorization, tmpbuf);
         }
+#if !defined(VERSION_R4QK01)
         else
         {
             return -1;
         }
+#endif
     }
 
     req_p->proxyEnabled = TRUE;
@@ -411,7 +490,11 @@ s32 NHTTPSetProxyDefault(NHTTPRequest* handle)
         proxy = &bgnEndInfo->ipConfig.proxy.http;
     }
 
+#if defined(VERSION_R4QK01)
+    if (proxy->mode == 1)
+#else
     if (proxy->mode == 1 && proxy->port != 0 && strlen(proxy->server) >= 6)
+#endif
     {
         username = NULL;
         password = NULL;
@@ -425,7 +508,11 @@ s32 NHTTPSetProxyDefault(NHTTPRequest* handle)
         if (result < 0)
         {
             OSReport("NHTTPSetProxy failed.(%d)\n", result);
+#if defined(VERSION_R4QK01)
+            OSPanic("d_nhttp.c", 0x3DC, "NHTTPSetProxy");
+#else
             OSPanic("d_nhttp.c", 0x346, "NHTTPSetProxy");
+#endif
         }
         else
         {
@@ -435,12 +522,55 @@ s32 NHTTPSetProxyDefault(NHTTPRequest* handle)
     return -1;
 }
 
-s32 NHTTPSetClientCertDefault(NHTTPRequest* handle)
+#if defined(VERSION_R4QK01)
+s32 NHTTPSetRootCADefault(NHTTPRequest* handle)
 {
     NHTTPRequestInfo* request;
+    s32 result;
 
     request = NHTTPi_GetRequest(
         NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), handle);
+    if (request == NULL)
+    {
+        result = -1;
+    }
+    else
+    {
+        request->builtinRootCA = 0;
+        request->rootCAData = NULL;
+        request->rootCASize = 0;
+        result = 0;
+    }
+    return result;
+}
+#endif
+
+s32 NHTTPSetClientCertDefault(NHTTPRequest* handle)
+{
+    NHTTPRequestInfo* request;
+#if defined(VERSION_R4QK01)
+    s32 result;
+#endif
+
+    request = NHTTPi_GetRequest(
+        NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP()), handle);
+#if defined(VERSION_R4QK01)
+    if (request == NULL)
+    {
+        result = -1;
+    }
+    else
+    {
+        request->builtinClientCert = 0;
+        request->clientCertDefault = TRUE;
+        request->clientCertData = NULL;
+        request->clientCertSize = 0;
+        request->privateKeyData = NULL;
+        request->privateKeySize = 0;
+        result = 0;
+    }
+    return result;
+#else
     if (request == NULL)
     {
         return -1;
@@ -451,8 +581,10 @@ s32 NHTTPSetClientCertDefault(NHTTPRequest* handle)
     request->privateKeyData = NULL;
     request->privateKeySize = 0;
     return 0;
+#endif
 }
 
+#if !defined(VERSION_R4QK01)
 s32 NHTTPSetRootCADefault(NHTTPRequest* handle)
 {
     NHTTPRequestInfo* request;
@@ -467,3 +599,4 @@ s32 NHTTPSetRootCADefault(NHTTPRequest* handle)
     request->rootCASize = 0;
     return 0;
 }
+#endif

@@ -2,6 +2,7 @@
 #define PRIVATE_NHTTP_H
 
 #include <revolution/nhttp.h>
+#include <revolution/ncd.h>
 #include <revolution/os.h>
 #include <revolution/ssl.h>
 
@@ -13,6 +14,22 @@
 typedef struct NHTTPBgnEndInfo NHTTPBgnEndInfo;
 typedef struct NHTTPRequestInfo NHTTPRequestInfo;
 typedef struct NHTTPConnectionInfo NHTTPConnectionInfo;
+
+struct NHTTPBgnEndInfo
+{
+    NCDIpConfig ipConfig;
+    NHTTPAlloc alloc;
+    NHTTPFree free;
+    BOOL started;
+    s32 socket;
+    s32 sslError;
+    NHTTPErr error;
+    u32 _unk7DC;
+    void* threadStack;
+#if defined(VERSION_R4QK01)
+    void (*sslCallback)(SSLId sslId, void* param);
+#endif
+};
 
 typedef enum NHTTPConnectionEvent
 {
@@ -135,11 +152,19 @@ struct NHTTPRequestInfo
     BOOL clientCertDefault;
     u32 verifyOption;
     NHTTPEncodingType encodingType;
+#if defined(VERSION_R4QK01)
+    void* sslCallbackParam;
+    u32 builtinRootCA;
+    u32 builtinClientCert;
+#endif
     char proxyServer[0x100];
     u32 proxyPort;
     char proxyAuthorization[0x5C];
     s32 proxyAuthorizationLength;
     u32 recvBufferSize;
+#if defined(VERSION_R4QK01)
+    u32 sendBufferSize;
+#endif
     const void* postBuffer;
     u32 postBufferSize;
     void* _unk244;
@@ -150,8 +175,12 @@ struct NHTTPConnectionInfo
     BOOL started;
     s32 state;
     s32 sslError;
+#if defined(VERSION_R4QK01)
+    BOOL inProgress;
+#else
     OSCond cond;
     OSMutex mutex;
+#endif
     NHTTPRequestInfo* request;
     NHTTPResponseInfo* response;
     s32 requestId;
@@ -161,6 +190,11 @@ struct NHTTPConnectionInfo
     u32 postSendSize;
     u32 virtualContentLength;
     NHTTPReqCallback requestCallback;
+#if defined(VERSION_R4QK01)
+    char recvBuffer[0x8000] ALIGN(32);
+    u32 recvBufferOffset;
+    u32 recvBufferRemaining;
+#endif
 };
 
 typedef struct NHTTPSysInfo NHTTPSysInfo;
@@ -227,5 +261,17 @@ void* NHTTPi_GetMutexInfoP(NHTTPSysInfo* sysInfo_p);
 void NHTTPi_SetVirtualContentLength(NHTTPConnectionInfo* connection,
     u32 length);
 u32 NHTTPi_GetVirtualContentLength(NHTTPConnectionInfo* connection);
+
+#if defined(VERSION_R4QK01)
+void NHTTPi_InitConnectionList(void);
+s32 NHTTPi_SocCheckKeepAlive(s32 socket);
+int NHTTPi_SocRecv(void* mutexInfo, NHTTPRequestInfo* request, int socket,
+    char* buffer, int length, int flags);
+s32 NHTTPi_RecvBuf(void* mutexInfo, NHTTPRequestInfo* request, s32 socket,
+    s32 offset, s32 flags);
+int NHTTPi_RecvBufN(void* mutexInfo, NHTTPRequestInfo* request, int socket,
+    int offset, int length, int flags);
+void NHTTPi_NotifyCompletion(NHTTPConnectionInfo* connection);
+#endif
 
 #endif // PRIVATE_NHTTP_H
