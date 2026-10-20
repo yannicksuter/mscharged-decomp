@@ -315,9 +315,10 @@ void gpDisconnect(GPConnection* connection) {
 
   // If we were connected prior, set to disconnected to save off info cache
   //////////////////////////////////////////////////////////////////////////
-  // TODO This was commented out
-  // if (oldState == GPI_CONNECTED)
-  //    iconnection->connectState = GPI_DISCONNECTED;
+#if defined(VERSION_R4QK01)
+  if (oldState == GPI_CONNECTED)
+    iconnection->connectState = GPI_DISCONNECTED;
+#endif
 }
 
 GPResult gpIsConnected(GPConnection* connection, GPEnum* connected) {
@@ -1359,6 +1360,36 @@ GPResult gpDeleteBuddy(GPConnection* connection, GPProfile profile) {
 
   return GP_NO_ERROR;
 }
+
+#if defined(VERSION_R4QK01)
+GPResult gpGetBlockedProfile(GPConnection* connection, int index,
+                             GPProfile* profile) {
+  GPIConnection* iconnection;
+  int num;
+  GPIProfile* pProfile;
+
+  if ((connection == NULL) || (*connection == NULL))
+    return GP_PARAMETER_ERROR;
+
+  iconnection = (GPIConnection*)*connection;
+  if (iconnection->simulation)
+    return GP_NO_ERROR;
+
+  if (profile == NULL)
+    Error(connection, GP_PARAMETER_ERROR, "Invalid profile container");
+
+  num = iconnection->profileList.numBlocked;
+  if ((index < 0) || (index >= num))
+    Error(connection, GP_PARAMETER_ERROR, "Invalid index.");
+
+  pProfile = gpiFindBlockedProfile(connection, index);
+  if (!pProfile)
+    Error(connection, GP_PARAMETER_ERROR, "Invalid index.");
+
+  *profile = (GPProfile)pProfile->profileId;
+  return GP_NO_ERROR;
+}
+#endif
 
 #ifndef GP_NEW_STATUS_INFO
 GPResult gpSetStatusA(GPConnection* connection, GPEnum status,

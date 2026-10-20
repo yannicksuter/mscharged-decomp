@@ -996,6 +996,11 @@ int gpIsBuddy(GPConnection* connection, GPProfile profile);
 
 int gpIsBuddyConnectionOpen(GPConnection* connection, GPProfile profile);
 
+#if defined(VERSION_R4QK01)
+GPResult gpGetBlockedProfile(GPConnection* connection, int index,
+                             GPProfile* profile);
+#endif
+
 // gpSetStatus
 //////////////
 #ifndef GP_NEW_STATUS_INFO

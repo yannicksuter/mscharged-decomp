@@ -6404,7 +6404,7 @@ RVL_SDK/gamespy/common/gsXML.c:
 	.text       start:0x8047E070 end:0x8047E088 align:16
 
 RVL_SDK/gamespy/GP/gp.c:
-	.text       start:0x8047E090 end:0x8047EF2C
+	.text       start:0x8047E090 end:0x8047F008 align:16
 	.data       start:0x8052A798 end:0x8052A9E8
 	.sdata      start:0x80603B98 end:0x80603BA8
 
@@ -6447,7 +6447,7 @@ RVL_SDK/gamespy/GP/gpiPeer.c:
 	.sdata      start:0x80603E10 end:0x80603E70
 
 RVL_SDK/gamespy/GP/gpiProfile.c:
-	.text       start:0x80488A00 end:0x804893C8 align:16
+	.text       start:0x80488A00 end:0x804895DC align:16
 	.data       start:0x8052B490 end:0x8052B678
 	.sdata      start:0x80603E70 end:0x80603E98
 
@@ -6538,7 +6538,7 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
 	.text       start:0x80498580 end:0x80499FF0
-	.rodata     start:0x804BE5C8 end:0x804BE5D4
+	.rodata     start:0x804BE5C8 end:0x804BE5D8
 	.data       start:0x8052D140 end:0x8052D210
 	.sdata      start:0x806040C8 end:0x80604120
 
@@ -6548,6 +6548,10 @@ RVL_SDK/gamespy/gstats/gbucket.c:
 	.sdata2     start:0x8060AD80 end:0x8060AD88
 
 RVL_SDK/gamespy/gstats/gstats.c:
+	.text       start:0x8049B1D0 end:0x8049D9DC
+	.rodata     start:0x804BE5D8 end:0x804BE6E8
+	.data       start:0x8052D210 end:0x8052D320
+	.bss        start:0x805FE200 end:0x805FE600
 	.sdata      start:0x80604120 end:0x80604188
 	.sbss       start:0x80606600 end:0x80606620
 
@@ -6559,6 +6563,7 @@ RVL_SDK/gamespy/natneg/NATify.c:
 RVL_SDK/gamespy/natneg/natneg.c:
 	.text       start:0x8049E130 end:0x8049FA98
 	.data       start:0x8052D320 end:0x8052D440
+	.bss        start:0x805FE840 end:0x805FEB20
 	.sdata      start:0x80604198 end:0x806041B8
 	.sbss       start:0x80606640 end:0x8060666C
 

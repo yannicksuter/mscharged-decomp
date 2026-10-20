@@ -44,6 +44,19 @@ static void gpiProfilesTableFree(void* arg) {
     freeclear(profile->buddyStatus->locationString);
     freeclear(profile->buddyStatus);
   }
+#if defined(VERSION_R4QK01)
+  if (profile->buddyStatusInfo) {
+    freeclear(profile->buddyStatusInfo->richStatus);
+    freeclear(profile->buddyStatusInfo->gameType);
+    freeclear(profile->buddyStatusInfo->gameVariant);
+    freeclear(profile->buddyStatusInfo->gameMapName);
+    if (profile->buddyStatusInfo->extendedInfoKeys) {
+      ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
+      profile->buddyStatusInfo->extendedInfoKeys = NULL;
+    }
+    freeclear(profile->buddyStatusInfo);
+  }
+#endif
   gpiFreeInfoCache(profile);
   freeclear(profile->authSig);
   freeclear(profile->peerSig);
@@ -53,6 +66,9 @@ GPIBool gpiInitProfiles(GPConnection* connection) {
   GPIConnection* iconnection = (GPIConnection*)*connection;
 
   iconnection->profileList.numBuddies = 0;
+#if defined(VERSION_R4QK01)
+  iconnection->profileList.numBlocked = 0;
+#endif
   iconnection->profileList.num = 0;
   iconnection->profileList.profileTable =
       TableNew(sizeof(GPIProfile), 32, gpiProfilesTableHash,
@@ -444,10 +460,188 @@ void gpiRemoveBuddyStatus(GPIBuddyStatus* buddyStatus) {
   freeclear(buddyStatus);
 }
 
+#if defined(VERSION_R4QK01)
+void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo* buddyStatusInfo) {
+  GS_ASSERT(buddyStatusInfo);
+
+  freeclear(buddyStatusInfo->richStatus);
+  freeclear(buddyStatusInfo->gameType);
+  freeclear(buddyStatusInfo->gameVariant);
+  freeclear(buddyStatusInfo->gameMapName);
+  ArrayFree(buddyStatusInfo->extendedInfoKeys);
+  buddyStatusInfo->extendedInfoKeys = NULL;
+  freeclear(buddyStatusInfo);
+}
+#endif
 
 GPIBool gpiCanFreeProfile(GPIProfile* profile) {
   return ((profile && !profile->cache && !profile->buddyStatus &&
-           !profile->peerSig && !profile->authSig))
+#if defined(VERSION_R4QK01)
+           !profile->buddyStatusInfo &&
+#endif
+           !profile->peerSig && !profile->authSig
+#if defined(VERSION_R4QK01)
+           && !profile->blocked
+#endif
+           ))
              ? GPITrue
              : GPIFalse;
 }
+
+#if defined(VERSION_R4QK01)
+GPResult gpiAddToBlockedList(GPConnection* connection, int profileid) {
+  GPIConnection* iconnection = (GPIConnection*)*connection;
+  GPIProfile* profile;
+  int index;
+
+  if (!gpiGetProfile(connection, profileid, &profile)) {
+    profile = gpiProfileListAdd(connection, profileid);
+    if (!profile)
+      Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+  } else {
+    if (profile->buddyStatus) {
+      index = profile->buddyStatus->buddyIndex;
+      freeclear(profile->buddyStatus->statusString);
+      freeclear(profile->buddyStatus->locationString);
+      freeclear(profile->buddyStatus);
+      iconnection->profileList.numBuddies--;
+      assert(iconnection->profileList.numBuddies >= 0);
+      gpiProfileMap(connection, gpiFixBuddyIndices, (void*)(unsigned long)index);
+    }
+    if (profile->buddyStatusInfo) {
+      index = profile->buddyStatusInfo->buddyIndex;
+      freeclear(profile->buddyStatusInfo->richStatus);
+      freeclear(profile->buddyStatusInfo->gameType);
+      freeclear(profile->buddyStatusInfo->gameVariant);
+      freeclear(profile->buddyStatusInfo->gameMapName);
+      freeclear(profile->buddyStatusInfo);
+      if (profile->buddyStatusInfo->extendedInfoKeys) {
+        ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
+        profile->buddyStatusInfo->extendedInfoKeys = NULL;
+      }
+      iconnection->profileList.numBuddies--;
+      assert(iconnection->profileList.numBuddies >= 0);
+      gpiProfileMap(connection, gpiFixBuddyIndices, (void*)(unsigned long)index);
+    }
+  }
+
+  if (!profile->blocked) {
+    profile->blocked = gsi_true;
+    profile->blockIndex = iconnection->profileList.numBlocked++;
+  }
+
+  // The server reports errors through the error callback.
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
+                          "\\addblock\\\\sesskey\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->sessKey);
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
+                          "\\profileid\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, profileid);
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
+  return GP_NO_ERROR;
+}
+
+static GPIBool gpiFixBlockIndices(GPConnection* connection,
+                                  GPIProfile* profile, void* data) {
+  int baseIndex = (int)(unsigned long)data;
+  GSI_UNUSED(connection);
+
+  if (profile->blocked && (profile->blockIndex > baseIndex))
+    profile->blockIndex--;
+  return GPITrue;
+}
+
+GPResult gpiRemoveFromBlockedList(GPConnection* connection, int profileid) {
+  GPIConnection* iconnection = (GPIConnection*)*connection;
+  GPIProfile* profile;
+  int index;
+
+  if (gpiGetProfile(connection, profileid, &profile) && profile->blocked) {
+    profile->blocked = gsi_false;
+    iconnection->profileList.numBlocked--;
+    index = profile->blockIndex;
+    gpiProfileMap(connection, gpiFixBlockIndices, (void*)(unsigned long)index);
+  }
+
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
+                          "\\removeblock\\\\sesskey\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer,
+                       iconnection->sessKey);
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer,
+                          "\\profileid\\");
+  gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, profileid);
+  gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
+  return GP_NO_ERROR;
+}
+
+static GPIBool gpiCheckForBlock(GPConnection* connection, GPIProfile* profile,
+                               void* udata) {
+  GPIFindProfileData* data = (GPIFindProfileData*)udata;
+  if (profile->blocked && data->index == profile->blockIndex) {
+    data->profile = profile;
+    return GPIFalse;
+  }
+  GSI_UNUSED(connection);
+  return GPITrue;
+}
+
+GPIProfile* gpiFindBlockedProfile(GPConnection* connection, int blockIndex) {
+  GPIFindProfileData data;
+  data.index = blockIndex;
+  data.profile = NULL;
+  gpiProfileMap(connection, gpiCheckForBlock, &data);
+  return data.profile;
+}
+
+GPResult gpiProcessRecvBlockedList(GPConnection* connection,
+                                  const char* input) {
+  int i = 0, j = 0;
+  int num = 0;
+  int index = 0;
+  char c;
+  char* str = NULL;
+  char buffer[512];
+  GPIProfile* profile;
+  GPProfile profileid;
+  GPIConnection* iconnection = (GPIConnection*)*connection;
+
+  if (gpiCheckForError(connection, input, GPITrue))
+    return GP_SERVER_ERROR;
+
+  if (!gpiValueForKeyWithIndex(input, "\\blk\\", &index, buffer, sizeof(buffer)))
+    CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                       "Unexpected data was received from the server.");
+  num = atoi(buffer);
+
+  str = strstr(input, "\\list\\");
+  if (str == NULL)
+    CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                       "Unexpected data was received from the server.");
+  str += 6;
+  index += 6;
+
+  for (i = 0; i < num; i++) {
+    if (i == 0) {
+      for (j = 0; (j < sizeof(buffer)) && ((c = str[j]) != '\0') && (c != ',');
+           j++) {
+        buffer[j] = c;
+      }
+      buffer[j] = '\0';
+      index += j;
+    } else {
+      if (!gpiValueForKeyWithIndex(input, ",", &index, buffer, sizeof(buffer)))
+        CallbackFatalError(connection, GP_NETWORK_ERROR, GP_PARSE,
+                           "Unexpected data was received from the server.");
+    }
+
+    profileid = atoi(buffer);
+    profile = gpiProfileListAdd(connection, profileid);
+    if (!profile)
+      Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+    profile->blocked = gsi_true;
+    profile->blockIndex = iconnection->profileList.numBlocked++;
+  }
+  return GP_NO_ERROR;
+}
+#endif

@@ -136,7 +136,18 @@ GPIBool gpiProfileMap(GPConnection* connection, gpiProfileMapFunc func,
 GPIProfile* gpiFindBuddy(GPConnection* connection, int buddyIndex);
 
 void gpiRemoveBuddyStatus(GPIBuddyStatus* buddyStatus);
+#if defined(VERSION_R4QK01)
+void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo* buddyStatusInfo);
+#endif
 
 GPIBool gpiCanFreeProfile(GPIProfile* profile);
+
+#if defined(VERSION_R4QK01)
+GPResult gpiAddToBlockedList(GPConnection* connection, int profileid);
+GPResult gpiRemoveFromBlockedList(GPConnection* connection, int profileid);
+GPIProfile* gpiFindBlockedProfile(GPConnection* connection, int blockIndex);
+GPResult gpiProcessRecvBlockedList(GPConnection* connection,
+                                  const char* input);
+#endif
 
 void gpiSetInfoCacheFilename(const char filename[FILENAME_MAX + 1]);
