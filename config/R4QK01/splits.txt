@@ -6481,7 +6481,7 @@ RVL_SDK/gamespy/gt2/gt2Callback.c:
 	.text       start:0x8048CB10 end:0x8048D3CC align:16
 
 RVL_SDK/gamespy/gt2/gt2Connection.c:
-	.text       start:0x8048D3D0 end:0x8048DAE4
+	.text       start:0x8048D3D0 end:0x8048DAE4 align:16
 
 RVL_SDK/gamespy/gt2/gt2Main.c:
 	.text       start:0x8048DAF0 end:0x8048DFA8
