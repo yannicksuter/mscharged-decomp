@@ -6585,12 +6585,14 @@ RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c:
 	.sdata      start:0x806041B8 end:0x806041C0
 
 RVL_SDK/gamespy/serverbrowsing/sb_server.c:
+	.text       start:0x804A0A00 end:0x804A17E0 align:16
+	.data       start:0x8052D468 end:0x8052D478
 	.sdata      start:0x806041C0 end:0x806041F0
 	.sbss       start:0x80606670 end:0x8060667C
 	.sdata2     start:0x8060AD88 end:0x8060AD90
 
 RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c:
-	.text       start:0x804A17E0 end:0x804A2078
+	.text       start:0x804A17E0 end:0x804A2078 align:16
 	.sdata      start:0x806041F0 end:0x806041F8
 
 RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
