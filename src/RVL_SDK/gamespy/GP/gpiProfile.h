@@ -142,4 +142,12 @@ void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo* buddyStatusInfo);
 
 GPIBool gpiCanFreeProfile(GPIProfile* profile);
 
+#if defined(VERSION_R4QK01)
+GPResult gpiAddToBlockedList(GPConnection* connection, int profileid);
+GPResult gpiRemoveFromBlockedList(GPConnection* connection, int profileid);
+GPIProfile* gpiFindBlockedProfile(GPConnection* connection, int blockIndex);
+GPResult gpiProcessRecvBlockedList(GPConnection* connection,
+                                  const char* input);
+#endif
+
 void gpiSetInfoCacheFilename(const char filename[FILENAME_MAX + 1]);
