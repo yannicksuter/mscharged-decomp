@@ -1686,7 +1686,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ipc/memory.c"),
 
             # RVL_SDK/kpad
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/kpad/KPAD.c"),
+            Object(Matching, "RVL_SDK/kpad/KPAD.c", source="RVL_SDK/kpad/R4QK01/KPAD.c" if config.version == "R4QK01" else "RVL_SDK/kpad/KPAD.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
 
             # RVL_SDK/mem
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mem/mem_allocator.c"),
@@ -1816,9 +1816,9 @@ config.libs = [
             # RVL_SDK/wpad
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wpad/debug_msg.c"),
             Object(Matching, "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad, source="RVL_SDK/wpad/R4QK01/WPAD.c" if config.version == "R4QK01" else "RVL_SDK/wpad/WPAD.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADEncrypt.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADHIDParser.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/wpad/WPADMem.c"),
+            Object(Matching, "RVL_SDK/wpad/WPADEncrypt.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
+            Object(Matching, "RVL_SDK/wpad/WPADHIDParser.c", source="RVL_SDK/wpad/R4QK01/WPADHIDParser.c" if config.version == "R4QK01" else "RVL_SDK/wpad/WPADHIDParser.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
+            Object(Matching, "RVL_SDK/wpad/WPADMem.c", source="RVL_SDK/wpad/R4QK01/WPADMem.c" if config.version == "R4QK01" else "RVL_SDK/wpad/WPADMem.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
 
             # RVL_SDK/wud
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/wud/debug_msg.c", cflags=cflags_rvl_wud, extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
@@ -1898,7 +1898,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/btu_task1.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gap_api.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/gap_conn.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gap_utils.c"),
+            Object(Matching, "RVL_SDK/bte/gap_utils.c"),
             Object(Matching, "RVL_SDK/bte/gki_buffer.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gki_ppc.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/gki_time.c"),

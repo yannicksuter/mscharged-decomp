@@ -5505,9 +5505,6 @@ RVL_SDK/ipc/ipcclt.c:
 	.sdata      start:0x806033F8 end:0x80603400
 	.sbss       start:0x80605F18 end:0x80605F28
 
-RVL_SDK/kpad/KPAD.c:
-	.sdata      start:0x80603400 end:0x80603480
-
 RVL_SDK/ipc/memory.c:
 	.text       start:0x803B16C0 end:0x803B1BE8
 	.bss        start:0x80584740 end:0x805847C0
@@ -5516,7 +5513,16 @@ RVL_SDK/ipc/ipcProfile.c:
 	.bss        start:0x805847C0 end:0x805848C0
 	.sbss       start:0x80605F28 end:0x80605F30
 
+RVL_SDK/kpad/KPAD.c:
+	.text       start:0x803B1DD0 end:0x803B5EB8
+	.data       start:0x80507400 end:0x80507460
+	.bss        start:0x805848C0 end:0x80585F10
+	.sdata      start:0x80603400 end:0x80603480
+	.sbss       start:0x80605F30 end:0x80605F68
+	.sdata2     start:0x8060AB48 end:0x8060ABB8
+
 RVL_SDK/mem/mem_heapCommon.c:
+	.text       start:0x803B5EC0 end:0x803B6330 align:16
 	.bss        start:0x80585F10 end:0x80585F38
 	.sbss       start:0x80605F68 end:0x80605F6C
 
@@ -5748,11 +5754,24 @@ RVL_SDK/wpad/WPAD.c:
 	.sbss       start:0x806062F8 end:0x80606358
 	.sdata2     start:0x8060AC90 end:0x8060AC98
 
+RVL_SDK/wpad/WPADHIDParser.c:
+	.text       start:0x803DBA30 end:0x803DFD00 align:16
+	.rodata     start:0x804B9630 end:0x804B9648
+	.data       start:0x80516CF8 end:0x80517268
+	.bss        start:0x8058F100 end:0x8058F165
+	.sbss       start:0x80606358 end:0x80606370
+	.sdata2     start:0x8060AC98 end:0x8060ACF8
+
 RVL_SDK/wpad/WPADEncrypt.c:
+	.text       start:0x803DFD00 end:0x803E0DC0 align:16
 	.data       start:0x80517268 end:0x80518590
+	.sbss       start:0x80606370 end:0x80606374
+
+RVL_SDK/wpad/WPADMem.c:
+	.text       start:0x803E0DC0 end:0x803E0EC0 align:16
 
 RVL_SDK/wpad/debug_msg.c:
-	.text       start:0x803E0EC0 end:0x803E0F10
+	.text       start:0x803E0EC0 end:0x803E0F10 align:16
 
 RVL_SDK/wud/WUD.c:
 	.text       start:0x803E0F10 end:0x803E7310 align:16

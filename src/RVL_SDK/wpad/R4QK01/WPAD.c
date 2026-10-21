@@ -7,6 +7,7 @@
 #include <revolution/os.h>
 #include <revolution/sc.h>
 #include <revolution/wpad.h>
+#include <revolution/wbc/WBC.h>
 #include <revolution/wud.h>
 
 #include <string.h>

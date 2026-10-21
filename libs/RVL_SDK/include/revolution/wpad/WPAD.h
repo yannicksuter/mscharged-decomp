@@ -135,6 +135,10 @@ typedef enum {
     WPAD_DEV_CLASSIC,
 #if defined(VERSION_R4QK01)
     WPAD_DEV_BALANCE_CHECKER,
+    WPAD_DEV_VSM,
+    WPAD_DEV_TRAIN = 16,
+    WPAD_DEV_GUITAR,
+    WPAD_DEV_DRUM,
 #endif
 
     WPAD_DEV_FUTURE = 251,
@@ -338,7 +342,8 @@ typedef struct WPADVSStatus {
     u16 unknown2A[5];
     u8 unknown34[2];
     u16 unknown36[5];
-    u8 unknown40[4];
+    u8 unknown40;
+    u16 unknown42;
     u16 unknown44;
     u8 unknown46;
     u8 unknown47[3];
@@ -390,6 +395,12 @@ WPADExtensionCallback* WPADSetExtensionCallback(s32 chan,
 
 #if defined(VERSION_R4QK01)
 void WPADSetCallbackByKPAD(BOOL isKPAD);
+u8 WPADGetDpdFormat(s32 chan);
+WPADResult WPADControlBLC(WPADChannel chan, s32 command, WPADCallback callback);
+BOOL WPADIsEnabledVSM(void);
+BOOL WPADIsEnabledTRN(void);
+BOOL WPADIsEnabledGTR(void);
+BOOL WPADIsEnabledDRM(void);
 #endif
 
 u32 WPADGetDataFormat(s32 chan);
