@@ -7,6 +7,10 @@
 
 static VIVideo Vdac_Flag_Region;
 volatile u32 Vdac_Flag_Changed = 0;
+#if defined(VERSION_R4QK01)
+u32 lbl_806062E4 = 0;
+static u32 __tvType = 0xFF;
+#endif
 static VIACPType __type;
 
 static VIGammaObj gammaSet[] = {
@@ -226,7 +230,9 @@ static u8 __cc3 = 0xFF;
 static u8 __cc4 = 0xFF;
 
 // this need to be here because of .sdata order
+#if !defined(VERSION_R4QK01)
 static u32 __tvType = 0xFF;
+#endif
 static u8 sFilter = 0xFF;
 
 void __VISetClosedCaption(void) {
@@ -351,6 +357,10 @@ void __VISetGammaImm(VIGammaObj* gamma) {
 }
 
 static VIGamma __gamma;
+
+#if defined(VERSION_R4QK01)
+void __VIResetGamma(void) { __VISetGammaImm(&gammaSet[VI_GM_1_0]); }
+#endif
 
 void __VISetGamma(void) { __VISetGammaImm(&gammaSet[__gamma]); }
 
@@ -477,8 +487,15 @@ void __VISetRevolutionModeSimple(void) {
     VISetClosedCaption(0, 0, 0, 0);
     __VISetClosedCaption();
     __VISetMacrovisionImm(&VIZeroACPType);
+#if defined(VERSION_R4QK01)
+    VISetRGBOverDrive(VI_ODV_L1);
+#else
     VISetRGBOverDrive(VI_ODV_L2);
+#endif
     __VISetRGBOverDrive();
     __VISetTrapFilterImm(VI_DISABLE);
     __VISetGammaImm(&gammaSet[VI_GM_1_0]);
+#if defined(VERSION_R4QK01)
+    lbl_806062E4 = 0;
+#endif
 }

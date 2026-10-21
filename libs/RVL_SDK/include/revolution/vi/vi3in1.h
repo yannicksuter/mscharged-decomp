@@ -27,7 +27,12 @@ void __VISetRGBOverDrive(void);
 void __VISetRGBModeImm(void);
 
 void __VISetRevolutionModeSimple(void);
+#if defined(VERSION_R4QK01)
+void __VIResetGamma(void);
+void __VISetYUVSEL(VIBool outsel);
+#else
 void __VISetYUVSEL(VIBool outsel) NO_INLINE;
+#endif
 
 #ifdef __cplusplus
 }

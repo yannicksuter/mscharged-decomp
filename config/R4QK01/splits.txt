@@ -5034,7 +5034,7 @@ MSL/direct_io.c:
 MSL/file_io.c:
 	extab       start:0x800065E0 end:0x80006600
 	extabindex  start:0x80006BD0 end:0x80006C00
-	.text       start:0x80384DCC end:0x80385150
+	.text       start:0x80384DCC end:0x80385364
 
 MSL/FILE_POS.c:
 	extab       start:0x80006600 end:0x80006610
@@ -5517,7 +5517,7 @@ RVL_SDK/mem/mem_heapCommon.c:
 	.sbss       start:0x80605F68 end:0x80605F6C
 
 RVL_SDK/mem/mem_expHeap.c:
-	.text       start:0x803B6330 end:0x803B6BB8
+	.text       start:0x803B6330 end:0x803B6BB8 align:16
 
 RVL_SDK/mix/mix.c:
 	.text       start:0x803B6D40 end:0x803B9E64
@@ -5570,11 +5570,6 @@ RVL_SDK/os/OSArena.c:
 	.sdata      start:0x806034C0 end:0x806034C8
 	.sbss       start:0x80605FE8 end:0x80605FF0
 
-RVL_SDK/os/OSFatal.c:
-	.bss        start:0x8058A3A0 end:0x8058A674
-	.sdata      start:0x806034E0 end:0x806034E4
-	.sdata2     start:0x8060AC00 end:0x8060AC40
-
 RVL_SDK/os/OSAudioSystem.c:
 	.text       start:0x803BD690 end:0x803BDB50
 	.data       start:0x805084A8 end:0x80508528
@@ -5588,19 +5583,27 @@ RVL_SDK/os/OSContext.c:
 	.data       start:0x80508760 end:0x80508940
 
 RVL_SDK/os/OSError.c:
-	.text       start:0x803BEAA0 end:0x803BF1EC
+	.text       start:0x803BEAA0 end:0x803BF1EC align:16
 	.data       start:0x80508940 end:0x80508C1C
+	.bss        start:0x8058A330 end:0x8058A374
+	.sdata      start:0x806034C8 end:0x806034D0
+
+RVL_SDK/os/OSFatal.c:
+	.bss        start:0x8058A3A0 end:0x8058A674
+	.sdata      start:0x806034E0 end:0x806034E4
+	.sdata2     start:0x8060AC00 end:0x8060AC40
 
 RVL_SDK/os/OSFont.c:
-	.text       start:0x803C1400 end:0x803C20E8
+	.text       start:0x803C1400 end:0x803C20F0 align:16
 	.data       start:0x80508C90 end:0x805097A0
 	.sdata      start:0x806034E8 end:0x806034F0
 	.sbss       start:0x80606008 end:0x80606018
-	.sdata2     start:0x8060AC40 end:0x8060AC58
+	.sdata2     start:0x8060AC40 end:0x8060AC48
 
 RVL_SDK/os/OSInterrupt.c:
-	.text       start:0x803C20F0 end:0x803C28C0
+	.text       start:0x803C20F0 end:0x803C28C0 align:16
 	.data       start:0x805097A0 end:0x805097D0
+	.sbss       start:0x80606018 end:0x8060602C
 
 RVL_SDK/os/OSMessage.c:
 	.text       start:0x803C28E0 end:0x803C2AEC
@@ -5717,13 +5720,15 @@ RVL_SDK/vi/vi.c:
 	.sbss       start:0x80606228 end:0x806062D8
 
 RVL_SDK/vi/i2c.c:
-	.sdata      start:0x80603568 end:0x8060356C
-	.sbss       start:0x806062D8 end:0x806062DC
+	.sdata      start:0x80603568 end:0x80603570
+	.sbss       start:0x806062D8 end:0x806062E0
 
 RVL_SDK/vi/vi3in1.c:
 	.text       start:0x803D2640 end:0x803D3D6C
 	.data       start:0x805162C0 end:0x805168D0
 	.bss        start:0x8058B980 end:0x8058B99C
+	.sdata      start:0x80603570 end:0x80603580
+	.sbss       start:0x806062E0 end:0x806062F8
 
 RVL_SDK/wenc/wenc.c:
 	.text       start:0x803D3D6C end:0x803D4044
