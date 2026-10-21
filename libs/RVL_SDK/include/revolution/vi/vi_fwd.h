@@ -26,6 +26,7 @@ unsigned long VIGetCurrentLine(void);
 VITvFormat VIGetTvFormat(void);
 unsigned long VIGetDTVStatus(void);
 VITimeToDIM VISetTimeToDimming(VITimeToDIM time);
+int VIResetDimmingCount(void);
 
 void __VIInit(VITVMode mode);
 void __VIDisplayPositionToXY(unsigned long hct, unsigned long vct, short* x, short* y);

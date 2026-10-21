@@ -118,6 +118,7 @@ BOOL __DVDTestAlarm(const OSAlarm* alarm);
 BOOL __DVDLowBreak(void);
 BOOL __DVDStopMotorAsync(DVDCommandBlock* block, DVDCommandCallback callback);
 void __DVDRestartMotor(void);
+BOOL __DVDCheckDevice(void);
 
 #ifdef __cplusplus
 }

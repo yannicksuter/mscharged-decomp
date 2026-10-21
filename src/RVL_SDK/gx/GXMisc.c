@@ -131,6 +131,9 @@ void GXSetDrawDone(void) {
     GXFlush();
     DrawDone = 0;
     OSRestoreInterrupts(enabled);
+#if defined(VERSION_R4QK01)
+    __GXData->bpSentNot = GX_FALSE;
+#endif
 }
 
 void GXWaitDrawDone(void) {

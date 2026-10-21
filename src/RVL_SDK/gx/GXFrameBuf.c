@@ -33,7 +33,11 @@ GXRenderModeObj GXEurgb60Hz480ProgSoft = {
     22, 640, 480, 480, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 }
 };
 
+#if defined(VERSION_R4QK01)
+void GXAdjustForOverscan(const GXRenderModeObj* rIn, GXRenderModeObj* rOut, u16 horiz, u16 vert)
+#else
 void GXAdjustForOverscan(GXRenderModeObj* rIn, GXRenderModeObj* rOut, u16 horiz, u16 vert)
+#endif
 {
     u16 hor2 = horiz * 2;
     u16 ver2 = vert * 2;

@@ -18,7 +18,7 @@ u32 OSGetPhysicalMem2Size(void);
 u32 OSGetConsoleSimulatedMem1Size(void);
 u32 OSGetConsoleSimulatedMem2Size(void);
 void __OSInitMemoryProtection(void);
-
+void __OSRestoreCodeExecOnMEM1(u32);
 
 #ifdef __cplusplus
 }

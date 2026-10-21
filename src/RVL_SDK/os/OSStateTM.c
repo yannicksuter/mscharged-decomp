@@ -83,7 +83,18 @@ OSStateCallback OSSetPowerCallback(OSStateCallback callback)
     enabled = OSDisableInterrupts();
 
     old = PowerCallback;
+#if defined(VERSION_R4QK01)
+    if (callback)
+    {
+        PowerCallback = callback;
+    }
+    else
+    {
+        PowerCallback = __OSDefaultPowerCallback;
+    }
+#else
     PowerCallback = callback;
+#endif
 
     if (!StmEhRegistered)
     {
@@ -91,6 +102,12 @@ OSStateCallback OSSetPowerCallback(OSStateCallback callback)
     }
 
     OSRestoreInterrupts(enabled);
+#if defined(VERSION_R4QK01)
+    if (old == __OSDefaultPowerCallback)
+    {
+        return NULL;
+    }
+#endif
     return old;
 }
 
@@ -156,7 +173,11 @@ void __OSShutdownToSBY(void)
 
     VI_HW_REGS[VI_DCR] = 0;
 
+#if defined(VERSION_R4QK01)
+    OSAssert("OSStateTM.c", 348, StmReady, "Error: The firmware doesn't support shutdown feature.\n");
+#else
     OSAssert("OSStateTM.c", 276, StmReady, "Error: The firmware doesn't support shutdown feature.\n");
+#endif
 
     in_args[0] = 0;
     IOS_Ioctl(StmImDesc, STM_IOCTL_SHUTDOWN_TO_SBY, StmImInBuf, sizeof(StmImInBuf), StmImOutBuf, sizeof(StmImOutBuf));
@@ -169,7 +190,11 @@ void __OSHotReset(void)
 {
     VI_HW_REGS[VI_DCR] = 0;
 
+#if defined(VERSION_R4QK01)
+    OSAssert("OSStateTM.c", 412, StmReady, "Error: The firmware doesn't support reboot feature.\n");
+#else
     OSAssert("OSStateTM.c", 340, StmReady, "Error: The firmware doesn't support reboot feature.\n");
+#endif
 
     IOS_Ioctl(StmImDesc, STM_IOCTL_HOT_RESET, StmImInBuf, sizeof(StmImInBuf), StmImOutBuf, sizeof(StmImOutBuf));
     LockUp();
@@ -286,7 +311,11 @@ static s32 __OSStateEventHandler(s32 result, void* arg)
     bool enabled;
     OSStateCallback callback;
 
+#if defined(VERSION_R4QK01)
+    OSAssert("OSStateTM.c", 820, result == IPC_RESULT_OK, "Error on STM state event handler\n");
+#else
     OSAssert("OSStateTM.c", 748, result == IPC_RESULT_OK, "Error on STM state event handler\n");
+#endif
 
     StmEhRegistered = false;
 
@@ -302,6 +331,9 @@ static s32 __OSStateEventHandler(s32 result, void* arg)
             callback();
 
             OSRestoreInterrupts(enabled);
+#if defined(VERSION_R4QK01)
+            VIResetDimmingCount();
+#endif
         }
         __OSRegisterStateEvent();
     }

@@ -8,7 +8,11 @@ static GXData gxData;
 
 GXData* const __GXData = &gxData;
 
+#if defined(VERSION_R4QK01)
+char* __GXVersion = "<< RVL_SDK - GX \trelease build: Feb 27 2009 10:04:13 (0x4302_145) >>";
+#else
 char* __GXVersion = "<< RVL_SDK - GX \trelease build: Nov 30 2006 03:30:39 (0x4199_60831) >>";
+#endif
 
 volatile void* __piReg = NULL;
 volatile void* __cpReg = NULL;
@@ -489,6 +493,9 @@ void __GXInitGX(void)
 
     GXSetProjectionv(GXDefaultProjData);
 
+#if defined(VERSION_R4QK01)
+    __GXSetGenMode();
+#endif
     GXSetCoPlanar(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
     GXSetClipMode(GX_CLIP_ENABLE);

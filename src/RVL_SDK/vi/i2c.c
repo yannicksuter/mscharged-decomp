@@ -10,8 +10,13 @@ static volatile u32 __i2c_ident_first = 0;
 void WaitMicroTime(s32 usec) {
     OSTime t = __OSGetSystemTime();
 
+#if defined(VERSION_R4QK01)
+    while (((__OSGetSystemTime() - t) * 8) / (OS_TIMER_CLOCK / 125000) < usec)
+        ;
+#else
     while (OSTicksToMicroseconds(__OSGetSystemTime() - t) < usec)
         ;
+#endif
 }
 
 static void VICheckI2C(void) { __i2c_ident_flag = 1; }

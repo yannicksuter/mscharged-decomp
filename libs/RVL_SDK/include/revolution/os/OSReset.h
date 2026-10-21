@@ -58,6 +58,20 @@ void OSReturnToMenu(void);
 void OSReturnToDataManager(void);
 void __OSReturnToMenuForError(void);
 
+#if defined(VERSION_R4QK01)
+#define OS_SETTING_CALENDAR 1u
+#define OS_SETTING_DISPLAY 2u
+#define OS_SETTING_SOUND 3u
+#define OS_SETTING_PARENTAL 4u
+#define OS_SETTING_INTERNET 5u
+#define OS_SETTING_WC24 6u
+#define OS_SETTING_UPDATE 7u
+
+void __OSHotResetForError(void);
+void OSReturnToSetting(u8);
+u32 OSSetBootDol(u32);
+#endif
+
 u32 OSGetResetCode(void);
 void OSResetSystem(int reset, u32 resetCode, BOOL forceMenu);
 

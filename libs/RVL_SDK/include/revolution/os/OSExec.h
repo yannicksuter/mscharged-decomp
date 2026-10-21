@@ -18,6 +18,7 @@ typedef struct OSExecParams {
 } OSExecParams;
 
 extern BOOL __OSInReboot;
+extern u32 __OSNextPartitionType;
 extern OSExecParams __OSRebootParams;
 
 void __OSGetExecParams(OSExecParams* params);

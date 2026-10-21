@@ -17,6 +17,7 @@ extern "C"
 
 static int fragmentID = -2;
 
+// clang-format off
 void __init_cpp_exceptions(void)
 {
     if (fragmentID == -2)
@@ -30,6 +31,8 @@ void __init_cpp_exceptions(void)
     }
 }
 
+// clang-format on
+
 void __fini_cpp_exceptions(void)
 {
     if (fragmentID != -2)
@@ -39,11 +42,9 @@ void __fini_cpp_exceptions(void)
     }
 }
 
-#pragma force_active on
 #pragma section ".ctors$10"
 __declspec(section ".ctors$10") extern void* const __init_cpp_exceptions_reference = __init_cpp_exceptions;
 #pragma section ".dtors$10"
 __declspec(section ".dtors$10") extern void* const __destroy_global_chain_reference = __destroy_global_chain;
 #pragma section ".dtors$15"
 __declspec(section ".dtors$15") extern void* const __fini_cpp_exceptions_reference = __fini_cpp_exceptions;
-#pragma force_active reset

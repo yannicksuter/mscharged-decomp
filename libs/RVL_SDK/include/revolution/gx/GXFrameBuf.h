@@ -16,8 +16,11 @@ extern GXRenderModeObj GXEurgb60Hz480Prog;
 extern GXRenderModeObj GXEurgb60Hz480ProgSoft;
 extern GXRenderModeObj GXMpal480IntDf;
 
-void GXAdjustForOverscan(GXRenderModeObj* rIn, GXRenderModeObj* rOut, u16 horiz,
-                         u16 vert);
+#if defined(VERSION_R4QK01)
+void GXAdjustForOverscan(const GXRenderModeObj* rIn, GXRenderModeObj* rOut, u16 horiz, u16 vert);
+#else
+void GXAdjustForOverscan(GXRenderModeObj* rIn, GXRenderModeObj* rOut, u16 horiz, u16 vert);
+#endif
 
 void GXSetDispCopySrc(u16 x, u16 y, u16 w, u16 h);
 void GXSetTexCopySrc(u16 x, u16 y, u16 w, u16 h);

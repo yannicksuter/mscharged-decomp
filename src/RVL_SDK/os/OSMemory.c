@@ -1,5 +1,9 @@
 #include <revolution/os.h>
 
+#if defined(VERSION_R4QK01)
+#define MEM_CONFIG_KEY 0xBA2CF
+#endif
+
 static BOOL OnShutdown(BOOL final, u32 event);
 static OSShutdownFunctionInfo ShutdownFunctionInfo = {OnShutdown, 127};
 
@@ -144,8 +148,12 @@ static asm void ConfigMEM2_52MB(void) {
     mtspr 0x238, r3
     isync
     mtspr 0x230, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x231, r7
+#else
     mtspr 0x231, r4
     mtspr 0x230, r3
+#endif
     isync
     mtspr 0x23a, r7
     mtspr 0x23b, r6
@@ -168,16 +176,24 @@ static asm void ConfigMEM2_52MB(void) {
     mtspr 0x23c, r3
     isync
     mtspr 0x234, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x235, r7
+#else
     mtspr 0x235, r4
     mtspr 0x234, r3
+#endif
     isync
     mtspr 0x23e, r7
     mtspr 0x23f, r6
     mtspr 0x23e, r5
     isync
     mtspr 0x236, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x237, r7
+#else
     mtspr 0x237, r6
     mtspr 0x236, r5
+#endif
     isync
     mfmsr r3
     ori r3, r3, 0x30
@@ -207,8 +223,12 @@ static asm void ConfigMEM2_56MB(void) {
     mtspr 0x238, r3
     isync
     mtspr 0x230, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x231, r7
+#else
     mtspr 0x231, r4
     mtspr 0x230, r3
+#endif
     isync
     mtspr 0x23a, r7
     mtspr 0x23b, r6
@@ -231,16 +251,24 @@ static asm void ConfigMEM2_56MB(void) {
     mtspr 0x23c, r3
     isync
     mtspr 0x234, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x235, r7
+#else
     mtspr 0x235, r4
     mtspr 0x234, r3
+#endif
     isync
     mtspr 0x23e, r7
     mtspr 0x23f, r6
     mtspr 0x23e, r5
     isync
     mtspr 0x236, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x237, r7
+#else
     mtspr 0x237, r6
     mtspr 0x236, r5
+#endif
     isync
     mfmsr r3
     ori r3, r3, 0x30
@@ -270,8 +298,12 @@ static asm void ConfigMEM2_64MB(void) {
     mtspr 0x238, r3
     isync
     mtspr 0x230, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x231, r7
+#else
     mtspr 0x231, r4
     mtspr 0x230, r3
+#endif
     isync
     mtspr 0x23a, r7
     mtspr 0x23b, r6
@@ -320,8 +352,12 @@ static asm void ConfigMEM2_112MB(void) {
     mtspr 0x238, r3
     isync
     mtspr 0x230, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x231, r7
+#else
     mtspr 0x231, r4
     mtspr 0x230, r3
+#endif
     isync
     mtspr 0x23a, r7
     mtspr 0x23b, r6
@@ -344,16 +380,24 @@ static asm void ConfigMEM2_112MB(void) {
     mtspr 0x23c, r3
     isync
     mtspr 0x234, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x235, r7
+#else
     mtspr 0x235, r4
     mtspr 0x234, r3
+#endif
     isync
     mtspr 0x23e, r7
     mtspr 0x23f, r6
     mtspr 0x23e, r5
     isync
     mtspr 0x236, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x237, r7
+#else
     mtspr 0x237, r6
     mtspr 0x236, r5
+#endif
     isync
     mfmsr r3
     ori r3, r3, 0x30
@@ -383,8 +427,12 @@ static asm void ConfigMEM2_128MB(void) {
     mtspr 0x238, r3
     isync
     mtspr 0x230, r7
+#if defined(VERSION_R4QK01)
+    mtspr 0x231, r7
+#else
     mtspr 0x231, r4
     mtspr 0x230, r3
+#endif
     isync
     mtspr 0x23a, r7
     mtspr 0x23b, r6
@@ -454,11 +502,21 @@ static asm void RealMode(register void* config) {
 }
 // clang-format on
 
+#if defined(VERSION_R4QK01)
+static void CheckConfigKey(u32 key) {
+    do {
+    } while (key != MEM_CONFIG_KEY);
+}
+
+static void BATConfig(u32 key) {
+#else
 static void BATConfig(void) {
+#endif
     u32 mem1sim;
     u32 mem1phys;
     void* mem2end;
 
+#if !defined(VERSION_R4QK01)
     if (OS_HOLLYWOOD_REV == 0) {
         // @bug Checks function address rather than result
         if (OSGetPhysicalMem1Size == 0) {
@@ -466,6 +524,7 @@ static void BATConfig(void) {
             return;
         }
     }
+#endif
 
     mem1sim = OSGetConsoleSimulatedMem1Size();
     mem1phys = OSGetPhysicalMem1Size();
@@ -477,8 +536,10 @@ static void BATConfig(void) {
 
     if (mem1sim <= OS_MEM_MB_TO_B(24)) {
         RealMode(ConfigMEM1_24MB);
+#if !defined(VERSION_R4QK01)
     } else if (mem1sim <= OS_MEM_MB_TO_B(48)) {
         RealMode(ConfigMEM1_48MB);
+#endif
     }
 
     mem2end = *(void**)OSPhysicalToCached(OS_PHYS_ACCESSIBLE_MEM2_END);
@@ -497,10 +558,29 @@ static void BATConfig(void) {
             RealMode(ConfigMEM2_128MB);
         }
     }
+
+#if defined(VERSION_R4QK01)
+    CheckConfigKey(key);
+#endif
 }
 
+#if defined(VERSION_R4QK01)
+void __OSRestoreCodeExecOnMEM1(u32 key) {
+    RealMode(ConfigMEM1_24MB);
+    CheckConfigKey(key);
+}
+#endif
+
 void __OSInitMemoryProtection(void) {
-    BOOL enabled = OSDisableInterrupts();
+    BOOL enabled;
+#if defined(VERSION_R4QK01)
+    static BOOL initialized = FALSE;
+
+    if (initialized) {
+        return;
+    }
+#endif
+    enabled = OSDisableInterrupts();
 
     MI_HW_REGS[MI_REG_0x20] = 0;
     MI_HW_REGS[MI_PROT_MEM0] = 0xFF;
@@ -515,8 +595,15 @@ void __OSInitMemoryProtection(void) {
     __OSSetInterruptHandler(OS_INTR_MEM_ADDRESS, MEMIntrruptHandler);
     OSRegisterShutdownFunction(&ShutdownFunctionInfo);
 
+#if defined(VERSION_R4QK01)
+    BATConfig(MEM_CONFIG_KEY);
+#else
     BATConfig();
+#endif
     __OSUnmaskInterrupts(OS_INTR_MASK(OS_INTR_MEM_ADDRESS));
 
+#if defined(VERSION_R4QK01)
+    initialized = TRUE;
+#endif
     OSRestoreInterrupts(enabled);
 }

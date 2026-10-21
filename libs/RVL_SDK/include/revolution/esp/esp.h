@@ -27,16 +27,29 @@ typedef struct ESPTmd {
 } ESPTmd;
 
 #if defined(VERSION_R4QK01)
+typedef struct ESLpEntry {
+    u32 code;
+    u32 limit;
+} ESLpEntry;
+
+#pragma pack(push, 4)
 typedef struct ESPTicketView {
-    u8 dummy[0xD8];
+    u8 unk_0x00[4];
+    u64 ticketId;
+    u8 unk_0x0C[0x98 - 0x0C];
+    ESLpEntry limits[8];
 } ESPTicketView;
+#pragma pack(pop)
 
 s32 ESP_InitLib(void);
 s32 ESP_CloseLib(void);
 s32 ESP_GetDataDir(u64 titleId, char* dataDir);
 s32 ESP_GetTitleId(u64* titleId);
+s32 ESP_GetTicketViews(u64 titleId, ESPTicketView* ticketViewList, u32* numTicketViews);
+s32 ESP_LaunchTitle(u64 titleId, ESPTicketView* ticketView);
 s32 ESP_DiGetTicketView(const ESPTicket* ticket, ESPTicketView* ticketView);
 s32 ESP_DiGetTmd(ESPTmd* tmd, u32* numTmdBytes);
+s32 ESP_GetConsumption(u64 ticketId, ESLpEntry* entries, u32* numEntries);
 #endif
 
 s32 ESP_ReadContentFile(s32 fd, void* dst, u32 len);

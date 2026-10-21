@@ -188,6 +188,7 @@ extern "C"
 
     s32 IPCCltInit(void);
 #if defined(VERSION_R4QK01)
+    void IPCReInit(void);
     s32 IPCCltReInit(void);
 #endif
     s32 IOS_OpenAsync(const char* path, IPCOpenMode mode, IPCAsyncCallback callback,

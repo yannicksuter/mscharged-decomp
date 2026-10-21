@@ -38,6 +38,20 @@ Second.c:
         with self.assertRaisesRegex(ValueError, "basenames"):
             align_script("", [{"output": "a/memory.o"}, {"output": "b/memory.o"}], {})
 
+    def test_init_preserves_linker_generated_tables(self):
+        entries = [
+            {"unit": "start.c", "output": "link/0000_start.o"},
+            {"unit": "init.c", "output": "link/0001_init.o"},
+        ]
+        script = align_script(
+            ".init ALIGN(4):{}", entries, {".init": {"init.c": 16}},
+        )
+        self.assertIn(
+            '"0000_start.o" (.init)\n            . = ALIGN(16);\n'
+            '            "0001_init.o" (.init)\n            * (.init)\n',
+            script,
+        )
+
     def test_rejects_invalid_alignment(self):
         for value in (0, 3, 12):
             with self.subTest(value=value), self.assertRaises(ValueError):
