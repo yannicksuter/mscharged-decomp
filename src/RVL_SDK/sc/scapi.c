@@ -123,6 +123,16 @@ BOOL SCSetBtDeviceInfoArray(const SCBtDeviceInfoArray* info) {
                                   SC_ITEM_BT_DINF);
 }
 
+#if defined(VERSION_R4QK01)
+BOOL SCGetBtCmpDevInfoArray(SCBtCmpDevInfoArray* info) {
+    return SCFindByteArrayItem(info, sizeof(*info), SC_ITEM_BT_CDIF);
+}
+
+BOOL SCSetBtCmpDevInfoArray(SCBtCmpDevInfoArray* info) {
+    return SCReplaceByteArrayItem(info, sizeof(*info), SC_ITEM_BT_CDIF);
+}
+#endif
+
 u32 SCGetBtDpdSensibility(void) {
     u32 item;
 
@@ -180,6 +190,20 @@ u8 SCGetWpadSpeakerVolume(void) {
 BOOL SCSetWpadSpeakerVolume(u8 vol) {
     return SCReplaceU8Item(vol, SC_ITEM_BT_SPKV);
 }
+
+#if defined(VERSION_R4QK01)
+BOOL SCCheckPCMessageRestriction(void) {
+    u32 item;
+
+    OSReport("<< RVL_SDK - SCCheckPCMessageRestriction >>");
+
+    if (!SCFindU32Item(&item, SC_ITEM_NET_CTPC)) {
+        item = 0;
+    }
+
+    return (item >> 1) & 1;
+}
+#endif
 
 u32 SCGetSimpleAddressID(void) {
     if (SCGetSimpleAddressData(&TempSimpleAddress)) {

@@ -61,7 +61,24 @@ typedef enum {
     SC_AREA_ASI,
     SC_AREA_LTN,
     SC_AREA_SAF,
+#if defined(VERSION_R4QK01)
+    SC_AREA_CHN,
+#endif
 } SCProductArea;
+
+#if defined(VERSION_R4QK01)
+typedef s8 SCProductGameRegion;
+enum SCProductGameRegion_et {
+    SC_PRD_GAME_REG_JP,
+    SC_PRD_GAME_REG_US,
+    SC_PRD_GAME_REG_EU,
+    SC_PRD_GAME_REG_DEBUG,
+    SC_PRD_GAME_REG_KR,
+    SC_PRD_GAME_REG_CN,
+    SC_PRD_GAME_REG_MAX,
+    SC_PRD_GAME_REG_NULL = -1
+};
+#endif
 
 typedef enum {
     SC_ITEM_IPL_CB,
@@ -93,12 +110,18 @@ typedef enum {
     SC_ITEM_DEV_CTC,
     SC_ITEM_DEV_DSM,
     SC_ITEM_BT_DINF,
+#if defined(VERSION_R4QK01)
+    SC_ITEM_BT_CDIF,
+#endif
     SC_ITEM_BT_SENS,
     SC_ITEM_BT_SPKV,
     SC_ITEM_BT_MOT,
     SC_ITEM_BT_BAR,
     SC_ITEM_DVD_CNF,
     SC_ITEM_WWW_RST,
+#if defined(VERSION_R4QK01)
+    SC_ITEM_IPL_TID,
+#endif
     SC_ITEM_MAX
 } SCItemID;
 
@@ -161,7 +184,7 @@ BOOL SCGetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
 BOOL SCSetBtCmpDevInfoArray(SCBtCmpDevInfoArray* devInfo);
 
 #if defined(VERSION_R4QK01)
-s8 SCGetProductGameRegion(void);
+SCProductGameRegion SCGetProductGameRegion(void);
 #endif
 
 u32 SCGetBtDpdSensibility(void);

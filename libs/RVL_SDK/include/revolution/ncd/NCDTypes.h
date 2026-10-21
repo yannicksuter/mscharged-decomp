@@ -15,12 +15,18 @@ enum {
     NCD_MODE_WPA_PSK_AES,
 };
 enum {
+    NCD_LINKSTATUS_WORKING = 1,
+    NCD_LINKSTATUS_NONE = 2,          // ?
     NCD_LINKSTATUS_WIRED = 3,  // ?
+    NCD_LINKSTATUS_WIRELESS_DOWN = 4, // ?
+    NCD_LINKSTATUS_WIRELESS_UP = 5,   // ?
 };
 
 enum {
     NCD_RESULT_SUCCESS = 0,
     NCD_RESULT_4 = -4,
+    NCD_RESULT_FAILURE = -6,
+    NCD_RESULT_FATAL_ERROR = -3,
     NCD_RESULT_INPROGRESS = -8,
 };
 

@@ -101,6 +101,19 @@ GPResult gpiFailedOpCallback(GPConnection* connection,
       CHECK_RESULT(gpiAddCallback(connection, callback, arg, operation, 0));
       break;
     }
+#if defined(VERSION_R4QK01)
+    case GPI_REGISTER_CDKEY: {
+      GPRegisterCdKeyResponseArg* arg;
+      arg = (GPRegisterCdKeyResponseArg*)gsimalloc(
+          sizeof(GPRegisterCdKeyResponseArg));
+      if (arg == NULL)
+        Error(connection, GP_MEMORY_ERROR, "Out of memory.");
+      memset(arg, 0, sizeof(GPRegisterCdKeyResponseArg));
+      arg->result = operation->result;
+      CHECK_RESULT(gpiAddCallback(connection, callback, arg, operation, 0));
+      break;
+    }
+#endif
     default:
       assert(0);
     }
@@ -282,6 +295,11 @@ GPResult gpiProcessOperation(GPConnection* connection, GPIOperation* operation,
     result = gpiProcessRegisterUniqueNick(connection, operation, input);
     break;
 
+#if defined(VERSION_R4QK01)
+  case GPI_REGISTER_CDKEY:
+    result = gpiProcessRegisterCdKey(connection, operation, input);
+    break;
+#endif
 
   default:
     gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_HotError,

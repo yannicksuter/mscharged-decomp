@@ -314,10 +314,21 @@ static void MD5_memset(POINTER output, int value, unsigned int len) {
 }
 
 inline void MD5Print(unsigned char digest[16], char output[33]) {
+#if defined(VERSION_R4QK01)
+  static const char hex_digits[] = "0123456789abcdef";
+#endif
   unsigned int i;
 
+#if defined(VERSION_R4QK01)
+  for (i = 0; i < 16; i++) {
+    output[i * 2] = hex_digits[digest[i] / 16];
+    output[i * 2 + 1] = hex_digits[digest[i] % 16];
+  }
+  output[32] = '\0';
+#else
   for (i = 0; i < 16; i++)
     sprintf(output + (i * 2), "%02x", digest[i]);
+#endif
 }
 
 void MD5Digest(unsigned char* input, unsigned int len, char output[33]) {

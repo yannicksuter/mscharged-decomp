@@ -2,19 +2,6 @@
 
 #include <revolution/ncd.h>
 
-typedef struct NHTTPBgnEndInfo
-{
-    NCDIpConfig ipConfig;
-    NHTTPAlloc alloc;
-    NHTTPFree free;
-    BOOL started;
-    s32 socket;
-    s32 sslError;
-    NHTTPErr error;
-    u32 _unk7DC;
-    void* threadStack;
-} NHTTPBgnEndInfo;
-
 typedef struct NHTTPThreadInfo
 {
     OSMessageQueue messageQueue;
@@ -71,14 +58,18 @@ s32 NHTTPi_SocSSLConnect(NHTTPBgnEndInfo* info, void* mutexInfo,
     NHTTPRequestInfo* request, s32 socket);
 int NHTTPi_SocSend(const NHTTPRequestInfo* req_p, const int socket,
     const char* buf_p, const int len, const int flags);
+#if !defined(VERSION_R4QK01)
 int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
     char* buf_p, const int len, const int flags);
+#endif
 
 int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos);
+#if !defined(VERSION_R4QK01)
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags);
 int NHTTPi_RecvBufN(NHTTPRequestInfo* req_p, const int socket, const int pos,
     int len, const int flags);
+#endif
 s32 NHTTPi_getHeaderValue(NHTTPResponseInfo* recvBuf, const char* name,
     s32* position);
 s32 NHTTPi_findNextLineHdrRecvBuf(NHTTPResponseInfo* recvBuf, s32 start,
@@ -182,7 +173,11 @@ s32 NHTTPi_SaveBuf(NHTTPRequestInfo* request, char* buffer, s32 socket,
     return length;
 }
 
-static inline s32 NHTTPi_SkipLineBuf(NHTTPRequestInfo* req_p, s32 socket)
+static inline s32 NHTTPi_SkipLineBuf(
+#if defined(VERSION_R4QK01)
+    void* mutexInfo_p,
+#endif
+    NHTTPRequestInfo* req_p, s32 socket)
 {
     char buf[2];
     s32 p;
@@ -194,7 +189,11 @@ static inline s32 NHTTPi_SkipLineBuf(NHTTPRequestInfo* req_p, s32 socket)
     for (p = 0;
          !(buf[p & 1] == '\r' && buf[(p - 1) & 1] == '\n'); p++)
     {
-        recvbyte = NHTTPi_SocRecv(req_p, socket, &buf[p & 1], 1, 0);
+        recvbyte = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+            mutexInfo_p,
+#endif
+            req_p, socket, &buf[p & 1], 1, 0);
         if (recvbyte <= 0)
         {
             return recvbyte;
@@ -366,7 +365,11 @@ BOOL NHTTPi_BufFull(void* mutexInfo, NHTTPResponseInfo* response)
     return result;
 }
 
+#if defined(VERSION_R4QK01)
+static int NHTTPi_SendData(NHTTPThreadData* threadData_p,
+#else
 static inline int NHTTPi_SendData(NHTTPThreadData* threadData_p,
+#endif
     const char* src_p, int srclen)
 {
     void* sysInfo_p = NHTTPi_GetSystemInfoP();
@@ -377,6 +380,12 @@ static inline int NHTTPi_SendData(NHTTPThreadData* threadData_p,
     char* commBuf_p = &threadInfo_p->commBuf[0];
     int stat = 0;
 
+#if defined(VERSION_R4QK01)
+    if (srclen == 0)
+    {
+        return 0;
+    }
+#endif
     stat = NHTTPi_SaveBuf(req_p, commBuf_p, bgnEndInfo_p->socket,
         &threadData_p->sendBufwp, src_p, srclen);
     if (stat < 0)
@@ -399,6 +408,13 @@ static inline s32 NHTTPi_SendProxyAuthorization(NHTTPThreadData* threadData_p)
     NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
     NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
     s32 sendStatus;
+
+#if defined(VERSION_R4QK01)
+    if (req_p->proxyAuthorizationLength == 0)
+    {
+        return 0;
+    }
+#endif
 
     sendStatus = NHTTPi_SendData(threadData_p,
         "Proxy-Authorization: Basic ", 27);
@@ -426,6 +442,13 @@ static inline s32 NHTTPi_SendBasicAuthorization(NHTTPThreadData* threadData_p)
     NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
     NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
     s32 sendStatus;
+
+#if defined(VERSION_R4QK01)
+    if (req_p->authorizationLength == 0)
+    {
+        return 0;
+    }
+#endif
 
     sendStatus = NHTTPi_SendData(threadData_p, "Authorization: Basic ", 21);
     if (sendStatus != 0)
@@ -546,6 +569,9 @@ BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p)
     NHTTPReqInfo* reqInfo = NHTTPi_GetReqInfoP(system);
     NHTTPThreadInfo* threadInfo = NHTTPi_GetThreadInfoP(system);
     NHTTPBgnEndInfo* bgnEndInfo = NHTTPi_GetBgnEndInfoP(system);
+#if defined(VERSION_R4QK01)
+    void* mutexInfo = NHTTPi_GetMutexInfoP(system);
+#endif
     char* sendBuffer = threadInfo->commBuf;
     NHTTPRequestInfo* request = reqInfo->reqQueue->request;
     NHTTPResponseInfo* response = request->response;
@@ -553,7 +579,11 @@ BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p)
     s32 received = 0;
     for (;;)
     {
-        s32 result = NHTTPi_SocRecv(request, bgnEndInfo->socket,
+        s32 result = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+            mutexInfo,
+#endif
+            request, bgnEndInfo->socket,
             buffer + received, 0x200 - received, 0);
         received += result;
         response->httpStatus = NHTTPi_strToInt(buffer + 9, 3);
@@ -595,7 +625,11 @@ BOOL NHTTPi_RecvProxyConnectHeader(NHTTPThreadData* threadData_p)
         {
             continue;
         }
-        result = NHTTPi_SocRecv(request, bgnEndInfo->socket, sendBuffer, 1, 0);
+        result = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+            mutexInfo,
+#endif
+            request, bgnEndInfo->socket, sendBuffer, 1, 0);
         if (result < 0)
         {
             return FALSE;
@@ -1083,7 +1117,11 @@ void NHTTPi_ThreadReqEnd(NHTTPThreadData* threadData_p)
     NHTTPi_CompleteCallback(mutexInfo, connection);
     if (connection != NULL)
     {
+#if defined(VERSION_R4QK01)
+        NHTTPi_NotifyCompletion(connection);
+#else
         OSSignalCond(&connection->cond);
+#endif
     }
 }
 
@@ -1165,11 +1203,26 @@ BOOL NHTTPi_ThreadConnectProc(NHTTPThreadData* threadData_p)
     NHTTPReqInfo* reqInfo = NHTTPi_GetReqInfoP(system);
     NHTTPRequestInfo* request = reqInfo->reqQueue->request;
     void* mutexInfo = NHTTPi_GetMutexInfoP(system);
+#if defined(VERSION_R4QK01)
+    BOOL reconnect = FALSE;
+    if (threadData_p->isKeepAlive == TRUE)
+    {
+        if (NHTTPi_SocCheckKeepAlive(bgnEndInfo->socket) == -1)
+        {
+            threadData_p->isKeepAlive = FALSE;
+            reconnect = TRUE;
+        }
+    }
+#endif
     if (threadData_p->isKeepAlive == 0)
     {
         if (bgnEndInfo->socket >= 0)
         {
-            if (NHTTPi_SocClose(mutexInfo, request, bgnEndInfo->socket) < 0)
+            if (NHTTPi_SocClose(mutexInfo, request, bgnEndInfo->socket) < 0
+#if defined(VERSION_R4QK01)
+                && !reconnect
+#endif
+            )
             {
                 bgnEndInfo->socket = -1;
                 threadData_p->result = NHTTP_ERROR_REVOLUTIONWIFI;
@@ -1195,7 +1248,9 @@ BOOL NHTTPi_ThreadConnectProc(NHTTPThreadData* threadData_p)
             if (request->proxyEnabled)
             {
                 threadData_p->result = NHTTP_ERROR_CONNECT_PROXY;
+#if !defined(VERSION_R4QK01)
                 threadData_p->preHostaddr = threadData_p->hostaddr;
+#endif
                 return FALSE;
             }
             if (NHTTPi_GetSSLError(bgnEndInfo) != 0)
@@ -1224,6 +1279,9 @@ s32 NHTTPi_ThreadProxyProc(NHTTPThreadData* threadData_p)
     void* mutexInfo = NHTTPi_GetMutexInfoP(system);
     NHTTPRequestInfo* request = reqInfo->reqQueue->request;
     threadData_p->result = NHTTP_ERROR_REVOLUTIONWIFI;
+#if defined(VERSION_R4QK01)
+    threadData_p->sendBufwp = 0;
+#endif
     if (request->secure != 0 && request->proxyEnabled != 0)
     {
         s32 result = NHTTPi_SendProxyConnectMethod(threadData_p);
@@ -1235,9 +1293,32 @@ s32 NHTTPi_ThreadProxyProc(NHTTPThreadData* threadData_p)
         {
             return 1;
         }
+#if defined(VERSION_R4QK01)
+        result = NHTTPi_SocSSLConnect(bgnEndInfo, mutexInfo, request, bgnEndInfo->socket);
+        if (result != 0)
+#else
         if (NHTTPi_SocSSLConnect(bgnEndInfo, mutexInfo, request,
                 bgnEndInfo->socket) != 0)
+#endif
         {
+#if defined(VERSION_R4QK01)
+            if (result == -1004)
+            {
+                if (NHTTPi_GetSSLError(bgnEndInfo) != 0)
+                {
+                    threadData_p->result = NHTTP_ERROR_SSL_ROOTCA;
+                }
+                return 1;
+            }
+            if (result == -1005)
+            {
+                if (NHTTPi_GetSSLError(bgnEndInfo) != 0)
+                {
+                    threadData_p->result = NHTTP_ERROR_SSL_CLIENTCERT;
+                }
+                return 1;
+            }
+#endif
             if (NHTTPi_GetSSLError(bgnEndInfo) != 0)
             {
                 threadData_p->result = NHTTP_ERROR_SSL;
@@ -1337,7 +1418,10 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
         }
     }
     if (req_p->proxyEnabled != 0 && req_p->secure == 0
-        && req_p->proxyAuthorizationLength > 0)
+#if !defined(VERSION_R4QK01)
+        && req_p->proxyAuthorizationLength > 0
+#endif
+    )
     {
         sendStatus = NHTTPi_SendProxyAuthorization(threadData_p);
         if (sendStatus != 0)
@@ -1345,7 +1429,9 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
             return sendStatus;
         }
     }
+#if !defined(VERSION_R4QK01)
     if (req_p->authorizationLength > 0)
+#endif
     {
         sendStatus = NHTTPi_SendBasicAuthorization(threadData_p);
         if (sendStatus != 0)
@@ -1419,6 +1505,29 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
             return sendStatus;
         }
     }
+#if defined(VERSION_R4QK01)
+    {
+        sendStatus = 0;
+        if (threadData_p->sendBufwp > 0)
+        {
+            s32 stat = NHTTPi_SocSend(req_p, bgnEndInfo_p->socket, commBuf_p,
+                threadData_p->sendBufwp, 0);
+            threadData_p->sendBufwp = 0;
+            NHTTPi_memclr(commBuf_p, 0x100);
+            if (stat < 0)
+            {
+                sendStatus = 1;
+            }
+            if (stat == 0)
+            {
+                sendStatus = 2;
+            }
+        }
+        threadData_p->sendBufwp = 0;
+        NHTTPi_memclr(commBuf_p, 0x100);
+        return sendStatus;
+    }
+#else
     if (threadData_p->sendBufwp > 0)
     {
         s32 stat = NHTTPi_SocSend(req_p, bgnEndInfo_p->socket, commBuf_p,
@@ -1433,6 +1542,7 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
         }
     }
     return 0;
+#endif
 }
 
 BOOL NHTTPi_ThreadRecvHeaderProc(NHTTPThreadData* threadData_p)
@@ -1465,7 +1575,11 @@ BOOL NHTTPi_ThreadRecvHeaderProc(NHTTPThreadData* threadData_p)
         }
         if (threadData_p->recvBufwp < NHTTP_HDRRECVBUF_INILEN)
         {
-            recvbyte = NHTTPi_SocRecv(req_p, bgnEndInfo_p->socket,
+            recvbyte = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+                mutexInfo_p,
+#endif
+                req_p, bgnEndInfo_p->socket,
                 (char*)res_p->hdrBufFirst + threadData_p->recvBufwp, 1,
                 0);
             tmpBuf[threadData_p->recvBufwp & 3] =
@@ -1496,7 +1610,11 @@ BOOL NHTTPi_ThreadRecvHeaderProc(NHTTPThreadData* threadData_p)
                 }
                 headerBuf_p->next_p = NULL;
             }
-            recvbyte = NHTTPi_SocRecv(req_p, bgnEndInfo_p->socket,
+            recvbyte = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+                mutexInfo_p,
+#endif
+                req_p, bgnEndInfo_p->socket,
                 (char*)&headerBuf_p->block[wp], 1, 0);
             tmpBuf[threadData_p->recvBufwp & 3] = headerBuf_p->block[wp];
         }
@@ -1606,6 +1724,29 @@ BOOL NHTTPi_ThreadParseHeaderProc(NHTTPThreadData* threadData_p)
             threadData_p->isKeepAlive = FALSE;
             return FALSE;
         }
+#if defined(VERSION_R4QK01)
+        if (NHTTPi_strnicmp(threadData_p->tmpHeaderBuf, "HTTP/1.1", 8) == 0)
+        {
+            threadData_p->isKeepAlive = TRUE;
+        }
+        else
+        {
+            threadData_p->isKeepAlive = FALSE;
+        }
+        if (connectionHeaderStrLen <= 0x100 && connectionHeaderStrLen > 0)
+        {
+            if (NHTTPi_compareTokenN_HdrRecvBuf(res_p, n,
+                    n + connectionHeaderStrLen, "Keep-Alive", 0) == 0)
+            {
+                threadData_p->isKeepAlive = TRUE;
+            }
+            if (NHTTPi_compareTokenN_HdrRecvBuf(res_p, n,
+                    n + connectionHeaderStrLen, "Close", 0) == 0)
+            {
+                threadData_p->isKeepAlive = FALSE;
+            }
+        }
+#else
         if (connectionHeaderStrLen > 0x100)
         {
             threadData_p->isKeepAlive = FALSE;
@@ -1630,6 +1771,7 @@ BOOL NHTTPi_ThreadParseHeaderProc(NHTTPThreadData* threadData_p)
                 threadData_p->isKeepAlive = FALSE;
             }
         }
+#endif
     }
     threadData_p->isChunked =
         NHTTPi_getHeaderValue(res_p, "Transfer-Encoding", &n);
@@ -1697,12 +1839,20 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
             }
             if (threadData_p->result == NHTTP_ERROR_BUFFULL)
             {
-                recvbyte = NHTTPi_RecvBufN(req_p, bgnEndInfo_p->socket, 0,
+                recvbyte = NHTTPi_RecvBufN(
+#if defined(VERSION_R4QK01)
+                    mutexInfo_p,
+#endif
+                    req_p, bgnEndInfo_p->socket, 0,
                     threadData_p->contentLength, 0);
             }
             else
             {
-                recvbyte = NHTTPi_RecvBufN(req_p, bgnEndInfo_p->socket,
+                recvbyte = NHTTPi_RecvBufN(
+#if defined(VERSION_R4QK01)
+                    mutexInfo_p,
+#endif
+                    req_p, bgnEndInfo_p->socket,
                     res_p->bodyLen, threadData_p->contentLength, 0);
             }
             if (recvbyte < 0)
@@ -1749,7 +1899,11 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                      threadData_p->recvBufwp < 0x100;
                      threadData_p->recvBufwp++)
                 {
-                    recvbyte = NHTTPi_SocRecv(req_p,
+                    recvbyte = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+                        mutexInfo_p,
+#endif
+                        req_p,
                         bgnEndInfo_p->socket,
                         commBuf_p + threadData_p->recvBufwp, 1,
                         0);
@@ -1772,7 +1926,10 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                         {
                             n = threadData_p->recvBufwp;
                             if (NHTTPi_SkipLineBuf(
-                                    req_p, bgnEndInfo_p->socket)
+#if defined(VERSION_R4QK01)
+                                mutexInfo_p,
+#endif
+                                req_p, bgnEndInfo_p->socket)
                                 <= 0)
                             {
                                 return FALSE;
@@ -1813,12 +1970,20 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                     }
                     if (threadData_p->result == NHTTP_ERROR_BUFFULL)
                     {
-                        recvbyte = NHTTPi_RecvBufN(req_p,
+                        recvbyte = NHTTPi_RecvBufN(
+#if defined(VERSION_R4QK01)
+                            mutexInfo_p,
+#endif
+                            req_p,
                             bgnEndInfo_p->socket, 0, chunkSize, 0);
                     }
                     else
                     {
-                        recvbyte = NHTTPi_RecvBufN(req_p,
+                        recvbyte = NHTTPi_RecvBufN(
+#if defined(VERSION_R4QK01)
+                            mutexInfo_p,
+#endif
+                            req_p,
                             bgnEndInfo_p->socket, res_p->bodyLen,
                             chunkSize, 0);
                     }
@@ -1831,7 +1996,11 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                     res_p->totalBodyLen += recvbyte;
                     if (chunkSize == 0)
                     {
-                        recvbyte = NHTTPi_SocRecv(req_p,
+                        recvbyte = NHTTPi_SocRecv(
+#if defined(VERSION_R4QK01)
+                            mutexInfo_p,
+#endif
+                            req_p,
                             bgnEndInfo_p->socket, commBuf_p, 2, 0);
                         if (recvbyte <= 0)
                         {
@@ -1840,7 +2009,11 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                     }
                 }
             }
-            NHTTPi_SkipLineBuf(req_p, bgnEndInfo_p->socket);
+            NHTTPi_SkipLineBuf(
+#if defined(VERSION_R4QK01)
+                mutexInfo_p,
+#endif
+                req_p, bgnEndInfo_p->socket);
             threadData_p->result = 0;
         }
         else
@@ -1855,12 +2028,20 @@ BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p)
                 }
                 if (threadData_p->result == NHTTP_ERROR_BUFFULL)
                 {
-                    recvbyte = NHTTPi_RecvBuf(req_p, bgnEndInfo_p->socket, 0,
+                    recvbyte = NHTTPi_RecvBuf(
+#if defined(VERSION_R4QK01)
+                        mutexInfo_p,
+#endif
+                        req_p, bgnEndInfo_p->socket, 0,
                         0);
                 }
                 else
                 {
-                    recvbyte = NHTTPi_RecvBuf(req_p, bgnEndInfo_p->socket,
+                    recvbyte = NHTTPi_RecvBuf(
+#if defined(VERSION_R4QK01)
+                        mutexInfo_p,
+#endif
+                        req_p, bgnEndInfo_p->socket,
                         res_p->bodyLen, 0);
                 }
                 if (recvbyte < 0)

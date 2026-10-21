@@ -97,7 +97,11 @@ typedef struct SCItem {
 } SCItem;
 
 const char* __SCVersion =
+#if defined(VERSION_R4QK01)
+    "<< RVL_SDK - SC \trelease build: Feb 27 2009 10:05:17 (0x4302_145) >>";
+#else
     "<< RVL_SDK - SC \trelease build: Nov 30 2006 03:33:00 (0x4199_60831) >>";
+#endif
 
 static SCControl Control;
 static u8 ConfBuf[SC_CONF_MAX_SIZE] ALIGN(32);
@@ -134,10 +138,18 @@ static SCNameAndID NameAndIDTbl[SC_ITEM_MAX] = {
     {"NET.WCPC", SC_ITEM_NET_WCPC}, {"NET.WCFG", SC_ITEM_NET_WCFG},
     {"DEV.BTM", SC_ITEM_DEV_BTM},   {"DEV.VIM", SC_ITEM_DEV_VIM},
     {"DEV.CTC", SC_ITEM_DEV_CTC},   {"DEV.DSM", SC_ITEM_DEV_DSM},
-    {"BT.DINF", SC_ITEM_BT_DINF},   {"BT.SENS", SC_ITEM_BT_SENS},
+    {"BT.DINF", SC_ITEM_BT_DINF},
+#if defined(VERSION_R4QK01)
+    {"BT.CDIF", SC_ITEM_BT_CDIF},
+#endif
+    {"BT.SENS", SC_ITEM_BT_SENS},
     {"BT.SPKV", SC_ITEM_BT_SPKV},   {"BT.MOT", SC_ITEM_BT_MOT},
     {"BT.BAR", SC_ITEM_BT_BAR},     {"DVD.CNF", SC_ITEM_DVD_CNF},
-    {"WWW.RST", SC_ITEM_WWW_RST}};
+    {"WWW.RST", SC_ITEM_WWW_RST},
+#if defined(VERSION_R4QK01)
+    {"IPL.TID", SC_ITEM_IPL_TID},
+#endif
+};
 
 static void SetBgJobStatus(SCStatus status);
 static s32 SCReloadConfFileAsync(u8* buf, u32 size, SCAsyncCallback callback);
@@ -934,7 +946,10 @@ static BOOL SCFindIntegerItem(void* dst, SCItemID id, u8 primType) {
 }
 
 static BOOL SCReplaceIntegerItem(const void* src, SCItemID id, u8 primType)
-    DECOMP_DONT_INLINE {
+#if !defined(VERSION_R4QK01)
+    DECOMP_DONT_INLINE
+#endif
+{
     BOOL success;
     BOOL enabled;
     SCItem item;

@@ -22,7 +22,26 @@ static SCRegion ProductAreaAndStringTbl[] = {{SC_AREA_JPN, "JPN"},
                                              {SC_AREA_ASI, "ASI"},
                                              {SC_AREA_LTN, "LTN"},
                                              {SC_AREA_SAF, "SAF"},
+#if defined(VERSION_R4QK01)
+                                             {SC_AREA_CHN, "CHN"},
+#endif
                                              {-1, ""}};
+
+#if defined(VERSION_R4QK01)
+typedef struct SCGameRegion {
+    SCProductGameRegion region;
+    char name[3];
+} SCGameRegion;
+
+static SCGameRegion ProductGameRegionAndStringTbl[] = {
+    {SC_PRD_GAME_REG_JP, "JP"},
+    {SC_PRD_GAME_REG_US, "US"},
+    {SC_PRD_GAME_REG_EU, "EU"},
+    {SC_PRD_GAME_REG_KR, "KR"},
+    {SC_PRD_GAME_REG_CN, "CN"},
+    {SC_PRD_GAME_REG_NULL, ""},
+};
+#endif
 
 BOOL __SCF1(const char* type, char* buf, u32 sz) {
     u8 ptext;
@@ -119,3 +138,21 @@ BOOL SCGetProductSN(u32* sn) {
 
     return FALSE;
 }
+
+#if defined(VERSION_R4QK01)
+SCProductGameRegion SCGetProductGameRegion(void) {
+    SCProductGameRegion region;
+    char name[3];
+    SCGameRegion* iter = ProductGameRegionAndStringTbl;
+
+    if (__SCF1("GAME", name, sizeof(name))) {
+        for (; (region = iter->region) != -1; iter++) {
+            if (!strcmp(iter->name, name)) {
+                return region;
+            }
+        }
+    }
+
+    return -1;
+}
+#endif

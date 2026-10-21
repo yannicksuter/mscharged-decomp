@@ -1,4 +1,7 @@
 #include <private/nhttp.h>
+#if defined(VERSION_R4QK01)
+#include <stdio.h>
+#endif
 
 static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, const char* name,
     const char* value)
@@ -36,6 +39,9 @@ static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, const char* na
         header = NHTTPi_alloc(sizeof(NHTTPHeader), 4);
         if (header == NULL)
         {
+#if defined(VERSION_R4QK01)
+            printf("failed to allocate memory\n");
+#endif
             NHTTPi_SetError(info, NHTTP_ERROR_ALLOC);
             return FALSE;
         }
@@ -160,6 +166,9 @@ BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* req_p,
     }
     if (req_p->isRawData)
     {
+#if defined(VERSION_R4QK01)
+        printf("already called NHTTPAddPostDataRaw (exclusive fucntion)\n");
+#endif
         return FALSE;
     }
 

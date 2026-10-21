@@ -21,7 +21,11 @@ OSMutex ncdMutex = {0};
 s32 ncdCommonResult[8] ALIGN(32);
 IPCIOVector ncdCommonVector[4] ALIGN(32);
 
+#if defined(VERSION_R4QK01)
+const char* __NCDVersion = "<< RVL_SDK - NCD \trelease build: Jun  9 2009 11:59:48 (0x4199_60831) >>";
+#else
 const char* __NCDVersion = "<< RVL_SDK - NCD \trelease build: Mar  9 2007 15:08:17 (0x4199_60831) >>";
+#endif
 
 static void LockRight(void);
 static NCDErr ExecConfigCommand(const char* name, NCDConfig* config, u32 command);
@@ -314,7 +318,11 @@ static void LockRight(void) {
         lo = (void*)OSRoundUp32B(IPCGetBufferLo());
 
         if ((u32)IPCGetBufferHi() - (u32)lo < NCD_IPC_HEAP_SIZE) {
+#if defined(VERSION_R4QK01)
+            OSPanic("ncdsystem.c", 1500,
+#else
             OSPanic("ncdsystem.c", 1448,
+#endif
                     "Could not reserve heap for NCD library from IPC arena");
         }
 
