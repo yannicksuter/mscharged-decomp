@@ -15,7 +15,11 @@ BOOL nandIsRelativePath(const char* path);
 BOOL nandIsPrivatePath(const char* path);
 BOOL nandIsUnderPrivatePath(const char* path);
 BOOL nandIsInitialized(void);
+#if defined(VERSION_R4QK01)
+void nandReportErrorCode(s32 result);
+#else
 void nandReportErrorCode(s32 result) DECOMP_DONT_INLINE;
+#endif
 s32 nandConvertErrorCode(s32 result);
 void nandGenerateAbsPath(char* abs, const char* rel);
 void nandGetParentDirectory(char* dir, const char* path);

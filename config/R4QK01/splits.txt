@@ -5426,6 +5426,8 @@ RVL_SDK/exi/EXICommon.c:
 RVL_SDK/fs/fs.c:
 	.text       start:0x803A6570 end:0x803A7E40
 	.data       start:0x80506A80 end:0x80506AC0
+	.sdata      start:0x80603390 end:0x806033A0
+	.sbss       start:0x80605E88 end:0x80605EA0
 
 RVL_SDK/gx/GXInit.c:
 	.data       start:0x80506AC0 end:0x80506D00 align:32
@@ -5495,7 +5497,9 @@ RVL_SDK/ipc/ipcMain.c:
 
 RVL_SDK/ipc/ipcclt.c:
 	.text       start:0x803AFCD0 end:0x803B16BC
+	.bss        start:0x80584680 end:0x80584740
 	.sdata      start:0x806033F8 end:0x80603400
+	.sbss       start:0x80605F18 end:0x80605F28
 
 RVL_SDK/kpad/KPAD.c:
 	.sdata      start:0x80603400 end:0x80603480
@@ -6054,33 +6058,52 @@ RVL_SDK/usb/usb.c:
 	.sbss       start:0x806063E8 end:0x806063F8
 
 RVL_SDK/sc/scsystem.c:
-	.text       start:0x80416670 end:0x80417FF8
-	.rodata     start:0x804B9AC0 end:0x804B9B14
-	.data       start:0x8051F9C8 end:0x8051FBD8
+	.text       start:0x80416670 end:0x80418000
+	.rodata     start:0x804B9AC0 end:0x804B9B18
+	.data       start:0x8051F9C8 end:0x8051FBA8
 	.bss        start:0x805C5EE0 end:0x805CE080 align:32
 	.sdata      start:0x80603678 end:0x80603788
 	.sbss       start:0x806063F8 end:0x80606410
 
+RVL_SDK/sc/scapi.c:
+	.text       start:0x80418000 end:0x80418500
+	.data       start:0x8051FBA8 end:0x8051FBD8
+
 RVL_SDK/sc/scapi_prdinfo.c:
-	.text       start:0x80418500 end:0x804187A8
+	.text       start:0x80418500 end:0x80418840
 	.data       start:0x8051FBD8 end:0x8051FC38
-	.sdata      start:0x80603788 end:0x806037B8
+	.sdata      start:0x80603788 end:0x806037B0
 	.sbss       start:0x80606410 end:0x80606418
 
+RVL_SDK/nand/nand.c:
+	.text       start:0x80418840 end:0x80419DD0
+	.sdata      start:0x806037B0 end:0x806037B8
+
 RVL_SDK/nand/NANDOpenClose.c:
-	.text       start:0x80419DD0 end:0x8041AC2C
-	.data       start:0x8051FC38 end:0x8051FC50
+	.text       start:0x80419DD0 end:0x8041AC30
+	.data       start:0x8051FC38 end:0x8051FC80
 	.sdata      start:0x806037B8 end:0x806037C8
-	.sbss       start:0x80606418 end:0x8060641C
+	.sbss       start:0x80606418 end:0x80606420
 
 RVL_SDK/nand/NANDCore.c:
-	.rodata     start:0x804B9B14 end:0x804B9C70 align:4
+	.text       start:0x8041AC30 end:0x8041BE30
+	.rodata     start:0x804B9B18 end:0x804B9C60
 	.data       start:0x8051FC80 end:0x8051FDD0 align:32
+	.bss        start:0x805CE080 end:0x805CE0C0 align:32
 	.sdata      start:0x806037C8 end:0x806037E8
+	.sbss       start:0x80606420 end:0x80606428
 
 RVL_SDK/nand/NANDCheck.c:
-	.text       start:0x8041BE30 end:0x8041C2E4
-	.data       start:0x8051FDD0 end:0x8051FF00
+	.text       start:0x8041BE30 end:0x8041C2F0
+	.data       start:0x8051FDD0 end:0x8051FEB8
+	.sdata      start:0x806037E8 end:0x806037F8
+
+RVL_SDK/nand/NANDLogging.c:
+	.text       start:0x8041C2F0 end:0x8041C8D4
+	.data       start:0x8051FEB8 end:0x8051FF00
+	.bss        start:0x805CE0C0 end:0x805CE3C0 align:64
+	.sdata      start:0x806037F8 end:0x80603800
+	.sbss       start:0x80606428 end:0x80606430
 
 RVL_SDK/ncd/ncdsystem.c:
 	.text       start:0x8041C8D4 end:0x8041D150

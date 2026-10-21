@@ -33,6 +33,8 @@ typedef struct ESPTicketView {
 
 s32 ESP_InitLib(void);
 s32 ESP_CloseLib(void);
+s32 ESP_GetDataDir(u64 titleId, char* dataDir);
+s32 ESP_GetTitleId(u64* titleId);
 s32 ESP_DiGetTicketView(const ESPTicket* ticket, ESPTicketView* ticketView);
 s32 ESP_DiGetTmd(ESPTmd* tmd, u32* numTmdBytes);
 #endif

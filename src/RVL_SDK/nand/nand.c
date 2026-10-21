@@ -5,7 +5,7 @@
 #include <string.h>
 
 static void nandSplitPerm(u8 perm, u32* ownerPerm, u32* groupPerm,
-                          u32* otherPerm) DECOMP_DONT_INLINE;
+                          u32* otherPerm);
 static void nandGetStatusCallback(s32 result, void* arg);
 static void nandGetFileStatusAsyncCallback(s32 result, void* arg);
 static BOOL nandInspectPermission(u8 perm);
@@ -105,6 +105,14 @@ s32 NANDDelete(const char* path) {
     return nandConvertErrorCode(nandDelete(path, NULL, FALSE, FALSE));
 }
 
+s32 NANDPrivateDelete(const char* path) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    return nandConvertErrorCode(nandDelete(path, NULL, FALSE, TRUE));
+}
+
 s32 NANDDeleteAsync(const char* path, NANDAsyncCallback callback,
                     NANDCommandBlock* block) {
     if (!nandIsInitialized()) {
@@ -113,14 +121,6 @@ s32 NANDDeleteAsync(const char* path, NANDAsyncCallback callback,
 
     block->callback = callback;
     return nandConvertErrorCode(nandDelete(path, block, TRUE, FALSE));
-}
-
-s32 NANDPrivateDelete(const char* path) {
-    if (!nandIsInitialized()) {
-        return NAND_RESULT_FATAL_ERROR;
-    }
-
-    return nandConvertErrorCode(nandDelete(path, NULL, FALSE, TRUE));
 }
 
 s32 NANDPrivateDeleteAsync(const char* path, NANDAsyncCallback callback,
@@ -285,6 +285,11 @@ s32 NANDPrivateCreateDirAsync(const char* path, u8 perm, u8 attr,
 
 static s32 nandMove(const char* from, const char* to, NANDCommandBlock* block,
                     BOOL async, BOOL priv) {
+#if defined(VERSION_R4QK01)
+    char absPathFrom[64] = {0};
+    char absPathTo[64] = {0};
+    char relativeName[13] = {0};
+#else
     char absPathFrom[64];
     char absPathTo[64];
     char relativeName[13];
@@ -294,6 +299,7 @@ static s32 nandMove(const char* from, const char* to, NANDCommandBlock* block,
     MEMCLR(&relativeName);
 
     relativeName[12] = '\0';
+#endif
 
     nandGenerateAbsPath(absPathFrom, from);
     nandGetRelativeName(relativeName, absPathFrom);
@@ -391,30 +397,37 @@ s32 NANDGetLengthAsync(NANDFileInfo* info, u32* lengthOut,
 }
 
 static void nandComposePerm(u8* out, u32 ownerPerm, u32 groupPerm,
-                            u32 otherPerm) DECOMP_DONT_INLINE {
+                            u32 otherPerm) {
     u32 perm = 0;
+    BOOL ownerRead, ownerWrite, groupRead, groupWrite, otherRead, otherWrite;
 
-    if (ownerPerm & NAND_ACCESS_READ) {
+    ownerRead = ownerPerm & NAND_ACCESS_READ;
+    if (ownerRead) {
         perm |= NAND_PERM_RUSR;
     }
 
-    if (ownerPerm & NAND_ACCESS_WRITE) {
+    ownerWrite = ownerPerm & NAND_ACCESS_WRITE;
+    if (ownerWrite) {
         perm |= NAND_PERM_WUSR;
     }
 
-    if (groupPerm & NAND_ACCESS_READ) {
+    groupRead = groupPerm & NAND_ACCESS_READ;
+    if (groupRead) {
         perm |= NAND_PERM_RGRP;
     }
 
-    if (groupPerm & NAND_ACCESS_WRITE) {
+    groupWrite = groupPerm & NAND_ACCESS_WRITE;
+    if (groupWrite) {
         perm |= NAND_PERM_WGRP;
     }
 
-    if (otherPerm & NAND_ACCESS_READ) {
+    otherRead = otherPerm & NAND_ACCESS_READ;
+    if (otherRead) {
         perm |= NAND_PERM_ROTH;
     }
 
-    if (otherPerm & NAND_ACCESS_WRITE) {
+    otherWrite = otherPerm & NAND_ACCESS_WRITE;
+    if (otherWrite) {
         perm |= NAND_PERM_WOTH;
     }
 
@@ -510,6 +523,17 @@ s32 NANDGetStatus(const char* path, NANDStatus* status) {
     return nandConvertErrorCode(
         nandGetStatus(path, status, NULL, FALSE, FALSE));
 }
+
+#if defined(VERSION_R4QK01)
+s32 NANDPrivateGetStatus(const char* path, NANDStatus* status) {
+    if (!nandIsInitialized()) {
+        return NAND_RESULT_FATAL_ERROR;
+    }
+
+    return nandConvertErrorCode(
+        nandGetStatus(path, status, NULL, FALSE, TRUE));
+}
+#endif
 
 s32 NANDPrivateGetStatusAsync(const char* path, NANDStatus* status,
                               NANDAsyncCallback callback,
