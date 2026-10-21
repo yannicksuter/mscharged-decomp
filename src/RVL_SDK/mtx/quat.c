@@ -41,7 +41,6 @@ f32 PSQUATDotProduct(const register Quaternion* p, const register Quaternion* q)
 }
 // clang-format on
 
-#pragma fp_contract off
 void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t)
 {
     f32 theta;
@@ -77,4 +76,3 @@ void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t)
     r->z = (tp * p->z) + (tq * q->z);
     r->w = (tp * p->w) + (tq * q->w);
 }
-#pragma fp_contract on

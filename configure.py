@@ -1568,12 +1568,12 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXBump.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXDisplayList.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/gx/GXFifo.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXFrameBuf.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXFrameBuf.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXGeometry.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXInit.c"),
+            Object(Matching, "RVL_SDK/gx/GXInit.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXLight.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXMisc.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/gx/GXPerf.c"),
+            Object(Matching, "RVL_SDK/gx/GXMisc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/gx/GXPerf.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXPixel.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXTev.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/gx/GXTexture.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline noauto"]),
@@ -1707,11 +1707,11 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mix/remote.c"),
 
             # RVL_SDK/mtx
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mtx/mtx.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mtx/mtx44.c"),
+            Object(Matching, "RVL_SDK/mtx/mtx.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/mtx/mtx44.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/mtx/mtxvec.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mtx/quat.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/mtx/vec.c"),
+            Object(Matching, "RVL_SDK/mtx/quat.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/mtx/vec.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/nand
             Object(Matching, "RVL_SDK/nand/nand.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
@@ -1808,14 +1808,14 @@ config.libs = [
             Object(Matching, "RVL_SDK/thp/THPSimple.cpp", cflags=cflags_game),
 
             # RVL_SDK/tpl
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/tpl/TPL.c"),
+            Object(Matching, "RVL_SDK/tpl/TPL.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/usb
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/usb/usb.c"),
 
             # RVL_SDK/vi
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/vi/i2c.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/vi/vi.c"),
+            Object(Matching, "RVL_SDK/vi/i2c.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/vi/vi.c", source="RVL_SDK/vi/R4QK01/vi.c" if config.version == "R4QK01" else None, mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/vi/vi3in1.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/wenc

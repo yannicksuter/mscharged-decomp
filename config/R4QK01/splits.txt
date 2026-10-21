@@ -5467,6 +5467,7 @@ RVL_SDK/fs/fs.c:
 	.sbss       start:0x80605E88 end:0x80605EA0
 
 RVL_SDK/gx/GXInit.c:
+	.text       start:0x803A7E40 end:0x803A8FD0
 	.data       start:0x80506AC0 end:0x80506D00 align:32
 	.bss        start:0x805838A0 end:0x80583F20
 	.sdata      start:0x806033A0 end:0x806033A8
@@ -5479,20 +5480,22 @@ RVL_SDK/gx/GXFifo.c:
 	.bss        start:0x80583F20 end:0x80583F68
 	.sbss       start:0x80605EC8 end:0x80605EE8
 
-RVL_SDK/gx/GXMisc.c:
-	.sbss       start:0x80605EE8 end:0x80605F00
-
 RVL_SDK/gx/GXAttr.c:
 	.text       start:0x803A9BC0 end:0x803AA710
 	.data       start:0x80506D30 end:0x80506E74
 	.sdata      start:0x806033A8 end:0x806033B4
 
-RVL_SDK/gx/GXFrameBuf.c:
-	.data       start:0x80506E74 end:0x80507058 align:4
-	.sdata2     start:0x8060AAA8 end:0x8060AAB8
+RVL_SDK/gx/GXMisc.c:
+	.text       start:0x803AA710 end:0x803AB100
+	.sbss       start:0x80605EE8 end:0x80605F00
 
 RVL_SDK/gx/GXGeometry.c:
 	.text       start:0x803AB100 end:0x803AB710
+
+RVL_SDK/gx/GXFrameBuf.c:
+	.text       start:0x803AB710 end:0x803AC2F0
+	.data       start:0x80506E78 end:0x80507058
+	.sdata2     start:0x8060AAA8 end:0x8060AAB8
 
 RVL_SDK/gx/GXLight.c:
 	.text       start:0x803AC2F0 end:0x803AC860
@@ -5517,16 +5520,17 @@ RVL_SDK/gx/GXPixel.c:
 	.data       start:0x805072F8 end:0x80507318
 	.sdata2     start:0x8060AAF8 end:0x8060AB30
 
-RVL_SDK/gx/GXPerf.c:
-	.data       start:0x80507318 end:0x805073FC
-
 RVL_SDK/gx/GXDisplayList.c:
 	.text       start:0x803AEA80 end:0x803AEC64
 	.bss        start:0x80583F68 end:0x80584668
 
 RVL_SDK/gx/GXTransform.c:
-	.text       start:0x803AEC70 end:0x803AF3A8
+	.text       start:0x803AEC70 end:0x803AF3B0
 	.sdata2     start:0x8060AB30 end:0x8060AB44
+
+RVL_SDK/gx/GXPerf.c:
+	.text       start:0x803AF3B0 end:0x803AFBE0
+	.data       start:0x80507318 end:0x805073FC
 
 RVL_SDK/ipc/ipcMain.c:
 	.text       start:0x803AFBE0 end:0x803AFCC8
@@ -5585,10 +5589,11 @@ RVL_SDK/mtx/mtx44.c:
 	.sdata2     start:0x8060ABC8 end:0x8060ABE0
 
 RVL_SDK/mtx/vec.c:
-	.text       start:0x803BB1B0 end:0x803BB23C
+	.text       start:0x803BB1B0 end:0x803BB240
 	.sdata2     start:0x8060ABE0 end:0x8060ABE8
 
 RVL_SDK/mtx/quat.c:
+	.text       start:0x803BB240 end:0x803BB420
 	.sdata2     start:0x8060ABE8 end:0x8060ABF4
 
 RVL_SDK/os/OS.c:
@@ -5787,17 +5792,19 @@ RVL_SDK/tpl/TPL.c:
 	.sdata      start:0x80603540 end:0x80603548
 
 RVL_SDK/vi/vi.c:
+	.text       start:0x803CF3D0 end:0x803D1D20 align:16
 	.data       start:0x80515D68 end:0x805162C0
 	.bss        start:0x8058B810 end:0x8058B980
 	.sdata      start:0x80603548 end:0x80603568
 	.sbss       start:0x80606228 end:0x806062D8
 
 RVL_SDK/vi/i2c.c:
+	.text       start:0x803D1D20 end:0x803D2640 align:16
 	.sdata      start:0x80603568 end:0x80603570
 	.sbss       start:0x806062D8 end:0x806062E0
 
 RVL_SDK/vi/vi3in1.c:
-	.text       start:0x803D2640 end:0x803D3D6C
+	.text       start:0x803D2640 end:0x803D3D6C align:16
 	.data       start:0x805162C0 end:0x805168D0
 	.bss        start:0x8058B980 end:0x8058B99C
 	.sdata      start:0x80603570 end:0x80603580
