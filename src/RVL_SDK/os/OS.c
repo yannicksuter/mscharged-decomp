@@ -11,6 +11,11 @@
 
 #include <string.h>
 
+#if defined(VERSION_R4QK01)
+#include <revolution/os/OSPlayTime.h>
+#define INVALID_NAME_CHAR(c) ('0' > (c) || ('9' < (c) && (c) < 'A') || (c) > 'Z')
+#endif
+
 OSExecParams __OSRebootParams;
 static DVDDriveInfo DriveInfo __attribute__((aligned(32)));
 static DVDCommandBlock DriveBlock;
@@ -32,7 +37,10 @@ __declspec(weak) BOOL __OSIsGcam;
 BOOL __OSInNandBoot;
 BOOL __OSInIPL;
 
-#if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
+#if defined(VERSION_R4QK01)
+#define OS_BUILD_DATE "Feb 27 2009"
+#define OS_BUILD_TIME "10:04:29"
+#elif defined(VERSION_R4QE01) || defined(VERSION_R4QJ01)
 #define OS_BUILD_DATE "Apr 24 2007"
 #define OS_BUILD_TIME "11:50:47"
 #else
@@ -41,7 +49,12 @@ BOOL __OSInIPL;
 #endif
 
 const char* __OSVersion =
-    "<< RVL_SDK - OS \trelease build: " OS_BUILD_DATE " " OS_BUILD_TIME " (0x4199_60831) >>";
+    "<< RVL_SDK - OS \trelease build: " OS_BUILD_DATE " " OS_BUILD_TIME
+#if defined(VERSION_R4QK01)
+    " (0x4302_145) >>";
+#else
+    " (0x4199_60831) >>";
+#endif
 
 static void OSExceptionInit(void);
 
@@ -216,6 +229,10 @@ u32 OSGetConsoleType(void) {
             if (hollywood > 0x00000011) {
                 return OS_CONSOLE_NDEV_2_1;
             }
+#if defined(VERSION_R4QK01)
+        case 0x0300:
+            return OS_CONSOLE_RVA_1;
+#endif
         }
     }
 
@@ -265,69 +282,55 @@ static void MemClear(void* mem, u32 size) {
     DCFlushRange(flush, 0x40000);
 }
 
-static void ClearArena(void) DECOMP_DONT_INLINE {
-    // System reset
+static void ClearArena(void) {
     if (!((OSGetResetCode() >> 31) & 1)) {
         MemClear(OSGetArenaLo(), (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+        return;
     }
-    // Region doesn't exist, or begins somewhere outside of MEM1
-    else if (__OSRebootParams.regionStart == NULL ||
-             !OSIsMEM1Region(__OSRebootParams.regionStart)) {
+    if (__OSRebootParams.regionStart == NULL ||
+        !OSIsMEM1Region(__OSRebootParams.regionStart)) {
         MemClear(OSGetArenaLo(), (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+        return;
     }
-    // Region begins after arena begins
-    else if (OSGetArenaLo() < __OSRebootParams.regionStart) {
-        // Region is outside of arena
+    ASSERTLINE(__OSRebootParams.regionEnd != NULL, __LINE__);
+    if (OSGetArenaLo() < __OSRebootParams.regionStart) {
         if (OSGetArenaHi() <= __OSRebootParams.regionStart) {
             MemClear(OSGetArenaLo(), (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+            return;
         }
-        // Region begins in arena
-        else {
-            // Clear arena area before region
-            MemClear(OSGetArenaLo(),
-                     (u32)__OSRebootParams.regionStart - (u32)OSGetArenaLo());
-
-            // Region ends inside arena
-            if (OSGetArenaHi() > __OSRebootParams.regionEnd) {
-                // Clear arena area after region
-                MemClear(__OSRebootParams.regionEnd,
-                         (u32)OSGetArenaHi() - (u32)__OSRebootParams.regionEnd);
-            }
+        MemClear(OSGetArenaLo(),
+                 (u32)__OSRebootParams.regionStart - (u32)OSGetArenaLo());
+        if (OSGetArenaHi() > __OSRebootParams.regionEnd) {
+            MemClear(__OSRebootParams.regionEnd,
+                     (u32)OSGetArenaHi() - (u32)__OSRebootParams.regionEnd);
         }
     }
 }
 
-static void ClearMEM2Arena(void) DECOMP_DONT_INLINE {
-    // System reset
+static void ClearMEM2Arena(void) {
     if (!((OSGetResetCode() >> 31) & 1)) {
         MemClear(OSGetMEM2ArenaLo(),
                  (u32)OSGetMEM2ArenaHi() - (u32)OSGetMEM2ArenaLo());
+        return;
     }
-    // Region doesn't exist, or begins somewhere outside of MEM2
-    else if (__OSRebootParams.regionStart == NULL ||
-             !OSIsMEM2Region(__OSRebootParams.regionStart)) {
+    if (__OSRebootParams.regionStart == NULL ||
+        !OSIsMEM2Region(__OSRebootParams.regionStart)) {
         MemClear(OSGetMEM2ArenaLo(),
                  (u32)OSGetMEM2ArenaHi() - (u32)OSGetMEM2ArenaLo());
+        return;
     }
-    // Region begins after arena begins
-    else if (OSGetMEM2ArenaLo() < __OSRebootParams.regionStart) {
-        // Region is outside of arena
+    ASSERTLINE(__OSRebootParams.regionEnd != NULL, __LINE__);
+    if (OSGetMEM2ArenaLo() < __OSRebootParams.regionStart) {
         if (OSGetMEM2ArenaHi() <= __OSRebootParams.regionStart) {
             MemClear(OSGetMEM2ArenaLo(),
                      (u32)OSGetMEM2ArenaHi() - (u32)OSGetMEM2ArenaLo());
+            return;
         }
-        // Region begins in arena
-        else {
-            // Clear arena area before region
-            MemClear(OSGetMEM2ArenaLo(), (u32)__OSRebootParams.regionStart -
-                                             (u32)OSGetMEM2ArenaLo());
-            // Region ends inside arena
-            if (OSGetMEM2ArenaHi() > __OSRebootParams.regionEnd) {
-                // Clear arena area after region
-                MemClear(__OSRebootParams.regionEnd,
-                         (u32)OSGetMEM2ArenaHi() -
-                             (u32)__OSRebootParams.regionEnd);
-            }
+        MemClear(OSGetMEM2ArenaLo(), (u32)__OSRebootParams.regionStart -
+                                       (u32)OSGetMEM2ArenaLo());
+        if (OSGetMEM2ArenaHi() > __OSRebootParams.regionEnd) {
+            MemClear(__OSRebootParams.regionEnd,
+                     (u32)OSGetMEM2ArenaHi() - (u32)__OSRebootParams.regionEnd);
         }
     }
 }
@@ -350,8 +353,13 @@ static void CheckTargets(void) {
     case 0x81:
         OSReport("OS ERROR: boot program is not for RVL target. Please use "
                  "correct boot program.\n");
+#if defined(VERSION_R4QK01)
+#line 1153
+        OS_ERROR("Failed to run app");
+#else
 #line 1112
         OS_ERROR("Failed to run app");
+#endif
         break;
     case 0x80:
     default:
@@ -362,8 +370,13 @@ static void CheckTargets(void) {
     case 0x81:
         OSReport("OS ERROR: apploader[D].img is not for RVL target. Please use "
                  "correct apploader[D].img.\n");
+#if defined(VERSION_R4QK01)
+#line 1171
+        OS_ERROR("Failed to run app");
+#else
 #line 1130
         OS_ERROR("Failed to run app");
+#endif
         break;
     case 0x80:
     default:
@@ -385,7 +398,11 @@ static void ReportOSInfo(void) {
     category = type & OS_CONSOLE_MASK;
     switch (category) {
     case OS_CONSOLE_MASK_RVL:
+#if defined(VERSION_R4QK01)
+        switch ((u32)type) {
+#else
         switch (type) {
+#endif
         case OS_CONSOLE_RVL_PP_1:
             OSReport("Pre-production board 1\n");
             break;
@@ -395,6 +412,11 @@ static void ReportOSInfo(void) {
         case OS_CONSOLE_RVL_PP_2_2:
             OSReport("Pre-production board 2-2\n");
             break;
+#if defined(VERSION_R4QK01)
+        case OS_CONSOLE_RVA_1:
+            OSReport("RVA 1\n");
+            break;
+#endif
         default:
             OSReport("Retail %d\n", type);
             break;
@@ -445,6 +467,40 @@ static void ReportOSInfo(void) {
     OSReport("MEM2 Arena : 0x%x - 0x%x\n", OSGetMEM2ArenaLo(),
              OSGetMEM2ArenaHi());
 }
+
+#if defined(VERSION_R4QK01)
+static void CheckFirmware(void) {
+    OSIOSRev rev;
+    u32 myVersion;
+    const GXColor bgColor = {0, 0, 255, 0};
+    const GXColor textColor = {255, 255, 255, 0};
+
+    __OSGetIOSRev(&rev);
+    myVersion = rev.idLo << 16 | rev.verMajor << 8 | rev.verMinor;
+
+    if (rev.idLo != (OS_MINIMUM_IOS_VERSION >> 16) ||
+        (rev.idLo == (OS_MINIMUM_IOS_VERSION >> 16) &&
+         myVersion < OS_MINIMUM_IOS_VERSION)) {
+        OSReport("OS ERROR: This firmware is an improper version for this SDK. "
+                 "Please use a correct Firmware.\n");
+        OSFatal(textColor, bgColor,
+                "\n\nERROR #002\nAn error has occurred.\n"
+                "Press the Eject Button, remove the\n"
+                "Game Disc, and turn off the power to \n"
+                "the console. \nPlease read the Wii Operations Manual \n"
+                "for further instructions.\n");
+#line 1236
+        OS_ERROR("Failed to run app");
+    }
+}
+
+static u8 GetAppType(void) {
+    if (__OSInIPL) {
+        return OS_APP_TYPE_IPL;
+    }
+    return *(u8*)OSPhysicalToCached(OS_PHYS_CURRENT_APP_TYPE);
+}
+#endif
 
 void OSInit(void) {
     OSBI2* bi2;
@@ -590,8 +646,14 @@ void OSInit(void) {
             EnableMetroTRKInterrupts();
         }
 
-        ClearArena();
-        ClearMEM2Arena();
+#if defined(VERSION_R4QK01)
+        if (!__OSInNandBoot && !__OSInReboot) {
+#endif
+            ClearArena();
+            ClearMEM2Arena();
+#if defined(VERSION_R4QK01)
+        }
+#endif
         OSEnableInterrupts();
         IPCCltInit();
 
@@ -608,6 +670,9 @@ void OSInit(void) {
 
         if (!__OSInIPL) {
             CheckTargets();
+#if defined(VERSION_R4QK01)
+            CheckFirmware();
+#endif
             DVDInit();
 
             if (__OSIsGcam) {
@@ -616,7 +681,19 @@ void OSInit(void) {
                 DCInvalidateRange(&DriveInfo, sizeof(DVDDriveInfo));
                 DVDInquiryAsync(&DriveBlock, &DriveInfo, InquiryCallback);
             }
+#if defined(VERSION_R4QK01)
+            if (GetAppType() == OS_APP_TYPE_DVD && !__OSInReboot &&
+                !__DVDCheckDevice()) {
+                OSReturnToMenu();
+            }
+#endif
         }
+
+#if defined(VERSION_R4QK01)
+        if (!__OSInIPL && !__OSInNandBoot) {
+            __OSInitPlayTime();
+        }
+#endif
 
         if (!__OSInIPL && !__OSInNandBoot && !__OSInReboot) {
             __OSStartPlayRecord();
@@ -734,7 +811,11 @@ static asm void __OSDBJump(void){
 
     entry __OSDBJUMPSTART
 
+#if defined(VERSION_R4QK01)
+    bla OS_PHYS_DB_INTEGRATOR_HOOK
+#else
     bl __OSDBJUMPDEST
+#endif
 
     entry __OSDBJUMPEND
 }
@@ -881,11 +962,21 @@ static const char* AppGameNameForSysMenu = "HAEA";
 
 const char* OSGetAppGamename(void) {
     int i;
+#if defined(VERSION_R4QK01)
+    const char* temp =
+        (const char*)OSPhysicalToCached(OS_PHYS_BOOT_PARTITION_TYPE);
+    const char* name = temp;
+#else
     const char* name =
         (const char*)OSPhysicalToCached(OS_PHYS_CURRENT_APP_NAME);
+#endif
 
     if (__OSInIPL) {
         name = AppGameNameForSysMenu;
+#if defined(VERSION_R4QK01)
+    } else if (INVALID_NAME_CHAR(*temp)) {
+        name = (const char*)OSPhysicalToCached(OS_PHYS_CURRENT_APP_NAME);
+#endif
     }
 
     for (i = 0; i < 4; i++) {

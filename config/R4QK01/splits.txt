@@ -5429,13 +5429,18 @@ RVL_SDK/dvd/dvdDeviceError.c:
 	.sdata2     start:0x8060AA70 end:0x8060AA74
 
 RVL_SDK/dvd/dvd_broadway.c:
-	.text       start:0x803A1750 end:0x803A3DF8
+	.text       start:0x803A1750 end:0x803A3E00
 	.data       start:0x80505B30 end:0x80506A38
 	.bss        start:0x80583620 end:0x805837E0
 	.sdata      start:0x80603368 end:0x80603378
 	.sbss       start:0x80605E38 end:0x80605E60
 
+RVL_SDK/esp/esp.c:
+	.text       start:0x803A3E00 end:0x803A4420 align:16
+	.sdata      start:0x80603378 end:0x80603388
+
 RVL_SDK/euart/euart.c:
+	.text       start:0x803A4420 end:0x803A47A0 align:16
 	.sbss       start:0x80605E60 end:0x80605E70
 
 RVL_SDK/exi/EXIBios.c:
@@ -5447,6 +5452,7 @@ RVL_SDK/exi/EXIBios.c:
 
 RVL_SDK/exi/EXIUart.c:
 	.text       start:0x803A60A0 end:0x803A63DC
+	.sbss       start:0x80605E78 end:0x80605E88
 
 RVL_SDK/exi/EXICommon.c:
 	.text       start:0x803A63E0 end:0x803A6568
@@ -5589,6 +5595,7 @@ RVL_SDK/os/OS.c:
 	.bss        start:0x8058A2C0 end:0x8058A330
 	.sdata      start:0x80603488 end:0x806034B8
 	.sbss       start:0x80605F88 end:0x80605FD0
+	.sdata2     start:0x8060ABF8 end:0x8060AC00
 
 RVL_SDK/os/OSAlarm.c:
 	.text       start:0x803BC960 end:0x803BD230
@@ -5618,12 +5625,20 @@ RVL_SDK/os/OSContext.c:
 	.data       start:0x80508760 end:0x80508940
 
 RVL_SDK/os/OSError.c:
-	.text       start:0x803BEAA0 end:0x803BF1EC align:16
-	.data       start:0x80508940 end:0x80508C1C
-	.bss        start:0x8058A330 end:0x8058A374
+	.text       start:0x803BEAA0 end:0x803BF1F0 align:16
+	.data       start:0x80508940 end:0x80508C20
+	.bss        start:0x8058A330 end:0x8058A380
 	.sdata      start:0x806034C8 end:0x806034D0
 
+RVL_SDK/os/OSExec.c:
+	.text       start:0x803BF1F0 end:0x803C07D0 align:16
+	.data       start:0x80508C20 end:0x80508C90
+	.bss        start:0x8058A380 end:0x8058A3A0 align:32
+	.sdata      start:0x806034D0 end:0x806034E0
+	.sbss       start:0x80605FF0 end:0x80606008
+
 RVL_SDK/os/OSFatal.c:
+	.text       start:0x803C07D0 end:0x803C1400 align:16
 	.bss        start:0x8058A3A0 end:0x8058A674
 	.sdata      start:0x806034E0 end:0x806034E4
 	.sdata2     start:0x8060AC00 end:0x8060AC40
@@ -5644,8 +5659,12 @@ RVL_SDK/os/OSMessage.c:
 	.text       start:0x803C28E0 end:0x803C2AEC
 
 RVL_SDK/os/OSMemory.c:
-	.text       start:0x803C2BC0 end:0x803C335C
+	.text       start:0x803C2BC0 end:0x803C3360
 	.data       start:0x805097D0 end:0x805097E0
+	.sbss       start:0x80606030 end:0x80606034
+
+RVL_SDK/os/OSMutex.c:
+	.text       start:0x803C3360 end:0x803C35E0
 
 RVL_SDK/os/OSReboot.c:
 	.text       start:0x803C35E0 end:0x803C3664
@@ -5653,6 +5672,7 @@ RVL_SDK/os/OSReboot.c:
 
 RVL_SDK/os/OSReset.c:
 	.text       start:0x803C3670 end:0x803C3F9C
+	.data       start:0x805097E0 end:0x80509A48
 	.sbss       start:0x80606040 end:0x80606050
 
 RVL_SDK/os/OSRtc.c:
@@ -5687,27 +5707,40 @@ RVL_SDK/os/OSStateTM.c:
 	.bss        start:0x8058B0E0 end:0x8058B1A0 align:32
 	.sbss       start:0x80606068 end:0x80606088
 
+RVL_SDK/os/__start.c:
+	.init       start:0x800060F0 end:0x800063E8
+	.sbss       start:0x80606088 end:0x8060608C
+
 RVL_SDK/os/OSPlayRecord.c:
 	.text       start:0x803C71D0 end:0x803C78EC
 	.data       start:0x805159B0 end:0x805159F8
 	.bss        start:0x8058B1A0 end:0x8058B3A0
-	.sdata      start:0x80603500 end:0x80603510
+	.sdata      start:0x80603500 end:0x80603504
+	.sbss       start:0x80606090 end:0x806060B0
 
 RVL_SDK/os/OSStateFlags.c:
-	.text       start:0x803C78F0 end:0x803C7B08
+	.text       start:0x803C78F0 end:0x803C7B08 align:16
 	.data       start:0x805159F8 end:0x80515A20
 	.bss        start:0x8058B3A0 end:0x8058B3C0 align:32
 
 RVL_SDK/os/OSNet.c:
-	.text       start:0x803C7B10 end:0x803C7BC4
+	.text       start:0x803C7B10 end:0x803C7BD0
 	.data       start:0x80515A20 end:0x80515B88
 
 RVL_SDK/os/OSNandbootInfo.c:
-	.data       start:0x80515B88 end:0x80515BA4
+	.text       start:0x803C7BD0 end:0x803C7DE0 align:16
+	.data       start:0x80515B88 end:0x80515BA8
 
-RVL_SDK/os/__start.c:
-	.init       start:0x800060F0 end:0x800063E8
-	.sbss       start:0x80606088 end:0x8060608C
+RVL_SDK/os/OSPlayTime.c:
+	.text       start:0x803C7DE0 end:0x803C85C0 align:16
+	.data       start:0x80515BA8 end:0x80515BE8
+	.bss        start:0x8058B3C0 end:0x8058B3F0
+	.sdata      start:0x80603508 end:0x80603510
+	.sbss       start:0x806060B0 end:0x806060C8
+	.sdata2     start:0x8060AC48 end:0x8060AC58
+
+RVL_SDK/os/OSLaunch.c:
+	.text       start:0x803C85C0 end:0x803C87D0 align:16
 
 RVL_SDK/os/__ppc_eabi_init.c:
 	.init       start:0x800063F0 end:0x80006454 align:16

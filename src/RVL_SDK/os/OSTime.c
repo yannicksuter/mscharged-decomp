@@ -74,15 +74,16 @@ static s32 GetLeapDays(s32 year) {
     return (year + 3) / 4 - (year - 1) / 100 + (year - 1) / 400;
 }
 
-static void GetDates(s32 days, OSCalendarTime* cal) DECOMP_DONT_INLINE {
+static void GetDates(s32 days, OSCalendarTime* cal) {
     s32 year;
     s32 totalDays;
     s32* p_days;
     s32 month;
 
+    ASSERTLINE(0 <= days, __LINE__);
+
     cal->wday = (days + 6) % WEEK_DAY_MAX;
 
-    // WTF??
     for (year = days / YEAR_DAY_MAX;
          days < (totalDays = year * YEAR_DAY_MAX + GetLeapDays(year)); year--) {
         ;

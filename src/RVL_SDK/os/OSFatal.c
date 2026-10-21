@@ -43,7 +43,11 @@ static void ScreenClear(u8* fb, u16 width, u16 height, GXColor yuv) {
 
 static void ScreenReport(void* fb, u16 width, u16 height, GXColor msgYUV, s32 x,
                          s32 y, u32 lf, const char* msg) {
+#if defined(VERSION_R4QK01)
+    u32 texel[24 / 8 * 24];
+#else
     u32 texel[70];
+#endif
     u32 charWidth;
     u8* tmp;
     u8 bright;
@@ -113,6 +117,9 @@ new_line:
 
 static void ConfigureVideo(u16 width, u16 height) {
     GXRenderModeObj rmode;
+#if defined(VERSION_R4QK01)
+    u32 tvFormat;
+#endif
 
     rmode.fbWidth = width;
     rmode.efbHeight = FATAL_FB_H;
@@ -122,7 +129,12 @@ static void ConfigureVideo(u16 width, u16 height) {
     rmode.viWidth = FATAL_FB_W;
     rmode.viHeight = height;
 
+#if defined(VERSION_R4QK01)
+    tvFormat = VIGetTvFormat();
+    switch (tvFormat) {
+#else
     switch (VIGetTvFormat()) {
+#endif
     case VI_TV_FMT_NTSC:
     case VI_TV_FMT_MPAL:
         if (VI_HW_REGS[VI_VICLK] & VI_VICLK_SPEED /* == VI_VICLK_54MHZ */) {
@@ -138,9 +150,19 @@ static void ConfigureVideo(u16 width, u16 height) {
         }
         break;
     case VI_TV_FMT_EURGB60:
+#if defined(VERSION_R4QK01)
+        if (VI_HW_REGS[VI_VICLK] & VI_VICLK_SPEED) {
+            rmode.tvInfo = VI_TVMODE(VI_TV_FMT_EURGB60, VI_SCAN_MODE_PROG);
+            rmode.viYOrigin = 0;
+            rmode.xfbMode = VI_XFB_MODE_SF;
+        } else {
+#endif
         rmode.tvInfo = VI_TVMODE(VI_TV_FMT_EURGB60, VI_SCAN_MODE_INT);
         rmode.viYOrigin = 0;
         rmode.xfbMode = VI_XFB_MODE_DF;
+#if defined(VERSION_R4QK01)
+        }
+#endif
         break;
     case VI_TV_FMT_PAL:
         rmode.tvInfo = VI_TVMODE(VI_TV_FMT_PAL, VI_SCAN_MODE_INT);
@@ -157,11 +179,9 @@ static void ConfigureVideo(u16 width, u16 height) {
 static GXColor RGB2YUV(GXColor rgb) {
     GXColor yuv;
 
-    // clang-format off
     f32 y =  ( 0.257f * rgb.r + 0.504f * rgb.g + 0.098f * rgb.b + 16.0f)  + 0.5f;
     f32 cb = (-0.148f * rgb.r - 0.291f * rgb.g + 0.439f * rgb.b + 128.0f) + 0.5f;
     f32 cr = ( 0.439f * rgb.r - 0.368f * rgb.g - 0.071f * rgb.b + 128.0f) + 0.5f;
-    // clang-format on
 
     yuv.r = CLAMP(16.0f, 235.0f, y);
     yuv.g = CLAMP(16.0f, 240.0f, cb);
@@ -227,7 +247,15 @@ void OSFatal(GXColor textColor, GXColor bgColor, const char* msg) {
     GXAbortFrame();
 
     OSSetArenaLo((void*)0x81400000);
+#if defined(VERSION_R4QK01)
+    if (!bootInfo->fstStart) {
+        OSSetArenaHi(*(void**)OSPhysicalToCached(0x3110));
+    } else {
+        OSSetArenaHi(bootInfo->fstStart);
+    }
+#else
     OSSetArenaHi(bootInfo->fstStart);
+#endif
 
     FatalParam.textColor = textColor;
     FatalParam.bgColor = bgColor;
