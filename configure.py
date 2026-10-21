@@ -1738,7 +1738,7 @@ config.libs = [
 
             # RVL_SDK/os
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/__ppc_eabi_init.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/__start.c"),
+            Object(Matching, "RVL_SDK/os/__start.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/OS.c"),
             Object(Matching, "RVL_SDK/os/OSAlarm.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/os/OSAlloc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),

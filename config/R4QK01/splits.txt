@@ -5685,7 +5685,7 @@ RVL_SDK/os/__start.c:
 	.sbss       start:0x80606088 end:0x8060608C
 
 RVL_SDK/os/__ppc_eabi_init.c:
-	.init       start:0x800063F0 end:0x80006454
+	.init       start:0x800063F0 end:0x80006454 align:16
 	.text       start:0x803C87D0 end:0x803C888C
 
 RVL_SDK/pad/Pad.c:

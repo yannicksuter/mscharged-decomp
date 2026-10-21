@@ -44,6 +44,10 @@ def align_script(script, entries, alignments):
             if entry["unit"] in units:
                 body.append(f"            . = ALIGN({units[entry['unit']]});")
             body.append(f'            "{name}" ({section})')
+        if section == ".init":
+            # The linker appends ROM-copy and BSS-initialization tables here.
+            # They belong to its generated symbol file, outside the manifest.
+            body.append("            * (.init)")
         pattern = r"(" + re.escape(section) + r"\s+ALIGN\([^\n]+?\):)\{\}"
         script, count = re.subn(
             pattern, lambda match: match[1] + "{\n" + "\n".join(body) + "\n        }", script
