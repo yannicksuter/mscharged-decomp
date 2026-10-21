@@ -5853,23 +5853,6 @@ RVL_SDK/wud/WUD.c:
 	.sbss       start:0x80606378 end:0x806063B0
 	.sdata2     start:0x8060ACF8 end:0x8060AD00
 
-RVL_SDK/bte/hcisu_h2.c:
-	.rodata     start:0x804B9648 end:0x804B9660
-	.sdata2     start:0x8060AD00 end:0x8060AD10
-
-RVL_SDK/bte/bta_dm_cfg.c:
-	.rodata     start:0x804B9660 end:0x804B96EC
-	.sdata      start:0x806035D8 end:0x806035EC
-	.sbss2      start:0x8060AF28 end:0x8060AF2C
-
-RVL_SDK/bte/bta_hh_cfg.c:
-	.rodata     start:0x804B96F0 end:0x804B96FC
-	.sdata      start:0x806035F0 end:0x806035FC
-
-RVL_SDK/bte/bta_sys_cfg.c:
-	.sdata      start:0x80603600 end:0x80603604
-	.sdata2     start:0x8060AD10 end:0x8060AD18
-
 RVL_SDK/wud/WUDHidHost.c:
 	.text       start:0x803E7310 end:0x803E7900 align:16
 	.data       start:0x80519738 end:0x805199D0
@@ -5885,22 +5868,44 @@ RVL_SDK/bte/gki_time.c:
 	.text       start:0x803E8DF0 end:0x803E9374
 
 RVL_SDK/bte/gki_ppc.c:
-	.text       start:0x803E9380 end:0x803E9684
+	.text       start:0x803E9380 end:0x803E9690
 	.bss        start:0x80591328 end:0x805B9E08
 
+RVL_SDK/bte/hcisu_h2.c:
+	.text       start:0x803E9690 end:0x803E9D50 align:16
+	.rodata     start:0x804B9648 end:0x804B9660
+	.data       start:0x80519B18 end:0x80519B88
+	.bss        start:0x805B9E08 end:0x805B9E40
+	.sdata2     start:0x8060AD00 end:0x8060AD10
+
 RVL_SDK/bte/uusb_ppc.c:
+	.text       start:0x803E9D50 end:0x803EA9D0 align:16
 	.bss        start:0x805B9E40 end:0x805BBEA0 align:32
+	.sdata      start:0x806035C8 end:0x806035D8
 	.sbss       start:0x806063B0 end:0x806063C8
 
+RVL_SDK/bte/bta_dm_cfg.c:
+	.rodata     start:0x804B9660 end:0x804B96EC
+	.sdata      start:0x806035D8 end:0x806035EC
+	.sbss2      start:0x8060AF28 end:0x8060AF2C
+
+RVL_SDK/bte/bta_hh_cfg.c:
+	.rodata     start:0x804B96F0 end:0x804B96FC
+	.sdata      start:0x806035F0 end:0x806035FC
+
+RVL_SDK/bte/bta_sys_cfg.c:
+	.sdata      start:0x80603600 end:0x80603604
+	.sdata2     start:0x8060AD10 end:0x8060AD18
+
 RVL_SDK/bte/bte_hcisu.c:
-	.text       start:0x803EA9D0 end:0x803EAAA0
+	.text       start:0x803EA9D0 end:0x803EAAA0 align:16
 	.sbss       start:0x806063C8 end:0x806063D0
 
 RVL_SDK/bte/bte_init.c:
 	.text       start:0x803EAAA0 end:0x803EAACC
 
 RVL_SDK/bte/bte_logmsg.c:
-	.text       start:0x803EAAD0 end:0x803EAC68
+	.text       start:0x803EAAD0 end:0x803EAC70
 	.bss        start:0x805BBEA0 end:0x805BC670
 	.sdata      start:0x80603608 end:0x8060360C
 
@@ -5918,6 +5923,7 @@ RVL_SDK/bte/btu_task1.c:
 
 RVL_SDK/bte/bd.c:
 	.text       start:0x803EB224 end:0x803EB2F8
+	.sbss2      start:0x8060AF30 end:0x8060AF38
 
 RVL_SDK/bte/bta_sys_conn.c:
 	.text       start:0x803EB2F8 end:0x803EB54C
@@ -6021,6 +6027,7 @@ RVL_SDK/bte/btu_hcif.c:
 
 RVL_SDK/bte/btu_init.c:
 	.text       start:0x803FC79C end:0x803FC814
+	.sdata2     start:0x8060AD50 end:0x8060AD58
 
 RVL_SDK/bte/wbt_ext.c:
 	.text       start:0x803FC814 end:0x803FC8F4

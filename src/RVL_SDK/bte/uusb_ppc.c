@@ -20,6 +20,13 @@
 #undef NULL
 #define NULL ((void*)(0))
 
+#if defined(VERSION_R4QK01)
+#define UUSB_DBG 0
+#else
+#define UUSB_DBG 1
+#endif
+
+#if UUSB_DBG
 #define UUSBDBG(param, ...)               \
     do                                    \
     {                                     \
@@ -33,6 +40,10 @@
         if (usb.trace_state) \
             OSReport(param); \
     } while (FALSE)
+#else
+#define UUSBDBG(param, ...) do {} while (FALSE)
+#define UUSBDBG0(param) do {} while (FALSE)
+#endif
 
 typedef struct
 {
@@ -217,6 +228,7 @@ static void uusb_ReadIntrDataCB(long ret, void* p_args)
     cp_len = (cp_len >> 2 << 2) + 4; // round up to 4
     memcpy(p_buf1, p_recv_buf, cp_len);
 
+#if UUSB_DBG
     UUSBDBG("HCISU_LOG: uusb_ReadIntrDataCB: len(%d) offset (%d) cp_len(%d) data = ",
         p_buf1->len,
         p_buf1->offset,
@@ -227,6 +239,7 @@ static void uusb_ReadIntrDataCB(long ret, void* p_args)
         UUSBDBG("%02x ", p[i]);
     }
     UUSBDBG0("\n");
+#endif
 
     OSSwitchFiberEx((unsigned long)p_buf1, 0, 0, 0, &bta_ci_hci_msg_handler, __uusb_ppc_stack1 + sizeof __uusb_ppc_stack1);
 
@@ -280,6 +293,7 @@ static void uusb_ReadBulkDataCB(long ret, void* p_args)
     cp_len = (cp_len >> 2 << 2) + 4;
     memcpy(p_buf1, p_recv_buf, cp_len);
 
+#if UUSB_DBG
     UUSBDBG("HCISU_LOG: uusb_ReadBulkDataCB: len(%d) offset(%d) cp_len(%d) data = ",
         p_buf1->len,
         p_buf1->offset,
@@ -290,6 +304,7 @@ static void uusb_ReadBulkDataCB(long ret, void* p_args)
         UUSBDBG("%02x ", p[i]);
     }
     UUSBDBG0("\n");
+#endif
 
     p_buf1 = (HC_BT_HDR*)l2cap_link_chk_pkt_start((BT_HDR*)p_buf1);
 
@@ -312,6 +327,7 @@ static void uusb_issue_bulk_read(void)
     void* p_buffer;
     IPCResult ret;
 
+#if UUSB_DBG
     for (;;)
     {
         p_buf = GKI_getpoolbuf(usb.acl_buffer_pool);
@@ -319,6 +335,12 @@ static void uusb_issue_bulk_read(void)
             break;
         UUSBDBG0("HCISU_ERR: ****\n* uusb_issue_bulk_read(): unable to get buffer - try again\n****\n");
     }
+#else
+    do
+    {
+        p_buf = GKI_getpoolbuf(usb.acl_buffer_pool);
+    } while (!p_buf);
+#endif
 
     p_buf->event = 0x1100;
     p_buf->len = 0;
@@ -343,6 +365,7 @@ static void uusb_issue_intr_read(void)
     void* p_buffer = NULL;
     IPCResult ret;
 
+#if UUSB_DBG
     for (;;)
     {
         p_buf = GKI_getpoolbuf(usb.cmd_buffer_pool);
@@ -350,6 +373,12 @@ static void uusb_issue_intr_read(void)
             break;
         UUSBDBG0("HCISU_ERR: ****\n* uusb_issue_intr_read(): unable to get buffer - try again\n****\n");
     }
+#else
+    do
+    {
+        p_buf = GKI_getpoolbuf(usb.cmd_buffer_pool);
+    } while (!p_buf);
+#endif
 
     p_buf->event = 0x1000;
     p_buf->len = 0;
@@ -638,12 +667,14 @@ UINT16 UUSB_Write(UINT8 param_1, void* p_data, UINT16 len, void* param_4)
         return 0;
     }
 
+#if UUSB_DBG
     UUSBDBG("HCISU_LOG: buffer size = %d\n",
         GKI_get_buf_size(param_4) - sizeof(HC_BT_HDR));
     UUSBDBG("HCISU_LOG: UUSB_Write: ep(%d) len(%d) data = ", param_1, len);
     for (sp18 = 0; sp18 < len; ++sp18)
         UUSBDBG("%02x ", *((UINT8*)p_data + sp18));
     UUSBDBG0("\n");
+#endif
 
     switch (param_1)
     {
