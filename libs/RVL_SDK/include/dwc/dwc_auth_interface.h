@@ -12,6 +12,8 @@ extern "C"
 
 #if defined(VERSION_R4QK01)
     BOOL DWCi_Auth_InitInterface(DWC_AuthServer);
+    void fn_80475700(void);
+    BOOL fn_80475730(void);
 #else
     void DWCi_Auth_InitInterface(DWC_AuthServer);
 #endif

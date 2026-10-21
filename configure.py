@@ -1473,15 +1473,15 @@ config.libs = [
 
             # RVL_SDK/dwc
             Object(Matching, "RVL_SDK/dwc/dwc_account.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_auth_interface.c", cflags=cflags_rvl_dwc),
+            Object(Matching, "RVL_SDK/dwc/dwc_auth_interface.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_auth_interface.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_auth_interface.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_base64.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_encsession.c", cflags=cflags_rvl_dwc),
+            Object(Matching, "RVL_SDK/dwc/dwc_encsession.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_error.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_ghttp.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_init.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_init.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc),
+            Object(Matching, "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_main.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_main.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_match.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_match.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_memfunc.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
@@ -1489,6 +1489,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/dwc/dwc_nonport.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_nonport.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_nonport.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_ranking.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_ranksession.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/dwc/dwc_reliable.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/dwc_reliable.c" if config.version == "R4QK01" else False, mw_version="Wii/1.0"),
             Object(Matching, "RVL_SDK/dwc/dwc_report.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_transport.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_transport.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwci_np_math.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
@@ -1799,7 +1800,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/sp/sp.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/ssl
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ssl/ssl_api.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ssl/ssl_api.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ssl/ssl_mutex.c"),
 
             # RVL_SDK/thp
@@ -1987,7 +1988,7 @@ config.libs = [
             # RVL_SDK/net
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/net/hmac.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/net/md5.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/net/neterrorcode.c", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline on"]),
+            Object(Matching, "RVL_SDK/net/neterrorcode.c", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/net/NETVersion.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/net/wireless_macaddr.c"),
 

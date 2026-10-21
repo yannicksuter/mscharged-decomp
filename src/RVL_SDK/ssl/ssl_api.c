@@ -20,10 +20,20 @@ enum
     SSL_IOCTL_SET_CLIENT_CERT_DEFAULT,
     SSL_IOCTL_SET_ROOT_CA = 10,
     SSL_IOCTL_SET_ROOT_CA_DEFAULT,
+#if defined(VERSION_R4QK01)
+    SSL_IOCTL_SET_BUILTIN_ROOT_CA = 13,
+    SSL_IOCTL_SET_BUILTIN_CLIENT_CERT,
+#endif
 };
 
 #define MAX_IOS_VECS 4
 
+#if defined(VERSION_R4QK01)
+const char* __SSLVersion =
+    "<< RVL_SDK - SSL \trelease build: May 12 2009 09:12:41 (0x4199_60831) >>";
+
+static BOOL sslRegistered = FALSE;
+#endif
 static s32 l_initialized = 0;
 
 static SSLResult SSL_read(s32 fd, SSLId i_sslId, char* o_buf, u32 i_bufSize);
@@ -35,6 +45,14 @@ static u32 SSL_strnlen(const char* s, u32 n);
 SSLId SSLNew(u32 i_verifyOption, const char* i_serverName)
 {
     s32 fd = OPEN_SSL_IOS();
+
+#if defined(VERSION_R4QK01)
+    if (!sslRegistered)
+    {
+        OSRegisterVersion(__SSLVersion);
+        sslRegistered = TRUE;
+    }
+#endif
 
     if (fd < 0)
     {
@@ -156,7 +174,11 @@ SSLResult SSLRead(SSLId i_sslId, char* o_buf, u32 i_bufSize)
     }
     else
     {
+#if defined(VERSION_R4QK01)
+        u32 bufSize = i_bufSize > SSL_BUFFER_MAX_LENGTH ? SSL_BUFFER_MAX_LENGTH : i_bufSize;
+#else
         u32 bufSize = i_bufSize;
+#endif
         char tmp[32] ALIGN(32);
         u32 align = (u32)o_buf & 31;
         u32 front_bytes = align != 0 ? (32 - align) : 0;
@@ -559,6 +581,76 @@ SSLResult SSLSetRootCADefault(SSLId i_sslId)
         return *result;
     }
 }
+
+#if defined(VERSION_R4QK01)
+SSLResult SSLSetBuiltinRootCA(SSLId i_sslId, u32 i_rootCAId)
+{
+    s32 fd = OPEN_SSL_IOS();
+
+    if (fd < 0)
+    {
+        return SSL_RESULT_INVALID;
+    }
+    else
+    {
+        IPCIOVector vec[MAX_IOS_VECS] ALIGN(32);
+        SSLResult result[SSL_MAX] ALIGN(32);
+        SSLId ssl_id[SSL_MAX] ALIGN(32);
+        u32 rootCAId[SSL_MAX] ALIGN(32);
+        s32 err;
+
+        *result = SSL_RESULT_INVALID;
+        *ssl_id = i_sslId;
+        *rootCAId = i_rootCAId;
+
+        vec[0].base = (void*)result;
+        vec[0].length = sizeof(result);
+        vec[1].base = (void*)ssl_id;
+        vec[1].length = sizeof(ssl_id);
+        vec[2].base = (void*)rootCAId;
+        vec[2].length = sizeof(rootCAId);
+
+        err = IOS_Ioctlv(fd, SSL_IOCTL_SET_BUILTIN_ROOT_CA, 1, 2, vec);
+        IOS_Close(fd);
+
+        return *result;
+    }
+}
+
+SSLResult SSLSetBuiltinClientCert(SSLId i_sslId, u32 i_clientCertId)
+{
+    s32 fd = OPEN_SSL_IOS();
+
+    if (fd < 0)
+    {
+        return SSL_RESULT_INVALID;
+    }
+    else
+    {
+        IPCIOVector vec[MAX_IOS_VECS] ALIGN(32);
+        SSLResult result[SSL_MAX] ALIGN(32);
+        SSLId ssl_id[SSL_MAX] ALIGN(32);
+        u32 clientCertId[SSL_MAX] ALIGN(32);
+        s32 err;
+
+        *result = SSL_RESULT_INVALID;
+        *ssl_id = i_sslId;
+        *clientCertId = i_clientCertId;
+
+        vec[0].base = (void*)result;
+        vec[0].length = sizeof(result);
+        vec[1].base = (void*)ssl_id;
+        vec[1].length = sizeof(ssl_id);
+        vec[2].base = (void*)clientCertId;
+        vec[2].length = sizeof(clientCertId);
+
+        err = IOS_Ioctlv(fd, SSL_IOCTL_SET_BUILTIN_CLIENT_CERT, 1, 2, vec);
+        IOS_Close(fd);
+
+        return *result;
+    }
+}
+#endif
 
 static SSLResult SSL_read(s32 fd, SSLId i_sslId, char* o_buf, u32 i_bufSize)
 {

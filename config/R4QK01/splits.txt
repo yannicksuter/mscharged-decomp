@@ -6316,7 +6316,11 @@ RVL_SDK/nhttp/d_nhttp_common.c:
 	.sbss       start:0x80606498 end:0x806064A0
 
 RVL_SDK/ssl/ssl_api.c:
+	.text       start:0x80427C68 end:0x804289B4
+	.data       start:0x805208B0 end:0x80520908
 	.bss        start:0x805CF400 end:0x805D2420
+	.sdata      start:0x806038A8 end:0x806038B0
+	.sbss       start:0x806064A0 end:0x806064A8
 
 RVL_SDK/ssl/ssl_mutex.c:
 	.text       start:0x804289B4 end:0x804289C0
@@ -6375,6 +6379,10 @@ RVL_SDK/vf/d_common.c:
 
 RVL_SDK/vf/sd_drv.c:
 	.text       start:0x804299B0 end:0x804299B4
+
+RVL_SDK/net/neterrorcode.c:
+	.text       start:0x804299B4 end:0x80429E24
+	.data       start:0x80520908 end:0x80520928
 
 RVL_SDK/net/md5.c:
 	.text       start:0x8042A2F4 end:0x8042AA20
@@ -6612,7 +6620,7 @@ RVL_SDK/dwc/dwc_friend.c:
 	.sbss       start:0x80606500 end:0x80606510
 
 RVL_SDK/dwc/dwc_login.c:
-	.text       start:0x80452290 end:0x80453168 align:16
+	.text       start:0x80452290 end:0x80453170 align:16
 	.data       start:0x805257A0 end:0x80525C18
 	.sbss       start:0x80606510 end:0x80606518
 
@@ -6630,6 +6638,11 @@ RVL_SDK/dwc/dwc_match.c:
 	.bss        start:0x805FC1C8 end:0x805FC900
 	.sdata      start:0x80603920 end:0x80603A10
 	.sbss       start:0x80606520 end:0x80606540
+
+RVL_SDK/dwc/dwc_reliable.c:
+	.text       start:0x8046F9B0 end:0x8046FCB0 align:16
+	.data       start:0x805295C0 end:0x805295F8
+	.sbss       start:0x80606540 end:0x80606548
 
 RVL_SDK/dwc/dwc_transport.c:
 	.text       start:0x8046FCB0 end:0x804711D0 align:16
@@ -6653,12 +6666,18 @@ RVL_SDK/dwc/dwc_account.c:
 	.sdata      start:0x80603A28 end:0x80603A30
 
 RVL_SDK/dwc/dwc_auth_interface.c:
-	.text       start:0x80474AF0 end:0x80476E48 align:16
+	.text       start:0x80474AF0 end:0x80476E50 align:16
 	.data       start:0x80529CB8 end:0x8052A4C0
+	.bss        start:0x805FC940 end:0x805FCDF8 align:32
 	.sdata      start:0x80603A30 end:0x80603B58
+	.sbss       start:0x80606560 end:0x80606570
 
 RVL_SDK/dwc/dwc_encsession.c:
+	.text       start:0x80476E50 end:0x80478380 align:16
+	.rodata     start:0x804BE588 end:0x804BE5B0
 	.data       start:0x8052A4C0 end:0x8052A690
+	.sdata      start:0x80603B58 end:0x80603B80
+	.sbss       start:0x80606570 end:0x80606578
 
 RVL_SDK/dwc/dwc_nastime.c:
 	.text       start:0x80478380 end:0x80478470
