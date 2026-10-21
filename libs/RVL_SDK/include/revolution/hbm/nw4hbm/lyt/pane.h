@@ -40,7 +40,7 @@ enum {
     /* 1 */ ANIMOPTION_SKIP_INVISIBLE = (1 << 0),
 };
 
-class Pane : detail::PaneBase {
+class Pane : public detail::PaneBase {
 private:
     enum {
         /* 0 */ BIT_VISIBLE = 0,

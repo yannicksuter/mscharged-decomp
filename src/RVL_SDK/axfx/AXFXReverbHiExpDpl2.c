@@ -207,6 +207,10 @@ void AXFXReverbHiExpCallbackDpl2(AXFX_BUFFERUPDATE_DPL2* bufferUpdate,
                        earlyLine[fx->earlyPos[1]] * fx->earlyCoef[1] +
                        earlyLine[fx->earlyPos[2]] * fx->earlyCoef[2];
 
+#if defined(VERSION_R4QK01)
+            earlyLine[fx->earlyPos[2]] = data;
+#endif
+
             if (fx->preDelayLength != 0) {
                 preDelayLine = fx->preDelayLine[ch];
                 preDelayOut = preDelayLine[fx->preDelayPos];

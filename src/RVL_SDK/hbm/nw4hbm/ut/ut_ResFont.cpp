@@ -182,7 +182,7 @@ FontInformation* ResFont::Rebuild(BinaryFileHeader* fileHeader) {
                 break;
 
             default:
-                nw4hbm::db::Panic(__FILE__, 345, "The font has unknown block('%c%c%c%c').", blockHeader->kind >> 24,
+                NW4HBMPanicMessage_Line(345, "The font has unknown block('%c%c%c%c').", blockHeader->kind >> 24,
                                   (blockHeader->kind >> 16) & 0xFF, (blockHeader->kind >> 8) & 0xFF,
                                   blockHeader->kind & 0xFF);
                 return NULL;

@@ -70,8 +70,13 @@ typedef struct _AXSTUDIO {
 #pragma pack(pop)
 
 AXSTUDIO* __AXGetStudio(void);
+#if defined(VERSION_R4QK01)
+void __AXDepopFadeMain(s32* all, s32* value, s16* depop);
+void __AXDepopFadeRmt(s32* all, s32* value, s16* depop);
+#else
 void __AXDepopFadeMain(s32* all, s32* value, s16* depop) DECOMP_DONT_INLINE;
 void __AXDepopFadeRmt(s32* all, s32* value, s16* depop) DECOMP_DONT_INLINE;
+#endif
 void __AXPrintStudio(void);
 void __AXSPBInit(void);
 void __AXDepopVoice(AXPB* pb);

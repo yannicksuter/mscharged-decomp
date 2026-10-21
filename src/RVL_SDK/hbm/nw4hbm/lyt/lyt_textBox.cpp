@@ -1,3 +1,5 @@
+#include "revolution/hbm/nw4hbm/lyt/textBox.h"
+
 #include "revolution/hbm/nw4hbm/ut/CharStrmReader.h"
 #include "revolution/hbm/nw4hbm/ut/Font.h"
 #include "revolution/hbm/nw4hbm/ut/ResFont.h"
@@ -6,7 +8,6 @@
 #include "revolution/hbm/nw4hbm/lyt/layout.h"
 #include "revolution/hbm/nw4hbm/lyt/material.h"
 #include "revolution/hbm/nw4hbm/lyt/pane.h"
-#include "revolution/hbm/nw4hbm/lyt/textBox.h"
 
 #include <new.h>
 

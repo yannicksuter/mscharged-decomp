@@ -208,7 +208,7 @@ u16 ResFontBase::FindGlyphIndex(const FontCodeMap* pMap, u16 c) const {
         } break;
 
         default:
-            nw4hbm::db::Panic(__FILE__, 597, "unknwon MAPMETHOD");
+            NW4HBMPanicMessage_Line(597, "unknwon MAPMETHOD");
             break;
     }
 
