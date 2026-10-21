@@ -5401,25 +5401,27 @@ RVL_SDK/dvd/dvdfs.c:
 	.text       start:0x8039B520 end:0x8039B9E8
 	.data       start:0x80504C90 end:0x80504D90
 	.sdata      start:0x80603330 end:0x80603340
+	.sbss       start:0x80605D58 end:0x80605D78
 
 RVL_SDK/dvd/dvd.c:
 	.text       start:0x8039B9F0 end:0x803A05B4
 	.data       start:0x80504D90 end:0x805051A0
 	.bss        start:0x8057E6C0 end:0x80583370
 	.sdata      start:0x80603340 end:0x80603358
-	.sbss       start:0x80605D80 end:0x80605E18
+	.sbss       start:0x80605D80 end:0x80605E18 align:32
 
 RVL_SDK/dvd/dvdqueue.c:
 	.text       start:0x803A05C0 end:0x803A0840
 	.bss        start:0x80583370 end:0x80583390
 
 RVL_SDK/dvd/dvderror.c:
-	.text       start:0x803A0840 end:0x803A1258
+	.text       start:0x803A0840 end:0x803A1260 align:16
 	.data       start:0x805051A0 end:0x805051D0
-	.sbss       start:0x80605E20 end:0x80605E24
+	.bss        start:0x805833A0 end:0x80583600 align:32
+	.sbss       start:0x80605E18 end:0x80605E24
 
 RVL_SDK/dvd/dvdidutils.c:
-	.text       start:0x803A1260 end:0x803A1350
+	.text       start:0x803A1260 end:0x803A1350 align:16
 
 RVL_SDK/dvd/dvdDeviceError.c:
 	.text       start:0x803A14C0 end:0x803A174C
@@ -6298,9 +6300,6 @@ RVL_SDK/nhttp/NHTTP_thread.c:
 	.data       start:0x805204A8 end:0x80520578
 	.sdata      start:0x80603838 end:0x80603898
 
-RVL_SDK/vf/pf_cp932.c:
-	.rodata     start:0x804B9D88 end:0x804BDFFC
-
 RVL_SDK/nhttp/d_nhttp_private.c:
 	.text       start:0x80426648 end:0x80426978
 
@@ -6316,23 +6315,66 @@ RVL_SDK/nhttp/d_nhttp_common.c:
 	.bss        start:0x805CE720 end:0x805CF400
 	.sbss       start:0x80606498 end:0x806064A0
 
-RVL_SDK/vf/pf_filelock.c:
-	.sbss       start:0x806064A8 end:0x806064AC
-
-RVL_SDK/vf/d_vf.c:
-	.sbss       start:0x806064B0 end:0x806064B8
-
-RVL_SDK/vf/d_vf_sys.c:
-	.sbss       start:0x806064B8 end:0x806064D0
-
 RVL_SDK/ssl/ssl_api.c:
 	.bss        start:0x805CF400 end:0x805D2420
 
 RVL_SDK/ssl/ssl_mutex.c:
 	.text       start:0x804289B4 end:0x804289C0
 
+RVL_SDK/vf/pf_clib.c:
+	.text       start:0x804289C0 end:0x80428AC0
+
+RVL_SDK/vf/pf_code.c:
+	.text       start:0x80428AC0 end:0x80428AE0
+
 RVL_SDK/vf/pdm_dskmng.c:
-	.text       start:0x80428AE0 end:0x80428C08
+	.text       start:0x80428AE0 end:0x80428C10
+	.bss        start:0x805D2420 end:0x805D2FF0
+
+RVL_SDK/vf/pf_fatfs.c:
+	.text       start:0x80428C10 end:0x80428C20
+
+RVL_SDK/vf/pf_volume.c:
+	.text       start:0x80428C20 end:0x80428DB0
+	.bss        start:0x805D2FF0 end:0x805FAD40
+
+RVL_SDK/vf/pf_cp932.c:
+	.text       start:0x80428DB0 end:0x804292B0
+	.rodata     start:0x804B9D88 end:0x804BDFFC
+
+RVL_SDK/vf/pf_api_util.c:
+	.text       start:0x804292B0 end:0x804292C0
+
+RVL_SDK/vf/pf_init_prfile2.c:
+	.text       start:0x804292C0 end:0x80429300
+
+RVL_SDK/vf/pf_filelock.c:
+	.text       start:0x80429300 end:0x80429310
+
+RVL_SDK/vf/pf_system.c:
+	.text       start:0x80429310 end:0x80429320
+	.sbss       start:0x806064A8 end:0x806064AC
+
+RVL_SDK/vf/d_vf.c:
+	.text       start:0x80429320 end:0x80429480
+	.bss        start:0x805FAD40 end:0x805FAD58 align:32
+	.sbss       start:0x806064B0 end:0x806064B8
+
+RVL_SDK/vf/d_vf_sys.c:
+	.text       start:0x80429480 end:0x804297B0
+	.bss        start:0x805FAD58 end:0x805FADC0
+	.sbss       start:0x806064B8 end:0x806064D0
+
+RVL_SDK/vf/d_hash.c:
+	.text       start:0x804297B0 end:0x804298C0
+	.bss        start:0x805FADC0 end:0x805FAFF0
+
+RVL_SDK/vf/d_common.c:
+	.text       start:0x804298C0 end:0x804299B0
+	.bss        start:0x805FAFF0 end:0x805FB1F8
+
+RVL_SDK/vf/sd_drv.c:
+	.text       start:0x804299B0 end:0x804299B4
 
 RVL_SDK/net/md5.c:
 	.text       start:0x8042A2F4 end:0x8042AA20

@@ -81,7 +81,10 @@ s32 VFiPFAPI_convertError(s32 err) {
 }
 
 s32 VFiPFAPI_convertReturnValue(s32 err) {
-    return (-err | err) >> 31;
+    if (err == 0) {
+        return 0;
+    }
+    return -1;
 }
 
 void* VFiPFAPI_convertReturnValue2NULL(s32 err, void* p_stream) {

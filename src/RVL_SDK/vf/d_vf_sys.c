@@ -33,11 +33,20 @@ static struct PDM_INIT_DISK l_dev_init_info_table[26];
 
 static struct PDM_INIT_DISK l_dev_nandflash_init_info;
 
+#if defined(VERSION_R4QK01)
+static u32 l_vfsys_vol_max = 0;
+static s32 l_vfsys_last_err = 0;
+static struct MEMiHeapHead* l_vfsys_exp_heap_handle = NULL;
+static s32 l_vfsys_dev_table_init = 0;
+static struct VF_HANDLE_TYPE* l_sys_handle_table_p = NULL;
+static VFSysTimeStampCallback l_timeStampCallback = NULL;
+#else
 static struct VF_HANDLE_TYPE* l_sys_handle_table_p;
 static s32 l_vfsys_dev_table_init;
 static struct MEMiHeapHead* l_vfsys_exp_heap_handle;
 static s32 l_vfsys_last_err;
 static u32 l_vfsys_vol_max;
+#endif
 
 
 static s32 VFSysCheckExistPrfFile_nandflash(struct VF_HANDLE_DEVICE* i_device_p, const s8* i_prf_file_name_p, void* i_memory_p, u32 i_handle_idx);
@@ -452,6 +461,14 @@ void VFSysFinalize(void) {
 
     l_vfsys_vol_max = 0;
 }
+
+#if defined(VERSION_R4QK01)
+VFSysTimeStampCallback VFSysSetTimeStampCallback(VFSysTimeStampCallback callback) {
+    VFSysTimeStampCallback previous = l_timeStampCallback;
+    l_timeStampCallback = callback;
+    return previous;
+}
+#endif
 
 static void VFSys_set_device_err_info(struct VF_HANDLE_TYPE* o_handle_p, s32 i_err) {
     if (o_handle_p != NULL && o_handle_p->drive.pf_disk_p != NULL) {
