@@ -116,7 +116,9 @@ void Pane::RemoveChild(Pane* pChild) {
     pChild->mpParent = NULL;
 }
 
+#if !defined(VERSION_R4QK01)
 #pragma ppc_iro_level 0
+#endif
 
 const ut::Rect Pane::GetPaneRect(const DrawInfo& drawInfo) const {
     ut::Rect ret;
@@ -135,7 +137,9 @@ const ut::Rect Pane::GetPaneRect(const DrawInfo& drawInfo) const {
     return ret;
 }
 
+#if !defined(VERSION_R4QK01)
 #pragma ppc_iro_level reset
+#endif
 
 ut::Color Pane::GetVtxColor(u32) const { return ut::Color(0xFFFFFFFF); }
 

@@ -6298,23 +6298,107 @@ RVL_SDK/hbm/HBMBase.cpp:
 	.data       start:0x80521228 end:0x80521F18
 	.bss        start:0x805FB3B8 end:0x805FB3D8
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_animation.cpp:
+	.text       start:0x80437060 end:0x80437C10 align:16
+	.rodata     start:0x804BE3E0 end:0x804BE400
+	.data       start:0x80521F18 end:0x80521F98
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_arcResourceAccessor.cpp:
+	.text       start:0x80437C10 end:0x80437FB0 align:16
+	.data       start:0x80521F98 end:0x80522018
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_bounding.cpp:
+	.text       start:0x80437FB0 end:0x80438130 align:16
+	.ctors      start:0x804B0E6C end:0x804B0E70
+	.data       start:0x80522018 end:0x80522100
+	.bss        start:0x805FB3D8 end:0x805FB3E0
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_common.cpp:
 	.text       start:0x80438130 end:0x80438FC0 align:16
 	.rodata     start:0x804BE400 end:0x804BE410
 	.bss        start:0x805FB3E0 end:0x805FB408
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_drawInfo.cpp:
+	.text       start:0x80438FC0 end:0x80439080 align:16
+	.rodata     start:0x804BE410 end:0x804BE418
+	.data       start:0x80522100 end:0x80522130
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_group.cpp:
+	.text       start:0x80439080 end:0x804393D0 align:16
+	.data       start:0x80522130 end:0x80522158
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_layout.cpp:
+	.text       start:0x804393D0 end:0x8043A070 align:16
+	.rodata     start:0x804BE418 end:0x804BE420
+	.data       start:0x80522158 end:0x805221A8
+	.bss        start:0x805FB408 end:0x805FB410
 
 RVL_SDK/hbm/nw4hbm/lyt/lyt_material.cpp:
 	.text       start:0x8043A070 end:0x8043D2E0 align:16
 	.rodata     start:0x804BE420 end:0x804BE450
 	.data       start:0x805221A8 end:0x80522230
 
+RVL_SDK/hbm/nw4hbm/lyt/lyt_pane.cpp:
+	.text       start:0x8043D2E0 end:0x8043E2D0 align:16
+	.ctors      start:0x804B0E70 end:0x804B0E74
+	.rodata     start:0x804BE450 end:0x804BE470
+	.data       start:0x80522230 end:0x80522298
+	.bss        start:0x805FB410 end:0x805FB418
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp:
+	.text       start:0x8043E2D0 end:0x8043E824 align:16
+	.ctors      start:0x804B0E74 end:0x804B0E78
+	.rodata     start:0x804BE470 end:0x804BE474
+	.data       start:0x80522298 end:0x80522338
+	.bss        start:0x805FB418 end:0x805FB420
+
 RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp:
-	.text       start:0x8043E830 end:0x8043E888
+	.text       start:0x8043E830 end:0x8043E888 align:16
+	.data       start:0x80522338 end:0x80522350
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_textBox.cpp:
+	.text       start:0x8043E890 end:0x8043FCD4 align:16
+	.ctors      start:0x804B0E78 end:0x804B0E7C
+	.rodata     start:0x804BE478 end:0x804BE490
+	.data       start:0x80522350 end:0x80522400
+	.bss        start:0x805FB420 end:0x805FB428
+
+RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp:
+	.text       start:0x8043FCE0 end:0x804421D4 align:16
+	.ctors      start:0x804B0E7C end:0x804B0E80
+	.rodata     start:0x804BE490 end:0x804BE4A8
+	.data       start:0x80522400 end:0x805224E8
+	.bss        start:0x805FB428 end:0x805FB430
 
 RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 	.text       start:0x804421E0 end:0x80442490 align:16
 	.rodata     start:0x804BE4A8 end:0x804BE4D0
 	.data       start:0x805224E8 end:0x80523600
+
+RVL_SDK/hbm/nw4hbm/ut/ut_CharWriter.cpp:
+	.text       start:0x80442630 end:0x8044402C align:16
+	.rodata     start:0x804BE4D0 end:0x804BE4F0
+	.bss        start:0x805FB430 end:0x805FB448
+
+RVL_SDK/hbm/nw4hbm/ut/ut_ResFont.cpp:
+	.text       start:0x80444360 end:0x80444660 align:16
+	.data       start:0x80523630 end:0x80523710
+
+RVL_SDK/hbm/nw4hbm/ut/ut_ResFontBase.cpp:
+	.text       start:0x80444660 end:0x80444CB0 align:16
+	.data       start:0x80523710 end:0x805237D0
+
+RVL_SDK/hbm/nw4hbm/ut/ut_TagProcessorBase.cpp:
+	.text       start:0x80444CB0 end:0x80445770 align:16
+	.rodata     start:0x804BE4F0 end:0x804BE4F8
+	.data       start:0x805237D0 end:0x80523858
+
+RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp:
+	.text       start:0x80445770 end:0x8044ABD4 align:16
+	.ctors      start:0x804B0E80 end:0x804B0E84
+	.rodata     start:0x804BE4F8 end:0x804BE50C
+	.data       start:0x80523858 end:0x80523860
+	.bss        start:0x805FB448 end:0x805FB478
 
 RVL_SDK/hbm/sound/mix.cpp:
 	.text       start:0x8044ABE0 end:0x8044C550 align:16

@@ -309,43 +309,53 @@ void Layout::SetTagProcessor(ut::TagProcessorBase<wchar_t>* pTagProcessor) {
 }
 
 Pane* Layout::BuildPaneObj(s32 kind, const void* dataPtr, const ResBlockSet& resBlockSet) {
+    Pane* pPane;
+
     switch (kind) {
         case res::OBJECT_SIGNATURE_PANE: {
             const res::Pane* pResPane = static_cast<const res::Pane*>(dataPtr);
 
-            return CreateObject<Pane>(pResPane);
+            pPane = CreateObject<Pane>(pResPane);
+            break;
         }
 
         case res::OBJECT_SIGNATURE_PICTURE: {
             const res::Picture* pResPic = static_cast<const res::Picture*>(dataPtr);
 
-            return CreateObject<Picture>(pResPic, resBlockSet);
+            pPane = CreateObject<Picture>(pResPic, resBlockSet);
+            break;
         }
 
         case res::OBJECT_SIGNATURE_TEXT_BOX: {
             // block?
             const res::TextBox* pBlock = static_cast<const res::TextBox*>(dataPtr);
 
-            return CreateObject<TextBox>(pBlock, resBlockSet);
+            pPane = CreateObject<TextBox>(pBlock, resBlockSet);
+            break;
         }
 
         case res::OBJECT_SIGNATURE_WINDOW: {
             // block?
             const res::Window* pBlock = static_cast<const res::Window*>(dataPtr);
 
-            return CreateObject<Window>(pBlock, resBlockSet);
+            pPane = CreateObject<Window>(pBlock, resBlockSet);
+            break;
         }
 
         case res::OBJECT_SIGNATURE_BOUNDING: {
             const res::Bounding* pResBounding = static_cast<const res::Bounding*>(dataPtr);
 
-            return CreateObject<Bounding>(pResBounding, resBlockSet);
+            pPane = CreateObject<Bounding>(pResBounding, resBlockSet);
+            break;
         }
 
         default:
             NW4HBMPanicMessage_Line(503, "unknown data type");
-            return NULL;
+            pPane = NULL;
+            break;
     }
+
+    return pPane;
 }
 
 } // namespace lyt
