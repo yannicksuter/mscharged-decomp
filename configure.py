@@ -1428,13 +1428,13 @@ config.libs = [
 
             # RVL_SDK/ax
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AX.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AXAlloc.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AXAux.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AXCL.c"),
+            Object(Matching, "RVL_SDK/ax/AXAlloc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/ax/AXAux.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/ax/AXCL.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ax/AXComp.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AXOut.c"),
+            Object(Matching, "RVL_SDK/ax/AXOut.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ax/AXProf.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AXSPB.c"),
+            Object(Matching, "RVL_SDK/ax/AXSPB.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-inline noauto"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/ax/AXVPB.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/DSPCode.c"),
 
@@ -1444,8 +1444,8 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXHooks.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHi.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHiDpl2.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHiExp.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHiExpDpl2.c"),
+            Object(Matching, "RVL_SDK/axfx/AXFXReverbHiExp.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/axfx/AXFXReverbHiExpDpl2.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/base
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/base/PPCArch.c"),
@@ -1669,6 +1669,15 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/ut/ut_ResFontBase.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/ut/ut_TagProcessorBase.cpp", cflags=cflags_rvl_hbm),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/hbm/nw4hbm/ut/ut_TextWriterBase.cpp", cflags=cflags_rvl_hbm),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/mix.cpp", source="RVL_SDK/hbm/sound/mix.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/syn.cpp", source="RVL_SDK/hbm/sound/syn.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synctrl.cpp", source="RVL_SDK/hbm/sound/synctrl.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synenv.cpp", source="RVL_SDK/hbm/sound/synenv.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synmix.cpp", source="RVL_SDK/hbm/sound/synmix.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synpitch.cpp", source="RVL_SDK/hbm/sound/synpitch.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synsample.cpp", source="RVL_SDK/hbm/sound/synsample.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/synvoice.cpp", source="RVL_SDK/hbm/sound/synvoice.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/hbm/sound/seq.cpp", source="RVL_SDK/hbm/sound/seq.cpp" if config.version == "R4QK01" else False, cflags=cflags_rvl_hbm, mw_version="Wii/1.0a", extra_cflags=["-UHBM_ASSERT", "-sdata 0", "-sdata2 0", "-func_align 16", "-RTTI on"]),
 
             # RVL_SDK/ipc
             Object(Matching, "RVL_SDK/ipc/ipcclt.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),

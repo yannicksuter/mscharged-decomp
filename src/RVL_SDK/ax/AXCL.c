@@ -50,6 +50,10 @@ static u32 __AXCommandListCycles;
 static u8 __AXCommandList[AX_CL_SIZE * LIST_MAX];
 
 static BOOL __AXCompressor;
+#if defined(VERSION_R4QK01)
+static u16* __AXCompressorTablePtr;
+static u16 __AXCompressorReleaseFrames;
+#endif
 
 static volatile u16 __AXMasterVolume;
 static u16 __AXAuxAVolume;
@@ -199,8 +203,13 @@ void __AXNextFrame(void* surround, void* lr, void* rmt) {
     if (__AXCompressor) {
         LIST_WRITE_16(COMMAND_COMPRESSOR);
         LIST_WRITE_16(THRESHOLD);
+#if defined(VERSION_R4QK01)
+        LIST_WRITE_16(__AXCompressorReleaseFrames);
+        LIST_WRITE_32((uintptr_t)__AXCompressorTablePtr);
+#else
         LIST_WRITE_16(RELEASE_FRAMES);
         LIST_WRITE_32((uintptr_t)__AXCompressorTable);
+#endif
         __AXCommandListCycles += 1850;
     }
 
@@ -236,6 +245,10 @@ void __AXClInit(void) {
     __AXCommandListPosition = 0;
     __AXClWrite = (u16*)__AXCommandList;
     __AXCompressor = TRUE;
+#if defined(VERSION_R4QK01)
+    __AXCompressorTablePtr = __AXCompressorTable;
+    __AXCompressorReleaseFrames = RELEASE_FRAMES;
+#endif
 
     __AXAuxCVolume = __AXAuxBVolume = __AXAuxAVolume = __AXMasterVolume =
         AX_MAX_VOLUME;

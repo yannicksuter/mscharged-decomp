@@ -5272,28 +5272,32 @@ RVL_SDK/arc/arc.c:
 	.sdata      start:0x80603308 end:0x80603310
 
 RVL_SDK/ax/AX.c:
-	.text       start:0x80393E20 end:0x80393E88
+	.text       start:0x80393E20 end:0x80393E90
 	.sdata      start:0x80603310 end:0x80603314
 	.sbss       start:0x80605BF0 end:0x80605BF4
 
 RVL_SDK/ax/AXAlloc.c:
+	.text       start:0x80393E90 end:0x803942E0 align:16
 	.bss        start:0x80568D98 end:0x80568E98
 	.sbss       start:0x80605BF8 end:0x80605BFC
 
 RVL_SDK/ax/AXAux.c:
+	.text       start:0x803942E0 end:0x80394AF0 align:16
 	.bss        start:0x80568EA0 end:0x8056C020 align:32
 	.sbss       start:0x80605C00 end:0x80605C48
 
 RVL_SDK/ax/AXCL.c:
-	.text       start:0x80394AF0 end:0x803955D8
+	.text       start:0x80394AF0 end:0x803955E0
 	.bss        start:0x8056C020 end:0x8056C120
+	.sbss       start:0x80605C48 end:0x80605C70
 
 RVL_SDK/ax/AXOut.c:
-	.text       start:0x803955E0 end:0x80395DE8
+	.text       start:0x803955E0 end:0x80395DF0 align:16
 	.bss        start:0x8056C120 end:0x8056CF20
 	.sbss       start:0x80605C70 end:0x80605CAC
 
 RVL_SDK/ax/AXSPB.c:
+	.text       start:0x80395DF0 end:0x80396220 align:16
 	.bss        start:0x8056CF20 end:0x8056CF98
 	.sbss       start:0x80605CB0 end:0x80605D00
 
@@ -6311,6 +6315,44 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 	.text       start:0x804421E0 end:0x80442490 align:16
 	.rodata     start:0x804BE4A8 end:0x804BE4D0
 	.data       start:0x805224E8 end:0x80523600
+
+RVL_SDK/hbm/sound/mix.cpp:
+	.text       start:0x8044ABE0 end:0x8044C550 align:16
+	.data       start:0x80523860 end:0x805243F0
+	.bss        start:0x805FB478 end:0x805FBB38
+
+RVL_SDK/hbm/sound/syn.cpp:
+	.text       start:0x8044C550 end:0x8044C9F0 align:16
+	.bss        start:0x805FBB38 end:0x805FC004
+
+RVL_SDK/hbm/sound/synctrl.cpp:
+	.text       start:0x8044C9F0 end:0x8044CE90 align:16
+	.data       start:0x805243F0 end:0x805245F0
+
+RVL_SDK/hbm/sound/synenv.cpp:
+	.text       start:0x8044CE90 end:0x8044D270 align:16
+	.rodata     start:0x804BE510 end:0x804BE530
+
+RVL_SDK/hbm/sound/synmix.cpp:
+	.text       start:0x8044D270 end:0x8044D3B0 align:16
+	.data       start:0x805245F0 end:0x80524980
+
+RVL_SDK/hbm/sound/synpitch.cpp:
+	.text       start:0x8044D3B0 end:0x8044D630 align:16
+	.rodata     start:0x804BE530 end:0x804BE544
+	.data       start:0x80524980 end:0x80524D70
+
+RVL_SDK/hbm/sound/synsample.cpp:
+	.text       start:0x8044D630 end:0x8044DAB0 align:16
+
+RVL_SDK/hbm/sound/synvoice.cpp:
+	.text       start:0x8044DAB0 end:0x8044DC60 align:16
+
+RVL_SDK/hbm/sound/seq.cpp:
+	.text       start:0x8044DC60 end:0x8044E560 align:16
+	.rodata     start:0x804BE548 end:0x804BE56C
+	.data       start:0x80524D70 end:0x80524DF0
+	.bss        start:0x805FC008 end:0x805FC010
 
 RVL_SDK/dwc/dwc_base64.c:
 	.text       start:0x8044E560 end:0x8044E8D0 align:16
