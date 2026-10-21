@@ -69,7 +69,6 @@ asm void PPCSync(void) {
 asm void PPCHalt(void) {
     nofralloc
     sync
-// clang-format on
 
 loop:
     nop
@@ -77,6 +76,7 @@ loop:
     nop
     b loop
 }
+// clang-format on
 
 // clang-format off
 asm void PPCMtmmcr0(register u32 val) {
@@ -126,7 +126,6 @@ asm void PPCMtpmc4(register u32 val){
 }
 // clang-format on
 
-// clang-format off
 u32 PPCMffpscr(void) {
     register u64 fpscr;
 
@@ -149,8 +148,13 @@ void PPCMtfpscr(register u32 val) {
     // clang-format off
     asm {
         li r4, 0
+#if defined(VERSION_R4QK01)
+        stw r4, fpscr.tmp
+        stw val, fpscr.data
+#else
         stw val, fpscr.data
         stw r4, fpscr.tmp
+#endif
         lfd f31, fpscr.tmp
         mtfs f31
     }

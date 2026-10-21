@@ -5124,16 +5124,6 @@ MSL/wprintf.c:
 	.data       start:0x80501328 end:0x805015D0
 	.sdata2     start:0x8060A508 end:0x8060A510
 
-MSL/e_acos.c:
-	.sdata2     start:0x8060A510 end:0x8060A598
-
-MSL/e_atan2.c:
-	.sdata2     start:0x8060A598 end:0x8060A6A0
-
-MSL/e_pow.c:
-	.rodata     start:0x804B9138 end:0x804B9168
-	.sdata2     start:0x8060A6A0 end:0x8060A7B0
-
 MSL/wstring.c:
 	.text       start:0x8038DF54 end:0x8038DFFC
 
@@ -5150,6 +5140,32 @@ MSL/math_sun.c:
 	extab       start:0x80006750 end:0x80006758
 	extabindex  start:0x80006DF8 end:0x80006E04
 	.text       start:0x8038E154 end:0x8038E194
+
+MSL/extras.c:
+	.text       start:0x8038E194 end:0x8038E390
+
+MSL/e_acos.c:
+	.text       start:0x8038E390 end:0x8038E654
+	.sdata2     start:0x8060A510 end:0x8060A598
+
+MSL/e_atan2.c:
+	.text       start:0x8038E654 end:0x8038E8C4
+	.sdata2     start:0x8060A598 end:0x8060A5F0
+
+MSL/e_log.c:
+	.text       start:0x8038E8C4 end:0x8038EB78
+	.sbss       start:0x80605B98 end:0x80605BA0
+	.sdata2     start:0x8060A5F0 end:0x8060A670
+
+MSL/e_log10.c:
+	.text       start:0x8038EB78 end:0x8038EC8C
+	.sbss       start:0x80605BA0 end:0x80605BA8
+	.sdata2     start:0x8060A670 end:0x8060A6A0
+
+MSL/e_pow.c:
+	.text       start:0x8038EC8C end:0x8038F4D4
+	.rodata     start:0x804B9138 end:0x804B9168
+	.sdata2     start:0x8060A6A0 end:0x8060A7B0
 
 MSL/e_rem_pio2.c:
 	.text       start:0x8038F4D4 end:0x8038F86C
@@ -5210,6 +5226,15 @@ MSL/s_tan.c:
 	.text       start:0x80391C30 end:0x80391CA8
 	.sdata2     start:0x8060A988 end:0x8060A990
 
+MSL/w_acos.c:
+	.text       start:0x80391CA8 end:0x80391CAC
+
+MSL/w_atan2.c:
+	.text       start:0x80391CAC end:0x80391CB0
+
+MSL/w_log10.c:
+	.text       start:0x80391CB0 end:0x80391CB4
+
 MSL/w_pow.c:
 	.text       start:0x80391CB4 end:0x80391CB8
 
@@ -5245,9 +5270,9 @@ Runtime/runtime.c:
 
 Runtime/__init_cpp_exceptions.cpp:
 	.text       start:0x80392C20 end:0x80392C90
-	.ctors      start:0x804B07E0 end:0x804B07E4
-	.dtors      start:0x804B0EA0 end:0x804B0EA4
-	.dtors      start:0x804B0EA4 end:0x804B0EA8
+	.ctors      start:0x804B07E0 end:0x804B07E4 rename:.ctors$10
+	.dtors      start:0x804B0EA0 end:0x804B0EA4 rename:.dtors$10
+	.dtors      start:0x804B0EA4 end:0x804B0EA8 rename:.dtors$15
 	.sdata      start:0x806032F8 end:0x80603300
 
 Runtime/Gecko_ExceptionPPC.cpp:
@@ -5346,7 +5371,7 @@ RVL_SDK/axfx/AXFXDelayExpDpl2.c:
 	.sdata2     start:0x8060AA58 end:0x8060AA70
 
 RVL_SDK/axfx/AXFXHooks.c:
-	.text       start:0x8039A660 end:0x8039A6A4
+	.text       start:0x8039A660 end:0x8039A6B0
 	.sdata      start:0x80603320 end:0x80603328
 
 RVL_SDK/base/PPCArch.c:
@@ -5689,7 +5714,7 @@ RVL_SDK/os/__ppc_eabi_init.c:
 	.text       start:0x803C87D0 end:0x803C888C
 
 RVL_SDK/pad/Pad.c:
-	.text       start:0x803C8890 end:0x803C9B1C
+	.text       start:0x803C8890 end:0x803C9B1C align:16
 	.sdata      start:0x80603510 end:0x80603530
 	.sbss       start:0x806060C8 end:0x806060E8
 

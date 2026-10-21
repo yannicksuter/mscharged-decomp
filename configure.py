@@ -1327,13 +1327,15 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/char_io.c", extra_cflags=["-Cpp_exceptions on", "-use_lmw_stmw on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/ctype.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/direct_io.c", extra_cflags=["-Cpp_exceptions on", "-use_lmw_stmw on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/e_acos.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/e_atan2.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/e_pow.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/e_acos.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/e_atan2.c"),
+            Object(MatchingFor("R4QK01"), "MSL/e_log.c"),
+            Object(MatchingFor("R4QK01"), "MSL/e_log10.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/e_pow.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/e_rem_pio2.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/e_sqrt.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/errno.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/extras.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/extras.c"),
             Object(Matching, "MSL/file_io.c", extra_cflags=["-Cpp_exceptions on", "-use_lmw_stmw on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/FILE_POS.c", extra_cflags=["-Cpp_exceptions on", "-use_lmw_stmw on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/float.c"),
@@ -1366,9 +1368,10 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/strtold.c", extra_cflags=["-Cpp_exceptions on", "-str reuse,pool,readonly", "-use_lmw_stmw on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/strtoul.c", extra_cflags=["-Cpp_exceptions on", "-use_lmw_stmw on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/uart_console_io_gcn.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/w_acos.c", extra_cflags=["-D_IEEE_LIBM"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/w_atan2.c", extra_cflags=["-D_IEEE_LIBM"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "MSL/w_pow.c", extra_cflags=["-D_IEEE_LIBM"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/w_acos.c", extra_cflags=["-D_IEEE_LIBM"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/w_atan2.c", extra_cflags=["-D_IEEE_LIBM"]),
+            Object(MatchingFor("R4QK01"), "MSL/w_log10.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/w_pow.c", extra_cflags=["-D_IEEE_LIBM"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/w_sqrt.c", extra_cflags=["-D_IEEE_LIBM"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/wchar_io.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "MSL/wctype.c"),
@@ -1384,7 +1387,7 @@ config.libs = [
         "progress_category": "sdk",  # str | List[str]
         "objects": [
             # GC/3.0a3, GC/3.0a5, and GC/3.0a5.2 all reproduce these units.
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Runtime/__init_cpp_exceptions.cpp"),
+            Object(Matching, "Runtime/__init_cpp_exceptions.cpp"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Runtime/__mem.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Runtime/__va_arg.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Runtime/GCN_mem_alloc.c"),
@@ -1392,7 +1395,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Runtime/global_destructor_chain.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "Runtime/NMWException.cpp", extra_cflags=["-Cpp_exceptions on"]),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Runtime/ptmf.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "Runtime/runtime.c"),
+            Object(Matching, "Runtime/runtime.c"),
         ],
     },
     {
@@ -1448,7 +1451,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/axfx/AXFXReverbHiExpDpl2.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/base
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/base/PPCArch.c"),
+            Object(Matching, "RVL_SDK/base/PPCArch.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/db
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/db/db.c"),
@@ -1737,7 +1740,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nwc24/NWC24Time.c"),
 
             # RVL_SDK/os
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/__ppc_eabi_init.c"),
+            Object(Matching, "RVL_SDK/os/__ppc_eabi_init.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/os/__start.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/OS.c"),
             Object(Matching, "RVL_SDK/os/OSAlarm.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
@@ -1767,7 +1770,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/os/OSSync.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/os/OSThread.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/OSTime.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/OSUtf.c"),
+            Object(Matching, "RVL_SDK/os/OSUtf.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
 
             # RVL_SDK/pad
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/pad/Pad.c", extra_cflags=["-inline noauto"]),

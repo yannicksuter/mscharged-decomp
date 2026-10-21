@@ -1,8 +1,6 @@
 // Adapted from the CodeWarrior Runtime sources used by LegoCloneWarsWii.
 #include "runtime.h"
 
-/* clang-format off *//* asm funcs */
-
 #define ENTRY_SAVE_FPR(reg) entry SAVE_FPR(reg)
 #define ENTRY_SAVE32_GPR(reg) entry SAVE32_GPR(reg)
 #define ENTRY_RESTORE_FPR(reg) entry RESTORE_FPR(reg)
@@ -21,6 +19,7 @@ static const unsigned long __constants[] = {
     0x41E00000, 0x00000000,
 };
 
+// clang-format off
 asm unsigned long __cvt_fp2unsigned(register double d)
 {
 	    stwu    r1,-16(r1)
@@ -48,6 +47,8 @@ asm unsigned long __cvt_fp2unsigned(register double d)
 		addi    r1,r1,16
 		blr
 }
+// clang-format on
+// clang-format off
 static asm void __save_fpr(void)
 {
 	ENTRY_SAVE_FPR(14)
@@ -106,7 +107,9 @@ static asm void __save_fpr(void)
 		stfd	fp31,-8(save_restore_reg)
 		blr
 }
+// clang-format on
 
+// clang-format off
 static asm void __restore_fpr(void)
 {
 	ENTRY_RESTORE_FPR(14)
@@ -165,7 +168,9 @@ static asm void __restore_fpr(void)
 		lfd		fp31,-8(save_restore_reg)
 		blr
 }
+// clang-format on
 
+// clang-format off
 static asm void __save_gpr(void)
 {
 	ENTRY_SAVE_GPR(14)
@@ -224,7 +229,9 @@ static asm void __save_gpr(void)
 		stw		r31,-4(save_restore_reg)
 		blr
 }
+// clang-format on
 
+// clang-format off
 static asm void __restore_gpr(void)
 {
 	ENTRY_RESTORE_GPR(14)
@@ -283,7 +290,9 @@ static asm void __restore_gpr(void)
 		lwz		r31,-4(save_restore_reg)
 		blr
 }
+// clang-format on
 
+// clang-format off
 asm void __div2u(void)
 {
        cmpwi	cr0,r3,0
@@ -355,10 +364,12 @@ asm void __div2u(void)
        li		r3,0
        blr
 }
+// clang-format on
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+// clang-format off
 asm void __div2i(void)
 {
 	   stwu     r1,-16(r1)
@@ -455,11 +466,13 @@ positive2:
 	   addi     r1,r1,16
        blr
 }
+// clang-format on
 #pragma pop
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+// clang-format off
 asm void __mod2u(void)
 {
        cmpwi	cr0,r3,0
@@ -529,11 +542,13 @@ asm void __mod2u(void)
  lab9:
        blr
 }
+// clang-format on
 #pragma pop
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+// clang-format off
 asm void __mod2i(void)
 {
        cmpwi	cr7,r3,0
@@ -616,8 +631,10 @@ positive2:
  no_adjust:
        blr
 }
+// clang-format on
 #pragma pop
 
+// clang-format off
 asm void __shl2i(void)
 {
 	subfic	r8,r5,32
@@ -630,8 +647,24 @@ asm void __shl2i(void)
 	slw		r4,r4,r5
 	blr
 }
+// clang-format on
 
+// clang-format off
+asm void __shr2u(void)
+{
+	subfic	r8,r5,32
+	subic	r9,r5,32
+	srw		r4,r4,r5
+	slw		r10,r3,r8
+	or		r4,r4,r10
+	srw		r10,r3,r9
+	or		r4,r4,r10
+	srw		r3,r3,r5
+	blr
+}
+// clang-format on
 
+// clang-format off
 asm void __cvt_ull_dbl(void)
 {
 	stwu r1,-0x10(r1)
@@ -677,7 +710,9 @@ zero:
 	addi r1,r1,0x10
 	blr
 }
+// clang-format on
 
+// clang-format off
 asm void __cvt_ull_flt(void)
 {
 	stwu r1,-0x10(r1)
@@ -724,7 +759,9 @@ zero:
 	addi r1,r1,0x10
 	blr
 }
+// clang-format on
 
+// clang-format off
 asm void __cvt_dbl_ull(void)
 {
     stwu r1, -0x10(r1)
@@ -781,3 +818,4 @@ func_end:
     addi r1, r1, 0x10
     blr
 }
+// clang-format on
