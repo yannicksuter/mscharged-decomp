@@ -14,7 +14,11 @@ s32 VFiPFCODE_CP932_OEM2Unicode(const s8* cp932_src, u16* uc_dst) {
         return VFiPFCODE_Combine_Width(1, 2);
     }
 
+#if defined(VERSION_R4QK01)
+    if (0xA1 <= cp932_lead && cp932_lead <= 0xDF) {
+#else
     if (cp932_lead >= 0xA1 && cp932_lead <= 0xDF) {
+#endif
         *uc_dst = cp932_lead + 0xFEC0;
         return VFiPFCODE_Combine_Width(1, 2);
     }
@@ -129,8 +133,13 @@ s32 VFiPFCODE_CP932_Unicode2OEM(const u16* uc_src, s8* cp932_dst) {
         return VFiPFCODE_Combine_Width(1, 2);
     }
 
+#if defined(VERSION_R4QK01)
+    cp932_dst[0] = (cp932 >> 8) & 0xFF;
+    cp932_dst[1] = (u8)(cp932 & 0xFF);
+#else
     cp932_dst[1] = (u8)(cp932 & 0xFF);
     cp932_dst[0] = (cp932 >> 8) & 0xFF;
+#endif
     return VFiPFCODE_Combine_Width(2, 2);
 }
 
@@ -146,7 +155,11 @@ s32 VFiPFCODE_CP932_OEMCharWidth(const s8* buf) {
 }
 
 u32 VFiPFCODE_CP932_isOEMMBchar(s8 cp932, u32 num) {
+#if defined(VERSION_R4QK01)
+    u32 code;
+#else
     u8 code;
+#endif
     u32 is_mb;
 
     code = (u8)cp932;
@@ -155,14 +168,22 @@ u32 VFiPFCODE_CP932_isOEMMBchar(s8 cp932, u32 num) {
     switch (num) {
         case 1:
             is_mb = 0;
+#if defined(VERSION_R4QK01)
+            if ((0x81 <= code && code <= 0x9F) || (0xE0 <= code && code <= 0xFC)) {
+#else
             if ((code >= 0x81 && code <= 0x9F) || (code >= 0xE0 && code <= 0xFC)) {
+#endif
                 is_mb = 1;
             }
             return is_mb;
 
         case 2:
             is_mb = 0;
+#if defined(VERSION_R4QK01)
+            if ((0x40 <= code && code <= 0x7E) || (0x80 <= code && code <= 0xFC)) {
+#else
             if ((code >= 0x40 && code <= 0x7E) || (code >= 0x80 && code <= 0xFC)) {
+#endif
                 is_mb = 1;
             }
             return is_mb;
@@ -171,6 +192,9 @@ u32 VFiPFCODE_CP932_isOEMMBchar(s8 cp932, u32 num) {
 }
 
 s32 VFiPFCODE_CP932_UnicodeCharWidth(const u16* buf) {
+#if defined(VERSION_R4QK01)
+    return 2;
+#else
     s8 tmp[2];
     s32 width;
     s16 oem_width;
@@ -180,6 +204,7 @@ s32 VFiPFCODE_CP932_UnicodeCharWidth(const u16* buf) {
     VFiPFCODE_Divide_Width(width, &oem_width, &uni_width);
 
     return uni_width;
+#endif
 }
 
 u32 VFiPFCODE_CP932_isUnicodeMBchar(u16 uc_src, u32 num) {

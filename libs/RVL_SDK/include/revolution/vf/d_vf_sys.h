@@ -14,6 +14,11 @@ struct VF_HANDLE_DRIVE* VFSysGetDriveP(s32 i_idx);
 struct VF_HANDLE_DRIVE* VFSysPDMDisk2DriveP(struct PDM_DISK* disk_p);
 void VFSysInit(void* i_heap_start_address_p, u32 i_size);
 void VFSysFinalize(void);
+#if defined(VERSION_R4QK01)
+struct VFSysTime;
+typedef void (*VFSysTimeStampCallback)(struct VFSysTime* time);
+VFSysTimeStampCallback VFSysSetTimeStampCallback(VFSysTimeStampCallback callback);
+#endif
 s32 VFSysSetDeviceNANDFlash(s32* o_idx_p, void* i_cache_heap_p, u32 i_cache_size);
 s32 VFSysUnsetDevice(s32 i_handle_idx);
 s32 VFSysCheckExistPrfFile_nandflash_sub(const s8* i_prf_file_name_p, u32 i_handle_idx);

@@ -9,6 +9,10 @@
 #include <nitro/math/rand.h>
 #include <revolution/types.h>
 #include <string.h>
+#if defined(VERSION_R4QK01)
+#include <dwc/dwc_match.h>
+#include <stdio.h>
+#endif
 
 static DWCLoginControl* stpLoginCnt;
 
@@ -43,6 +47,9 @@ void DWCi_LoginInit(DWCLoginControl* logcnt, DWCUserData* userdata,
     stpLoginCnt->userdata = userdata;
 
     DWC_Printf(0x20, "******************************************\n");
+#if defined(VERSION_R4QK01)
+    DWC_Printf(0x20, "userdata::\n");
+#endif
     DWC_Printf(0x20, "  pseudo    UserID   : %016llx\n",
         DWCi_Acc_GetUserId(&userdata->pseudo));
     DWC_Printf(0x20, "  pseudo    PlayerID : %08x\n",
@@ -51,6 +58,19 @@ void DWCi_LoginInit(DWCLoginControl* logcnt, DWCUserData* userdata,
         DWCi_Acc_GetUserId(&userdata->authentic));
     DWC_Printf(0x20, "  authentic PlayerID : %08x\n",
         DWCi_Acc_GetPlayerId(&userdata->authentic));
+#if defined(VERSION_R4QK01)
+    DWC_Printf(0x20, "console::\n");
+    if (fn_80475730())
+    {
+        DWC_Printf(0x20, "  authentic UserID   : %016llx\n",
+            DWCi_Auth_GetConsoleUserId());
+    }
+    else
+    {
+        DWC_Printf(0x20, "  pseudo    UserID   : %016llx\n",
+            DWCi_Auth_GetConsoleUserId());
+    }
+#endif
     DWC_Printf(0x20, "******************************************\n");
 }
 
@@ -143,6 +163,9 @@ static void DWCi_CloseLogin(void)
         return;
     }
 
+#if defined(VERSION_R4QK01)
+    fn_80475700();
+#endif
     stpLoginCnt->state = DWC_LOGIN_STATE_INIT;
     stpLoginCnt->connectFlag = FALSE;
 }
@@ -187,10 +210,36 @@ static void DWCi_GPConnectCallback(
     GPConnection* pconnection, GPConnectResponseArg* arg)
 {
     GPResult gpResult;
+#if defined(VERSION_R4QK01)
+    char firstname[GP_FIRSTNAME_LEN];
+    char userid[GP_AIMNAME_LEN];
+#endif
 
     DWC_Printf(DWC_REPORTFLAG_LOGIN,
         "Finished connecting to GP server, result = %d\n", arg->result);
     stpLoginCnt->connectFlag = FALSE;
+#if defined(VERSION_R4QK01)
+    snprintf(firstname, sizeof(firstname), "%s:%016llu",
+        DWCi_Np_GetConsoleName(), DWCi_Np_GetConsoleId());
+    gpResult = gpSetInfos(pconnection, GP_FIRSTNAME, firstname);
+    if (DWCi_HandleGPError(gpResult))
+    {
+        return;
+    }
+
+    DWCi_Acc_U64ToString32(DWCi_Auth_GetConsoleUserId(), DWC_ACC_USERID_BITS, userid);
+    gpResult = gpSetInfos(pconnection, GP_AIMNAME, userid);
+    if (DWCi_HandleGPError(gpResult))
+    {
+        return;
+    }
+
+    gpResult = gpSetInfos(pconnection, GP_ZIPCODE, DWCi_Np_GetAppGameName());
+    if (DWCi_HandleGPError(gpResult))
+    {
+        return;
+    }
+#endif
 
     if (arg->result == GP_NO_ERROR)
     {
@@ -202,7 +251,11 @@ static void DWCi_GPConnectCallback(
                     "  gs profile id is valid.\n");
                 stpLoginCnt->state = DWC_LOGIN_STATE_CONNECTED;
 
+#if defined(VERSION_R4QK01)
+                gpResult = DWCi_GPSetServerStatus(DWC_STATUS_ONLINE);
+#else
                 gpResult = DWCi_SetGPStatus(DWC_STATUS_ONLINE, "", NULL);
+#endif
                 if (DWCi_HandleGPError(gpResult))
                 {
                     return;
@@ -213,10 +266,16 @@ static void DWCi_GPConnectCallback(
 
                 if (!DWCi_GT2Startup())
                 {
+#if defined(VERSION_R4QK01)
+                    fn_8046F920(arg->profile);
+                    fn_8046F930();
+                    return;
+#else
                     if (DWCi_QR2Startup(arg->profile))
                     {
                         return;
                     }
+#endif
                 }
                 else
                 {
@@ -227,6 +286,10 @@ static void DWCi_GPConnectCallback(
             {
                 DWC_Printf(DWC_REPORTFLAG_LOGIN,
                     "  gs profile id is invalid.\n");
+#if defined(VERSION_R4QK01)
+                DWC_Printf(DWC_REPORTFLAG_LOGIN, "  You can't use copied userdata.\n");
+                DWC_Printf(DWC_REPORTFLAG_LOGIN, "  Please find DWC_AllowMovedUserData().\n");
+#endif
                 DWCi_StopLogin(DWC_ERROR_NETWORK, DWC_ECODE_SEQ_LOGIN);
             }
         }
@@ -337,6 +400,9 @@ static void DWCi_RemoteLoginProcess(void)
             DWC_Printf(DWC_REPORTFLAG_LOGIN, " *** Auth Done\n");
             DWCi_Auth_GetGameSpyToken(
                 stpLoginCnt->authToken, stpLoginCnt->partnerChallenge);
+#if defined(VERSION_R4QK01)
+            fn_80475700();
+#endif
 
             if (DWCi_Acc_IsAuthentic(stpLoginCnt->userdata))
             {

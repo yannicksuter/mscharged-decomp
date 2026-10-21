@@ -3,6 +3,10 @@
 #include <dwc/dwc_encsession.h>
 #include <dwc/dwc_report.h>
 #include <dwc/dwci_memfunc.h>
+#if defined(VERSION_R4QK01)
+#include <dwc/dwc_error.h>
+#include <dwc/dwci_error.h>
+#endif
 #include <gamespy/common/gsPlatformUtil.h>
 #include <nitro/math/dgt.h>
 
@@ -18,6 +22,9 @@ static int s_local_seed;
 static struct
 {
     DWCiRankingSessionState state;
+#if defined(VERSION_R4QK01)
+    BOOL initialized;
+#endif
     int reqid;
     BOOL validated;
     char gamename[32];
@@ -34,11 +41,31 @@ static struct
     void* decodedbuf;
     u32 decodedbuflen;
     BOOL (*callback)(u32* data, int size);
+#if defined(VERSION_R4QK01)
+    char cachedHash[41];
+#endif
 } g_session = { DWCi_ENC_SESSION_STATE_INITIAL };
 
 #define DWCi_RankingByteSwap32(value) \
     ((((u32)(value) << 24) & 0xFF000000) | (((u32)(value) << 8) & 0x00FF0000) \
         | (((u32)(value) >> 8) & 0x0000FF00) | (((u32)(value) >> 24) & 0x000000FF))
+
+#if defined(VERSION_R4QK01)
+#define DWCi_ENC_HASH_LENGTH (sizeof(g_session.cachedHash) - 1)
+#else
+#define DWCi_ENC_HASH_LENGTH strlen("0000000000000000000000000000000000000000")
+#endif
+
+static void DWCi_EncSessionSetError(void)
+{
+#if defined(VERSION_R4QK01)
+    if (!DWCi_IsError())
+    {
+        DWCi_SetError(DWC_ERROR_NETWORK, DWC_ECODE_SEQ_ETC + DWC_ECODE_TYPE_DATA);
+    }
+#endif
+    g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+}
 
 static u32 b64size(u32 len)
 {
@@ -110,7 +137,11 @@ static BOOL DWCi_EncValidateKey(const char* gamename,
         return FALSE;
     }
 
+#if defined(VERSION_R4QK01)
+    strncpy(g_session.gamename, gamename, sizeof(g_session.gamename));
+#else
     memcpy(g_session.gamename, gamename, sizeof(g_session.gamename));
+#endif
     memcpy(g_session.secretkey, secretkey, sizeof(g_session.secretkey));
     g_session.key1 = key1;
     g_session.key2 = key2;
@@ -136,7 +167,7 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
     }
 
     tmpbuf = DWC_Alloc(DWC_ALLOCTYPE_ENC,
-        b64bufsize(len - strlen("0000000000000000000000000000000000000000")) + 40);
+        b64bufsize(len - DWCi_ENC_HASH_LENGTH) + 40);
     if (tmpbuf == NULL)
     {
         DWC_Printf(DWC_REPORTFLAG_WARNING, "no enough memory\n");
@@ -146,16 +177,16 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
     memcpy(tmpbuf, g_session.secretkey, sizeof(g_session.secretkey));
     B64Encode(buf,
         (char*)tmpbuf + sizeof(g_session.secretkey),
-        len - strlen("0000000000000000000000000000000000000000"),
+        len - DWCi_ENC_HASH_LENGTH,
         2);
     memcpy(tmpbuf + sizeof(g_session.secretkey)
-               + b64size(len - strlen("0000000000000000000000000000000000000000")),
+               + b64size(len - DWCi_ENC_HASH_LENGTH),
         g_session.secretkey,
         sizeof(g_session.secretkey));
 
     MATH_CalcSHA1(hash,
         tmpbuf,
-        b64size(len - strlen("0000000000000000000000000000000000000000"))
+        b64size(len - DWCi_ENC_HASH_LENGTH)
             + sizeof(g_session.secretkey) * 2);
     DWC_Free(DWC_ALLOCTYPE_ENC, tmpbuf, 0);
 
@@ -173,7 +204,11 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
     }
 
     g_session.decodedbuf = (void*)buf;
+#if defined(VERSION_R4QK01)
+    g_session.decodedbuflen = len - DWCi_ENC_HASH_LENGTH;
+#else
     g_session.decodedbuflen = len - 40;
+#endif
     return TRUE;
 }
 
@@ -222,12 +257,15 @@ static void DWCi_EncSessionCompleteCallback(const char* buf,
                 }
 
                 *(g_session.hash - strlen("&hash=")) = '&';
+#if defined(VERSION_R4QK01)
+                strncpy(g_session.cachedHash, g_session.hash, sizeof(g_session.cachedHash));
+#endif
                 g_session.state = DWCi_ENC_SESSION_STATE_GOT_TOKEN;
             }
             else
             {
                 DWC_Printf(DWC_REPORTFLAG_WARNING, "invalid response length : %d\n", len);
-                g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+                DWCi_EncSessionSetError();
             }
 
             DWCi_GsFree((void*)buf);
@@ -238,7 +276,7 @@ static void DWCi_EncSessionCompleteCallback(const char* buf,
             {
                 DWC_Printf(DWC_REPORTFLAG_WARNING, "invalid response : (%s)\n", buf);
                 DWCi_GsFree((void*)buf);
-                g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+                DWCi_EncSessionSetError();
                 return;
             }
 
@@ -251,14 +289,14 @@ static void DWCi_EncSessionCompleteCallback(const char* buf,
             if (!DWCi_EncSessionValidateResponse(buf, len))
             {
                 DWCi_GsFree((void*)buf);
-                g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+                DWCi_EncSessionSetError();
                 return;
             }
 
             if (g_session.callback != NULL && !g_session.callback((u32*)buf, len))
             {
                 DWCi_GsFree((void*)buf);
-                g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+                DWCi_EncSessionSetError();
                 return;
             }
 
@@ -270,7 +308,7 @@ static void DWCi_EncSessionCompleteCallback(const char* buf,
     }
     else
     {
-        g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+        DWCi_EncSessionSetError();
     }
 }
 
@@ -364,6 +402,9 @@ void DWCi_EncSessionInitialize(int server, const char* initdata)
     DWCi_EncValidateKey(initdata + 52, secretkey, key1, key2, key3, key4);
     DWC_InitGHTTP(NULL);
     g_session.state = DWCi_ENC_SESSION_STATE_INITIALIZED;
+#if defined(VERSION_R4QK01)
+    g_session.initialized = TRUE;
+#endif
 }
 
 DWCiRankingSessionState DWCi_EncSessionProcess(void)
@@ -372,6 +413,11 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
 
     switch (g_session.state)
     {
+#if defined(VERSION_R4QK01)
+    case DWCi_ENC_SESSION_STATE_ERROR:
+        DWCi_EncSessionSetError();
+        break;
+#else
     case DWCi_ENC_SESSION_STATE_CANCELED:
         break;
 
@@ -380,6 +426,7 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
 
     case DWCi_ENC_SESSION_STATE_INITIALIZED:
         break;
+#endif
 
     case DWCi_ENC_SESSION_STATE_REQUEST:
         result = DWC_GetGHTTPDataEx(g_session.request,
@@ -395,14 +442,14 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
         }
         else
         {
-            g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+            DWCi_EncSessionSetError();
         }
         break;
 
     case DWCi_ENC_SESSION_STATE_GETTING_TOKEN:
         if (!DWC_ProcessGHTTP())
         {
-            g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+            DWCi_EncSessionSetError();
         }
         break;
 
@@ -420,19 +467,21 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
         }
         else
         {
-            g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+            DWCi_EncSessionSetError();
         }
         break;
 
     case DWCi_ENC_SESSION_STATE_SENDING_DATA:
         if (!DWC_ProcessGHTTP())
         {
-            g_session.state = DWCi_ENC_SESSION_STATE_ERROR;
+            DWCi_EncSessionSetError();
         }
         break;
 
+#if !defined(VERSION_R4QK01)
     case DWCi_ENC_SESSION_STATE_COMPLETED:
         break;
+#endif
 
     default:
         break;
@@ -441,8 +490,25 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
     return g_session.state;
 }
 
+#if defined(VERSION_R4QK01)
+void DWCi_EncSessionCancel(void)
+{
+    if (g_session.reqid >= 0)
+    {
+        DWC_CancelGHTTPRequest(g_session.reqid);
+    }
+    g_session.state = DWCi_ENC_SESSION_STATE_CANCELED;
+}
+#endif
+
 void DWCi_EncSessionShutdown(void)
 {
+#if defined(VERSION_R4QK01)
+    if (!g_session.initialized)
+    {
+        return;
+    }
+#endif
     if (g_session.request != NULL)
     {
         DWC_Free(DWC_ALLOCTYPE_ENC, g_session.request, 0);
@@ -458,6 +524,9 @@ void DWCi_EncSessionShutdown(void)
 
     DWC_ShutdownGHTTP();
     g_session.state = DWCi_ENC_SESSION_STATE_INITIAL;
+#if defined(VERSION_R4QK01)
+    g_session.initialized = FALSE;
+#endif
 }
 
 void* DWCi_EncSessionGetResponse(u32* size)
@@ -466,11 +535,20 @@ void* DWCi_EncSessionGetResponse(u32* size)
     return g_session.decodedbuf;
 }
 
+#if defined(VERSION_R4QK01)
+static DWCiRankingSessionResult DWCi_EncSessionGetAsyncEx(const char* url,
+    s32 pid,
+    void* data,
+    u32 size,
+    BOOL (*cb)(u32* data, int size),
+    BOOL reuseHash)
+#else
 DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
     s32 pid,
     void* data,
     u32 size,
     BOOL (*cb)(u32* data, int size))
+#endif
 {
     struct
     {
@@ -496,9 +574,13 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
             + strlen(g_session.gamename)
             + strlen(url)
             + strlen("?pid=")
+#if defined(VERSION_R4QK01)
+            + snprintf(buf, sizeof(buf), "%d", pid)
+#else
             + strlen(itoa(pid, buf, 10))
+#endif
             + strlen("&hash=")
-            + strlen("0000000000000000000000000000000000000000")
+            + DWCi_ENC_HASH_LENGTH
             + strlen("&data=")
             + b64size(size + sizeof(putheader) + 4)
             + 1);
@@ -519,7 +601,7 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
     g_session.data = g_session.request + strlen(g_session.request);
     g_session.hash = g_session.data
                    - strlen("&data=")
-                   - strlen("0000000000000000000000000000000000000000");
+                   - DWCi_ENC_HASH_LENGTH;
 
     putheader.pid = DWCi_RankingByteSwap32(pid);
     putheader.size = DWCi_RankingByteSwap32(size);
@@ -536,8 +618,29 @@ DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
         return DWCi_ENC_SESSION_ERROR_NOMEMORY;
     }
 
-    *(g_session.hash - strlen("&hash=")) = '\0';
-    g_session.state = DWCi_ENC_SESSION_STATE_REQUEST;
+#if defined(VERSION_R4QK01)
+    if (reuseHash)
+    {
+        memcpy(g_session.hash, g_session.cachedHash, DWCi_ENC_HASH_LENGTH);
+        g_session.state = DWCi_ENC_SESSION_STATE_GOT_TOKEN;
+    }
+    else
+#endif
+    {
+        *(g_session.hash - strlen("&hash=")) = '\0';
+        g_session.state = DWCi_ENC_SESSION_STATE_REQUEST;
+    }
     g_session.callback = cb;
     return DWCi_ENC_SESSION_SUCCESS;
 }
+
+#if defined(VERSION_R4QK01)
+DWCiRankingSessionResult DWCi_EncSessionGetAsync(const char* url,
+    s32 pid,
+    void* data,
+    u32 size,
+    BOOL (*cb)(u32* data, int size))
+{
+    return DWCi_EncSessionGetAsyncEx(url, pid, data, size, cb, FALSE);
+}
+#endif

@@ -2,8 +2,13 @@
 #include <revolution/vf.h>
 
 static OSMutex l_Mutex;
+#if defined(VERSION_R4QK01)
+static s32 l_vf_init = 0;
+static s32 l_InitedMutex = 0;
+#else
 static s32 l_InitedMutex;
 static s32 l_vf_init;
+#endif
 __declspec(align(32)) char l_vf_drive_work[0x68000];
 
 #define VF_ERROR_B001 0xB001
@@ -31,9 +36,11 @@ static void _VFUnlockMutex() {
     }
 }
 
+#if !defined(VERSION_R4QK01)
 s32 VFIsAvailable() {
     return l_vf_init != 0;
 }
+#endif
 
 void VFInit() {
     VFInitEx(l_vf_drive_work, sizeof(l_vf_drive_work));
@@ -44,11 +51,17 @@ void VFInitEx(void* i_heap_start_address_p, u32 i_size) {
     _VFLockMutex();
 
     if (l_vf_init == 0) {
+#if !defined(VERSION_R4QK01)
         l_vf_init = 1;
+#endif
         VFSysInit(i_heap_start_address_p, i_size);
         VFipdm_init_diskmanager(0, 0);
         VFipf2_init_prfile2(0, 0);
         dHash_InitHashTable();
+#if defined(VERSION_R4QK01)
+        VFSysSetTimeStampCallback(NULL);
+        l_vf_init = 1;
+#endif
     }
 
     _VFUnlockMutex();
@@ -64,6 +77,12 @@ void VFFinalize() {
 
     _VFUnlockMutex();
 }
+
+#if defined(VERSION_R4QK01)
+s32 VFIsAvailable() {
+    return l_vf_init != 0;
+}
+#endif
 
 static s32 VFAttachDriveNANDFlash(const s8* i_drive) {
     s32 err = VF_ERR_0xB004;

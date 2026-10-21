@@ -173,11 +173,15 @@ typedef struct PF_DIR_ENT {
     unsigned short entry_offset;      // offset 0x23C, size 0x2
 } PF_DIR_ENT;
 
+// Layout annotations below describe the earlier VF revision. The Korean
+// revision removes file versions and keeps a last-access hint in each file.
 typedef struct PF_FAT_HINT {
     // total size: 0xC
     unsigned long chain_index;   // offset 0x0, size 0x4
     unsigned long cluster;       // offset 0x4, size 0x4
+#if !defined(VERSION_R4QK01)
     unsigned long file_version;  // offset 0x8, size 0x4
+#endif
 } PF_FAT_HINT;
 
 struct PF_CLUSTER_LINK {
@@ -192,7 +196,9 @@ struct PF_CLUSTER_LINK {
 
 typedef struct PF_FFD {
     // total size: 0x38
+#if !defined(VERSION_R4QK01)
     unsigned long file_version;                     // offset 0x0, size 0x4
+#endif
     unsigned long start_cluster;                    // offset 0x4, size 0x4
     unsigned long* p_start_cluster;                 // offset 0x8, size 0x4
     struct PF_LAST_CLUSTER last_cluster;            // offset 0xC, size 0x8
@@ -282,6 +288,9 @@ typedef struct PF_FILE {
     long open_mode;             // offset 0x4, size 0x4
     struct PF_SFD* p_sfd;       // offset 0x8, size 0x4
     struct PF_FAT_HINT hint;    // offset 0xC, size 0xC
+#if defined(VERSION_R4QK01)
+    struct PF_FAT_HINT last_access;
+#endif
     long last_error;            // offset 0x18, size 0x4
     struct PF_CURSOR cursor;    // offset 0x1C, size 0x10
     unsigned short lock_count;  // offset 0x2C, size 0x2
@@ -502,6 +511,9 @@ typedef struct PDM_DISK {
     struct PDM_DISK_INFO disk_info;         // offset 0x18, size 0x14
     struct PDM_INIT_DISK* p_init_disk_tbl;  // offset 0x2C, size 0x4
     struct PDM_PARTITION* p_cur_part;       // offset 0x30, size 0x4
+#if defined(VERSION_R4QK01)
+    s32 (*p_erase_func)(u32 block, u32 num_block);
+#endif
 } PDM_DISK;
 
 struct PDM_DISK_HANDLE {
