@@ -81,9 +81,9 @@ typedef struct DSPTask DSPTask;
 typedef void (*DSPTaskCallback)(DSPTask* task);
 
 typedef struct DSPTask {
-    /* 0x00 */ u32 state;
+    /* 0x00 */ volatile u32 state;
     /* 0x04 */ volatile u32 prio;
-    /* 0x08 */ u32 flags;
+    /* 0x08 */ volatile u32 flags;
     /* 0x0C */ void* iramMmemAddr;
     /* 0x10 */ u32 iramMmemLen;
     /* 0x14 */ u32 iramDspAddr;

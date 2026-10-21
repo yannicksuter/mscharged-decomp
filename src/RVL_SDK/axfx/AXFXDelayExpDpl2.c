@@ -6,7 +6,7 @@
 
 static BOOL __AllocDelayLine(AXFX_DELAY_EXP_DPL2* fx);
 static void __FreeDelayLine(AXFX_DELAY_EXP_DPL2* fx);
-static BOOL __InitParams(AXFX_DELAY_EXP_DPL2* fx) DECOMP_DONT_INLINE;
+static BOOL __InitParams(AXFX_DELAY_EXP_DPL2* fx);
 
 u32 AXFXDelayExpGetMemSizeDpl2(const AXFX_DELAY_EXP_DPL2* fx) {
     u32 num = 0;
@@ -168,18 +168,22 @@ static void __FreeDelayLine(AXFX_DELAY_EXP_DPL2* fx) {
 
 static BOOL __InitParams(AXFX_DELAY_EXP_DPL2* fx) {
     int i;
+    BOOL success;
 
     for (i = 0; i < ARRAY_SIZE(fx->line); i++) {
         if (fx->feedback[i] >= 100) {
-            return FALSE;
+            success = FALSE;
+            goto done;
         }
 
         if (fx->output[i] > 100) {
-            return FALSE;
+            success = FALSE;
+            goto done;
         }
 
         if (fx->line[i] == NULL) {
-            return FALSE;
+            success = FALSE;
+            goto done;
         }
 
         memset(fx->line[i], 0, fx->length[i] * sizeof(s32));
@@ -189,5 +193,7 @@ static BOOL __InitParams(AXFX_DELAY_EXP_DPL2* fx) {
         fx->outGain[i] = 128.0f * fx->output[i] / 100.0f;
     }
 
-    return TRUE;
+    success = TRUE;
+done:
+    return success;
 }

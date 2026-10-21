@@ -1424,7 +1424,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/WiiPadMonkey.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
             # RVL_SDK/ai
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ai/ai.c"),
+            Object(Matching, "RVL_SDK/ai/ai.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/arc
             Object(Matching, "RVL_SDK/arc/arc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
@@ -1442,11 +1442,11 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/DSPCode.c"),
 
             # RVL_SDK/axfx
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXDelay.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXDelayExpDpl2.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXHooks.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHi.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/axfx/AXFXReverbHiDpl2.c"),
+            Object(Matching, "RVL_SDK/axfx/AXFXDelay.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/axfx/AXFXDelayExpDpl2.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/axfx/AXFXHooks.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/axfx/AXFXReverbHi.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/axfx/AXFXReverbHiDpl2.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/axfx/AXFXReverbHiExp.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/axfx/AXFXReverbHiExpDpl2.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
@@ -1457,9 +1457,9 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/db/db.c"),
 
             # RVL_SDK/dsp
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dsp/dsp.c"),
+            Object(Matching, "RVL_SDK/dsp/dsp.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/dsp/dsp_debug.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/dsp/dsp_task.c"),
+            Object(Matching, "RVL_SDK/dsp/dsp_task.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/dvd
             Object(Matching, "RVL_SDK/dvd/dvd.c", source="RVL_SDK/dvd/R4QK01/dvd.c" if config.version == "R4QK01" else "RVL_SDK/dvd/dvd.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
@@ -1796,14 +1796,14 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/so/SOOption.c"),
 
             # RVL_SDK/sp
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/sp/sp.c"),
+            Object(Matching, "RVL_SDK/sp/sp.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/ssl
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ssl/ssl_api.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ssl/ssl_mutex.c"),
 
             # RVL_SDK/thp
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/thp/THPAudio.c"),
+            Object(Matching, "RVL_SDK/thp/THPAudio.c", source="RVL_SDK/thp/R4QK01/THPAudio.c" if config.version == "R4QK01" else None, mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/thp/THPDec.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
             Object(Matching, "RVL_SDK/thp/THPSimple.cpp", cflags=cflags_game),
 

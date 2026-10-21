@@ -5288,6 +5288,7 @@ RVL_SDK/dvd/dvdFatal.c:
 
 RVL_SDK/ai/ai.c:
 	.text       start:0x80392E70 end:0x8039343C
+	.data       start:0x805015D0 end:0x80501618
 	.sdata      start:0x80603300 end:0x80603304
 	.sbss       start:0x80605BB0 end:0x80605BEC
 
@@ -5367,8 +5368,8 @@ RVL_SDK/axfx/AXFXDelay.c:
 	.sdata2     start:0x8060AA48 end:0x8060AA58
 
 RVL_SDK/axfx/AXFXDelayExpDpl2.c:
-	.text       start:0x80399F40 end:0x8039A654
-	.sdata2     start:0x8060AA58 end:0x8060AA70
+	.text       start:0x80399F40 end:0x8039A660
+	.sdata2     start:0x8060AA58 end:0x8060AA68
 
 RVL_SDK/axfx/AXFXHooks.c:
 	.text       start:0x8039A660 end:0x8039A6B0
@@ -5384,6 +5385,7 @@ RVL_SDK/db/db.c:
 
 RVL_SDK/dsp/dsp.c:
 	.text       start:0x8039A9D0 end:0x8039AC2C
+	.data       start:0x80504AD0 end:0x80504B50
 	.sdata      start:0x80603328 end:0x8060332C
 	.sbss       start:0x80605D38 end:0x80605D3C
 
@@ -5768,7 +5770,7 @@ RVL_SDK/sp/sp.c:
 	.sdata2     start:0x8060AC58 end:0x8060AC68
 
 RVL_SDK/thp/THPDec.c:
-	.text       start:0x803CB890 end:0x803CED1C
+	.text       start:0x803CB890 end:0x803CED20
 	.rodata     start:0x804B9520 end:0x804B95B0
 	.data       start:0x80515CF0 end:0x80515D38
 	.bss        start:0x8058B6C0 end:0x8058B80C
@@ -5776,8 +5778,11 @@ RVL_SDK/thp/THPDec.c:
 	.sbss       start:0x80606100 end:0x80606224 align:32
 	.sdata2     start:0x8060AC68 end:0x8060AC84
 
+RVL_SDK/thp/THPAudio.c:
+	.text       start:0x803CED20 end:0x803CF290 align:16
+
 RVL_SDK/tpl/TPL.c:
-	.text       start:0x803CF290 end:0x803CF3D0
+	.text       start:0x803CF290 end:0x803CF3D0 align:16
 	.data       start:0x80515D38 end:0x80515D68
 	.sdata      start:0x80603540 end:0x80603548
 
