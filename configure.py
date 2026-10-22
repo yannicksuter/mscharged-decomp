@@ -1733,12 +1733,12 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/ndev/exi2.c"),
 
             # RVL_SDK/nwc24
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24Config.c"),
+            Object(Matching, "RVL_SDK/nwc24/NWC24Config.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24Download.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24FileApi.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24FriendList.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nwc24/NWC24Ipc.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24Manage.c"),
+            Object(Matching, "RVL_SDK/nwc24/NWC24Manage.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24MBoxCtrl.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24Mime.c"),
             Object(Matching, "RVL_SDK/nwc24/NWC24Schedule.c"),
@@ -1746,6 +1746,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nwc24/NWC24StdApi.c"),
             Object(Matching, "RVL_SDK/nwc24/NWC24System.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nwc24/NWC24Time.c"),
+            Object(Matching if config.version == "R4QK01" else NonMatching, "RVL_SDK/nwc24/NWC24UserId.c", source="RVL_SDK/nwc24/NWC24UserId.c" if config.version == "R4QK01" else False),
 
             # RVL_SDK/os
             Object(Matching, "RVL_SDK/os/__ppc_eabi_init.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),

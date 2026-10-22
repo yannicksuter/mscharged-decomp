@@ -6253,8 +6253,15 @@ RVL_SDK/ncd/ncdsystem.c:
 	.sdata      start:0x80603800 end:0x80603804
 	.sbss       start:0x80606430 end:0x80606438
 
-RVL_SDK/nwc24/NWC24Download.c:
+RVL_SDK/nwc24/NWC24Config.c:
+	.text       start:0x8041D150 end:0x8041D2B8
+	.sbss       start:0x80606438 end:0x8060643C
+
+RVL_SDK/nwc24/NWC24Manage.c:
+	.text       start:0x8041D2B8 end:0x8041D3CC
+	.data       start:0x8051FFF0 end:0x80520040
 	.sdata      start:0x80603808 end:0x8060380C
+	.sbss       start:0x80606440 end:0x80606448
 
 RVL_SDK/nwc24/NWC24Schedule.c:
 	.text       start:0x8041D3CC end:0x8041DAA8
@@ -6262,9 +6269,13 @@ RVL_SDK/nwc24/NWC24Schedule.c:
 	.bss        start:0x805CE420 end:0x805CE5A0
 	.sbss       start:0x80606448 end:0x80606458
 
+RVL_SDK/nwc24/NWC24UserId.c:
+	.text       start:0x8041DAA8 end:0x8041DDC4
+	.rodata     start:0x804B9C60 end:0x804B9C70
+
 RVL_SDK/nwc24/NWC24Time.c:
 	.text       start:0x8041DDC4 end:0x8041DFA0
-	.data       start:0x80520084 end:0x805200B0
+	.data       start:0x80520088 end:0x805200B0
 	.bss        start:0x805CE5A0 end:0x805CE680
 	.sbss       start:0x80606458 end:0x80606460
 
