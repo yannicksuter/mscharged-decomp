@@ -4062,6 +4062,9 @@ Game/SAnim/pnScaleBlender.cpp:
 	.bss        start:0x80549360 end:0x80549388
 	.sdata2     start:0x80609E98 end:0x80609EA8
 
+Game/SAnim/AnimRetargeter.cpp:
+	.text       start:0x80313990 end:0x80313C80
+
 Game/SAnimDecode.cpp:
 	.text       start:0x80313C80 end:0x80313E00
 	.sdata2     start:0x80609EA8 end:0x80609EC0
@@ -5598,6 +5601,7 @@ RVL_SDK/mix/mix.c:
 
 RVL_SDK/mix/remote.c:
 	.text       start:0x803B9E70 end:0x803BA3B8
+	.bss        start:0x80588938 end:0x8058A2C0
 	.sbss       start:0x80605F80 end:0x80605F88
 
 RVL_SDK/mtx/mtx.c:

@@ -190,6 +190,12 @@ void __VISetCGMS(void) {
     WaitMicroTime(2);
 }
 
+#if defined(VERSION_R4QK01)
+DECOMP_FORCEACTIVE(vi3in1_c,
+                   "vi3in1.c",
+                   "VISetCGMS(): Tried to set APS Trigger bit(WORD2[3:2]) \nwhen the scan is progressive in DTV mode, which is forbidden\n");
+#endif
+
 static inline void __VISetCGMSClear(void) {
     __wd0 = 0;
     __wd1 = 0;
