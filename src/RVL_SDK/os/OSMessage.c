@@ -54,3 +54,25 @@ BOOL OSReceiveMessage(OSMessageQueue* queue, OSMessage* msg, s32 flags) {
 
     return TRUE;
 }
+
+#if defined(VERSION_R4QK01)
+BOOL OSJamMessage(OSMessageQueue* queue, OSMessage msg, s32 flags) {
+    BOOL enabled = OSDisableInterrupts();
+
+    while (queue->msgCount <= queue->usedCount) {
+        if (!(flags & OS_MESSAGE_BLOCK)) {
+            OSRestoreInterrupts(enabled);
+            return FALSE;
+        }
+        OSSleepThread(&queue->queueSend);
+    }
+    queue->firstIndex = (queue->firstIndex + queue->msgCount - 1) % queue->msgCount;
+    queue->msgArray[queue->firstIndex] = msg;
+    queue->usedCount++;
+
+    OSWakeupThread(&queue->queueReceive);
+    OSRestoreInterrupts(enabled);
+
+    return TRUE;
+}
+#endif

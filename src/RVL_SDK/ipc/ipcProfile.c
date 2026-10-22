@@ -6,12 +6,18 @@ static s32 IpcNumUnIssuedReqs;
 static s32 IpcNumPendingReqs;
 
 static IPCRequestEx* IpcReqPtrArray[IPC_REQUEST_MAX];
+#if defined(VERSION_R4QK01)
+static s32 IpcFdArray[IPC_REQUEST_MAX] = {0};
+#else
 static s32 IpcFdArray[IPC_REQUEST_MAX];
+#endif
 
 static void AddReqInfo(IPCRequestEx* req, s32 fd);
 static void DelReqInfo(IPCRequestEx* req, s32 fd);
 
+#if !defined(VERSION_R4QK01)
 DECOMP_FORCEACTIVE(ipcProfile_c, IpcFdArray);
+#endif
 
 void IPCiProfInit(void) {
     int i;

@@ -8,6 +8,9 @@ extern "C" {
 #endif
 
 typedef void (*USBCallback)(s32 result, void* arg);
+#if defined(VERSION_R4QK01)
+typedef void (*USBISOCallback)(s32, void*, void*);
+#endif
 
 IPCResult IUSB_OpenLib(void);
 IPCResult IUSB_CloseLib(void);

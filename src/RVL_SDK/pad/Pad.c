@@ -371,6 +371,10 @@ BOOL PADInit(void)
     return PADReset(PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
 }
 
+#if defined(VERSION_R4QK01)
+#pragma push
+#pragma pool_data off
+#endif
 u32 PADRead(PADStatus* status)
 {
     BOOL enabled;
@@ -380,6 +384,11 @@ u32 PADRead(PADStatus* status)
     u32 sr;
     s32 chanShift;
     u32 motor;
+#if defined(VERSION_R4QK01)
+    static u8 unused[0x30];
+    static PADStatus pre_status[SI_MAX_CHAN];
+    int threshold;
+#endif
 
     enabled = OSDisableInterrupts();
 
@@ -464,6 +473,29 @@ u32 PADRead(PADStatus* status)
 
         MakeStatus(chan, status, data);
 
+#if defined(VERSION_R4QK01)
+        if (((Type[chan] & 0xFFFF0000) == SI_GC_CONTROLLER) && ((status->button & 0x80) ^ 0x80))
+        {
+            threshold = 10;
+        }
+        else
+        {
+            threshold = 3;
+        }
+
+        if (__abs(__abs(status->stickX) - __abs(pre_status[chan].stickX)) >= threshold ||
+            __abs(__abs(status->stickY) - __abs(pre_status[chan].stickY)) >= threshold ||
+            __abs(__abs(status->substickX) - __abs(pre_status[chan].substickX)) >= threshold ||
+            __abs(__abs(status->substickY) - __abs(pre_status[chan].substickY)) >= threshold ||
+            __abs(__abs(status->triggerLeft) - __abs(pre_status[chan].triggerLeft)) >= threshold ||
+            __abs(__abs(status->triggerRight) - __abs(pre_status[chan].triggerRight)) >= threshold ||
+            pre_status[chan].button != status->button)
+        {
+            __VIResetSIIdle();
+        }
+        memcpy(&pre_status[chan], status, sizeof(PADStatus));
+#endif
+
         if (status->button & 0x2000)
         {
             status->err = PAD_ERR_TRANSFER;
@@ -481,6 +513,10 @@ u32 PADRead(PADStatus* status)
     OSRestoreInterrupts(enabled);
     return motor;
 }
+
+#if defined(VERSION_R4QK01)
+#pragma pop
+#endif
 
 void PADControlMotor(s32 chan, u32 command)
 {
@@ -714,12 +750,14 @@ static void SPEC2_MakeStatus(s32 chan, PADStatus* status, u32 data[2])
     status->triggerLeft = ClampU8(status->triggerLeft, origin->triggerLeft);
     status->triggerRight = ClampU8(status->triggerRight, origin->triggerRight);
 
+#if !defined(VERSION_R4QK01)
     if (__abs(SQ(status->stickX) - SQ(PrevStatus[chan].stickX)) >= 9 || __abs(SQ(status->stickY) - SQ(PrevStatus[chan].stickY)) >= 9 || __abs(SQ(status->substickX) - SQ(PrevStatus[chan].substickX)) >= 9 || __abs(SQ(status->substickY) - SQ(PrevStatus[chan].substickY)) >= 9 || __abs(SQ(status->triggerLeft) - SQ(PrevStatus[chan].triggerLeft)) >= 9 || __abs(SQ(status->triggerRight) - SQ(PrevStatus[chan].triggerRight)) >= 9 || status->button != PrevStatus[chan].button)
     {
         __VIResetSIIdle();
     }
 
     memcpy(&PrevStatus[chan], status, sizeof(PADStatus));
+#endif
 }
 
 BOOL PADSync(void)

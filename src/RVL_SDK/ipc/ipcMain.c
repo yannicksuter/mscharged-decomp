@@ -17,6 +17,17 @@ void IPCInit(void) {
     }
 }
 
+#if defined(VERSION_R4QK01)
+void IPCReInit(void) {
+    Initialized = FALSE;
+    IPCBufferHi = __OSGetIPCBufferHi();
+    IPCBufferLo = __OSGetIPCBufferLo();
+    IPCCurrentBufferHi = IPCBufferHi;
+    IPCCurrentBufferLo = IPCBufferLo;
+    Initialized = TRUE;
+}
+#endif
+
 u32 IPCReadReg(s32 index) {
     return IPC_HW_REGS_PPC[index];
 }
