@@ -8,7 +8,11 @@
 #include <revolution/os/OS.h>
 
 const char* __AXVersion =
+#if defined(VERSION_R4QK01)
+    "<< RVL_SDK - AX \trelease build: Feb 27 2009 10:01:36 (0x4302_145) >>";
+#else
     "<< RVL_SDK - AX \trelease build: Dec 18 2006 15:43:48 (0x4199_60831) >>";
+#endif
 
 static BOOL __init = FALSE;
 

@@ -1430,7 +1430,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/arc/arc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/ax
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/ax/AX.c"),
+            Object(Matching, "RVL_SDK/ax/AX.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/ax/AXAlloc.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/ax/AXAux.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/ax/AXCL.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
