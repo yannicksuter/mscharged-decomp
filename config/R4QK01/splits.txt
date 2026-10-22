@@ -4846,6 +4846,9 @@ NL/plat/SocketNetwork.cpp:
 	.sdata      start:0x80603298 end:0x806032A0
 	.sbss       start:0x80605B20 end:0x80605B30
 
+NL/plat/TransportSocket.cpp:
+	.text       start:0x80379D08 end:0x80379D5C
+
 NL/plat/PlatPadManager.cpp:
 	.text       start:0x80379D5C end:0x8037A980
 	.sbss       start:0x80605B30 end:0x80605B38
@@ -6425,6 +6428,20 @@ RVL_SDK/net/neterrorcode.c:
 	.text       start:0x804299B4 end:0x80429E24
 	.data       start:0x80520908 end:0x80520928
 
+RVL_SDK/net/NETVersion.c:
+	.text       start:0x80429E24 end:0x80429E2C
+	.data       start:0x80520928 end:0x80520960
+	.sdata      start:0x806038B0 end:0x806038B8
+
+RVL_SDK/net/wireless_macaddr.c:
+	.text       start:0x80429E2C end:0x80429E30
+
+RVL_SDK/net/netmemcpy.c:
+	.text       start:0x80429E30 end:0x8042A1F0
+
+RVL_SDK/net/netmemset.c:
+	.text       start:0x8042A1F0 end:0x8042A2F4
+
 RVL_SDK/net/md5.c:
 	.text       start:0x8042A2F4 end:0x8042AA20
 	.rodata     start:0x804BDFFC end:0x804BE020 align:4
@@ -6987,6 +7004,10 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
 	.sdata      start:0x806041F8 end:0x80604208
 	.sbss       start:0x80606680 end:0x80606688
 	.sdata2     start:0x8060AD90 end:0x8060AD9C
+
+RVL_SDK/dwc/dwc_cf.c:
+	.text       start:0x804A5B30 end:0x804A5B80
+	.sbss       start:0x80606688 end:0x8060668C
 
 RVL_SDK/rfl/RFL_System.c:
 	extab       start:0x800067A0 end:0x800067C8

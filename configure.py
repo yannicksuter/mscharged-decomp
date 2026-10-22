@@ -320,6 +320,9 @@ cflags_rvl_sdk = [
     "-fp_contract off",
 ]
 
+# Preserve calls to weak SDK fallbacks so the full library can replace them.
+cflags_rvl_sdk_no_ipa = [flag for flag in cflags_rvl_sdk if flag != "-ipa file"] + ["-ipa off"]
+
 # MetroTRK uses its own debugger-runtime optimization model.
 cflags_metrotrk = [
     *(flag for flag in cflags_base if flag != "-enc SJIS"),
@@ -1420,7 +1423,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/nlMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/plat/TransportSocket.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/TransportSocket.cpp", source="NL/plat/R4QK01/TransportSocket.cpp" if config.version == "R4QK01" else None, cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/WiiPadMonkey.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
             # RVL_SDK/ai
@@ -1475,6 +1478,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/dwc/dwc_account.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_auth_interface.c", cflags=cflags_rvl_dwc, source="RVL_SDK/dwc/R4QK01/dwc_auth_interface.c" if config.version == "R4QK01" else "RVL_SDK/dwc/dwc_auth_interface.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_base64.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
+            Object(Matching, "RVL_SDK/dwc/dwc_cf.c", source="RVL_SDK/dwc/dwc_cf.c" if config.version == "R4QK01" else False, cflags=cflags_rvl_dwc, mw_version="Wii/1.0"),
             Object(Matching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/dwc/dwc_encsession.c", cflags=cflags_rvl_dwc, mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/dwc/dwc_error.c", extra_cflags=["-func_align", "16"] if config.version == "R4QK01" else []),
@@ -1765,7 +1769,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/os/OSMessage.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/os/OSMutex.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
             Object(Matching, "RVL_SDK/os/OSNandbootInfo.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/os/OSNet.c"),
+            Object(Matching, "RVL_SDK/os/OSNet.c", source="RVL_SDK/os/R4QK01/OSNet.c" if config.version == "R4QK01" else None, cflags=cflags_rvl_sdk_no_ipa if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/os/OSPlayRecord.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QK01"), "RVL_SDK/os/OSPlayTime.c", source="RVL_SDK/os/OSPlayTime.c" if config.version == "R4QK01" else False, mw_version="Wii/1.0"),
             Object(Matching, "RVL_SDK/os/OSReboot.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
@@ -1956,7 +1960,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             # RVL_SDK/nhttp
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/nhttp/d_nhttp.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/nhttp/d_nhttp.c"),
             Object(Matching, "RVL_SDK/nhttp/d_nhttp_common.c"),
             Object(Matching, "RVL_SDK/nhttp/d_nhttp_private.c"),
             Object(Matching, "RVL_SDK/nhttp/NHTTP_bgnend.c"),
@@ -1972,8 +1976,8 @@ config.libs = [
         ],
     },
     {
-        # RevoEX 1.0: NETVersion.c registers the "<< REX-PPC 1.0.0.0 (RevoEX-1.0)
-        # REL 070309140556 >>" banner, which carries no compiler stamp. The VF
+        # NETVersion.c identifies RevoEX 1.0 in the original releases and
+        # RevoEX 2.4 in Korea; neither banner carries a compiler stamp. The VF
         # file system (RevoEX in the wii-ipl tree) shows both compilers: the
         # constant placement of VFiPFENT_ITER_DoGetEntry and VFiPFCODE_CP932_* is
         # exact under GC/3.0a5 only and inert to every donor spelling, while
@@ -1986,11 +1990,13 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             # RVL_SDK/net
+            Object(NonMatching, "RVL_SDK/net/netmemcpy.c", source="RVL_SDK/net/netmemcpy.c" if config.version == "R4QK01" else False),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/net/hmac.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/net/md5.c"),
             Object(Matching, "RVL_SDK/net/neterrorcode.c", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline on"]),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/net/NETVersion.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/net/wireless_macaddr.c"),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/net/NETVersion.c"),
+            Object(Matching, "RVL_SDK/net/wireless_macaddr.c"),
+            Object(MatchingFor("R4QK01"), "RVL_SDK/net/netmemset.c", source="RVL_SDK/net/netmemset.c" if config.version == "R4QK01" else False),
 
             # RVL_SDK/vf
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/vf/d_common.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),

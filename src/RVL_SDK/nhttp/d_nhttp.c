@@ -307,6 +307,14 @@ s32 NHTTPAddPostDataAscii(NHTTPRequest* handle, const char* name,
     return result;
 }
 
+#if defined(VERSION_R4QK01)
+DECOMP_FORCEACTIVE(nhttp_post,
+                   "NHTTPAddPostDataBinary",
+                   "NHTTPAddPostDataRaw",
+                   "already called NHTTPAddPostDataAscii or NHTTPAddPostDataBinary (exclusive fucntion)\n",
+                   "NHTTPSetPostDataEncoding");
+#endif
+
 NHTTPConnection NHTTPSendRequestAsync(NHTTPRequest* request)
 {
     NHTTPConnectionInfo* connection;
@@ -599,4 +607,8 @@ s32 NHTTPSetRootCADefault(NHTTPRequest* handle)
     request->rootCASize = 0;
     return 0;
 }
+#endif
+
+#if defined(VERSION_R4QK01)
+DECOMP_FORCEACTIVE(nhttp_verify, "NHTTPDisableVerifyOptionForDebug");
 #endif
