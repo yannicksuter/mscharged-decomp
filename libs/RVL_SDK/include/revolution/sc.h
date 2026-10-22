@@ -2,6 +2,7 @@
 #define REVOLUTION_SC_H
 
 #include <revolution/types.h>
+#include <revolution/bte_types.h>
 #include <revolution/sc_fwd.h>
 
 #ifdef __cplusplus
@@ -13,8 +14,6 @@ extern "C" {
 #define SC_MAX_DEV_ENTRY (SC_MAX_DEV_ENTRY_FOR_STD + SC_MAX_DEV_ENTRY_FOR_SMP)
 #define SC_PRDINFO_SIZE 0x100
 
-typedef u8 BD_ADDR[6];
-typedef u8 LINK_KEY[16];
 
 typedef enum {
     SC_STATUS_OK,

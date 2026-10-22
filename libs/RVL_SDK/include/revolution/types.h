@@ -2,6 +2,8 @@
 #define REVOLUTION_TYPES_H
 
 #include <decomp.h>
+#include <stdint.h>
+#include <wchar_t.h>
 
 typedef signed char s8;
 typedef signed short s16;
@@ -33,7 +35,6 @@ typedef int UNKWORD;
 typedef void UNKTYPE;
 #ifndef __cplusplus
 typedef int bool;
-typedef unsigned short wchar_t;
 
 #ifndef true
 #define true 1
@@ -54,7 +55,6 @@ typedef unsigned short wchar_t;
 #define NULL 0
 #endif
 
-typedef unsigned long uintptr_t;
 typedef unsigned short int byte2_t;
 typedef unsigned char byte1_t;
 typedef byte1_t byte_t;

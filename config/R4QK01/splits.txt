@@ -5297,13 +5297,13 @@ Runtime/GCN_mem_alloc.c:
 	.rodata     start:0x804B9458 end:0x804B94C8
 
 RVL_SDK/ai/ai.c:
-	.text       start:0x80392E70 end:0x8039343C
+	.text       start:0x80392E70 end:0x8039343C align:16
 	.data       start:0x805015D0 end:0x80501618
 	.sdata      start:0x80603300 end:0x80603304
 	.sbss       start:0x80605BB0 end:0x80605BEC
 
 RVL_SDK/arc/arc.c:
-	.text       start:0x80393440 end:0x80393E20
+	.text       start:0x80393440 end:0x80393E20 align:16
 	.data       start:0x80501618 end:0x80501688
 	.sdata      start:0x80603308 end:0x80603310
 
@@ -5341,7 +5341,7 @@ RVL_SDK/ax/AXSPB.c:
 RVL_SDK/ax/AXVPB.c:
 	.text       start:0x80396220 end:0x80397728
 	.data       start:0x805016D0 end:0x80501760
-	.bss        start:0x8056CFA0 end:0x8057E6A0
+	.bss        start:0x8056CFA0 end:0x8057E6A0 align:32
 	.sbss       start:0x80605D00 end:0x80605D1C
 	.sdata2     start:0x8060A998 end:0x8060A9B8
 
@@ -5353,7 +5353,7 @@ RVL_SDK/ax/DSPCode.c:
 	.sdata      start:0x80603318 end:0x80603320
 
 RVL_SDK/ax/AXProf.c:
-	.text       start:0x80397730 end:0x80397770
+	.text       start:0x80397730 end:0x80397770 align:16
 	.sbss       start:0x80605D20 end:0x80605D30
 
 RVL_SDK/axfx/AXFXReverbHi.c:
@@ -5361,25 +5361,25 @@ RVL_SDK/axfx/AXFXReverbHi.c:
 	.sdata2     start:0x8060A9B8 end:0x8060A9C0
 
 RVL_SDK/axfx/AXFXReverbHiDpl2.c:
-	.text       start:0x80397890 end:0x803979E4
+	.text       start:0x80397890 end:0x803979E4 align:16
 	.sdata2     start:0x8060A9C0 end:0x8060A9C8
 
 RVL_SDK/axfx/AXFXReverbHiExp.c:
-	.text       start:0x803979F0 end:0x803988E4
+	.text       start:0x803979F0 end:0x803988E4 align:16
 	.data       start:0x80504720 end:0x805048C0
 	.sdata2     start:0x8060A9C8 end:0x8060AA08
 
 RVL_SDK/axfx/AXFXReverbHiExpDpl2.c:
-	.text       start:0x803988F0 end:0x803998A4
+	.text       start:0x803988F0 end:0x803998A4 align:16
 	.data       start:0x805048C0 end:0x80504A7C
 	.sdata2     start:0x8060AA08 end:0x8060AA48
 
 RVL_SDK/axfx/AXFXDelay.c:
-	.text       start:0x803998B0 end:0x80399F34
+	.text       start:0x803998B0 end:0x80399F34 align:16
 	.sdata2     start:0x8060AA48 end:0x8060AA58
 
 RVL_SDK/axfx/AXFXDelayExpDpl2.c:
-	.text       start:0x80399F40 end:0x8039A660
+	.text       start:0x80399F40 end:0x8039A660 align:16
 	.sdata2     start:0x8060AA58 end:0x8060AA68
 
 RVL_SDK/axfx/AXFXHooks.c:
@@ -5402,7 +5402,7 @@ RVL_SDK/dsp/dsp.c:
 	.sbss       start:0x80605D38 end:0x80605D3C
 
 RVL_SDK/dsp/dsp_debug.c:
-	.text       start:0x8039AC30 end:0x8039AC80
+	.text       start:0x8039AC30 end:0x8039AC80 align:16
 
 RVL_SDK/dsp/dsp_task.c:
 	.text       start:0x8039AC80 end:0x8039B518
@@ -5410,20 +5410,20 @@ RVL_SDK/dsp/dsp_task.c:
 	.sbss       start:0x80605D40 end:0x80605D58
 
 RVL_SDK/dvd/dvdfs.c:
-	.text       start:0x8039B520 end:0x8039B9E8
+	.text       start:0x8039B520 end:0x8039B9E8 align:16
 	.data       start:0x80504C90 end:0x80504D90
 	.sdata      start:0x80603330 end:0x80603340
 	.sbss       start:0x80605D58 end:0x80605D78
 
 RVL_SDK/dvd/dvd.c:
-	.text       start:0x8039B9F0 end:0x803A05B4
+	.text       start:0x8039B9F0 end:0x803A05B4 align:16
 	.data       start:0x80504D90 end:0x805051A0
-	.bss        start:0x8057E6C0 end:0x80583370
+	.bss        start:0x8057E6C0 end:0x80583370 align:64
 	.sdata      start:0x80603340 end:0x80603358
 	.sbss       start:0x80605D80 end:0x80605E18 align:32
 
 RVL_SDK/dvd/dvdqueue.c:
-	.text       start:0x803A05C0 end:0x803A0840
+	.text       start:0x803A05C0 end:0x803A0840 align:16
 	.bss        start:0x80583370 end:0x80583390
 
 RVL_SDK/dvd/dvderror.c:
@@ -5453,7 +5453,7 @@ RVL_SDK/dvd/dvdDeviceError.c:
 	.sdata2     start:0x8060AA70 end:0x8060AA74
 
 RVL_SDK/dvd/dvd_broadway.c:
-	.text       start:0x803A1750 end:0x803A3E00
+	.text       start:0x803A1750 end:0x803A3E00 align:16
 	.data       start:0x80505B30 end:0x80506A38
 	.bss        start:0x80583620 end:0x805837E0
 	.sdata      start:0x80603368 end:0x80603378
@@ -5475,15 +5475,15 @@ RVL_SDK/exi/EXIBios.c:
 	.sbss       start:0x80605E70 end:0x80605E74
 
 RVL_SDK/exi/EXIUart.c:
-	.text       start:0x803A60A0 end:0x803A63DC
+	.text       start:0x803A60A0 end:0x803A63DC align:16
 	.sbss       start:0x80605E78 end:0x80605E88
 
 RVL_SDK/exi/EXICommon.c:
-	.text       start:0x803A63E0 end:0x803A6568
+	.text       start:0x803A63E0 end:0x803A6568 align:16
 	.sdata2     start:0x8060AA78 end:0x8060AA7C
 
 RVL_SDK/fs/fs.c:
-	.text       start:0x803A6570 end:0x803A7E40
+	.text       start:0x803A6570 end:0x803A7E40 align:16
 	.data       start:0x80506A80 end:0x80506AC0
 	.sdata      start:0x80603390 end:0x806033A0
 	.sbss       start:0x80605E88 end:0x80605EA0
@@ -5547,7 +5547,7 @@ RVL_SDK/gx/GXDisplayList.c:
 	.bss        start:0x80583F68 end:0x80584668
 
 RVL_SDK/gx/GXTransform.c:
-	.text       start:0x803AEC70 end:0x803AF3B0
+	.text       start:0x803AEC70 end:0x803AF3B0 align:16
 	.sdata2     start:0x8060AB30 end:0x8060AB44
 
 RVL_SDK/gx/GXPerf.c:
@@ -5560,12 +5560,12 @@ RVL_SDK/ipc/ipcMain.c:
 
 RVL_SDK/ipc/ipcclt.c:
 	.text       start:0x803AFCD0 end:0x803B16BC
-	.bss        start:0x80584680 end:0x80584740
+	.bss        start:0x80584680 end:0x80584740 align:32
 	.sdata      start:0x806033F8 end:0x80603400
 	.sbss       start:0x80605F18 end:0x80605F28
 
 RVL_SDK/ipc/memory.c:
-	.text       start:0x803B16C0 end:0x803B1BF0
+	.text       start:0x803B16C0 end:0x803B1BF0 align:16
 	.bss        start:0x80584740 end:0x805847C0
 
 RVL_SDK/ipc/ipcProfile.c:
@@ -5590,11 +5590,11 @@ RVL_SDK/mem/mem_expHeap.c:
 	.text       start:0x803B6330 end:0x803B6BB8 align:16
 
 RVL_SDK/mem/mem_allocator.c:
-	.text       start:0x803B6BC0 end:0x803B6C1C
+	.text       start:0x803B6BC0 end:0x803B6C1C align:16
 	.sdata2     start:0x8060ABB8 end:0x8060ABC0
 
 RVL_SDK/mem/mem_list.c:
-	.text       start:0x803B6C20 end:0x803B6D40
+	.text       start:0x803B6C20 end:0x803B6D40 align:16
 
 RVL_SDK/mix/mix.c:
 	.text       start:0x803B6D40 end:0x803B9E64
@@ -5603,24 +5603,24 @@ RVL_SDK/mix/mix.c:
 	.sbss       start:0x80605F70 end:0x80605F80
 
 RVL_SDK/mix/remote.c:
-	.text       start:0x803B9E70 end:0x803BA3B8
+	.text       start:0x803B9E70 end:0x803BA3B8 align:16
 	.bss        start:0x80588938 end:0x8058A2C0
 	.sbss       start:0x80605F80 end:0x80605F88
 
 RVL_SDK/mtx/mtx.c:
-	.text       start:0x803BA3C0 end:0x803BAA94
+	.text       start:0x803BA3C0 end:0x803BAA94 align:16
 	.sdata      start:0x80603480 end:0x80603488
 	.sdata2     start:0x8060ABC0 end:0x8060ABC8
 
 RVL_SDK/mtx/mtxvec.c:
-	.text       start:0x803BAAA0 end:0x803BAAF4
+	.text       start:0x803BAAA0 end:0x803BAAF4 align:16
 
 RVL_SDK/mtx/mtx44.c:
-	.text       start:0x803BAB00 end:0x803BB1A4
+	.text       start:0x803BAB00 end:0x803BB1A4 align:16
 	.sdata2     start:0x8060ABC8 end:0x8060ABE0
 
 RVL_SDK/mtx/vec.c:
-	.text       start:0x803BB1B0 end:0x803BB240
+	.text       start:0x803BB1B0 end:0x803BB240 align:16
 	.sdata2     start:0x8060ABE0 end:0x8060ABE8
 
 RVL_SDK/mtx/quat.c:
@@ -5651,7 +5651,7 @@ RVL_SDK/os/OSArena.c:
 	.sbss       start:0x80605FE8 end:0x80605FF0
 
 RVL_SDK/os/OSAudioSystem.c:
-	.text       start:0x803BD690 end:0x803BDB50
+	.text       start:0x803BD690 end:0x803BDB50 align:16
 	.data       start:0x805084A8 end:0x80508528
 
 RVL_SDK/os/OSCache.c:
@@ -5659,7 +5659,7 @@ RVL_SDK/os/OSCache.c:
 	.data       start:0x80508528 end:0x80508760
 
 RVL_SDK/os/OSContext.c:
-	.text       start:0x803BE1C0 end:0x803BEA98
+	.text       start:0x803BE1C0 end:0x803BEA98 align:16
 	.data       start:0x80508760 end:0x80508940
 
 RVL_SDK/os/OSError.c:
@@ -5712,12 +5712,12 @@ RVL_SDK/os/OSReboot.c:
 	.sbss       start:0x80606038 end:0x80606040
 
 RVL_SDK/os/OSReset.c:
-	.text       start:0x803C3670 end:0x803C3F9C
+	.text       start:0x803C3670 end:0x803C3F9C align:16
 	.data       start:0x805097E0 end:0x80509A48
 	.sbss       start:0x80606040 end:0x80606050
 
 RVL_SDK/os/OSRtc.c:
-	.text       start:0x803C3FA0 end:0x803C4A50
+	.text       start:0x803C3FA0 end:0x803C4A50 align:16
 	.bss        start:0x8058A680 end:0x8058A6D8 align:32
 
 RVL_SDK/os/OSSync.c:
@@ -5730,7 +5730,7 @@ RVL_SDK/os/OSThread.c:
 	.sbss       start:0x80606050 end:0x8060605C
 
 RVL_SDK/os/OSTime.c:
-	.text       start:0x803C6160 end:0x803C6830
+	.text       start:0x803C6160 end:0x803C6830 align:16
 	.data       start:0x80509A48 end:0x80509AA8
 
 RVL_SDK/os/OSUtf.c:
@@ -5743,17 +5743,17 @@ RVL_SDK/os/OSIpc.c:
 	.sbss       start:0x80606060 end:0x80606064
 
 RVL_SDK/os/OSStateTM.c:
-	.text       start:0x803C6AC0 end:0x803C71C4
+	.text       start:0x803C6AC0 end:0x803C71C4 align:16
 	.data       start:0x805158E8 end:0x805159B0
 	.bss        start:0x8058B0E0 end:0x8058B1A0 align:32
 	.sbss       start:0x80606068 end:0x80606088
 
 RVL_SDK/os/__start.c:
-	.init       start:0x800060F0 end:0x800063E8
+	.init       start:0x800060F0 end:0x800063E8 align:16
 	.sbss       start:0x80606088 end:0x8060608C
 
 RVL_SDK/os/OSPlayRecord.c:
-	.text       start:0x803C71D0 end:0x803C78EC
+	.text       start:0x803C71D0 end:0x803C78EC align:16
 	.data       start:0x805159B0 end:0x805159F8
 	.bss        start:0x8058B1A0 end:0x8058B3A0
 	.sdata      start:0x80603500 end:0x80603504
@@ -5765,7 +5765,7 @@ RVL_SDK/os/OSStateFlags.c:
 	.bss        start:0x8058B3A0 end:0x8058B3C0 align:32
 
 RVL_SDK/os/OSNet.c:
-	.text       start:0x803C7B10 end:0x803C7BD0
+	.text       start:0x803C7B10 end:0x803C7BD0 align:16
 	.data       start:0x80515A20 end:0x80515B88
 
 RVL_SDK/os/OSNandbootInfo.c:
@@ -5794,7 +5794,7 @@ RVL_SDK/pad/Pad.c:
 	.sbss       start:0x806060C8 end:0x806060E8
 
 RVL_SDK/si/SIBios.c:
-	.text       start:0x803C9B20 end:0x803CAF80
+	.text       start:0x803C9B20 end:0x803CAF80 align:16
 	.data       start:0x80515BE8 end:0x80515C58
 	.bss        start:0x8058B4A0 end:0x8058B6C0
 	.sdata      start:0x80603530 end:0x80603534
@@ -5810,7 +5810,7 @@ RVL_SDK/sp/sp.c:
 	.sdata2     start:0x8060AC58 end:0x8060AC68
 
 RVL_SDK/thp/THPDec.c:
-	.text       start:0x803CB890 end:0x803CED20
+	.text       start:0x803CB890 end:0x803CED20 align:16
 	.rodata     start:0x804B9520 end:0x804B95B0
 	.data       start:0x80515CF0 end:0x80515D38
 	.bss        start:0x8058B6C0 end:0x8058B80C
@@ -5898,10 +5898,10 @@ RVL_SDK/bte/gki_buffer.c:
 	.data       start:0x805199D0 end:0x80519B18
 
 RVL_SDK/bte/gki_time.c:
-	.text       start:0x803E8DF0 end:0x803E9374
+	.text       start:0x803E8DF0 end:0x803E9374 align:16
 
 RVL_SDK/bte/gki_ppc.c:
-	.text       start:0x803E9380 end:0x803E9690
+	.text       start:0x803E9380 end:0x803E9690 align:16
 	.bss        start:0x80591328 end:0x805B9E08
 
 RVL_SDK/bte/hcisu_h2.c:
@@ -5938,7 +5938,7 @@ RVL_SDK/bte/bte_init.c:
 	.text       start:0x803EAAA0 end:0x803EAACC
 
 RVL_SDK/bte/bte_logmsg.c:
-	.text       start:0x803EAAD0 end:0x803EAC70
+	.text       start:0x803EAAD0 end:0x803EAC70 align:16
 	.bss        start:0x805BBEA0 end:0x805BC670
 	.sdata      start:0x80603608 end:0x8060360C
 
@@ -6193,7 +6193,7 @@ RVL_SDK/bte/sdp_utils.c:
 	.data       start:0x8051F0A0 end:0x8051F198
 
 RVL_SDK/usb/usb.c:
-	.text       start:0x80415120 end:0x80416670
+	.text       start:0x80415120 end:0x80416670 align:16
 	.data       start:0x8051F198 end:0x8051F9C8
 	.sdata      start:0x80603668 end:0x80603678
 	.sbss       start:0x806063E8 end:0x806063F8
@@ -6595,14 +6595,14 @@ RVL_SDK/hbm/nw4hbm/ut/ut_CharWriter.cpp:
 	.bss        start:0x805FB430 end:0x805FB448
 
 RVL_SDK/hbm/nw4hbm/ut/ut_Font.cpp:
-	.text       start:0x80444030 end:0x804440D4
+	.text       start:0x80444030 end:0x804440D4 align:16
 	.data       start:0x80523600 end:0x80523630
 
 RVL_SDK/hbm/nw4hbm/ut/ut_LinkList.cpp:
-	.text       start:0x804440E0 end:0x804441EC
+	.text       start:0x804440E0 end:0x804441EC align:16
 
 RVL_SDK/hbm/nw4hbm/ut/ut_list.cpp:
-	.text       start:0x804441F0 end:0x80444360
+	.text       start:0x804441F0 end:0x80444360 align:16
 
 RVL_SDK/hbm/nw4hbm/ut/ut_ResFont.cpp:
 	.text       start:0x80444360 end:0x80444660 align:16
@@ -6679,16 +6679,16 @@ RVL_SDK/dwc/dwc_init.c:
 	.sbss       start:0x806064E0 end:0x806064E8
 
 RVL_SDK/dwc/dwc_memfunc.c:
-	.text       start:0x8044EB50 end:0x8044EE28
+	.text       start:0x8044EB50 end:0x8044EE28 align:16
 	.sbss       start:0x806064E8 end:0x806064F0
 
 RVL_SDK/dwc/dwc_report.c:
-	.text       start:0x8044EE30 end:0x8044F188
+	.text       start:0x8044EE30 end:0x8044F188 align:16
 	.data       start:0x80524F48 end:0x805250C8
 	.sbss       start:0x806064F0 end:0x806064F4
 
 RVL_SDK/dwc/dwc_ghttp.c:
-	.text       start:0x8044F190 end:0x8044F930
+	.text       start:0x8044F190 end:0x8044F930 align:16
 	.data       start:0x805250C8 end:0x805251D8
 	.sdata      start:0x806038E0 end:0x806038E4
 	.sbss       start:0x806064F8 end:0x80606500
@@ -6699,7 +6699,7 @@ RVL_SDK/dwc/dwc_common.c:
 	.bss        start:0x805FC010 end:0x805FC028
 
 RVL_SDK/dwc/dwc_friend.c:
-	.text       start:0x8044FD00 end:0x80452290
+	.text       start:0x8044FD00 end:0x80452290 align:16
 	.data       start:0x805251E8 end:0x805257A0
 	.sdata      start:0x806038E8 end:0x806038F1
 	.sbss       start:0x80606500 end:0x80606510
@@ -6777,10 +6777,10 @@ RVL_SDK/dwc/dwc_ranksession.c:
 	.data       start:0x8052A6C0 end:0x8052A720
 
 RVL_SDK/gamespy/darray.c:
-	.text       start:0x80479190 end:0x80479C24
+	.text       start:0x80479190 end:0x80479C24 align:16
 
 RVL_SDK/gamespy/hashtable.c:
-	.text       start:0x80479C30 end:0x8047A0FC
+	.text       start:0x80479C30 end:0x8047A0FC align:16
 
 RVL_SDK/gamespy/md5c.c:
 	.text       start:0x8047A100 end:0x8047B040 align:16
@@ -6820,7 +6820,7 @@ RVL_SDK/gamespy/GP/gpi.c:
 	.sdata      start:0x80603BA8 end:0x80603BF0
 
 RVL_SDK/gamespy/GP/gpiBuddy.c:
-	.text       start:0x8047FA30 end:0x80481A10
+	.text       start:0x8047FA30 end:0x80481A10 align:16
 	.data       start:0x8052AA68 end:0x8052ABB0
 	.sdata      start:0x80603BF0 end:0x80603CA0
 
@@ -6864,7 +6864,7 @@ RVL_SDK/gamespy/GP/gpiProfile.c:
 	.sdata      start:0x80603E70 end:0x80603E98
 
 RVL_SDK/gamespy/GP/gpiSearch.c:
-	.text       start:0x804895E0 end:0x8048BB40
+	.text       start:0x804895E0 end:0x8048BB40 align:16
 	.data       start:0x8052B678 end:0x8052BA18
 	.sdata      start:0x80603E98 end:0x80603F88
 
@@ -6897,7 +6897,7 @@ RVL_SDK/gamespy/gt2/gt2Connection.c:
 	.text       start:0x8048D3D0 end:0x8048DAE4 align:16
 
 RVL_SDK/gamespy/gt2/gt2Main.c:
-	.text       start:0x8048DAF0 end:0x8048DFA8
+	.text       start:0x8048DAF0 end:0x8048DFA8 align:16
 
 RVL_SDK/gamespy/gt2/gt2Message.c:
 	.text       start:0x8048DFB0 end:0x80491320 align:16
@@ -6959,7 +6959,7 @@ RVL_SDK/gamespy/ghttp/ghttpPost.c:
 	.sdata2     start:0x8060AD78 end:0x8060AD7C
 
 RVL_SDK/gamespy/ghttp/ghttpProcess.c:
-	.text       start:0x80498580 end:0x80499FF0
+	.text       start:0x80498580 end:0x80499FF0 align:16
 	.rodata     start:0x804BE5C8 end:0x804BE5D8
 	.data       start:0x8052D140 end:0x8052D210
 	.sdata      start:0x806040C8 end:0x80604120
@@ -6970,7 +6970,7 @@ RVL_SDK/gamespy/gstats/gbucket.c:
 	.sdata2     start:0x8060AD80 end:0x8060AD88
 
 RVL_SDK/gamespy/gstats/gstats.c:
-	.text       start:0x8049B1D0 end:0x8049D9DC
+	.text       start:0x8049B1D0 end:0x8049D9DC align:16
 	.rodata     start:0x804BE5D8 end:0x804BE6E8
 	.data       start:0x8052D210 end:0x8052D320
 	.bss        start:0x805FE200 end:0x805FE600
@@ -7017,7 +7017,7 @@ RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c:
 	.sdata2     start:0x8060AD90 end:0x8060AD9C
 
 RVL_SDK/dwc/dwc_cf.c:
-	.text       start:0x804A5B30 end:0x804A5B80
+	.text       start:0x804A5B30 end:0x804A5B80 align:16
 	.sbss       start:0x80606688 end:0x8060668C
 
 RVL_SDK/rfl/RFL_System.c:
@@ -7032,7 +7032,7 @@ RVL_SDK/rfl/RFL_System.c:
 RVL_SDK/rfl/RFL_NANDLoader.c:
 	extab       start:0x800067C8 end:0x80006848
 	extabindex  start:0x80006E7C end:0x80006F3C
-	.text       start:0x804A6630 end:0x804A76C8
+	.text       start:0x804A6630 end:0x804A76C8 align:16
 	.rodata     start:0x804BE6F8 end:0x804BE788
 	.data       start:0x8052D500 end:0x8052D520
 	.sdata      start:0x80604210 end:0x80604214
@@ -7040,7 +7040,7 @@ RVL_SDK/rfl/RFL_NANDLoader.c:
 RVL_SDK/rfl/RFL_NANDAccess.c:
 	extab       start:0x80006848 end:0x800068C0
 	extabindex  start:0x80006F3C end:0x80006FF0
-	.text       start:0x804A76D0 end:0x804A8F08
+	.text       start:0x804A76D0 end:0x804A8F08 align:16
 	.data       start:0x8052D520 end:0x8052D5A8
 	.sdata      start:0x80604218 end:0x80604220
 	.sdata2     start:0x8060ADA0 end:0x8060ADA8
@@ -7049,14 +7049,14 @@ RVL_SDK/rfl/RFL_NANDAccess.c:
 RVL_SDK/rfl/RFL_Model.c:
 	extab       start:0x800068C0 end:0x80006928
 	extabindex  start:0x80006FF0 end:0x8000708C
-	.text       start:0x804A8F10 end:0x804AAD84
+	.text       start:0x804A8F10 end:0x804AAD84 align:16
 	.rodata     start:0x804BE788 end:0x804BE898
 	.sdata2     start:0x8060ADA8 end:0x8060ADE4
 
 RVL_SDK/rfl/RFL_MakeTex.c:
 	extab       start:0x80006928 end:0x80006968
 	extabindex  start:0x8000708C end:0x800070EC
-	.text       start:0x804AAD90 end:0x804AD530
+	.text       start:0x804AAD90 end:0x804AD530 align:16
 	.rodata     start:0x804BE898 end:0x804BE958
 	.sdata2     start:0x8060ADE8 end:0x8060AEA4
 
@@ -7085,7 +7085,7 @@ RVL_SDK/rfl/RFL_Controller.c:
 RVL_SDK/rfl/RFL_MiddleDatabase.c:
 	extab       start:0x80006A28 end:0x80006A40
 	extabindex  start:0x8000720C end:0x80007230
-	.text       start:0x804AF070 end:0x804AF380
+	.text       start:0x804AF070 end:0x804AF380 align:16
 
 RVL_SDK/rfl/RFL_DefaultDatabase.c:
 	.text       start:0x804AF380 end:0x804AF3C8
@@ -7094,13 +7094,13 @@ RVL_SDK/rfl/RFL_DefaultDatabase.c:
 RVL_SDK/rfl/RFL_DataUtility.c:
 	extab       start:0x80006A40 end:0x80006A68
 	extabindex  start:0x80007230 end:0x8000726C
-	.text       start:0x804AF3D0 end:0x804AFC48
+	.text       start:0x804AF3D0 end:0x804AFC48 align:16
 	.rodata     start:0x804BEB58 end:0x804BEB68
 
 RVL_SDK/rfl/RFL_Format.c:
 	extab       start:0x80006A68 end:0x80006A70
 	extabindex  start:0x8000726C end:0x80007278
-	.text       start:0x804AFC50 end:0x804AFD0C
+	.text       start:0x804AFC50 end:0x804AFD0C align:16
 
 RVL_SDK/ndev/DebuggerDriver.c:
 	.text       start:0x804AFD0C end:0x804B0040

@@ -2,6 +2,7 @@
 #define REVOLUTION_DSP_H
 
 #include <revolution/types.h>
+#include <revolution/os/OSContext_fwd.h>
 
 volatile u16 DSP_HW_REGS[] AT_ADDRESS(0xCC005000);
 
@@ -60,7 +61,6 @@ typedef enum DSPHwReg {
         }                              \
     } while (0)
 
-typedef struct OSContext OSContext;
 
 typedef void* DSPMail;
 
@@ -80,7 +80,7 @@ typedef struct DSPTask DSPTask;
 
 typedef void (*DSPTaskCallback)(DSPTask* task);
 
-typedef struct DSPTask {
+struct DSPTask {
     /* 0x00 */ volatile u32 state;
     /* 0x04 */ volatile u32 prio;
     /* 0x08 */ volatile u32 flags;
@@ -99,7 +99,7 @@ typedef struct DSPTask {
     /* 0x38 */ DSPTask* next;
     /* 0x3C */ DSPTask* prev;
     /* 0x40 */ char UNK_0x40[0x50 - 0x40];
-} DSPTask; // size = 0x50
+}; // size = 0x50
 
 extern BOOL __DSP_rude_task_pending;
 extern DSPTask* __DSP_rude_task;

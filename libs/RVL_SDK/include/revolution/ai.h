@@ -2,6 +2,7 @@
 #define REVOLUTION_AI_H
 
 #include <revolution/types.h>
+#include <revolution/os/OSContext_fwd.h>
 
 volatile u32 AI_HW_REGS[4] AT_ADDRESS(0xCD006C00);
 
@@ -20,7 +21,6 @@ typedef enum AIHwReg {
 #define AI_AICR_AFR (1 << 1)
 #define AI_AICR_PSTAT (1 << 0)
 
-typedef struct OSContext OSContext;
 
 typedef void (*AIDMACallback)(void);
 

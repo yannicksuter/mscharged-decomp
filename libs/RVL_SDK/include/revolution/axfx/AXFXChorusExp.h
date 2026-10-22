@@ -1,13 +1,10 @@
 #ifndef RVL_SDK_AXFX_CHORUS_EXP_H
 #define RVL_SDK_AXFX_CHORUS_EXP_H
 #include <revolution/types.h>
+#include <revolution/axfx/AXFXCommon_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Forward declarations
-typedef struct AXFX_BUS AXFX_BUS;
-typedef struct AXFX_BUFFERUPDATE AXFX_BUFFERUPDATE;
 
 typedef struct AXFX_CHORUS_EXP_DELAY {
     f32* line[3]; // at 0x0

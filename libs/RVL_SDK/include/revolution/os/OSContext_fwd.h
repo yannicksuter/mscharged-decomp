@@ -1,0 +1,6 @@
+#ifndef REVOLUTION_OS_CONTEXT_FWD_H
+#define REVOLUTION_OS_CONTEXT_FWD_H
+
+typedef struct OSContext OSContext;
+
+#endif // REVOLUTION_OS_CONTEXT_FWD_H

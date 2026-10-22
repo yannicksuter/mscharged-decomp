@@ -1,6 +1,7 @@
 #ifndef RVL_SDK_ESP_H
 #define RVL_SDK_ESP_H
 #include <revolution/types.h>
+#include <revolution/esp/ESPTypes_fwd.h>
 
 #include <revolution/arc.h>
 #include <revolution/ipc.h>
@@ -18,13 +19,13 @@ typedef enum {
     ES_IOCTLV_SEEK_CONTENT_FILE = 35,
 } ESIoctl;
 
-typedef struct ESPTicket {
+struct ESPTicket {
     u8 dummy[0x2A4];
-} ESPTicket;
+};
 
-typedef struct ESPTmd {
+struct ESPTmd {
     u8 dummy[0x49E4];
-} ESPTmd;
+};
 
 #if defined(VERSION_R4QK01)
 typedef struct ESLpEntry {
@@ -33,12 +34,12 @@ typedef struct ESLpEntry {
 } ESLpEntry;
 
 #pragma pack(push, 4)
-typedef struct ESPTicketView {
+struct ESPTicketView {
     u8 unk_0x00[4];
     u64 ticketId;
     u8 unk_0x0C[0x98 - 0x0C];
     ESLpEntry limits[8];
-} ESPTicketView;
+};
 #pragma pack(pop)
 
 s32 ESP_InitLib(void);

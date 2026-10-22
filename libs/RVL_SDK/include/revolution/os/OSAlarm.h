@@ -3,6 +3,7 @@
 
 #include <revolution/os/OSContext.h>
 #include <revolution/types.h>
+#include <revolution/os/OSAlarm_fwd.h>
 
 #define OSGetAlarmUserDataAny(type_, alarm_) ((type_)(OSGetAlarmUserData(alarm_)))
 #define OSSetAlarmUserDataAny(alarm_, data_) OSSetAlarmUserData(alarm_, (void*)(data_))
@@ -11,7 +12,6 @@
 extern "C" {
 #endif
 
-typedef struct OSAlarm OSAlarm;
 typedef void (*OSAlarmHandler)(OSAlarm* alarm, OSContext* context);
 
 struct OSAlarm {

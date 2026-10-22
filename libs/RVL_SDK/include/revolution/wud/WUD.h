@@ -60,7 +60,7 @@ typedef void (*WUDHidConnCallback)(UINT8 devHandle, u8 open);
 #endif
 typedef void (*WUDHidRecvCallback)(UINT8 devHandle, UINT8* pReport, UINT16 len);
 
-typedef struct WUDDevInfo {
+struct WUDDevInfo {
     SCDevInfo conf;   // at 0x0
     BD_ADDR devAddr;  // at 0x40
     LINK_KEY linkKey; // at 0x46
@@ -73,7 +73,7 @@ typedef struct WUDDevInfo {
     u8 UNK_0x5C;      // at 0x5C
     u8 UNK_0x5D[1];
     tBTA_HH_ATTR_MASK hhAttrMask; // at 0x5E
-} WUDDevInfo;
+};
 
 BOOL WUDInit(void);
 BOOL WUDIsBusy(void);

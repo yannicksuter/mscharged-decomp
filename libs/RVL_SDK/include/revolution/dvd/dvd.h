@@ -1,6 +1,8 @@
 #ifndef RVL_SDK_DVD_H
 #define RVL_SDK_DVD_H
 #include <revolution/types.h>
+#include <revolution/os/OSAlarm_fwd.h>
+#include <revolution/dvd/DVDTypes_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -8,11 +10,6 @@ extern "C" {
 // OS sets MSB to signal that the device code was successfully read
 #define DVD_DEVICE_CODE_READ (1 << 15)
 #define MAKE_DVD_DEVICE_CODE(x) (DVD_DEVICE_CODE_READ | (x))
-
-// Forward declarations
-typedef struct DVDCommandBlock DVDCommandBlock;
-typedef struct DVDFileInfo DVDFileInfo;
-typedef struct OSAlarm OSAlarm;
 
 typedef enum {
     DVD_RESULT_COVER_CLOSED = -4,
@@ -48,7 +45,7 @@ typedef enum {
 typedef void (*DVDAsyncCallback)(s32 result, DVDFileInfo* info);
 typedef void (*DVDCommandCallback)(s32 result, DVDCommandBlock* block);
 
-typedef struct DVDDiskID {
+struct DVDDiskID {
     char game[4];    // at 0x0
     char company[2]; // at 0x4
     u8 disk;         // at 0x6
@@ -58,9 +55,9 @@ typedef struct DVDDiskID {
     u8 padding[14];  // at 0xA
     u32 rvlMagic;    // at 0x18
     u32 gcMagic;     // at 0x1C
-} DVDDiskID;
+};
 
-typedef struct DVDCommandBlock {
+struct DVDCommandBlock {
     DVDCommandBlock* next;       // at 0x0
     DVDCommandBlock* prev;       // at 0x4
     u32 command;                 // at 0x8
@@ -73,21 +70,21 @@ typedef struct DVDCommandBlock {
     DVDDiskID* id;               // at 0x24
     DVDCommandCallback callback; // at 0x28
     void* userData;              // at 0x2C
-} DVDCommandBlock;
+};
 
-typedef struct DVDDriveInfo {
+struct DVDDriveInfo {
     u16 revision;    // at 0x0
     u16 deviceCode;  // at 0x2
     u32 releaseDate; // at 0x4
     char padding[32 - 0x8];
-} DVDDriveInfo;
+};
 
-typedef struct DVDFileInfo {
+struct DVDFileInfo {
     DVDCommandBlock block;     // at 0x0
     u32 offset;                // at 0x30
     u32 size;                  // at 0x34
     DVDAsyncCallback callback; // at 0x38
-} DVDFileInfo;
+};
 
 extern volatile u32 __DVDLayoutFormat;
 extern DVDCommandBlock __DVDStopMotorCommandBlock;
