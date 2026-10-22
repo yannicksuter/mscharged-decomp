@@ -3,6 +3,9 @@
 #include <revolution/types.h>
 
 #include <revolution/mtx.h>
+#if defined(VERSION_R4QK01)
+#include <revolution/wpad/WPAD.h>
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,6 +74,11 @@ void KPADSetAccParam(s32 chan, f32 playRadius, f32 sensitivity);
 s32 KPADRead(s32 chan, KPADStatus* pSamples, u32 numSamples);
 
 void KPADInit(void);
+void KPADEnableDPD(s32 chan);
+void KPADDisableDPD(s32 chan);
+#if defined(VERSION_R4QK01)
+WPADConnectCallback* KPADSetConnectCallback(s32 chan, WPADConnectCallback* callback);
+#endif
 
 #ifdef __cplusplus
 }

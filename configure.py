@@ -1418,7 +1418,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/nlFileCache.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"], mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/nlFlash.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/nlMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
+            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "NL/plat/TransportSocket.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "NL/plat/WiiPadMonkey.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
@@ -1779,7 +1779,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/os/OSUtf.c", extra_cflags=["-func_align 16"] if config.version == "R4QK01" else []),
 
             # RVL_SDK/pad
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/pad/Pad.c", extra_cflags=["-inline noauto"]),
+            Object(Matching, "RVL_SDK/pad/Pad.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None, extra_cflags=["-inline noauto"]),
 
             # RVL_SDK/sc
             Object(Matching, "RVL_SDK/sc/scapi.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
@@ -1788,7 +1788,7 @@ config.libs = [
 
             # RVL_SDK/si
             Object(Matching, "RVL_SDK/si/SIBios.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5.2"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/si/SISamplingRate.c"),
+            Object(Matching, "RVL_SDK/si/SISamplingRate.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/so
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/so/soBasic.c"),
@@ -1812,7 +1812,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/tpl/TPL.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/usb
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/usb/usb.c"),
+            Object(Matching, "RVL_SDK/usb/usb.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
 
             # RVL_SDK/vi
             Object(Matching, "RVL_SDK/vi/i2c.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
@@ -1891,7 +1891,7 @@ config.libs = [
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/bta_sys_main.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/bte_hcisu.c", mw_version="Wii/1.0" if config.version == "R4QK01" else "GC/3.0a5"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/bte_init.c"),
-            Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01"), "RVL_SDK/bte/bte_logmsg.c"),
+            Object(Matching, "RVL_SDK/bte/bte_logmsg.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(Matching, "RVL_SDK/bte/bte_main.c", mw_version="Wii/1.0" if config.version == "R4QK01" else None),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/btm_acl.c"),
             Object(MatchingFor("R4QE01", "R4QP01_rev2", "R4QP01_rev1", "R4QJ01", "R4QK01"), "RVL_SDK/bte/btm_dev.c"),

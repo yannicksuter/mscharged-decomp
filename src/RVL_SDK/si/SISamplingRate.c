@@ -58,7 +58,11 @@ void SISetSamplingRate(u32 msec) {
 
     SamplingRate = msec;
 
+#if defined(VERSION_R4QK01)
+    switch ((u32)VIGetTvFormat()) {
+#else
     switch (VIGetTvFormat()) {
+#endif
     case VI_TV_FMT_NTSC:
     case VI_TV_FMT_MPAL:
     case VI_TV_FMT_EURGB60:

@@ -60,12 +60,17 @@ void PlatPadManager::Initialize()
         KPADSetAccParam(channel, 0.0f, 1.0f);
         KPADSetBtnRepeat(channel, 0.75f, 0.25f);
 
+#if defined(VERSION_R4QK01)
+        KPADSetConnectCallback(channel, PadConnectChanged);
+#endif
         type[channel] = PLAT_PAD_NONE;
         connected[channel] = false;
         dpdEnabled[channel] = false;
         dpdActive[channel] = false;
         dataFormatSet[channel] = false;
+#if !defined(VERSION_R4QK01)
         WPADSetConnectCallback(channel, PadConnectChanged);
+#endif
     }
 }
 
@@ -211,8 +216,26 @@ bool PlatPadManager::IsDPDEnabled(int channel) const
     return dpdEnabled[channel];
 }
 
+#if defined(VERSION_R4QK01)
+inline
+#endif
 void PlatPadManager::UpdateDPD(int channel, unsigned int deviceType)
 {
+#if defined(VERSION_R4QK01)
+    if (dpdActive[channel] != dpdEnabled[channel])
+    {
+        if (dpdEnabled[channel])
+        {
+            KPADEnableDPD(channel);
+            dpdActive[channel] = true;
+        }
+        else
+        {
+            KPADDisableDPD(channel);
+            dpdActive[channel] = false;
+        }
+    }
+#else
     if (dpdActive[channel] != dpdEnabled[channel])
     {
         if (dpdEnabled[channel])
@@ -240,6 +263,7 @@ void PlatPadManager::UpdateDPD(int channel, unsigned int deviceType)
             dpdActive[channel] = false;
         }
     }
+#endif
 }
 
 WiiRemotePadStatus* PlatPadManager::GetRemoteStatus(int channel)

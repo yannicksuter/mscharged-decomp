@@ -4,11 +4,21 @@
 
 #include <stdio.h>
 
+#if defined(VERSION_R4QK01)
+#define USB_HEAP_SIZE 0x4000
+#else
 #define USB_HEAP_SIZE 0x1000
+#endif
 
 typedef enum {
     USB_NCLEAN_CLOSEDEVICE = 0,
+#if defined(VERSION_R4QK01)
+    USB_NCLEAN_MSG2 = 2,
+#endif
     USB_NCLEAN_BULKMSG = 3,
+#if defined(VERSION_R4QK01)
+    USB_NCLEAN_MSG4 = 4,
+#endif
     USB_NCLEAN_CTRLMSG = 7,
     USB_NCLEAN_MAX = 8
 } USBNClean;
@@ -16,7 +26,10 @@ typedef enum {
 typedef enum {
     USB_IOCTLV_CTRLMSG,
     USB_IOCTLV_BLKMSG,
-    USB_IOCTLV_INTRMSG
+    USB_IOCTLV_INTRMSG,
+#if defined(VERSION_R4QK01)
+    USB_IOCTLV_LONGBLKMSG = 10
+#endif
 } USBIoctl;
 
 typedef struct USBMsg {
@@ -26,11 +39,21 @@ typedef struct USBMsg {
 
 typedef struct USBCommandBlock {
     USBCallback callback; // at 0x0
+#if defined(VERSION_R4QK01)
+    USBISOCallback isoCallback; // at 0x4
+    void* callbackArg; // at 0x8
+    void* isoCallbackArg; // at 0xC
+    char UNK_0x10[0x4];
+    void* clean[USB_NCLEAN_MAX]; // at 0x14
+    u32 nclean; // at 0x34
+    char UNK_0x38[0x40 - 0x38];
+#else
     void* callbackArg;    // at 0x4
     char UNK_0x8[0x4];
     void* clean[USB_NCLEAN_MAX]; // at 0xC
     u32 nclean;                  // at 0x2C
     char UNK_0x30[0x40 - 0x30];
+#endif
     union {
         char path[FS_MAX_PATH];
         USBMsg msg;
@@ -43,6 +66,9 @@ static void* lo = NULL;
 static void* hi = NULL;
 
 static u8 s_usb_log = FALSE;
+#if defined(VERSION_R4QK01)
+static u8 s_usb_err = TRUE;
+#endif
 
 static void USB_LOG(const char* fmt, ...) {
     va_list list;
@@ -58,7 +84,11 @@ static void USB_LOG(const char* fmt, ...) {
 static void USB_ERR(const char* fmt, ...) {
     va_list list;
 
+#if defined(VERSION_R4QK01)
+    if (s_usb_err) {
+#else
     if (s_usb_log) {
+#endif
         OSReport("USB ERR: ");
         va_start(list, fmt);
         vprintf(fmt, list);
@@ -133,28 +163,54 @@ IPCResult IUSB_CloseLib(void) {
     return IPC_RESULT_OK;
 }
 
+#if defined(VERSION_R4QK01)
+static s32 _intrBlkCtrlIsoCb(s32 result, void* arg) {
+#else
 static s32 _intBlkCtrlCb(s32 result, void* arg) {
+#endif
     int i;
     USBCommandBlock* block = (USBCommandBlock*)arg;
 
+#if defined(VERSION_R4QK01)
+    USB_LOG("_intrBlkCtrlIsoCb returned: %d\n", result);
+    USB_LOG("_intrBlkCtrlIsoCb: nclean = %d\n", block->nclean);
+#else
     USB_LOG("_intrBlkCtrlCb returned: %d\n", result);
     USB_LOG("_intrBlkCtrlCb: nclean = %d\n", block->nclean);
+#endif
 
     if (block->nclean != USB_NCLEAN_CTRLMSG &&
         block->nclean != USB_NCLEAN_BULKMSG &&
-        block->nclean != USB_NCLEAN_CLOSEDEVICE) {
+        block->nclean != USB_NCLEAN_CLOSEDEVICE
+#if defined(VERSION_R4QK01)
+        && block->nclean != USB_NCLEAN_MSG4 &&
+        block->nclean != USB_NCLEAN_MSG2
+#endif
+        ) {
+#if defined(VERSION_R4QK01)
+        USB_ERR("__intrBlkCtrlIsoCb: got invalid nclean\n");
+#else
         USB_ERR("__intBlkCtrlCb: got invalid nclean\n");
+#endif
     } else {
         for (i = 0; i < block->nclean; i++) {
             USB_LOG("Freeing clean[%d] = %x\n", i, block->clean[i]);
             IOSFree(block->clean[i]);
         }
+#if defined(VERSION_R4QK01)
+        block->nclean = 0;
+#endif
     }
 
     USB_LOG("cb = %x cbArg = %x\n", block->callback, block->callbackArg);
 
     if (block->callback != NULL) {
         block->callback(result, block->callbackArg);
+#if defined(VERSION_R4QK01)
+    } else if (block->isoCallback != NULL) {
+        USB_LOG("calling iso callback\n");
+        block->isoCallback(result, block->isoCallbackArg, block->callbackArg);
+#endif
     }
 
     IOSFree(block);
@@ -180,6 +236,9 @@ IPCResult IUSB_OpenDeviceIds(const char* interface, u16 vid, u16 pid,
         goto end;
     }
 
+#if defined(VERSION_R4QK01)
+    memset(block, 0, sizeof(USBCommandBlock));
+#endif
     snprintf(block->path, sizeof(block->path), "/dev/usb/%s/%x/%x", interface,
              vid, pid);
     USB_LOG("OpenDevice - %s\n", block->path);
@@ -214,11 +273,18 @@ IPCResult IUSB_CloseDeviceAsync(s32 fd, USBCallback callback,
         goto end;
     }
 
+#if defined(VERSION_R4QK01)
+    memset(block, 0, sizeof(USBCommandBlock));
+#endif
     block->callback = callback;
     block->callbackArg = callbackArg;
     block->nclean = USB_NCLEAN_CLOSEDEVICE;
 
+#if defined(VERSION_R4QK01)
+    result = IOS_CloseAsync(fd, _intrBlkCtrlIsoCb, block);
+#else
     result = IOS_CloseAsync(fd, _intBlkCtrlCb, block);
+#endif
     USB_LOG("CloseDevice returned: %d\n", result);
 
     if (result < 0) {
@@ -232,6 +298,96 @@ end:
 DECOMP_FORCEACTIVE(usb_c,
                    "openDevice: Not enough memory\n",
                    "getDeviceList: Not enough memory\n");
+
+#if defined(VERSION_R4QK01)
+static IPCResult __LongBlkMsgInt(s32 fd, u32 endpoint, u32 length, void* buffer,
+                                 USBCallback callback, void* callbackArg,
+                                 u8 async) {
+    IPCResult result;
+    IPCIOVector* vectors;
+    u8* endpointWork;
+    u32* lengthWork;
+    USBCommandBlock* block;
+
+    vectors = (IPCIOVector*)IOSAlloc(0x60);
+    endpointWork = (u8*)IOSAlloc(32);
+    lengthWork = (u32*)IOSAlloc(32);
+
+    if (vectors == NULL || endpointWork == NULL || lengthWork == NULL) {
+        USB_ERR("__LongBlkMsgInt: Not enough memory\n");
+        result = IPC_RESULT_ALLOC_FAILED;
+        goto end;
+    }
+
+    *endpointWork = (u8)endpoint;
+    *lengthWork = length;
+
+    // Input vector 1: Transfer endpoint
+    vectors[0].base = endpointWork;
+    vectors[0].length = sizeof(u8);
+
+    // Input vector 2: Transfer length
+    vectors[1].base = lengthWork;
+    vectors[1].length = sizeof(u32);
+
+    // Output vector 1: Transfer buffer
+    vectors[2].base = buffer;
+    vectors[2].length = length;
+
+    DCFlushRange(endpointWork, 32);
+    DCFlushRange(lengthWork, 32);
+    DCFlushRange(vectors, 0x60);
+
+    if (!async) {
+        result = IOS_Ioctlv(fd, USB_IOCTLV_LONGBLKMSG, 2, 1, vectors);
+        USB_LOG("Long bulk ioctl returned: %d\n", result);
+        goto end;
+    }
+
+    block = IOSAlloc(sizeof(USBCommandBlock));
+    if (block == NULL) {
+        USB_ERR("LongBlkMsgInt (async): Not enough memory\n");
+        result = IPC_RESULT_ALLOC_FAILED;
+        goto end;
+    }
+    memset(block, 0, sizeof(USBCommandBlock));
+
+    block->callback = callback;
+    block->callbackArg = callbackArg;
+    USB_LOG("longblkmsg: cb = 0x%x cbArg = 0x%x\n", block->callback,
+            block->callbackArg);
+
+    // Mark memory for deletion
+    block->nclean = USB_NCLEAN_BULKMSG;
+    block->clean[0] = endpointWork;
+    block->clean[1] = lengthWork;
+    block->clean[2] = vectors;
+
+    block->msg.buffer = buffer;
+    block->msg.length = length;
+
+    result = IOS_IoctlvAsync(fd, USB_IOCTLV_LONGBLKMSG, 2, 1, vectors,
+                             _intrBlkCtrlIsoCb, block);
+    if (result >= IPC_RESULT_OK) {
+        goto end_async;
+    }
+    if (result == IPC_RESULT_ALLOC_FAILED) {
+        OSReport("%s: IoctlvAsync returned error %d\n", __FUNCTION__, result);
+    }
+
+    IOSFree(block);
+
+// Non-async (or unsuccessful async) means we must manually free memory
+end:
+    IOSFree(endpointWork);
+    IOSFree(lengthWork);
+    IOSFree(vectors);
+
+// Async callback automatically freed the memory marked in block->clean
+end_async:
+    return result;
+}
+#endif
 
 static IPCResult __IntrBlkMsgInt(s32 fd, u32 endpoint, u32 length, void* buffer,
                                  u8 ioctl, USBCallback callback,
@@ -284,6 +440,9 @@ static IPCResult __IntrBlkMsgInt(s32 fd, u32 endpoint, u32 length, void* buffer,
         goto end;
     }
 
+#if defined(VERSION_R4QK01)
+    memset(block, 0, sizeof(USBCommandBlock));
+#endif
     block->callback = callback;
     block->callbackArg = callbackArg;
     USB_LOG("intrblkmsg: cb = 0x%x cbArg = 0x%x\n", block->callback,
@@ -298,10 +457,20 @@ static IPCResult __IntrBlkMsgInt(s32 fd, u32 endpoint, u32 length, void* buffer,
     block->msg.buffer = buffer;
     block->msg.length = length;
 
+#if defined(VERSION_R4QK01)
+    result = IOS_IoctlvAsync(fd, ioctl, 2, 1, vectors, _intrBlkCtrlIsoCb, block);
+#else
     result = IOS_IoctlvAsync(fd, ioctl, 2, 1, vectors, _intBlkCtrlCb, block);
+#endif
     if (result >= IPC_RESULT_OK) {
         goto end_async;
     }
+
+#if defined(VERSION_R4QK01)
+    if (result == IPC_RESULT_ALLOC_FAILED) {
+        OSReport("%s: IoctlvAsync returned error %d\n", __FUNCTION__, result);
+    }
+#endif
 
     IOSFree(block);
 
@@ -316,6 +485,12 @@ end_async:
     return result;
 }
 
+#if defined(VERSION_R4QK01)
+DECOMP_FORCEACTIVE(usb_long_bulk,
+                   "calling short blk transfer fn: buflen = %u limit = %u\n",
+                   "calling long blk transfer fn: buflen = %u limit = %u\n");
+#endif
+
 IPCResult IUSB_ReadIntrMsgAsync(s32 fd, u32 endpoint, u32 length, void* buffer,
                                 USBCallback callback, void* callbackArg) {
     DCInvalidateRange(buffer, length);
@@ -323,13 +498,37 @@ IPCResult IUSB_ReadIntrMsgAsync(s32 fd, u32 endpoint, u32 length, void* buffer,
                            callback, callbackArg, TRUE);
 }
 
+#if defined(VERSION_R4QK01)
+IPCResult IUSB_ReadBlkMsgAsync(s32 fd, u32 endpoint, u32 length, void* buffer,
+                               USBCallback callback, void* callbackArg) {
+    DCInvalidateRange(buffer, length);
+    if (length <= 0xFFFF)
+        return __IntrBlkMsgInt(fd, endpoint, length, buffer,
+                               USB_IOCTLV_BLKMSG, callback, callbackArg, TRUE);
+    return __LongBlkMsgInt(fd, endpoint, length, buffer, callback,
+                           callbackArg, TRUE);
+}
+#else
 IPCResult IUSB_ReadBlkMsgAsync(s32 fd, u32 endpoint, u32 length, void* buffer,
                                USBCallback callback, void* callbackArg) {
     DCInvalidateRange(buffer, length);
     return __IntrBlkMsgInt(fd, endpoint, length, buffer, USB_IOCTLV_BLKMSG,
                            callback, callbackArg, TRUE);
 }
+#endif
 
+#if defined(VERSION_R4QK01)
+IPCResult IUSB_WriteBlkMsgAsync(s32 fd, u32 endpoint, u32 length,
+                                const void* buffer, USBCallback callback,
+                                void* callbackArg) {
+    DCFlushRange(buffer, length);
+    if (length <= 0xFFFF)
+        return __IntrBlkMsgInt(fd, endpoint, length, (void*)buffer,
+                               USB_IOCTLV_BLKMSG, callback, callbackArg, TRUE);
+    return __LongBlkMsgInt(fd, endpoint, length, (void*)buffer, callback,
+                           callbackArg, TRUE);
+}
+#else
 IPCResult IUSB_WriteBlkMsgAsync(s32 fd, u32 endpoint, u32 length,
                                 const void* buffer, USBCallback callback,
                                 void* callbackArg) {
@@ -337,6 +536,7 @@ IPCResult IUSB_WriteBlkMsgAsync(s32 fd, u32 endpoint, u32 length,
     return __IntrBlkMsgInt(fd, endpoint, length, (void*)buffer,
                            USB_IOCTLV_BLKMSG, callback, callbackArg, TRUE);
 }
+#endif
 
 static IPCResult __CtrlMsgInt(s32 fd, u8 requestType, u8 request, u16 value,
                               u16 index, u16 length, void* buffer,
@@ -429,6 +629,9 @@ static IPCResult __CtrlMsgInt(s32 fd, u8 requestType, u8 request, u16 value,
         goto end;
     }
 
+#if defined(VERSION_R4QK01)
+    memset(block, 0, sizeof(USBCommandBlock));
+#endif
     block->callback = callback;
     block->callbackArg = callbackArg;
     USB_LOG("ctrlmsgint: cb = 0x%x cbArg = 0x%x\n", block->callback,
@@ -448,7 +651,11 @@ static IPCResult __CtrlMsgInt(s32 fd, u8 requestType, u8 request, u16 value,
     block->msg.length = length;
 
     result = IOS_IoctlvAsync(fd, USB_IOCTLV_CTRLMSG, 6, 1, vectors,
+#if defined(VERSION_R4QK01)
+                             _intrBlkCtrlIsoCb, block);
+#else
                              _intBlkCtrlCb, block);
+#endif
     USB_LOG("Ctrl Msg async returned: %d\n", result);
 
     if (result >= IPC_RESULT_OK) {
@@ -480,6 +687,33 @@ IPCResult IUSB_WriteCtrlMsgAsync(s32 fd, u8 requestType, u8 request, u16 value,
                         callback, callbackArg, TRUE);
 }
 
+#if defined(VERSION_R4QK01)
+DECOMP_FORCEACTIVE(usb_c,
+                   "GetStrCb returned: %d\n",
+                   "GetStrCb: buf = 0x%x buflen = %u\n",
+                   "Failed to convert buffer from unicode 2 ascii\n",
+                   "calling cb 0x%x with arg 0x%x\n",
+                   "Failed __CtrlMsg: %d",
+                   "Failed to convert unicode 2 ascii\n",
+                   "GetStr - _GetStrCb\n",
+                   " GetAsciiStrAsync: Not enough memory\n",
+                   "__CtrlMsgInt failed %d\n",
+                   "GetDescrCb returned: %d\n",
+                   "GetDevDescr\n",
+                   "GetDevDescr: Not enough memory\n",
+                   "GetDevDescr: %d\n",
+                   "GetDevDescr - _GetDescrCb\n",
+                   "GetDevDescrAsync: Not enough memory\n",
+                   "DeviceRemovalNotifyAsync\n",
+                   "packet %u too big: %u\n",
+                   "Invalid parameters for ISO transfer request\n",
+                   "IUSB_IsoMsgAsync: Not enough memory\n",
+                   "Open(%s) failed\n",
+                   "Invalid path or devClass in insertion notification call\n",
+                   "IUSB_RegisterInsertionNotifyWithIdAsync",
+                   "%s: Not enough memory\n",
+                   "Failed to open %s: %d\n");
+#else
 DECOMP_FORCEACTIVE(usb_c,
                    "GetStrCb returned: %d\n",
                    "GetStrCb: buf = 0x%x buflen = %u\n",
@@ -500,3 +734,4 @@ DECOMP_FORCEACTIVE(usb_c,
                    "Invalid parameters for ISO transfer request\n",
                    "IUSB_IsoMsgAsync: Not enough memory\n",
                    "Open(%s) failed\n");
+#endif
