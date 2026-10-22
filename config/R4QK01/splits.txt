@@ -5136,6 +5136,9 @@ MSL/uart_console_io_gcn.c:
 	.text       start:0x8038E084 end:0x8038E154
 	.sbss       start:0x80605B88 end:0x80605B90
 
+MSL/abort_exit_ppc_eabi.c:
+	.sbss       start:0x80605B90 end:0x80605B98
+
 MSL/math_sun.c:
 	extab       start:0x80006750 end:0x80006758
 	extabindex  start:0x80006DF8 end:0x80006E04
@@ -5264,6 +5267,9 @@ Runtime/NMWException.cpp:
 	extabindex  start:0x80006E04 end:0x80006E40
 	.text       start:0x8039204C end:0x803923FC
 
+Runtime/ptmf.c:
+	.text       start:0x803923FC end:0x80392454
+
 Runtime/runtime.c:
 	.text       start:0x80392454 end:0x80392C20
 	.rodata     start:0x804B9440 end:0x804B9458
@@ -5282,9 +5288,6 @@ Runtime/Gecko_ExceptionPPC.cpp:
 Runtime/GCN_mem_alloc.c:
 	.text       start:0x80392CF4 end:0x80392E64
 	.rodata     start:0x804B9458 end:0x804B94C8
-
-RVL_SDK/dvd/dvdFatal.c:
-	.rodata     start:0x804B94C8 end:0x804B9500
 
 RVL_SDK/ai/ai.c:
 	.text       start:0x80392E70 end:0x8039343C
@@ -5381,6 +5384,7 @@ RVL_SDK/base/PPCArch.c:
 	.data       start:0x80504A80 end:0x80504AB8
 
 RVL_SDK/db/db.c:
+	.text       start:0x8039A8D0 end:0x8039A9D0
 	.data       start:0x80504AB8 end:0x80504AD0
 	.sbss       start:0x80605D30 end:0x80605D38
 
@@ -5423,6 +5427,14 @@ RVL_SDK/dvd/dvderror.c:
 
 RVL_SDK/dvd/dvdidutils.c:
 	.text       start:0x803A1260 end:0x803A1350 align:16
+
+RVL_SDK/dvd/dvdFatal.c:
+	.text       start:0x803A1350 end:0x803A14C0
+	.rodata     start:0x804B94C8 end:0x804B9500
+	.data       start:0x805051D0 end:0x80505998
+	.sdata      start:0x80603358 end:0x80603360
+	.sbss       start:0x80605E28 end:0x80605E2C
+	.sdata2     start:0x8060AA68 end:0x8060AA6C
 
 RVL_SDK/dvd/dvdDeviceError.c:
 	.text       start:0x803A14C0 end:0x803A174C
@@ -5536,7 +5548,7 @@ RVL_SDK/gx/GXPerf.c:
 	.data       start:0x80507318 end:0x805073FC
 
 RVL_SDK/ipc/ipcMain.c:
-	.text       start:0x803AFBE0 end:0x803AFCC8
+	.text       start:0x803AFBE0 end:0x803AFCD0
 	.sbss       start:0x80605F00 end:0x80605F14
 
 RVL_SDK/ipc/ipcclt.c:
@@ -5546,10 +5558,11 @@ RVL_SDK/ipc/ipcclt.c:
 	.sbss       start:0x80605F18 end:0x80605F28
 
 RVL_SDK/ipc/memory.c:
-	.text       start:0x803B16C0 end:0x803B1BE8
+	.text       start:0x803B16C0 end:0x803B1BF0
 	.bss        start:0x80584740 end:0x805847C0
 
 RVL_SDK/ipc/ipcProfile.c:
+	.text       start:0x803B1BF0 end:0x803B1DD0
 	.bss        start:0x805847C0 end:0x805848C0
 	.sbss       start:0x80605F28 end:0x80605F30
 
@@ -5568,6 +5581,13 @@ RVL_SDK/mem/mem_heapCommon.c:
 
 RVL_SDK/mem/mem_expHeap.c:
 	.text       start:0x803B6330 end:0x803B6BB8 align:16
+
+RVL_SDK/mem/mem_allocator.c:
+	.text       start:0x803B6BC0 end:0x803B6C1C
+	.sdata2     start:0x8060ABB8 end:0x8060ABC0
+
+RVL_SDK/mem/mem_list.c:
+	.text       start:0x803B6C20 end:0x803B6D40
 
 RVL_SDK/mix/mix.c:
 	.text       start:0x803B6D40 end:0x803B9E64
@@ -5665,8 +5685,11 @@ RVL_SDK/os/OSInterrupt.c:
 	.data       start:0x805097A0 end:0x805097D0
 	.sbss       start:0x80606018 end:0x8060602C
 
+RVL_SDK/os/OSLink.c:
+	.text       start:0x803C28C0 end:0x803C28E0
+
 RVL_SDK/os/OSMessage.c:
-	.text       start:0x803C28E0 end:0x803C2AEC
+	.text       start:0x803C28E0 end:0x803C2BC0
 
 RVL_SDK/os/OSMemory.c:
 	.text       start:0x803C2BC0 end:0x803C3360
@@ -6376,6 +6399,9 @@ RVL_SDK/vf/d_vf_sys.c:
 	.text       start:0x80429480 end:0x804297B0
 	.bss        start:0x805FAD58 end:0x805FADC0
 	.sbss       start:0x806064B8 end:0x806064D0
+
+RVL_SDK/vf/nand_drv.c:
+	.sbss       start:0x806064D0 end:0x806064D8
 
 RVL_SDK/vf/d_hash.c:
 	.text       start:0x804297B0 end:0x804298C0
