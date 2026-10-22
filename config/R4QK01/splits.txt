@@ -5293,12 +5293,13 @@ RVL_SDK/ai/ai.c:
 	.sbss       start:0x80605BB0 end:0x80605BEC
 
 RVL_SDK/arc/arc.c:
-	.text       start:0x80393440 end:0x80393E18
+	.text       start:0x80393440 end:0x80393E20
 	.data       start:0x80501618 end:0x80501688
 	.sdata      start:0x80603308 end:0x80603310
 
 RVL_SDK/ax/AX.c:
 	.text       start:0x80393E20 end:0x80393E90
+	.data       start:0x80501688 end:0x805016D0
 	.sdata      start:0x80603310 end:0x80603314
 	.sbss       start:0x80605BF0 end:0x80605BF4
 
