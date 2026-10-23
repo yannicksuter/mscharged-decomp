@@ -2,6 +2,7 @@
 #define REVOLUTION_OS_CONTEXT_H
 
 #include <revolution/types.h>
+#include <revolution/os/OSContext_fwd.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,7 +10,7 @@ extern "C" {
 
 #define OS_CONTEXT_STATE_FP_SAVED (1 << 0)
 
-typedef struct OSContext {
+struct OSContext {
     u32 gprs[32];
     u32 cr;
     u32 lr;
@@ -25,7 +26,7 @@ typedef struct OSContext {
     u32 gqrs[8];
     u32 psf_pad;
     f64 psfs[32];
-} OSContext;
+};
 
 void OSSaveFPUContext(OSContext* context);
 void OSSetCurrentContext(OSContext* context);

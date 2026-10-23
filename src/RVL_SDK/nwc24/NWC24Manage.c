@@ -17,7 +17,11 @@ typedef enum {
     NWC24_FAIL_FATAL = 1 << 2
 } NWC24FailFlag;
 
+#if defined(VERSION_R4QK01)
+RVL_LIB_VERSION(NWC24, "Jun  9 2009", "11:59:51", "0x4199_60831");
+#else
 RVL_LIB_VERSION(NWC24, "Mar  9 2007", "15:08:21", "0x4199_60831");
+#endif
 
 NWC24iWork* NWC24WorkP = NULL;
 

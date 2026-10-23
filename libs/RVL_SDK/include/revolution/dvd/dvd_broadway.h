@@ -1,20 +1,15 @@
 #ifndef RVL_SDK_DVD_BROADWAY_H
 #define RVL_SDK_DVD_BROADWAY_H
 #include <revolution/types.h>
+#include <revolution/os/OSAlarm_fwd.h>
+#include <revolution/esp/ESPTypes_fwd.h>
+#include <revolution/dvd/DVDTypes_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define DVD_LOW_OFFSET(x) ((x) >> 2)
 #define DVD_LOW_SPEED(x) (((x) & 3) << 16)
-
-// Forward declarations
-typedef struct DVDDiskID DVDDiskID;
-typedef struct DVDDriveInfo DVDDriveInfo;
-typedef struct ESPTicket ESPTicket;
-typedef struct ESPTicketView ESPTicketView;
-typedef struct ESPTmd ESPTmd;
-typedef struct OSAlarm OSAlarm;
 
 typedef enum {
     DVD_INTTYPE_TC = (1 << 0),   // Transaction callback?

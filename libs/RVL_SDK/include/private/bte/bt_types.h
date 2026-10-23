@@ -27,6 +27,7 @@
 /* Includes changes by muff1n1634 and for this repository (KoopTheKoopa) */
 
 #include "data_types.h"
+#include <revolution/bte_types.h>
 
 #define UINT8_TO_STREAM(p, u8)									\
 	do															\
@@ -294,12 +295,7 @@ enum
 	GUARANTEED = 2,
 };
 
-#define BD_ADDR_LEN			6
-typedef UINT8 BD_ADDR[BD_ADDR_LEN];
-typedef UINT8 *BD_ADDR_PTR;
 
-#define LINK_KEY_LEN		16
-typedef UINT8 LINK_KEY[LINK_KEY_LEN];
 
 #define DEV_CLASS_LEN		3
 typedef UINT8 DEV_CLASS[DEV_CLASS_LEN];

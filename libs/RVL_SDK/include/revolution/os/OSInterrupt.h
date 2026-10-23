@@ -2,8 +2,8 @@
 #define REVOLUTION_OS_INTERRUPT_H
 
 #include <revolution/types.h>
+#include <revolution/os/OSContext_fwd.h>
 
-typedef struct OSContext OSContext;
 
 #ifdef __cplusplus
 extern "C" {

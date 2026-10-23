@@ -1,15 +1,10 @@
 #ifndef RVL_SDK_AXFX_REVERB_HI_EXP_DPL2_H
 #define RVL_SDK_AXFX_REVERB_HI_EXP_DPL2_H
 #include <revolution/types.h>
+#include <revolution/axfx/AXFXCommon_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Forward declarations
-typedef struct AXFX_BUS AXFX_BUS;
-typedef struct AXFX_BUS_DPL2 AXFX_BUS_DPL2;
-typedef struct AXFX_BUFFERUPDATE AXFX_BUFFERUPDATE;
-typedef struct AXFX_BUFFERUPDATE_DPL2 AXFX_BUFFERUPDATE_DPL2;
 
 typedef struct AXFX_REVERBHI_EXP_DPL2 {
     f32* earlyLine[4];  // at 0x0

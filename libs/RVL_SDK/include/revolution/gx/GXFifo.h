@@ -5,12 +5,13 @@
 #include <revolution/gx/GXInternal.h>
 #include <revolution/gx/GXFifo_fwd.h>
 
+#include <revolution/os/OSThread_fwd.h>
 #include <revolution/os.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-GX_PUBLIC_STRUCT_DECL(GXFifoObj, 128);
+GX_PUBLIC_STRUCT_DEF(GXFifoObj, 128);
 
 typedef void (*GXBreakPtCallback)(void);
 
@@ -40,8 +41,6 @@ void __GXCleanGPFifo(void);
 
 void GXEnableBreakPt(void* writePtr);
 void GXDisableBreakPt(void);
-
-typedef struct OSThread OSThread;
 
 OSThread* GXGetCurrentGXThread(void);
 

@@ -3,8 +3,8 @@
 
 #include <revolution/os/OSCache_fwd.h>
 #include <revolution/types.h>
+#include <revolution/os/OSContext_fwd.h>
 
-typedef struct OSContext OSContext;
 
 #ifdef __cplusplus
 extern "C" {

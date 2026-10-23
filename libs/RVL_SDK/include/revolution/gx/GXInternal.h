@@ -22,11 +22,14 @@ extern "C" {
  * (Implementation size is included to require that such a structure already
  * exists.)
  */
-#define GX_PUBLIC_STRUCT_DECL(name, size)                                      \
-    typedef struct _##name {                                                   \
-        u32 dummy[((size) - sizeof(name##Impl) + sizeof(name##Impl)) /         \
-                  sizeof(u32)];                                                \
-    } name;
+#define GX_PUBLIC_STRUCT_DEF(name, size)                                     \
+    struct _##name {                                                         \
+        u32 dummy[((size) - sizeof(name##Impl) + sizeof(name##Impl)) /       \
+                  sizeof(u32)];                                              \
+    }
+
+#define GX_PUBLIC_STRUCT_DECL(name, size) \
+    typedef GX_PUBLIC_STRUCT_DEF(name, size) name;
 
 typedef struct _GXFifoObjImpl {
     u8* base;        // at 0x0

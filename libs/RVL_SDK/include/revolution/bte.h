@@ -2,6 +2,7 @@
 #define RVL_SDK_BTE_H
 
 #include <revolution/types.h>
+#include <revolution/bte_types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,9 +23,6 @@ typedef unsigned short UINT16;
 typedef unsigned long UINT32;
 typedef unsigned char BOOLEAN;
 
-#define BD_ADDR_LEN 6
-typedef UINT8 BD_ADDR[BD_ADDR_LEN];
-typedef UINT8* BD_ADDR_PTR;
 
 typedef UINT16 tBTA_HH_ATTR_MASK;
 typedef UINT32 tBTA_SERVICE_MASK;

@@ -94,7 +94,7 @@ typedef struct NANDFileInfo {
     u8 mark;                    // at 0x8A
 } NANDFileInfo;
 
-typedef struct NANDCommandBlock {
+struct NANDCommandBlock {
     void* userData;             // at 0x0
     NANDAsyncCallback callback; // at 0x4
     NANDFileInfo* info;         // at 0x8
@@ -130,7 +130,7 @@ typedef struct NANDCommandBlock {
 #if defined(VERSION_R4QK01)
     BOOL simpleFlag;            // at 0xB8
 #endif
-} NANDCommandBlock;
+};
 
 s32 NANDCreate(const char* path, u8 perm, u8 attr);
 s32 NANDPrivateCreate(const char* path, u8 perm, u8 attr);

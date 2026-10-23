@@ -3,6 +3,12 @@
 #include <revolution/nwc24/NWC24Internal.h>
 #include <revolution/os.h>
 
+#ifdef VERSION_R4QK01
+#include <revolution/nwc24/internal/NWC24iUserId.h>
+
+#define NWC24_USER_ID_ADDRESS OSPhysicalToCached(0x31C0)
+#endif
+
 #define CONFIG_MAGIC FOURCC('W', 'c', 'C', 'f')
 #define CONFIG_VERSION 8
 #define CONFIG_MAX_ID_COUNT 32
@@ -20,13 +26,55 @@ static u32 GetConfigCheckSum(void);
 static NWC24Err CheckConfig(void) DECOMP_DONT_INLINE;
 static NWC24Err GenerateUserId(u64* pId);
 
+#ifdef VERSION_R4QK01
+static NWC24Err GetCachedUserId(u64* pId) {
+    *pId = *(u64*)NWC24_USER_ID_ADDRESS;
+    if (*pId == 0) {
+        return NWC24_ERR_NULL;
+    }
+
+    return NWC24iCheckUserIdCRC(*pId);
+}
+#endif
+
 NWC24Err NWC24GetMyUserId(u64* pId) {
+#ifdef VERSION_R4QK01
+    NWC24Err scdErr;
+    NWC24Err result = NWC24_OK;
+
+    if (NWC24IsMsgLibOpened() || NWC24IsMsgLibOpenedByTool()) {
+        *pId = config->userId;
+    } else {
+        scdErr = GetCachedUserId(pId);
+        if (scdErr == NWC24_OK) {
+            return scdErr;
+        }
+
+        scdErr = NWC24SuspendScheduler();
+        if (scdErr < 0) {
+            return scdErr;
+        }
+
+        result = NWC24GenerateNewUserId(pId);
+        if (result == NWC24_ERR_ID_GENERATED || result == NWC24_ERR_ID_REGISTERED) {
+            result = NWC24_OK;
+        }
+
+        scdErr = NWC24ResumeScheduler();
+        if (scdErr < 0) {
+            result = result != NWC24_OK ? result : scdErr;
+        }
+    }
+
+    return result;
+#else
     if (NWC24WorkP == NULL) {
         return NWC24_ERR_LIB_NOT_OPENED;
     }
 
     *pId = config->userId;
     return NWC24_OK;
+#endif
 }
 
 NWC24Err NWC24GenerateNewUserId(u64* pId) {
@@ -239,11 +287,21 @@ static NWC24Err CheckConfig(void) {
 
 static NWC24Err GenerateUserId(u64* pId) {
     u32 dummy = 0;
+#ifdef VERSION_R4QK01
+    NWC24Err result;
+#endif
 
     if (pId == NULL) {
         return NWC24_ERR_INVALID_VALUE;
     }
 
     *pId = 9999999999999999;
+#ifdef VERSION_R4QK01
+    result = NWC24iRequestGenerateUserId(pId, &dummy);
+    *(u64*)NWC24_USER_ID_ADDRESS = *pId;
+    DCStoreRange(NWC24_USER_ID_ADDRESS, 32);
+    return result;
+#else
     return NWC24iRequestGenerateUserId(pId, &dummy);
+#endif
 }
