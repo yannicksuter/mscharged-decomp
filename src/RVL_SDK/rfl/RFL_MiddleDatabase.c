@@ -85,6 +85,13 @@ void RFLInitMiddleDB(RFLMiddleDB* db, RFLMiddleDBType type, void* buffer,
         break;
     }
 
+#if defined(VERSION_R4QK01)
+    case RFLMiddleDBType_Reserved1: {
+        *(u16*)&idb->userData1 = 0;
+        break;
+    }
+#endif
+
     default: {
         break;
     }
@@ -637,7 +644,11 @@ RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db, const RFLCharData* raw) {
     RFLiConvertRaw2HRaw((RFLiCharData*)raw, &hraw);
 
     if (idb->type != RFLMiddleDBType_UserSet) {
+#if defined(VERSION_R4QK01)
+        return RFLErrcode_WrongParam;
+#else
         return RFLErrcode_NotAvailable;
+#endif
     }
 
     if (!RFLiIsValidID(&hraw.createID)) {

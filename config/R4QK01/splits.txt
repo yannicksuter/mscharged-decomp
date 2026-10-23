@@ -6555,10 +6555,26 @@ RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp:
 	.rodata     start:0x804BE4A8 end:0x804BE4D0
 	.data       start:0x805224E8 end:0x80523600
 
+RVL_SDK/hbm/nw4hbm/ut/ut_binaryFileFormat.cpp:
+	.text       start:0x80442490 end:0x80442510
+
+RVL_SDK/hbm/nw4hbm/ut/ut_CharStrmReader.cpp:
+	.text       start:0x80442510 end:0x80442630
+
 RVL_SDK/hbm/nw4hbm/ut/ut_CharWriter.cpp:
 	.text       start:0x80442630 end:0x8044402C align:16
 	.rodata     start:0x804BE4D0 end:0x804BE4F0
 	.bss        start:0x805FB430 end:0x805FB448
+
+RVL_SDK/hbm/nw4hbm/ut/ut_Font.cpp:
+	.text       start:0x80444030 end:0x804440D4
+	.data       start:0x80523600 end:0x80523630
+
+RVL_SDK/hbm/nw4hbm/ut/ut_LinkList.cpp:
+	.text       start:0x804440E0 end:0x804441EC
+
+RVL_SDK/hbm/nw4hbm/ut/ut_list.cpp:
+	.text       start:0x804441F0 end:0x80444360
 
 RVL_SDK/hbm/nw4hbm/ut/ut_ResFont.cpp:
 	.text       start:0x80444360 end:0x80444660 align:16
@@ -7033,6 +7049,11 @@ RVL_SDK/rfl/RFL_Controller.c:
 	extab       start:0x80006A18 end:0x80006A28
 	extabindex  start:0x800071F4 end:0x8000720C
 	.text       start:0x804AEDD0 end:0x804AF06C
+
+RVL_SDK/rfl/RFL_MiddleDatabase.c:
+	extab       start:0x80006A28 end:0x80006A40
+	extabindex  start:0x8000720C end:0x80007230
+	.text       start:0x804AF070 end:0x804AF380
 
 RVL_SDK/rfl/RFL_DefaultDatabase.c:
 	.text       start:0x804AF380 end:0x804AF3C8
