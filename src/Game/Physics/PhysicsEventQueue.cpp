@@ -628,7 +628,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             && !((PhysicsPatch*)pObject)->m_bKillMe)
         {
             CreateExplosionShockwave(&pObject->GetPosition());
-            pObject->Unknown0();
+            pObject->ResetState();
         }
         break;
     case PHYSOBJ_BIRDO_EGG:
@@ -645,7 +645,7 @@ void HandleCollisionPatchPatch(void* data)
     if (*(int*)(object + 0x48) == 0 && object[0x65] == false)
     {
         CreateExplosionShockwave(&((PhysicsObject*)object)->GetPosition());
-        ((PhysicsObject*)object)->Unknown0();
+        ((PhysicsObject*)object)->ResetState();
     }
 }
 

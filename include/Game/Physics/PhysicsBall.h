@@ -9,7 +9,7 @@ class PhysicsBall : public PhysicsSphere
 public:
     PhysicsBall(CollisionSpace* space, PhysicsWorld* world, float radius);
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual bool SetContactInfo(
         dContact* contact, PhysicsObject* other, bool first);
     virtual void PreUpdate();

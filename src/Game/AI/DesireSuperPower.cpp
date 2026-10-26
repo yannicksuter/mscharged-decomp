@@ -1709,7 +1709,7 @@ void HandleMuckBallCollision(void* context)
             g_pPhysicsPatchManager->CreatePatch(PATCH_MUCK_HOLE, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
-        event->pPatch->Unknown0();
+        event->pPatch->ResetState();
     }
 }
 

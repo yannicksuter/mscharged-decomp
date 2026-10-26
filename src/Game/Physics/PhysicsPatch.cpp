@@ -178,7 +178,7 @@ void PhysicsPatch::InitType(const int* type)
     }
 }
 
-void PhysicsPatch::Unknown0()
+void PhysicsPatch::ResetState()
 {
     KillEffect();
 
@@ -401,7 +401,7 @@ void PhysicsPatch::Update(float dt)
         }
         else
         {
-            Unknown0();
+            ResetState();
             m_bKillMe = true;
         }
     }
@@ -436,7 +436,7 @@ void PhysicsPatch::ClearMuckHole(float)
     if (m_Type == PATCH_MUCK_HOLE)
     {
         DestroyEffect();
-        Unknown0();
+        ResetState();
     }
 }
 
@@ -646,7 +646,7 @@ void PhysicsPatchManager::ResetEffects()
     {
         if (mPatches[i] != 0)
         {
-            mPatches[i]->Unknown0();
+            mPatches[i]->ResetState();
             delete mPatches[i];
             mPatches[i] = 0;
         }

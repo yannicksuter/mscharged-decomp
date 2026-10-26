@@ -396,7 +396,7 @@ static inline void ClearPhysicsPatchesOfType(int type)
         PhysicsPatch* pPatch = g_pPhysicsPatchManager->GetPatch(i);
         if (pPatch != 0 && pPatch->GetType() == type)
         {
-            pPatch->Unknown0();
+            pPatch->ResetState();
         }
     }
 }

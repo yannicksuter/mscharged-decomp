@@ -1088,7 +1088,7 @@ void OnLavaCollisionPatchGround(CollisionPatchData* event)
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
         g_pPhysicsPatchManager->CreatePatch(PATCH_LAVA_HOLE, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
-        event->pPatch->Unknown0();
+        event->pPatch->ResetState();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
 }
@@ -1260,7 +1260,7 @@ void BubblingLava::Stop(bool initialize)
             {
                 if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
                     continue;
-                patch->Unknown0();
+                patch->ResetState();
             }
         }
     }
@@ -1499,7 +1499,7 @@ void StormShipWeather::ResetLightning(bool initialize)
             PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch && patch->m_Type == PATCH_CHAIN_LIGHTNING)
             {
-                patch->Unknown0();
+                patch->ResetState();
             }
         }
     }
@@ -1635,7 +1635,7 @@ void SandTombWeather::CreateSandPatches()
         {
             PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch && patch->m_Type == PATCH_SAND)
-                patch->Unknown0();
+                patch->ResetState();
         }
     }
     for (int side = 0; side < 2; side++)

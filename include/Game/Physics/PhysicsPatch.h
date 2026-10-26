@@ -60,7 +60,7 @@ public:
         m_PhysicsPatchSlotPool.Free((PhysicsPatch*)ptr);
     }
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const { return PHYSOBJ_PATCH; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual ContactType Contact(PhysicsObject*, dContact*, int);

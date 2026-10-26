@@ -2431,7 +2431,7 @@ void ConvertDMat3ToNLMat4(const float* src, nlMatrix4* dest)
     dest->e2[2][3] = 0.0f;
 }
 
-void PhysicsObject::Unknown0()
+void PhysicsObject::ResetState()
 {
     nlMatrix4 identity;
     dMatrix3 parentOdeRotation;

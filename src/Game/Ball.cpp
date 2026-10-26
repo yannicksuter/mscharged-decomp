@@ -2647,7 +2647,7 @@ void ResetBall(cBall* pBall, bool bParam)
         pBall->m_pOwner->ReleaseBall(BALL_STATE_LOOSE);
     }
 
-    pBall->m_pPhysicsBall->Unknown0();
+    pBall->m_pPhysicsBall->ResetState();
     CancelBallShotImpl(pBall, false);
 
     pBall->m_bVisible = true;

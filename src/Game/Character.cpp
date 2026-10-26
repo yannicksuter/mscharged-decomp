@@ -1560,7 +1560,7 @@ void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_DetChar.Reset();
     ResetAnimState();
     m_pHeadTrack->Reset();
-    m_pPhysicsCharacter->Unknown0();
+    m_pPhysicsCharacter->ResetState();
     SetPosition(v3Position);
     m_DetChar.m_v3PrevPosition = v3Position;
     m_DetChar.m_aDesiredFacingDirection = aDirection;
