@@ -71,9 +71,9 @@ float gSuperGrowTime = 0.45f;
 float gSuperShrinkTime = 0.25f;
 float gSuperGrowTimeLimit = 1e+01f;
 float gSuperGrowScale = 3.73f;
-float lbl_806DC260 = 1.35f;
+float gSuperGrowDekeMovementScale = 1.35f;
 float gSuperGrowHitMovementScale = 1.75f;
-float lbl_806DC268 = 0.6f;
+float gSuperGrowAvoidanceMultiplier = 0.6f;
 float gBowserFireBallSpawnOffset = 0.5f;
 float gBowserFireBallRampTime = 0.5f;
 float gBowserFireBallStartRadius = 0.3f;
@@ -825,7 +825,7 @@ void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
 
 void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->SetAvoidanceMultiplier(lbl_806DC268);
+    m_pFielder->SetAvoidanceMultiplier(gSuperGrowAvoidanceMultiplier);
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
@@ -850,7 +850,7 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
     switch (m_pFielder->m_eActionState)
     {
     case ACTION_DEKE:
-        m_pFielder->SetMovementScale(lbl_806DC260);
+        m_pFielder->SetMovementScale(gSuperGrowDekeMovementScale);
         break;
     case ACTION_HIT:
         m_pFielder->SetMovementScale(gSuperGrowHitMovementScale);
@@ -869,7 +869,7 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
 
 void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->SetAvoidanceMultiplier(lbl_806DC268);
+    m_pFielder->SetAvoidanceMultiplier(gSuperGrowAvoidanceMultiplier);
     if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * gSuperGrowShootToScoreTimeScale;
@@ -894,7 +894,7 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
     switch (m_pFielder->m_eActionState)
     {
     case ACTION_DEKE:
-        m_pFielder->SetMovementScale(lbl_806DC260);
+        m_pFielder->SetMovementScale(gSuperGrowDekeMovementScale);
         break;
     case ACTION_HIT:
         m_pFielder->SetMovementScale(gSuperGrowHitMovementScale);

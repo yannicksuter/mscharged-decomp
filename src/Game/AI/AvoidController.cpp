@@ -73,10 +73,10 @@ public:
     nlList<ObstacleAvoidance>& mRemovals;
 };
 
-bool lbl_806E0BB8;
+bool gDrawAvoidanceRepulsion;
 
 
-bool lbl_806E0BB9;
+bool gDrawSidelineAvoidance;
 
 
 
@@ -531,7 +531,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
                 m_SidelineUnavoidable = true;
             }
             bHitSideline = true;
-            if (lbl_806E0BB9)
+            if (gDrawSidelineAvoidance)
             {
                 nlVector3 v3DebugPos;
                 nlVector3 v3DebugNormalEnd;
@@ -747,7 +747,7 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         }
     }
 
-    if (lbl_806E0BB8)
+    if (gDrawAvoidanceRepulsion)
     {
         nlColour colour;
         nlColourSet(colour, 0, 0, 255, 255);

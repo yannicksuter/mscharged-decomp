@@ -5,7 +5,7 @@
 #include "Game/SHierarchy.h"
 #include "NL/nlSlotPool.h"
 
-SlotPool<cSAnimCallback> lbl_805840D8(16, 16);
+SlotPool<cSAnimCallback> gSAnimCallbackPool(16, 16);
 
 cSAnim* cSAnim::Initialize(nlChunk* pChunk)
 {
@@ -410,7 +410,7 @@ void cSAnim::Destroy()
     while ((pCallback = m_pCallbackList) != 0)
     {
         pNext = pCallback->next;
-        lbl_805840D8.Free(pCallback);
+        gSAnimCallbackPool.Free(pCallback);
         m_pCallbackList = pNext;
     }
     m_pCallbackList = 0;
@@ -490,7 +490,7 @@ void cSAnim::CreateCallback(float fTime, unsigned int nParam1,
     void (*funcCallback)(cSAnim*, unsigned int))
 {
     cSAnimCallback* pCallback = 0;
-    lbl_805840D8.Allocate(pCallback);
+    gSAnimCallbackPool.Allocate(pCallback);
 
     if (pCallback != 0)
     {

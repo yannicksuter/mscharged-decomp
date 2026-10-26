@@ -116,7 +116,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         QueueKoopaShellDestroyPowerup(powerup);
         if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB
-            || ((PhysicsBanana*)other)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
+            || ((PhysicsBanana*)other)->m_pPowerupObject->mtMotionFreezeTimer.m_uPackedTime != 0)
         {
             CollisionKoopaShellEndData* eventData = 0;
             g_CollisionKoopaShellEndDataPool.Allocate(eventData);
@@ -135,7 +135,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
             return NO_CONTACT;
         }
         QueueKoopaShellDestroyPowerup(powerup);
-        if (((PhysicsShell*)other)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
+        if (((PhysicsShell*)other)->m_pPowerupObject->mtMotionFreezeTimer.m_uPackedTime != 0)
         {
             CollisionKoopaShellEndData* eventData = 0;
             g_CollisionKoopaShellEndDataPool.Allocate(eventData);

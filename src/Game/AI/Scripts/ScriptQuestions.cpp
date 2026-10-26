@@ -46,8 +46,8 @@ static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/P
 static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCategory, &gConfidenceDistanceRange.y);
 static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
 static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
-float lbl_806DC3E8 = 100000000000.0f;
-float lbl_806DC3EC = -100000000000.0f;
+float gMinGoalieAvoidanceRepulsion = 100000000000.0f;
+float gMaxGoalieAvoidanceRepulsion = -100000000000.0f;
 
 
 float GenerateFilteredRandom()
@@ -775,7 +775,7 @@ float ActiveDesire(int nAction, cFielder* pFielder)
     return 0.0f;
 }
 
-static const nlVector2 lbl_806E41E0 = { 3000.0f, 0.0f };
+static const nlVector2 sRecentDesireTimeRange = { 3000.0f, 0.0f };
 
 
 float RecentlyActiveDesire(int nAction, cFielder* pFielder)
@@ -790,7 +790,7 @@ float RecentlyActiveDesire(int nAction, cFielder* pFielder)
     if (pDesire != NULL)
     {
         float fStartTime = pDesire->mLastActiveTime;
-        fScore = NormalizeVal(gAIActivityClock() - fStartTime, lbl_806E41E0);
+        fScore = NormalizeVal(gAIActivityClock() - fStartTime, sRecentDesireTimeRange);
     }
     return fScore;
 }
@@ -1434,8 +1434,8 @@ float AvoidingGoalie(cFielder* pFielder)
     float fMagnitude = nlVec3Length(vRepulsion);
     float fScore = NormalizeVal(fMagnitude, g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMin,
         g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMax);
-    lbl_806DC3E8 = nlMinEquals(fMagnitude, lbl_806DC3E8);
-    lbl_806DC3EC = FMAX(fMagnitude, lbl_806DC3EC);
+    gMinGoalieAvoidanceRepulsion = nlMinEquals(fMagnitude, gMinGoalieAvoidanceRepulsion);
+    gMaxGoalieAvoidanceRepulsion = FMAX(fMagnitude, gMaxGoalieAvoidanceRepulsion);
     return fScore;
 }
 
@@ -1956,7 +1956,7 @@ float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     return fDistanceWeight * fDistanceScore + (1.0f - fDistanceWeight) * fAngleScore;
 }
 
-static const nlVector2 lbl_806E4258 = { 10922.5f, 0.0f };
+static const nlVector2 sLaneBlockingAngleRange = { 10922.5f, 0.0f };
 
 
 float LaneOpenness(const nlVector3& vFrom, const nlVector3& vTo,
@@ -1987,7 +1987,7 @@ float LaneOpenness(const nlVector3& vFrom, const nlVector3& vTo,
             nlVector2 distanceRange = { 0.0f, 0.0f };
             distanceRange.y = fDistance;
             float fScore = DistanceAndAngleConfidence(vFrom, vPosition, aDirection, &distanceRange,
-                &lbl_806E4258, false, true, 0.2f);
+                &sLaneBlockingAngleRange, false, true, 0.2f);
             if (pIgnorePlayer1 != NULL && pIgnorePlayer1->m_pTeam == pPlayer->m_pTeam)
                 fScore *= fTeamWeight;
             else if (pPlayer->m_eClassType == FIELDER)
@@ -2594,7 +2594,7 @@ float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     return NormalizeVal(nlSqrt(diff.x * diff.x + diff.y * diff.y, true), fMin, fMax);
 }
 
-static const nlVector2 lbl_806E4270 = { 2.5f, 0.4f };
+static const nlVector2 sCloseDesiredPositionRange = { 2.5f, 0.4f };
 
 
 float CloseToDesiredPosition(cFielder* pFielder)
@@ -2604,10 +2604,10 @@ float CloseToDesiredPosition(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4270);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), sCloseDesiredPositionRange);
 }
 
-static const nlVector2 lbl_806E4278 = { 10.0f, 1.0f };
+static const nlVector2 sNearDesiredPositionRange = { 10.0f, 1.0f };
 
 
 float NearToDesiredPosition(cFielder* pFielder)
@@ -2617,10 +2617,10 @@ float NearToDesiredPosition(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4278);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), sNearDesiredPositionRange);
 }
 
-static const nlVector2 lbl_806E4280 = { 4.0f, 10.0f };
+static const nlVector2 sFarDesiredPositionRange = { 4.0f, 10.0f };
 
 
 float FarToDesiredPosition(cFielder* pFielder)
@@ -2630,7 +2630,7 @@ float FarToDesiredPosition(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4280);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), sFarDesiredPositionRange);
 }
 
 float CloseToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
@@ -2648,7 +2648,7 @@ float CloseToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4270);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), sCloseDesiredPositionRange);
 }
 
 float NearToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
@@ -2666,7 +2666,7 @@ float NearToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4278);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), sNearDesiredPositionRange);
 }
 
 float FarToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
@@ -2684,7 +2684,7 @@ float FarToPlayersDesiredPosition(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4280);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), sFarDesiredPositionRange);
 }
 
 float FacingSideline(cFielder* pFielder)
@@ -3927,7 +3927,7 @@ float InOffensiveZoneOfPlayer(cBall* pBall, cPlayer* pPlayer)
         g_pGame->m_pFuzzyTweaks->fOffensiveConfidenceDistancesMax);
 }
 
-static const nlVector2 lbl_806E42B0 = { 5.0f, 1.0f };
+static const nlVector2 sBallCrowdingDistanceRange = { 5.0f, 1.0f };
 
 
 float BallCrowding(cPlayer* pPlayer)
@@ -3936,15 +3936,15 @@ float BallCrowding(cPlayer* pPlayer)
         return 0.0f;
     float fMaxDistance;
     float fMinDistance;
-    float fMaxDistanceForPlayer = lbl_806E42B0.y;
-    float fMinDistanceForPlayer = lbl_806E42B0.x;
+    float fMaxDistanceForPlayer = sBallCrowdingDistanceRange.y;
+    float fMinDistanceForPlayer = sBallCrowdingDistanceRange.x;
     float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex];
     float fTotal = 0.0f;
     float fClose = NormalizeVal(fPlayerDistance, fMinDistanceForPlayer, fMaxDistanceForPlayer);
     if (fClose < 1.0f)
     {
-        fMaxDistance = lbl_806E42B0.y;
-        fMinDistance = lbl_806E42B0.x;
+        fMaxDistance = sBallCrowdingDistanceRange.y;
+        fMinDistance = sBallCrowdingDistanceRange.x;
         for (int i = 0; i < 10; i++)
         {
             cPlayer* pOther = (cPlayer*)g_pCharacters[i];
