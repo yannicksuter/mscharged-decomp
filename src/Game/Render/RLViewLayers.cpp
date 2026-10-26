@@ -478,7 +478,7 @@ static void CreateLayerViews(
         RLView* view = new (8, false) RLView(camera, layers[i].useDisplayTarget ? display : blank, layers[i].sortMode);
         sLayerViews[layers[i].layer] = view;
         sLayerViews[layers[i].layer]->m_Name = layers[i].name;
-        sLayerViews[layers[i].layer]->m_Unknown48 = layers[i].layer;
+        sLayerViews[layers[i].layer]->m_LayerID = layers[i].layer;
     }
 }
 
