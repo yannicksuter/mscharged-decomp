@@ -1287,7 +1287,7 @@ bool cFielder::InitActionDeke(unsigned short aDirection)
     if (bIsGameplay)
     {
         StatsTracker::Instance()->TrackStat(
-            STATS_15, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
+            STATS_DEKES, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
     }
 
     return true;
