@@ -187,7 +187,7 @@ void DrawableCharacter::Grab(cCharacter& source)
 {
     character = &source;
     position = source.m_DetChar.m_v3Position;
-    bip01Position = source.GetJointPosition(source.m_nBip01JointIndex_0xA4);
+    bip01Position = source.GetJointPosition(source.m_nBip01JointIndex);
     headPosition = source.GetJointPosition(source.m_nHeadJointIndex);
     height = bip01Position.z;
     scale = source.m_DetChar.m_fPlayerScale;
@@ -753,7 +753,7 @@ void DrawableCharacter::EvaluateFrom(const cPoseNode& poseNode, const nlVector3&
 
     BuildNodeMatrices(poseAccumulator);
 
-    nlMatrix4& bip01Matrix = poseAccumulator->GetNodeMatrix(character->m_nBip01JointIndex_0xA4);
+    nlMatrix4& bip01Matrix = poseAccumulator->GetNodeMatrix(character->m_nBip01JointIndex);
     bip01Position = bip01Matrix.GetTranslation();
 
     nlMatrix4& headMatrix = poseAccumulator->GetNodeMatrix(character->m_nHeadJointIndex);

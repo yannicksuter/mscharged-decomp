@@ -408,7 +408,7 @@ static void PrePhysicsAITask(float fDeltaT)
     int i;
     for (i = 0; i < 10; i++)
     {
-        g_pCharacters[i]->Unknown7(fDeltaT);
+        g_pCharacters[i]->BeginPhysicsStep(fDeltaT);
     }
 }
 
@@ -417,7 +417,7 @@ static void PostPhysicsAITask(float fDeltaT)
     int i;
     for (i = 0; i < 10; i++)
     {
-        g_pCharacters[i]->PrePhysicsUpdate();
+        g_pCharacters[i]->EndPhysicsStep();
     }
     g_pBall->PostPhysicsUpdate(fDeltaT);
 }

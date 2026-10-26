@@ -1452,7 +1452,7 @@ void EmitTackleImpact(cPlayer* pCharacter)
     EmissionController* pController = EmissionManager::Instance()->Create(
         EmissionManager::Instance()->GetEffectsGroup("tackle_impact"), 3, true, 0);
     pController->SetPosition(
-        pCharacter->m_pPoseAccumulator->GetNodeMatrix(pCharacter->m_nBip01JointIndex_0xA4).GetTranslation());
+        pCharacter->m_pPoseAccumulator->GetNodeMatrix(pCharacter->m_nBip01JointIndex).GetTranslation());
     pController->SetVelocity(v3Zero);
 }
 

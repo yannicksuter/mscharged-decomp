@@ -381,7 +381,7 @@ public:
         PlayerTweaks* pSuperPowerTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual ~cFielder();
-    virtual void PrePhysicsUpdate();
+    virtual void EndPhysicsStep();
     virtual void PreUpdate(float fTime);
     virtual void ResetAnimState();
     virtual void ResetEffects();

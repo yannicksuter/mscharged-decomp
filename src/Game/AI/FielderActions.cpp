@@ -918,7 +918,7 @@ void cFielder::InitActionCrowdRiot()
     mActionCrowdVars = ActCrowdVars(false, -1.0f);
     mActionCrowdVars.fStuckInRiotTime = 0.75f + nlRandomf(0.25f);
 
-    nlVector3 v3Position = GetJointPosition(m_nBip01JointIndex_0xA4);
+    nlVector3 v3Position = GetJointPosition(m_nBip01JointIndex);
     SetPosition(v3Position);
 
     InitDesire(
@@ -1389,10 +1389,10 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
     SetAnimState(0x76, true, 0.2f, false, false);
     InitMovementNone(0.0f, 0.0f);
 
-    nlVector3 newPosition = GetJointPosition(m_nBip01JointIndex_0xA4);
+    nlVector3 newPosition = GetJointPosition(m_nBip01JointIndex);
 
     nlVector3 safeBip01Position;
-    GetJointPositionFuture(&safeBip01Position, 0, m_nBip01JointIndex_0xA4, 0.0f, false, false, false, true);
+    GetJointPositionFuture(&safeBip01Position, 0, m_nBip01JointIndex, 0.0f, false, false, false, true);
 
     safeBip01Position.z += 0.25f;
     newPosition.z = (newPosition.z >= safeBip01Position.z) ? newPosition.z : safeBip01Position.z;
@@ -1483,10 +1483,10 @@ void cFielder::InitActionGroundElectrocution(const nlVector3& v3Position)
     SetAnimState(0x79, true, 0.2f, false, false);
     InitMovementNone(0.0f, 0.0f);
 
-    nlVector3 jointPos = GetJointPosition(m_nBip01JointIndex_0xA4);
+    nlVector3 jointPos = GetJointPosition(m_nBip01JointIndex);
 
     nlVector3 futureJointPos;
-    GetJointPositionFuture(&futureJointPos, 0, m_nBip01JointIndex_0xA4, 0.0f, false, false, false, true);
+    GetJointPositionFuture(&futureJointPos, 0, m_nBip01JointIndex, 0.0f, false, false, false, true);
 
     futureJointPos.z += 0.05f;
     jointPos.z = (jointPos.z >= futureJointPos.z) ? jointPos.z

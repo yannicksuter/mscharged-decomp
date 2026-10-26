@@ -1337,7 +1337,7 @@ bool cFielder::CanGetElectrocuted(
                 = netWidth / 2.0f + netPostRadius;
             float netHeight = m_pTeam->m_pNet->GetNetHeight();
             nlVector3 jointPos
-                = GetJointPosition(m_nBip01JointIndex_0xA4);
+                = GetJointPosition(m_nBip01JointIndex);
             if ((float)fabs(eventData->contactPoint.y)
                     > minYElectrocutionPosition
                 || (float)fabs(jointPos.z) > netHeight)
@@ -1355,7 +1355,7 @@ bool cFielder::CanGetElectrocuted(
             = netWidth / 2.0f + netPostRadius;
         float netHeight = m_pTeam->m_pNet->GetNetHeight();
         nlVector3 jointPos
-            = GetJointPosition(m_nBip01JointIndex_0xA4);
+            = GetJointPosition(m_nBip01JointIndex);
         if ((float)fabs(eventData->contactPoint.y)
                 > minYElectrocutionPosition
             || (float)fabs(jointPos.z) > netHeight)
@@ -5384,9 +5384,9 @@ void cFielder::PreUpdate(float fTime)
     mbWasHitByPowerupThisFrame = false;
 }
 
-void cFielder::PrePhysicsUpdate()
+void cFielder::EndPhysicsStep()
 {
-    cPlayer::PrePhysicsUpdate();
+    cPlayer::EndPhysicsStep();
 
     DesireFrozen* pAction = (DesireFrozen*)
         GetConcurrentState(m_pAIContext->mScriptMachine, 0x1D);
@@ -5643,7 +5643,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         if (hitTarget != 0)
         {
             m_pHeadTrack->m_v3OOI
-                = hitTarget->GetJointPosition(hitTarget->m_nBip01JointIndex_0xA4);
+                = hitTarget->GetJointPosition(hitTarget->m_nBip01JointIndex);
             m_pHeadTrack->m_bTrackOOI = true;
             return;
         }

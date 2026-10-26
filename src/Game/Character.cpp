@@ -344,7 +344,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
     m_nHeadJointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01 head"));
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
-    m_nBip01JointIndex_0xA4 = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01"));
+    m_nBip01JointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01"));
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
     m_nSpine1JointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01 spine1"));
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
@@ -365,7 +365,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     m_fFrozenHammerScale = 0.0f;
     for (int i = 0; i < 4; ++i)
     {
-        unknown_0x018[i] = false;
+        m_bSkinMeshPosed[i] = false;
     }
 }
 
@@ -426,7 +426,7 @@ void cCharacter::InvalidateSkinMeshPoses()
 {
     for (int i = 0; i < 4; ++i)
     {
-        unknown_0x018[i] = false;
+        m_bSkinMeshPosed[i] = false;
     }
 }
 
@@ -843,14 +843,14 @@ void cCharacter::PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType)
     {
         modelType = CHAR_MODEL_NORMAL;
     }
-    if (!unknown_0x018[modelType])
+    if (!m_bSkinMeshPosed[modelType])
     {
         m_pSkinMesh[modelType]->Pose(pPoseAccumulator);
-        unknown_0x018[modelType] = true;
+        m_bSkinMeshPosed[modelType] = true;
     }
 }
 
-void cCharacter::Unknown7(float dt)
+void cCharacter::BeginPhysicsStep(float dt)
 {
 }
 
@@ -858,7 +858,7 @@ void cCharacter::PreUpdate(float dt)
 {
 }
 
-void cCharacter::PrePhysicsUpdate()
+void cCharacter::EndPhysicsStep()
 {
 }
 

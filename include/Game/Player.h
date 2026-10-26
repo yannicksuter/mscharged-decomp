@@ -113,8 +113,8 @@ public:
         AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType);
     virtual ~cPlayer();
     virtual void PostPhysicsUpdate();
-    virtual void PrePhysicsUpdate();
-    virtual void Unknown7(float dt);
+    virtual void EndPhysicsStep();
+    virtual void BeginPhysicsStep(float dt);
     virtual void PreUpdate(float dt);
     virtual void ResetAnimState();
     virtual void SetAnimID(int animID);

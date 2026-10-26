@@ -976,7 +976,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             && pFielder->mActionBooSkillshot.bFollowingBall)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
-                pFielder->m_nBip01JointIndex_0xA4);
+                pFielder->m_nBip01JointIndex);
             nlVector2 v2Delta;
             v2Delta.x = v3JointPosition.x - pFielder->m_DetChar.m_v3Position.x;
             v2Delta.y = v3JointPosition.y - pFielder->m_DetChar.m_v3Position.y;
