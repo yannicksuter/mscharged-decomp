@@ -25,7 +25,7 @@ static unsigned short sDesireUsePowerupType = 0xFFFF;
 static int sTransDesireUsePowerupContinue = 0;
 #pragma explicit_zero_data off
 static int sUsePowerupDesireState = 17;
-static bool lbl_806DC3A4 = true;
+static bool sUsePowerupConcurrentFlag = true;
 
 /**
  * Offset/Address/Size: 0x0 | 0x800D2074 | size: 0xF48
@@ -99,7 +99,7 @@ void DesireUsePowerup::Update(
     if (update->mData.i == 3)
     {
         update->SetParameter(8, FuzzyVariant(sUsePowerupDesireState));
-        update->SetParameter(9, FuzzyVariant(lbl_806DC3A4));
+        update->SetParameter(9, FuzzyVariant(sUsePowerupConcurrentFlag));
         return;
     }
 
