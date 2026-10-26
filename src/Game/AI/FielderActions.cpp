@@ -74,80 +74,80 @@
 #include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-float lbl_806DB890 = 0.99f;
-float lbl_806DB894 = 1.0f;
-float lbl_806DB898 = 1.2f;
-float lbl_806DB89C = 8.0f;
-float lbl_806DB8A0 = 1.3f;
-float lbl_806DB8A4 = 0.45f;
-float lbl_806DB8A8 = 6.66f;
-int lbl_806DB8AC = 300;
-int lbl_806DB8B0 = 100;
-float lbl_806DB8B4 = 5.0f;
-float lbl_806DB8B8 = 7.5f;
-float lbl_806DB8BC = 3.0f;
-float lbl_806DB8C0 = 15.0f;
-float lbl_806DB8C4 = 0.66f;
-float lbl_806DB8C8 = 1.33f;
-float lbl_806DB8CC = 1.5f;
-float lbl_806DB8D0 = 6.0f;
-float lbl_806DB8D4 = 16.0f;
-float lbl_806DB8D8 = 1.7f;
-float lbl_806DB8DC = 0.4f;
-float lbl_806DB8E0 = 0.5f;
-float lbl_806DB8E4 = 100.0f;
-float lbl_806DB8E8 = 4.0f;
-float lbl_806DB8EC = 2.0f;
-float lbl_806DB8F0 = 0.75f;
-float lbl_806DB8F4 = 0.66f;
-float lbl_806DB8F8 = 3.0f;
-float lbl_806DB8FC = 0.001f;
-float lbl_806DB900 = 0.8f;
-float lbl_806DB904 = 0.5f;
-float lbl_806DB908 = 0.4f;
-float lbl_806DB90C = 15.0f;
-float lbl_806DB910 = 22.5f;
-float lbl_806DB914 = 4.0f;
-float lbl_806DB918 = 3300.0f;
-float lbl_806DB91C = 0.021f;
-float lbl_806DB920 = 0.33f;
-float lbl_806DB924 = 1.35f;
-float lbl_806DB928 = 0.1f;
-float lbl_806DB92C = 0.27f;
-float lbl_806DB930 = 0.41f;
-float lbl_806DB934 = 0.22f;
-float lbl_806DB938 = 0.12f;
-float lbl_806DB93C = 0.15f;
-float lbl_806DB940 = 0.05f;
-float lbl_806DB944 = 0.03f;
-float lbl_806DB948 = 3.0f;
-float lbl_806DB94C = 3.0f;
-float lbl_806DB950 = 6.0f;
-float lbl_806DB954 = 6.0f;
-float lbl_806DB958 = 0.22f;
-float lbl_806DB95C = 0.5f;
-float lbl_806DB960 = 0.12f;
-float lbl_806DB964 = 0.24f;
-float lbl_806DB968 = 0.06f;
-float lbl_806DB96C = 0.22f;
-float lbl_806DB970 = 0.3f;
-float lbl_806DB974 = 0.2f;
-float lbl_806DB978 = 0.5f;
+float gPerfectPassMinOpenness = 0.99f;
+float gHitLowTerrainAnimSpeed = 1.0f;
+float gHitHighTerrainAnimSpeed = 1.2f;
+float gHammerBaseThrowDistance = 8.0f;
+float gHammerThrowDistanceStep = 1.3f;
+float gHammerVerticalSpeedPerDistance = 0.45f;
+float gBooSkillshotFollowDistance = 6.66f;
+int gBurningAngularVelocityThreshold = 300;
+int gBurningMaxAngularAcceleration = 100;
+float gFallReturnMinSpeed = 5.0f;
+float gFallReturnMaxSpeed = 7.5f;
+float gFallMinDuration = 3.0f;
+float gFallMaxDuration = 15.0f;
+float gLooseBallContactMinAnimSpeed = 0.66f;
+float gLooseBallContactMaxAnimSpeed = 1.33f;
+float gLooseBallLeadCatchupSpeedScale = 1.5f;
+float gRunningPassShortHoldVerticalSpeed = 6.0f;
+float gRunningPassLongHoldVerticalSpeed = 16.0f;
+float gRunningPassShortHoldSpeedBoost = 1.7f;
+float gRunningPassLongHoldSpeedBoost = 0.4f;
+float gRunningPassMaxHoldDuration = 0.5f;
+float gRunningPassSpinSpeed = 100.0f;
+float gRunningPassMinSpeed = 4.0f;
+float gCaptainClashTriggerFrame = 2.0f;
+float gDekeResetAnimTime = 0.75f;
+float gDekeDecelerationFalloff = 0.66f;
+float gBurningResumeDuration = 3.0f;
+float gYoshiTongueStartRadius = 0.001f;
+float gYoshiTongueEndRadius = 0.8f;
+float gYoshiTongueLifetime = 0.5f;
+float gSuckedAwayPositionBlendFraction = 0.4f;
+float gSuckedAwayDuration = 15.0f;
+float gSuckedAwayVerticalSpeed = 22.5f;
+float gSuckedAwaySpinSpeedIncrease = 4.0f;
+float gSuckedAwayBaseSpinStep = 3300.0f;
+float gSuckedAwayVerticalSpeedFalloff = 0.021f;
+float gElectrocutionExtraDuration = 0.33f;
+float gMegaStrikeFirstPhaseDuration = 1.35f;
+float gMegaStrikeReturnTimeBelowMidpoint = 0.1f;
+float gMegaStrikeReturnTimeAboveMidpoint = 0.27f;
+float gMegaStrikeReturnTimeAtEnd = 0.41f;
+float gMegaStrikeLowShootingGreenWidth = 0.22f;
+float gMegaStrikeHighShootingGreenWidth = 0.12f;
+float gMegaStrikeGreenBarPosition = 0.15f;
+float gMegaStrikeLowShootingYellowWidth = 0.05f;
+float gMegaStrikeHighShootingYellowWidth = 0.03f;
+float gMegaStrikeLowShootingMinBalls = 3.0f;
+float gMegaStrikeHighShootingMinBalls = 3.0f;
+float gMegaStrikeLowShootingMaxBalls = 6.0f;
+float gMegaStrikeHighShootingMaxBalls = 6.0f;
+float gMegaStrikeHighShootingSegment1Width = 0.22f;
+float gMegaStrikeLowShootingSegment1Width = 0.5f;
+float gMegaStrikeLowShootingSegment2Width = 0.12f;
+float gMegaStrikeHighShootingSegment2Width = 0.24f;
+float gMegaStrikeLowShootingSegment3Width = 0.06f;
+float gMegaStrikeHighShootingSegment3Width = 0.22f;
+float gMegaStrikeFirstSegmentStart = 0.3f;
+float gMegaStrikeNetworkResultDelay = 0.2f;
+float gMegaStrikeResultFrameLockDuration = 0.5f;
 bool gbUseTurboCharging = true;
-float lbl_806DB980 = 2.0f;
-float lbl_806DB984 = 2.0f;
-float lbl_806DB988 = 1.15f;
-float lbl_806DB98C = 1.6f;
-float lbl_806DB990 = 0.8f;
-float lbl_806DB994 = 1.25f;
-float lbl_806DB998 = 0.25f;
-float lbl_806DB99C = 1.5f;
-float lbl_806DB9A0 = 1.4f;
-float lbl_806DB9A4 = 0.5f;
-float lbl_806DB9A8 = 0.8f;
-float lbl_806DB9AC = 0.2f;
-float lbl_806DB9B0 = 0.48f;
-float lbl_806DB9B4 = 0.54f;
+float gRunningPassLowSpeedCharge = 2.0f;
+float gRunningPassHighSpeedCharge = 2.0f;
+float gDekeLowTerrainAnimSpeed = 1.15f;
+float gDekeHighTerrainAnimSpeed = 1.6f;
+float gBallContactAnimBlendTimeScale = 0.8f;
+float gGroundElectrocutionBaseDuration = 1.25f;
+float gGroundElectrocutionDurationRange = 0.25f;
+float gGroundElectrocutionLiftDuration = 1.5f;
+float gGroundElectrocutionRiseSpeed = 1.4f;
+float gElectrocutionAirEffectStartTime = 0.5f;
+float gElectrocutionAirEffectEndTime = 0.8f;
+float gElectrocutionRecoveryFirstEndTime = 0.2f;
+float gElectrocutionRecoveryRestartTime = 0.48f;
+float gElectrocutionRecoverySecondEndTime = 0.54f;
 #if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
 int gFramesSinceElectrocutionSound = 100;
 #endif
@@ -158,8 +158,8 @@ static unsigned short gHitReactFacingOffsets[4] = {
     0xC000,
 };
 
-float lbl_806E0C68;
-float lbl_806E0C6C;
+float gMegaStrikeLowShootingSegment4Width;
+float gMegaStrikeHighShootingSegment4Width;
 
 extern const float lbl_806E3538[1] = { 0.1f };
 extern const float lbl_806E35D4[1];
@@ -901,7 +901,7 @@ void cFielder::EndAction()
     }
     else
     {
-        InitActionBurning(lbl_806DB8F8);
+        InitActionBurning(gBurningResumeDuration);
     }
 }
 
@@ -1270,14 +1270,14 @@ bool cFielder::InitActionDeke(unsigned short aDirection)
     case KOOPA:
     case SHYGUY:
         m_pCurrentAnimController->m_fPlaybackSpeedScale
-            = InterpolateRangeClamped(lbl_806DB988, lbl_806DB98C, 0.35f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
+            = InterpolateRangeClamped(gDekeLowTerrainAnimSpeed, gDekeHighTerrainAnimSpeed, 0.35f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
         break;
     case BOWSER:
     case WARIO:
     case BOWSERJR:
     case HAMMERBROS:
         SetFacingDirection(sFacingDelta + m_DetChar.m_aActualFacingDirection, true);
-        InitMovementDecelerateExponential(lbl_806DB8F4);
+        InitMovementDecelerateExponential(gDekeDecelerationFalloff);
         break;
     }
 
@@ -1308,7 +1308,7 @@ void cFielder::ActionDeke(float fDeltaT)
 
     if (GetGlobalPad() != 0)
     {
-        if (m_pCurrentAnimController->m_fTime > lbl_806DB8F0)
+        if (m_pCurrentAnimController->m_fTime > gDekeResetAnimTime)
         {
             m_bDekeReset = !IsDekePadPressed();
         }
@@ -1376,7 +1376,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
     float fElectrocutionTime;
     m_pCurrentAnimController->m_pSAnim->GetRemainingTime(
         m_pCurrentAnimController->m_fTime, fElectrocutionTime);
-    fElectrocutionTime += lbl_806DB920;
+    fElectrocutionTime += gElectrocutionExtraDuration;
 
     InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_ELECTROCUTION);
@@ -1500,8 +1500,8 @@ void cFielder::InitActionGroundElectrocution(const nlVector3& v3Position)
 
     SetPosition(jointPos);
 
-    m_fElectrocutionTime = lbl_806DB994 + nlRandomf(lbl_806DB998);
-    m_fElectrocutionLiftTime = lbl_806DB99C;
+    m_fElectrocutionTime = gGroundElectrocutionBaseDuration + nlRandomf(gGroundElectrocutionDurationRange);
+    m_fElectrocutionLiftTime = gGroundElectrocutionLiftDuration;
     m_bGroundElectrocution = true;
     EmitElectrocution(this);
 
@@ -1531,7 +1531,7 @@ void cFielder::ActionElectrocution(float dt)
             nlVector3 v3Position = m_DetChar.m_v3Position;
             float fShake
                 = this->GetTweaks()->fDefenseSize;
-            float fRise = lbl_806DB9A0
+            float fRise = gGroundElectrocutionRiseSpeed
                         * ((1.0f - fShake) * nlRandomf(0.5f) + 0.5f);
             v3Position.z += fRise * dt;
             SetPosition(v3Position);
@@ -1601,11 +1601,11 @@ void cFielder::ActionElectrocution(float dt)
         }
         else
         {
-            if (m_pCurrentAnimController->TestTrigger(lbl_806DB9A4))
+            if (m_pCurrentAnimController->TestTrigger(gElectrocutionAirEffectStartTime))
             {
                 EmitElectrocution(this);
             }
-            if (m_pCurrentAnimController->TestTrigger(lbl_806DB9A8))
+            if (m_pCurrentAnimController->TestTrigger(gElectrocutionAirEffectEndTime))
             {
                 EndElectrocution(this);
             }
@@ -1615,17 +1615,17 @@ void cFielder::ActionElectrocution(float dt)
     case 0x78:
     case 0x7B:
     {
-        if (m_pCurrentAnimController->TestTrigger(lbl_806DB9AC))
+        if (m_pCurrentAnimController->TestTrigger(gElectrocutionRecoveryFirstEndTime))
         {
             EndElectrocution(this);
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
-        if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B0))
+        if (m_pCurrentAnimController->TestTrigger(gElectrocutionRecoveryRestartTime))
         {
             EmitElectrocution(this);
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
-        if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B4))
+        if (m_pCurrentAnimController->TestTrigger(gElectrocutionRecoverySecondEndTime))
         {
             EndElectrocution(this);
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
@@ -1700,7 +1700,7 @@ void cFielder::InitActionSuckedAway(PhysicsObject* pObject)
         InitMovementCoast();
         SetVelocity(v3Zero);
 
-        m_fFallingTime = lbl_806DB90C;
+        m_fFallingTime = gSuckedAwayDuration;
         m_v3SuckToSpot = pObject->GetPosition();
 
         KillSlideTackleTrail(this, 1);
@@ -1731,10 +1731,10 @@ void cFielder::ActionSuckedAway(float fDeltaT)
     {
         m_fFallingTime -= fDeltaT;
 
-        int nSpinStep = (u16)(lbl_806DB918
-                              * (lbl_806DB914
+        int nSpinStep = (u16)(gSuckedAwayBaseSpinStep
+                              * (gSuckedAwaySpinSpeedIncrease
                                       * InterpolateRangeClamped(
-                                          0.0f, 1.0f, 0.0f, lbl_806DB910, m_DetChar.m_v3Velocity.z)
+                                          0.0f, 1.0f, 0.0f, gSuckedAwayVerticalSpeed, m_DetChar.m_v3Velocity.z)
                                   + 1.0f));
         SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection + nSpinStep, false);
 
@@ -1746,8 +1746,8 @@ void cFielder::ActionSuckedAway(float fDeltaT)
                 fDeltaT),
             true);
 
-        float fT = FMIN((float)fabs(m_fFallingTime - lbl_806DB90C)
-                            / (lbl_806DB90C * lbl_806DB908),
+        float fT = FMIN((float)fabs(m_fFallingTime - gSuckedAwayDuration)
+                            / (gSuckedAwayDuration * gSuckedAwayPositionBlendFraction),
             1.0f);
 
         nlVector3 v3NewPosition;
@@ -1767,7 +1767,7 @@ void cFielder::ActionSuckedAway(float fDeltaT)
         }
 
         float fNewVelocityZ = SeekSpeedExponential(
-            m_DetChar.m_v3Velocity.z, lbl_806DB910, lbl_806DB91C, fDeltaT);
+            m_DetChar.m_v3Velocity.z, gSuckedAwayVerticalSpeed, gSuckedAwayVerticalSpeedFalloff, fDeltaT);
         nlVector3 v3NewVelocity = v3Zero;
         v3NewVelocity.z = fNewVelocityZ;
         SetVelocity(v3NewVelocity);
@@ -1793,7 +1793,7 @@ void cFielder::ActionSuckedAway(float fDeltaT)
                 fDeltaT),
             true);
 
-        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualFacingDirection, InterpolateRangeClamped(lbl_806DB8B4, lbl_806DB8B8, 0.0f, 4.0f, CountFallingFielders(m_pTeam)));
+        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualFacingDirection, InterpolateRangeClamped(gFallReturnMinSpeed, gFallReturnMaxSpeed, 0.0f, 4.0f, CountFallingFielders(m_pTeam)));
 
         nlVector2 v3Distance = {
             m_DetChar.m_v3Position.x - v3Zero.x,
@@ -1903,8 +1903,8 @@ void cFielder::InitActionFall()
 
         m_bShadowVisible = false;
 
-        m_fFallingTime = InterpolateRangeClamped(lbl_806DB8BC,
-            lbl_806DB8C0,
+        m_fFallingTime = InterpolateRangeClamped(gFallMinDuration,
+            gFallMaxDuration,
             3.0f,
             0.0f,
             CountFallingFielders(m_pTeam));
@@ -1974,7 +1974,7 @@ void cFielder::ActionFall(float fDeltaT)
                 fDeltaT),
             true);
 
-        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualFacingDirection, InterpolateRangeClamped(lbl_806DB8B4, lbl_806DB8B8, 0.0f, 4.0f, CountFallingFielders(m_pTeam)));
+        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualFacingDirection, InterpolateRangeClamped(gFallReturnMinSpeed, gFallReturnMaxSpeed, 0.0f, 4.0f, CountFallingFielders(m_pTeam)));
 
         nlVector2 v3Distance = {
             m_DetChar.m_v3Position.x - v3Zero.x,
@@ -2058,8 +2058,8 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 {
     if (!IsStuck())
     {
-        float fSpeedScale = InterpolateRangeClamped(lbl_806DB894,
-            lbl_806DB898,
+        float fSpeedScale = InterpolateRangeClamped(gHitLowTerrainAnimSpeed,
+            gHitHighTerrainAnimSpeed,
             0.35f,
             0.75f,
             g_pGame->mpTerrain->GetSpeedFactor());
@@ -2154,7 +2154,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         if (m_DetChar.m_eCharacterClass == YOSHI)
         {
             lbl_806E12C8
-                ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
+                ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, gYoshiTongueStartRadius, gYoshiTongueEndRadius, gYoshiTongueLifetime)
                 ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
         }
@@ -2392,7 +2392,7 @@ bool cFielder::InitActionHitReact(cPlayer* pAttacker, unsigned short aDirection,
 
 void cFielder::ActionHitReact(float fDeltaT)
 {
-    if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB8EC)
+    if (m_pCurrentAnimController->TestFrameTrigger(gCaptainClashTriggerFrame)
         && m_bHitReactFrameLock)
     {
         DeliverCaptainClashPresentationEvent(g_pGame);
@@ -2630,7 +2630,7 @@ bool cFielder::DoCommonInitActionLooseBall(
                     fCatchup /= fSimulatedTime;
                 }
                 bool bCanReach = fCatchup <= fMaxCatchupSpeed;
-                if (fAnimTime > lbl_806DB8C4 && fAnimTime < lbl_806DB8C8
+                if (fAnimTime > gLooseBallContactMinAnimSpeed && fAnimTime < gLooseBallContactMaxAnimSpeed
                     && bCanReach)
                 {
                     bNoContactFound = false;
@@ -2659,7 +2659,7 @@ bool cFielder::DoCommonInitActionLooseBall(
                     fCatchup /= fSimulatedTime;
                 }
                 bool bCanReach = fCatchup <= fMaxCatchupSpeed;
-                if (fAnimTime > lbl_806DB8C4 && fAnimTime < lbl_806DB8C8
+                if (fAnimTime > gLooseBallContactMinAnimSpeed && fAnimTime < gLooseBallContactMaxAnimSpeed
                     && bCanReach)
                 {
                     pAnimInfoList = GetOneTimerIdleVolleyContactAnims();
@@ -2690,8 +2690,8 @@ bool cFielder::DoCommonInitActionLooseBall(
             {
                 fCatchup /= fSimulatedTime;
             }
-            bool bCanReach = fCatchup <= fMaxCatchupSpeed * lbl_806DB8CC;
-            if (fAnimTime > lbl_806DB8C4 && fAnimTime < lbl_806DB8C8
+            bool bCanReach = fCatchup <= fMaxCatchupSpeed * gLooseBallLeadCatchupSpeedScale;
+            if (fAnimTime > gLooseBallContactMinAnimSpeed && fAnimTime < gLooseBallContactMaxAnimSpeed
                 && bCanReach)
             {
                 pAnimInfoList = GetOneTimerLeadGroundContactAnims();
@@ -2769,7 +2769,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
     m_fOneTimerAnimTime = fContactTime;
 
-    SetAnimState(pBestBallContactAnimInfo->nAnimID, false, m_fOneTimerAnimTime * lbl_806DB990, false, false);
+    SetAnimState(pBestBallContactAnimInfo->nAnimID, false, m_fOneTimerAnimTime * gBallContactAnimBlendTimeScale, false, false);
 
     m_pCurrentAnimController->m_fPlaybackSpeedScale
         = (pBestBallContactAnimInfo->fAnimContactFrame / 30.0f)
@@ -2778,7 +2778,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     nlVec3Sub(v3TmpAdjustment, v3SimulatedBallPos, v3ContactOffsetWorld);
     nlVec3Sub(v3MoveAdjustment, v3TmpAdjustment, m_DetChar.m_v3Position);
 
-    InitMovementFromAnim(nFacingDelta, v3MoveAdjustment, m_fOneTimerAnimTime * lbl_806DB990, false);
+    InitMovementFromAnim(nFacingDelta, v3MoveAdjustment, m_fOneTimerAnimTime * gBallContactAnimBlendTimeScale, false);
 
     m_pPhysicsCharacter->m_pPlayerPlayerColumn->GetRadius(&fPhysicsRadius);
 
@@ -2955,7 +2955,7 @@ float cFielder::GetMegaStrikeMinBalls()
     {
         fShooting = 1.0f;
     }
-    return InterpolateClamped(lbl_806DB948, lbl_806DB94C, fShooting);
+    return InterpolateClamped(gMegaStrikeLowShootingMinBalls, gMegaStrikeHighShootingMinBalls, fShooting);
 }
 
 float cFielder::GetMegaStrikeMaxBalls()
@@ -2965,7 +2965,7 @@ float cFielder::GetMegaStrikeMaxBalls()
     {
         fShooting = 1.0f;
     }
-    return InterpolateClamped(lbl_806DB950, lbl_806DB954, fShooting);
+    return InterpolateClamped(gMegaStrikeLowShootingMaxBalls, gMegaStrikeHighShootingMaxBalls, fShooting);
 }
 
 void cFielder::InitActionMegaStrikeMeter(bool bParam)
@@ -3088,7 +3088,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         ClearPowerupAnimState(false);
 
-        float fMeterTime = lbl_806DB924;
+        float fMeterTime = gMegaStrikeFirstPhaseDuration;
         m_fMegaStrikeFirstPhaseDuration = fMeterTime;
         m_fMegaStrikePhaseTimeRemaining = fMeterTime;
         m_bMegaStrikeSecondPhase = false;
@@ -3104,20 +3104,20 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         }
 
         float fSegmentA
-            = InterpolateClamped(lbl_806DB95C, lbl_806DB958, fShooting);
+            = InterpolateClamped(gMegaStrikeLowShootingSegment1Width, gMegaStrikeHighShootingSegment1Width, fShooting);
         float fSegmentB
-            = InterpolateClamped(lbl_806DB960, lbl_806DB964, fShooting);
+            = InterpolateClamped(gMegaStrikeLowShootingSegment2Width, gMegaStrikeHighShootingSegment2Width, fShooting);
         float fSegmentC
-            = InterpolateClamped(lbl_806DB968, lbl_806DB96C, fShooting);
+            = InterpolateClamped(gMegaStrikeLowShootingSegment3Width, gMegaStrikeHighShootingSegment3Width, fShooting);
         float fSegmentD
-            = InterpolateClamped(lbl_806E0C68, lbl_806E0C6C, fShooting);
+            = InterpolateClamped(gMegaStrikeLowShootingSegment4Width, gMegaStrikeHighShootingSegment4Width, fShooting);
 
         float fHalfA = fSegmentA / 2.0f;
         float fHalfB = fSegmentB / 2.0f;
         float fHalfC = fSegmentC / 2.0f;
         float fHalfD = fSegmentD / 2.0f;
 
-        m_fMegaStrikeSegment1Position = lbl_806DB970 + fHalfA;
+        m_fMegaStrikeSegment1Position = gMegaStrikeFirstSegmentStart + fHalfA;
         ShootToScoreMeter::instance.SetSegment1Position(m_fMegaStrikeSegment1Position);
         ShootToScoreMeter::instance.SetSegment1Width(fSegmentA);
 
@@ -3180,10 +3180,10 @@ void cFielder::AdvanceMegaStrikeMeter(float fDeltaT, bool bButtonPressed, int nP
                 DoMegaMeterFirstButtonPressEvent(nParam);
             }
 
-            float fMidTime = GetShotMeterMidpointRatio() * lbl_806DB934 + lbl_806DB93C;
+            float fMidTime = GetShotMeterMidpointRatio() * gMegaStrikeLowShootingGreenWidth + gMegaStrikeGreenBarPosition;
             if (m_fMegaStrikeMeterPosition <= fMidTime)
             {
-                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(lbl_806DB928,
+                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(gMegaStrikeReturnTimeBelowMidpoint,
                     0.0f,
                     fMidTime,
                     0.0f,
@@ -3191,18 +3191,18 @@ void cFielder::AdvanceMegaStrikeMeter(float fDeltaT, bool bButtonPressed, int nP
             }
             else
             {
-                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(lbl_806DB930,
-                    lbl_806DB92C,
+                m_fMegaStrikeSecondPhaseDuration = InterpolateRangeClamped(gMegaStrikeReturnTimeAtEnd,
+                    gMegaStrikeReturnTimeAboveMidpoint,
                     1.0f,
                     fMidTime,
                     m_fMegaStrikeMeterPosition);
             }
 
-            m_fMegaStrikeGreenRegionWidth = InterpolateClamped(lbl_806DB934,
-                lbl_806DB938,
+            m_fMegaStrikeGreenRegionWidth = InterpolateClamped(gMegaStrikeLowShootingGreenWidth,
+                gMegaStrikeHighShootingGreenWidth,
                 this->GetTweaks()->fShooting);
-            float fSecondPhaseTime = InterpolateClamped(lbl_806DB940,
-                lbl_806DB944,
+            float fSecondPhaseTime = InterpolateClamped(gMegaStrikeLowShootingYellowWidth,
+                gMegaStrikeHighShootingYellowWidth,
                 this->GetTweaks()->fShooting);
 
             m_bMegaStrikeSecondPhase = true;
@@ -3210,7 +3210,7 @@ void cFielder::AdvanceMegaStrikeMeter(float fDeltaT, bool bButtonPressed, int nP
             ShootToScoreMeter::instance.SetGreenRegionWidth(
                 m_fMegaStrikeGreenRegionWidth);
             ShootToScoreMeter::instance.SetYellowRegionWidth(fSecondPhaseTime);
-            ShootToScoreMeter::instance.SetGreenBarPosition(lbl_806DB93C);
+            ShootToScoreMeter::instance.SetGreenBarPosition(gMegaStrikeGreenBarPosition);
             ShootToScoreMeter::instance.mbShowGreenRegion = true;
         }
         else if (m_fMegaStrikeSecondPressPosition < 0.0f)
@@ -3288,7 +3288,7 @@ void cFielder::UpdateMegaStrikeMeter(float fDeltaT, bool bButtonPressed, int nPa
         }
         else
         {
-            float fEndTime = m_fMegaStrikeReceivedTimestamp + lbl_806DB974;
+            float fEndTime = m_fMegaStrikeReceivedTimestamp + gMegaStrikeNetworkResultDelay;
             if (GetFixedUpdateTask()->mSimulationTime >= fEndTime)
             {
                 m_nMegaStrikeResultState = MEGA_RESULT_READY;
@@ -3438,7 +3438,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 
     if (!IsNetworkOrRecordedGame())
     {
-        FixedUpdateTask::SetFrameLock(lbl_806DB978);
+        FixedUpdateTask::SetFrameLock(gMegaStrikeResultFrameLockDuration);
     }
 }
 
@@ -3459,13 +3459,13 @@ float GetMegaStrikeShotCount(cFielder* pFielder, int nParam)
     }
 
     float fSegmentA
-        = InterpolateClamped(lbl_806DB95C, lbl_806DB958, fShooting);
+        = InterpolateClamped(gMegaStrikeLowShootingSegment1Width, gMegaStrikeHighShootingSegment1Width, fShooting);
     float fSegmentB
-        = InterpolateClamped(lbl_806DB960, lbl_806DB964, fShooting);
+        = InterpolateClamped(gMegaStrikeLowShootingSegment2Width, gMegaStrikeHighShootingSegment2Width, fShooting);
     float fSegmentC
-        = InterpolateClamped(lbl_806DB968, lbl_806DB96C, fShooting);
+        = InterpolateClamped(gMegaStrikeLowShootingSegment3Width, gMegaStrikeHighShootingSegment3Width, fShooting);
     float fSegmentD
-        = InterpolateClamped(lbl_806E0C68, lbl_806E0C6C, fShooting);
+        = InterpolateClamped(gMegaStrikeLowShootingSegment4Width, gMegaStrikeHighShootingSegment4Width, fShooting);
 
     float fHalfA = fSegmentA / 2.0f;
     float fHalfB = fSegmentB / 2.0f;
@@ -3520,10 +3520,10 @@ float GetMegaStrikeAccuracy(cFielder* pFielder, int nParam)
         {
             fTime = pFielder->m_fMegaStrikeMeterPosition;
         }
-        float fDelta = fabsf(lbl_806DB93C - fTime);
+        float fDelta = fabsf(gMegaStrikeGreenBarPosition - fTime);
         float fHalfWidth = fabsf(pFielder->m_fMegaStrikeGreenRegionWidth / 2.0f);
         if (fDelta
-            < InterpolateClamped(lbl_806DB940, lbl_806DB944, pFielder->GetTweaks()->fShooting)
+            < InterpolateClamped(gMegaStrikeLowShootingYellowWidth, gMegaStrikeHighShootingYellowWidth, pFielder->GetTweaks()->fShooting)
                   / 2.0f)
         {
             fDelta = 0.0f;
@@ -3540,11 +3540,11 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
     bIsModified = bIsChipShot;
     SetAction(ACTION_ONETIMER);
     m_fOneTimerAnimTime = fAdjustEndTime;
-    SetAnimState(animID, false, fAdjustEndTime * lbl_806DB990, false, false);
+    SetAnimState(animID, false, fAdjustEndTime * gBallContactAnimBlendTimeScale, false, false);
 
     nlVector3 v3MoveAdjustment;
     nlVec3Sub(v3MoveAdjustment, targetPos, m_DetChar.m_v3Position);
-    InitMovementFromAnim(nTurnAdjust, v3MoveAdjustment, fAdjustEndTime * lbl_806DB990, false);
+    InitMovementFromAnim(nTurnAdjust, v3MoveAdjustment, fAdjustEndTime * gBallContactAnimBlendTimeScale, false);
 
     ClearPowerupAnimState(false);
 
@@ -3658,7 +3658,7 @@ bool cFielder::DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& positio
             pOther->m_DetChar.m_v3Position.y - m_DetChar.m_v3Position.y,
         };
         if (nlVec2LengthSquared(v2Delta) > 25.0f
-            && fOtherScore > lbl_806DB890 && fOtherOpen > fThisOpen)
+            && fOtherScore > gPerfectPassMinOpenness && fOtherOpen > fThisOpen)
         {
             bResult = true;
         }
@@ -4023,12 +4023,12 @@ void cFielder::InitActionRunningPass()
     if (GetGlobalPad() != 0)
     {
         mActionRunPassVars.fSpeed
-            = InterpolateRangeClamped(lbl_806DB8D8, lbl_806DB8DC, 0.2f, lbl_806DB8E0, (float)mActionRunPassVars.nHeldTicks * FixedUpdateTask::GetPhysicsUpdateTick());
+            = InterpolateRangeClamped(gRunningPassShortHoldSpeedBoost, gRunningPassLongHoldSpeedBoost, 0.2f, gRunningPassMaxHoldDuration, (float)mActionRunPassVars.nHeldTicks * FixedUpdateTask::GetPhysicsUpdateTick());
         GetGlobalPad()->ResetButtonStateTicks(0x17, 1);
     }
     else
     {
-        mActionRunPassVars.fSpeed = lbl_806DB8D8;
+        mActionRunPassVars.fSpeed = gRunningPassShortHoldSpeedBoost;
     }
 
     SetAnimState(0x25, true, 0.2f, false, false);
@@ -4040,23 +4040,23 @@ void cFielder::ActionRunningPass(float fDeltaT)
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
         float fSpeed = m_DetChar.m_fActualSpeed + mActionRunPassVars.fSpeed;
-        if (fSpeed < lbl_806DB8E8)
+        if (fSpeed < gRunningPassMinSpeed)
         {
-            fSpeed = lbl_806DB8E8;
+            fSpeed = gRunningPassMinSpeed;
         }
 
         nlVector3 v3BallVelocity;
         nlPolarToCartesian(v3BallVelocity.x, v3BallVelocity.y, m_DetChar.m_aActualFacingDirection, fSpeed);
-        v3BallVelocity.z = InterpolateRangeClamped(lbl_806DB8D0,
-            lbl_806DB8D4,
-            lbl_806DB8D8,
-            lbl_806DB8DC,
+        v3BallVelocity.z = InterpolateRangeClamped(gRunningPassShortHoldVerticalSpeed,
+            gRunningPassLongHoldVerticalSpeed,
+            gRunningPassShortHoldSpeedBoost,
+            gRunningPassLongHoldSpeedBoost,
             mActionRunPassVars.fSpeed);
 
         nlVector3 v3Spin;
         nlVector3 v3UpCopy = { 0.0f, 0.0f, 1.0f };
         nlVec3CrossProduct(v3Spin, v3BallVelocity, v3UpCopy);
-        float fScale = lbl_806DB8E4 / nlSqrt(v3Spin.GetLengthSq3D(), true);
+        float fScale = gRunningPassSpinSpeed / nlSqrt(v3Spin.GetLengthSq3D(), true);
         nlVec3Scale(v3Spin, fScale);
 
         ReleaseBall(BALL_STATE_LOOSE);
@@ -4070,7 +4070,7 @@ void cFielder::ActionRunningPass(float fDeltaT)
             float fValue = this->GetTweaks()->fMovementSpeed;
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
-            float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);
+            float fCharge = Interpolate(gRunningPassLowSpeedCharge, gRunningPassHighSpeedCharge, fFraction);
             SetBallCharge(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
         }
 
@@ -4258,7 +4258,7 @@ void cFielder::ActionShotWindup(float fDeltaT)
     InitMovementRunningNoTurn(0.0f, m_DetChar.m_fActualSpeed / fChargeTime);
     m_DetChar.m_fDesiredSpeed = 0.0f;
 
-    if (fChargeTime < 0.5f && lbl_806E0C74 == 0)
+    if (fChargeTime < 0.5f && g_pShotLaneAvoidancePolygon == 0)
     {
         if (AIsgn(m_DetChar.m_v3Position.x)
             == AIsgn(m_pTeam->GetOtherNet()->m_v3NetLocation.x))
@@ -4268,10 +4268,10 @@ void cFielder::ActionShotWindup(float fDeltaT)
             nlVec3Normalize(v3Dir, v3Dir);
             nlVec3ScaleAdd(v3Dir, 2.0f, v3Dir, m_DetChar.m_v3Position);
 
-            lbl_806E0C74 = new (nlMalloc(
+            g_pShotLaneAvoidancePolygon = new (nlMalloc(
                 sizeof(AvoidablePolygon), 8, false))
                 AvoidablePolygon(AVOID_POLYGON_SHOT_LANE, v3Dir, m_pTeam->GetOtherNet()->m_v3NetLocation, 3.5f);
-            lbl_806E0C74->mOwner = this;
+            g_pShotLaneAvoidancePolygon->mOwner = this;
         }
     }
 
@@ -4302,10 +4302,10 @@ void cFielder::ActionShotWindup(float fDeltaT)
 
 void cFielder::EndActionShotWindup(eFielderActionState eNewAction)
 {
-    if (lbl_806E0C74 != 0)
+    if (g_pShotLaneAvoidancePolygon != 0)
     {
-        delete lbl_806E0C74;
-        lbl_806E0C74 = 0;
+        delete g_pShotLaneAvoidancePolygon;
+        g_pShotLaneAvoidancePolygon = 0;
     }
 
     KillWindups();
@@ -4874,7 +4874,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
 {
     m_fOneTimerAnimTime = fAdjustEndTime;
     SetAction(ACTION_RECEIVE_PASS);
-    SetAnimState(animID, false, fAdjustEndTime * lbl_806DB990, false, false);
+    SetAnimState(animID, false, fAdjustEndTime * gBallContactAnimBlendTimeScale, false, false);
 
     nlVector3 v3Direction;
     nlVec3Set(v3Direction,
@@ -4882,7 +4882,7 @@ void cFielder::InitActionReceivePass(int animID, nlVector3& v3TargetPos,
         v3TargetPos.y - m_DetChar.m_v3Position.y,
         v3TargetPos.z - m_DetChar.m_v3Position.z);
 
-    InitMovementFromAnim(sDirectionSeekSpeed, v3Direction, fAdjustEndTime * lbl_806DB990, false);
+    InitMovementFromAnim(sDirectionSeekSpeed, v3Direction, fAdjustEndTime * gBallContactAnimBlendTimeScale, false);
     ClearPowerupAnimState(false);
 }
 
@@ -4936,7 +4936,7 @@ void cFielder::ActionBurning()
     else
     {
         int nTarget = 0x32;
-        int nLimit = lbl_806DB8AC;
+        int nLimit = gBurningAngularVelocityThreshold;
         if (m_nStunnedAngularVelocity < -nLimit)
         {
             nTarget = 0x4B;
@@ -4957,13 +4957,13 @@ void cFielder::ActionBurning()
 
         s16 nRandom = (s16)nlRandom(0x64);
         m_nStunnedAngularAcceleration = m_nStunnedAngularAcceleration + (nTarget - nRandom) / 15;
-        if (m_nStunnedAngularAcceleration > lbl_806DB8B0)
+        if (m_nStunnedAngularAcceleration > gBurningMaxAngularAcceleration)
         {
-            m_nStunnedAngularAcceleration = lbl_806DB8B0;
+            m_nStunnedAngularAcceleration = gBurningMaxAngularAcceleration;
         }
-        else if (m_nStunnedAngularAcceleration < -lbl_806DB8B0)
+        else if (m_nStunnedAngularAcceleration < -gBurningMaxAngularAcceleration)
         {
-            m_nStunnedAngularAcceleration = -lbl_806DB8B0;
+            m_nStunnedAngularAcceleration = -gBurningMaxAngularAcceleration;
         }
         m_nStunnedAngularVelocity = m_nStunnedAngularVelocity + m_nStunnedAngularAcceleration;
         SetFacingDirection(m_nStunnedAngularVelocity + m_DetChar.m_aActualFacingDirection, true);
@@ -5023,8 +5023,8 @@ void cFielder::ReleaseHammerProjectile()
                 pProjectile->Activate(this);
                 pProjectile->SetPosition(GetJointPosition(m_nLeftHandJointIndex));
 
-                float fDistance = lbl_806DB89C
-                                + lbl_806DB8A0
+                float fDistance = gHammerBaseThrowDistance
+                                + gHammerThrowDistanceStep
                                       * (float)(int)(pProjectile->mIndex % 5);
 
                 nlVector3 v3Target;
@@ -5038,7 +5038,7 @@ void cFielder::ReleaseHammerProjectile()
                 float fStartHeight = pProjectile->GetPosition()->z;
 
                 float fVerticalSpeed
-                    = lbl_806DB8A4
+                    = gHammerVerticalSpeedPerDistance
                     * nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
                         true);
 
@@ -5213,7 +5213,7 @@ void cFielder::ActionBooSkillshot(float fDeltaT)
             mActionBooSkillshot.v3StartPosition, v3BallPos);
 
         if (IsBooSkillshotBall(g_pBall)
-            && !(fDistSq > lbl_806DB8A8 * lbl_806DB8A8)
+            && !(fDistSq > gBooSkillshotFollowDistance * gBooSkillshotFollowDistance)
             && !(fAbsX > fGoalLineX))
         {
             return;
@@ -5339,4 +5339,4 @@ static TweakBoolBinding s_UseTurboChargingTweak(
 
 u16 g_IdleTurnCompletionDelta = (u16)DegreesToAngle(10.0f);
 
-AvoidablePolygon* lbl_806E0C74;
+AvoidablePolygon* g_pShotLaneAvoidancePolygon;

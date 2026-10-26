@@ -20,7 +20,7 @@ struct PlayerAttackData
 template <typename T>
 class SlotPool;
 extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
-extern AvoidablePolygon* lbl_806E0C74;
+extern AvoidablePolygon* g_pShotLaneAvoidancePolygon;
 
 #if defined(VERSION_R4QP01_REV1) || defined(VERSION_R4QP01_REV2)
 extern int gFramesSinceElectrocutionSound;
