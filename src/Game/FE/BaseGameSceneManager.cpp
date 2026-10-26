@@ -311,7 +311,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     const char* filename = SceneEntryTable[newscene].mFenFileName;
     BaseSceneHandler* newHandler = 0;
 
-    if (newscene == SCENE_TITLE && (g_e3_Build || gUseAlternateTitleScreen))
+    if (newscene == SCENE_TITLE && (g_e3_Build || gOverrideTitleSceneFile))
     {
         filename = "art/fe/sms2_start.fen";
     }
