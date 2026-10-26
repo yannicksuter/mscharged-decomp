@@ -892,7 +892,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     , m_pDrawableObj(0)
     , m_pTarget(pTarget)
     , m_eType(eType)
-    , m_unk20(true)
+    , m_bVisible(true)
 {
     AvoidablePowerup* pAvoidable = 0;
 
@@ -1017,12 +1017,12 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_v3Position.y = 0.0f;
     m_v3Position.z = fRadius;
 
-    m_unk44.m_uWasRunning = m_unk44.m_uPackedTime != 0;
-    m_unk44.m_uPackedTime = 0;
-    m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
-    m_unk3C.m_uPackedTime = 0;
-    m_unk34.m_uWasRunning = m_unk34.m_uPackedTime != 0;
-    m_unk34.m_uPackedTime = 0;
+    mtMotionFreezeTimer.m_uWasRunning = mtMotionFreezeTimer.m_uPackedTime != 0;
+    mtMotionFreezeTimer.m_uPackedTime = 0;
+    mtFreezeHideTimer.m_uWasRunning = mtFreezeHideTimer.m_uPackedTime != 0;
+    mtFreezeHideTimer.m_uPackedTime = 0;
+    mtVelocityDampingTimer.m_uWasRunning = mtVelocityDampingTimer.m_uPackedTime != 0;
+    mtVelocityDampingTimer.m_uPackedTime = 0;
 
     nlVector3 v3ZeroVelocity = v3Zero;
     m_v3SavedVelocity = v3ZeroVelocity;
@@ -1096,7 +1096,7 @@ float PowerupBase::GetRadius() const
  */
 void PowerupBase::Update(float dt)
 {
-    if (m_unk44.m_uPackedTime == 0)
+    if (mtMotionFreezeTimer.m_uPackedTime == 0)
     {
         UpdateTransform();
 
@@ -1116,7 +1116,7 @@ void PowerupBase::Update(float dt)
 
         UpdatePhysicsState();
         mtActiveTimer.Countdown(dt, 0.0f);
-        m_unk34.Countdown(dt, 0.0f);
+        mtVelocityDampingTimer.Countdown(dt, 0.0f);
 
         if (m_pBlurHandler != 0)
         {
@@ -1135,16 +1135,16 @@ void PowerupBase::Update(float dt)
         m_v3Velocity = v3Zero;
         m_pPhysicsObject->SetLinearVelocity(v3Zero);
 
-        if (m_unk44.Countdown(dt, 0.0f))
+        if (mtMotionFreezeTimer.Countdown(dt, 0.0f))
         {
-            m_unk44.m_uWasRunning = m_unk44.m_uPackedTime != 0;
-            m_unk44.m_uPackedTime = 0;
-            m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
-            m_unk3C.m_uPackedTime = 0;
+            mtMotionFreezeTimer.m_uWasRunning = mtMotionFreezeTimer.m_uPackedTime != 0;
+            mtMotionFreezeTimer.m_uPackedTime = 0;
+            mtFreezeHideTimer.m_uWasRunning = mtFreezeHideTimer.m_uPackedTime != 0;
+            mtFreezeHideTimer.m_uPackedTime = 0;
             m_v3Velocity = m_v3SavedVelocity;
             m_pPhysicsObject->SetLinearVelocity(m_v3SavedVelocity);
             m_pPhysicsObject->EnableCollisions();
-            m_unk20 = true;
+            m_bVisible = true;
 
             if (m_szStreakTexture != 0 && m_pBlurHandler == 0)
             {
@@ -1153,11 +1153,11 @@ void PowerupBase::Update(float dt)
             }
         }
 
-        if (m_unk3C.m_uPackedTime != 0 && m_unk3C.Countdown(dt, 0.0f))
+        if (mtFreezeHideTimer.m_uPackedTime != 0 && mtFreezeHideTimer.Countdown(dt, 0.0f))
         {
-            m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
-            m_unk3C.m_uPackedTime = 0;
-            m_unk20 = false;
+            mtFreezeHideTimer.m_uWasRunning = mtFreezeHideTimer.m_uPackedTime != 0;
+            mtFreezeHideTimer.m_uPackedTime = 0;
+            m_bVisible = false;
         }
     }
 }
@@ -1594,7 +1594,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     pCharacter = 0;
     pPlayerTarget = 0;
 
-    if (pObj->m_unk44.m_uPackedTime != 0)
+    if (pObj->mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -1627,7 +1627,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     }
     case PHYSOBJ_SHELL:
     {
-        if (((PhysicsShell*)pObjB)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
+        if (((PhysicsShell*)pObjB)->m_pPowerupObject->mtMotionFreezeTimer.m_uPackedTime != 0)
         {
             break;
         }
@@ -1674,7 +1674,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     case PHYSOBJ_BANANA:
     {
         PowerupBase* pOther = ((PhysicsBanana*)pObjB)->m_pPowerupObject;
-        if (pOther->m_unk44.m_uPackedTime != 0)
+        if (pOther->mtMotionFreezeTimer.m_uPackedTime != 0)
         {
             break;
         }
@@ -1764,10 +1764,10 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
                 else if (pObj->m_eType != POWER_UP_BOBOMB)
                 {
-                    bool bUnknown = IsFielderDazed((cFielder*)pCharacter);
+                    bool bFielderDazed = IsFielderDazed((cFielder*)pCharacter);
                     if (pObj->m_eType != POWER_UP_FREEZE_SHELL)
                     {
-                        if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
+                        if (!bFielderDazed || pObj->m_eType == POWER_UP_SPINY_SHELL)
                         {
                             CollisionPlayerShellData* pData = g_CollisionPlayerShellDataPool.Allocate();
                             pData->pPlayer = (cFielder*)pCharacter;
@@ -1797,7 +1797,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                         QueueCollisionPlayerFreeze(pData);
                     }
 
-                    if (!bUnknown)
+                    if (!bFielderDazed)
                     {
                         if (pObj->meSize != POWERUPSIZE_LARGE)
                         {
@@ -1962,7 +1962,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
  */
 void PowerupBase::ReactToShockwave(const nlVector3& v3ShockwaveOrigin)
 {
-    if (m_unk44.m_uPackedTime == 0)
+    if (mtMotionFreezeTimer.m_uPackedTime == 0)
     {
         if (m_eType != POWER_UP_BANANA)
         {
@@ -2168,7 +2168,7 @@ void PowerupBase::UpdatePhysicsState()
     m_pPhysicsObject->GetPosition(&m_v3Position);
     m_pPhysicsObject->GetLinearVelocity(&m_v3Velocity);
 
-    if (m_unk34.m_uPackedTime != 0)
+    if (mtVelocityDampingTimer.m_uPackedTime != 0)
     {
         nlVector3 velocity = m_v3Velocity;
         velocity.x *= gPowerupDampingVelocityScale;
@@ -2232,9 +2232,9 @@ void PowerupBase::PreThrow(cFielder* pFielder)
  */
 void PowerupBase::FreezeMotion(float seconds, bool bEnableCollisions)
 {
-    m_unk44.SetSeconds(seconds);
+    mtMotionFreezeTimer.SetSeconds(seconds);
     m_v3SavedVelocity = m_v3Velocity;
-    m_unk3C.SetSeconds(0.2f);
+    mtFreezeHideTimer.SetSeconds(0.2f);
 
     if (!bEnableCollisions)
     {
@@ -2417,7 +2417,7 @@ inline void PowerupBase::SpeedManagement()
     nlVector2 v2NewVelocity;
     nlVector3 v3NewVelocity;
 
-    if (mtNoHitTimer.m_uPackedTime == 0 && m_unk44.m_uPackedTime == 0)
+    if (mtNoHitTimer.m_uPackedTime == 0 && mtMotionFreezeTimer.m_uPackedTime == 0)
     {
         nlCartesianToPolar(aShell, m_v3Velocity.x, m_v3Velocity.y);
         if (aShell.r < 0.99f)
@@ -2518,7 +2518,7 @@ void GreenShell::Update(float dt)
 {
     PowerupBase::Update(dt);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -2576,7 +2576,7 @@ void RedShell::Update(float dt)
 {
     PowerupBase::Update(dt);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -2736,7 +2736,7 @@ void Banana::Update(float dt)
 {
     PowerupBase::Update(dt);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -2808,7 +2808,7 @@ void SpinyShell::Update(float dt)
 {
     PowerupBase::Update(dt);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -2866,7 +2866,7 @@ void FreezeShell::Update(float fDeltaT)
 {
     PowerupBase::Update(fDeltaT);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }
@@ -2939,7 +2939,7 @@ void Bobomb::Update(float dt)
 {
     PowerupBase::Update(dt);
 
-    if (m_unk44.m_uPackedTime != 0)
+    if (mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return;
     }

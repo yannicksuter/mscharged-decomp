@@ -151,12 +151,12 @@ public:
     /* 0x14 */ cFielder* m_pThrower;
     /* 0x18 */ AvoidableObject* m_pAvoidableObject;
     /* 0x1C */ ePowerUpType m_eType;
-    /* 0x20 */ bool m_unk20;
+    /* 0x20 */ bool m_bVisible;
     /* 0x24 */ Timer mtActiveTimer;
     /* 0x2C */ Timer mtNoHitTimer;
-    /* 0x34 */ Timer m_unk34;
-    /* 0x3C */ Timer m_unk3C;
-    /* 0x44 */ Timer m_unk44;
+    /* 0x34 */ Timer mtVelocityDampingTimer;
+    /* 0x3C */ Timer mtFreezeHideTimer;
+    /* 0x44 */ Timer mtMotionFreezeTimer;
     /* 0x4C */ float m_fSpawnGrowTimeRemaining;
     /* 0x50 */ nlVector3 m_v3SavedVelocity;
     /* 0x5C */ u16 m_aOrientation;

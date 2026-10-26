@@ -94,7 +94,7 @@ ContactType PhysicsBanana::Contact(
     nlVector3 bananaPos;
     GetPosition(&bananaPos);
 
-    if (m_pPowerupObject->m_unk44.m_uPackedTime != 0)
+    if (m_pPowerupObject->mtMotionFreezeTimer.m_uPackedTime != 0)
     {
         return ONE_WAY_CONTACT_OTHER;
     }

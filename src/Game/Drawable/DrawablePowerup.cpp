@@ -145,7 +145,7 @@ void DrawablePowerup::Grab(int idx)
     if (powerup != 0)
     {
         mType = powerup->m_eType;
-        mVisible = powerup->m_unk20;
+        mVisible = powerup->m_bVisible;
         mRadius = powerup->GetRadius();
         mOrientation = powerup->m_aOrientation;
         mPosition = powerup->m_v3Position;
