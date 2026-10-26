@@ -188,8 +188,8 @@ GameplaySettings::GameplaySettings()
     mAwayPowerupsEnabled = true;
     mHomeMegastrikeEnabled = true;
     mAwayMegastrikeEnabled = true;
-    m_unk18 = true;
-    m_unk19 = true;
+    mHomeSkillshotEnabled = true;
+    mAwaySkillshotEnabled = true;
     m_unk1A = true;
 }
 

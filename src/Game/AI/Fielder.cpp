@@ -4152,7 +4152,7 @@ bool cFielder::CanDoSidekickShootToScore()
     }
 
     bool homeEnabled = false;
-    if (GameInfoManager::Instance()->GetCurrentSettings()->m_unk18
+    if (GameInfoManager::Instance()->GetCurrentSettings()->mHomeSkillshotEnabled
         && m_pTeam->m_nSide == HOME)
     {
         homeEnabled = true;
@@ -4160,7 +4160,7 @@ bool cFielder::CanDoSidekickShootToScore()
 
     bool enabled = false;
     if (homeEnabled
-        || (GameInfoManager::Instance()->GetCurrentSettings()->m_unk19
+        || (GameInfoManager::Instance()->GetCurrentSettings()->mAwaySkillshotEnabled
             && m_pTeam->m_nSide == AWAY))
     {
         enabled = true;

@@ -335,8 +335,8 @@ void GameInfoManager::SetupGameFromConfig()
     mCurGameGameplayOptions.mAwayPowerupsEnabled = settings->mAwayPowerupsEnabled;
     mCurGameGameplayOptions.mHomeMegastrikeEnabled = settings->mHomeMegastrikeEnabled;
     mCurGameGameplayOptions.mAwayMegastrikeEnabled = settings->mAwayMegastrikeEnabled;
-    mCurGameGameplayOptions.m_unk18 = settings->m_unk18;
-    mCurGameGameplayOptions.m_unk19 = settings->m_unk19;
+    mCurGameGameplayOptions.mHomeSkillshotEnabled = settings->mHomeSkillshotEnabled;
+    mCurGameGameplayOptions.mAwaySkillshotEnabled = settings->mAwaySkillshotEnabled;
     mCurGameGameplayOptions.m_unk1A = settings->m_unk1A;
     mUseCurGameSettings = 1;
 
@@ -392,8 +392,8 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameGameplayOptions.mAwayPowerupsEnabled = challenge->mAwayPowerupsEnabled;
         mCurGameGameplayOptions.mHomeMegastrikeEnabled = challenge->mHomeMegastrikeEnabled;
         mCurGameGameplayOptions.mAwayMegastrikeEnabled = challenge->mAwayMegastrikeEnabled;
-        mCurGameGameplayOptions.m_unk18 = challenge->mHomeSkillshotDisabled;
-        mCurGameGameplayOptions.m_unk19 = challenge->mAwaySkillshotDisabled;
+        mCurGameGameplayOptions.mHomeSkillshotEnabled = challenge->mHomeSkillshotEnabled;
+        mCurGameGameplayOptions.mAwaySkillshotEnabled = challenge->mAwaySkillshotEnabled;
         mCurGameGameplayOptions.GameLimitType = GAME_LIMIT_TIME;
         mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)challenge->mAIDifficulty;
         mCurGameGameplayOptions.NumGames = 1;

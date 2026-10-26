@@ -70,8 +70,8 @@ StrikerChallenge::StrikerChallenge()
     mAwayPowerupsEnabled = true;
     mHomeMegastrikeEnabled = true;
     mAwayMegastrikeEnabled = true;
-    mHomeSkillshotDisabled = true;
-    mAwaySkillshotDisabled = true;
+    mHomeSkillshotEnabled = true;
+    mAwaySkillshotEnabled = true;
     mStunnedHomeGoalies = false;
     mStunnedAwayGoalies = false;
 }
@@ -121,8 +121,8 @@ void StrikerChallenge::LoadSettings()
     mAwayPowerupsEnabled = !GetTweakBool("challenge/awaypowerups", false);
     mHomeMegastrikeEnabled = !GetTweakBool("challenge/homemegastrike", false);
     mAwayMegastrikeEnabled = !GetTweakBool("challenge/awaymegastrike", false);
-    mHomeSkillshotDisabled = !GetTweakBool("challenge/homeskillshot", false);
-    mAwaySkillshotDisabled = !GetTweakBool("challenge/awayskillshot", false);
+    mHomeSkillshotEnabled = !GetTweakBool("challenge/homeskillshot", false);
+    mAwaySkillshotEnabled = !GetTweakBool("challenge/awayskillshot", false);
     mStunnedHomeGoalies = GetTweakBool("challenge/stunnedhomegoalies", false);
     mStunnedAwayGoalies = GetTweakBool("challenge/stunnedawaygoalies", false);
     mCustomPowerups = GetTweakInt("challenge/custompowerups", POWERUP_CHEAT_NONE);
