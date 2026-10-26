@@ -143,10 +143,12 @@ typedef struct SCSimpleAddress {
 
 typedef struct SCDevInfo {
     char devName[20];
-    char at_0x14[1];
-    char UNK_0x15[0xB];
-    LINK_KEY linkKey;
-    char UNK_0x30[0x10];
+#if defined(VERSION_R4QK01)
+    LINK_KEY wbcLinkKey;
+    u8 unknown24[0x1C];
+#else
+    u8 unknown14[0x2C];
+#endif
 } SCDevInfo;
 
 /* the same structure under the SDK's other spelling */
