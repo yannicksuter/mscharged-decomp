@@ -18,9 +18,7 @@ TaskManager::TaskManager() :
     OSInitMutex(&mMutex);
     mHeapHandle = MEMCreateUnitHeap(mTaskArea, sizeof(mTaskArea), 64);
 
-    // clang-format off
     NW4HBMAssert_Line(MEMCountFreeBlockForUnitHeap( mHeapHandle ) >= TASK_NUM, 55);
-    // clang-format on
 }
 
 void* TaskManager::Alloc() {
@@ -41,8 +39,8 @@ void* TaskManager::Alloc() {
 }
 
 u32 TaskManager::GetTaskBufferSize() {
-    //! TODO: fake match?
-    return *((u32*)mHeapHandle + 0x10);
+    const MEMiUntHeapHead* unitHeap = reinterpret_cast<const MEMiUntHeapHead*>(mHeapHandle + 1);
+    return unitHeap->blockSize;
 }
 
 void TaskManager::Free(void* ptr) {
