@@ -1971,7 +1971,7 @@ void DestroyGameState(AsyncLoadingManager* manager)
     g_pTeams[0]->StopGameplayEffectsAndSounds();
     g_pTeams[1]->StopGameplayEffectsAndSounds();
     DestroyPowerups();
-    lbl_806E12C8->ResetEffects();
+    g_pPhysicsPatchManager->ResetEffects();
     DestroyCharacters();
     g_pGame->mpWeatherManager->Stop(true);
     ShootToScoreMeter::instance.TurnOffMeter();

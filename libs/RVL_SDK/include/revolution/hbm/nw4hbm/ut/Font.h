@@ -65,9 +65,6 @@ public:
     void InitReaderFunc(FontEncoding encoding);
 
     CharStrmReader GetCharStrmReader() const
-#if !defined(VERSION_R4QK01)
-        DECOMP_DONT_INLINE
-#endif
     {
         NW4HBMAssertPointerValid_Line(this, 117);
         CharStrmReader reader(mReaderFunc);

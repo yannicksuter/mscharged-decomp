@@ -173,7 +173,7 @@ typedef struct SCBtDeviceInfoArray {
 typedef struct SCBtCmpDevInfo {
     BD_ADDR addr;      // 0x00
     u8 name[64];       // 0x06
-    LINK_KEY linkKey;  // 0x30
+    LINK_KEY linkKey;  // 0x46
 } SCBtCmpDevInfo;
 
 typedef struct SCBtCmpDevInfoArray {

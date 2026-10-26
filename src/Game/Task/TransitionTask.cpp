@@ -156,7 +156,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
             g_pGame->ResetPowerups(false);
             gNPCManager->ResetNPCs();
-            lbl_806E12C8->ResetEffects();
+            g_pPhysicsPatchManager->ResetEffects();
         }
     }
     else if ((from & 0x18) || (from == 1 && (nlTaskManager::m_pInstance->mPreviousState & 0x18)))
@@ -171,7 +171,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
             g_pGame->ResetPowerups(false);
             gNPCManager->ResetNPCs();
-            lbl_806E12C8->ResetEffects();
+            g_pPhysicsPatchManager->ResetEffects();
         }
         else if (to == 1)
         {

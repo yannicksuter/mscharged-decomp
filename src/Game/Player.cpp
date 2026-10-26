@@ -1474,7 +1474,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             }
             for (unsigned int i = 0; i < 60; i++)
             {
-                PhysicsPatch* pPatch = lbl_806E12C8->GetPatch(i);
+                PhysicsPatch* pPatch = g_pPhysicsPatchManager->GetPatch(i);
                 if (pPatch != NULL && pPatch->m_bVisible)
                 {
                     const nlVector3& v3Position = pPatch->GetPosition();

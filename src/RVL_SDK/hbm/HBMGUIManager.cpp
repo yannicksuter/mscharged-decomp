@@ -326,7 +326,6 @@ bool PaneComponent::contain(f32 x_, f32 y_) {
         return false;
     }
 
-    // goes into PaneManager vtable?
     const nw4hbm::lyt::DrawInfo* pDrawInfo = static_cast<PaneManager*>(mpManager)->getDrawInfo();
 
     if (!pDrawInfo) {
@@ -354,8 +353,6 @@ void PaneComponent::draw() {
     if (!pDrawInfo) {
         return;
     }
-
-    (void)mpPane->GetTranslate();
 
     nw4hbm::lyt::Size size = mpPane->GetSize();
 

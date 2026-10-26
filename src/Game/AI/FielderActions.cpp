@@ -166,12 +166,6 @@ extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
-
-extern bool lbl_806DB5A8;
-
-
-
-
 extern int gHitReactAnims[3][4];
 
 extern int gShellAttackReactAnims[4];
@@ -2153,7 +2147,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
         if (m_DetChar.m_eCharacterClass == YOSHI)
         {
-            lbl_806E12C8
+            g_pPhysicsPatchManager
                 ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, gYoshiTongueStartRadius, gYoshiTongueEndRadius, gYoshiTongueLifetime)
                 ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
@@ -2167,7 +2161,7 @@ void cFielder::ActionHit(float fDeltaT)
     {
         for (int i = 0; i < 0x3C; i++)
         {
-            PhysicsPatch* pEffect = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* pEffect = g_pPhysicsPatchManager->GetPatch(i);
             if (pEffect != 0 && pEffect->m_Type == PATCH_YOSHI_TONGUE)
             {
                 cSHierarchy* pHierarchy = m_pPoseAccumulator->GetBaseHierarchy();
@@ -2908,7 +2902,7 @@ void cFielder::ActionLooseBallShot(float fDeltaT)
 
 void FreezeEveryoneButCaptain(cFielder* pFielder)
 {
-    lbl_806DB5A8 = false;
+    gHeaderTargetEnabled = false;
 
     for (int i = 0; i < 2; i++)
     {
@@ -2927,7 +2921,7 @@ void FreezeEveryoneButCaptain(cFielder* pFielder)
 
 void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
 {
-    lbl_806DB5A8 = true;
+    gHeaderTargetEnabled = true;
 
     for (int i = 0; i < 2; i++)
     {

@@ -43,14 +43,14 @@
 #include "Game/Render/RLViewLayers.h"
 extern "C"
 {
-    extern bool lbl_806DEE60;
-    bool lbl_806E1960;
+    extern bool gUseReducedStadiumUpdates;
+    bool gStadiumGoalLightEnabled;
     bool gDisableHighRange;
     BasicStadium* pBasicStadiumInstance;
-    int lbl_806E1968;
-    StadiumTweaks* lbl_806E196C;
-    unsigned long lbl_806DEE30 = -1;
-    unsigned long lbl_806DEE34 = -1;
+    int gStadiumLoadStage;
+    StadiumTweaks* gStadiumTweaks;
+    unsigned long gStadiumLightRampTexture = -1;
+    unsigned long gStadiumSTSLightRampTexture = -1;
 }
 
 bool gSkipGameplayModels;
@@ -526,9 +526,9 @@ void DestroyStadium()
 }
 
 #if defined(VERSION_R4QP01_REV1)
-extern "C" bool lbl_806DEE60 = false;
+extern "C" bool gUseReducedStadiumUpdates = false;
 #else
-extern "C" bool lbl_806DEE60 = true;
+extern "C" bool gUseReducedStadiumUpdates = true;
 #endif
 
 void UpdateStadium(float fDeltaT)
@@ -536,7 +536,7 @@ void UpdateStadium(float fDeltaT)
     bool bUpdateState = true;
     bool bUpdateNPCs = true;
     if (GameInfoManager::Instance() != 0
-        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && lbl_806DEE60
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && gUseReducedStadiumUpdates
         && (GameInfoManager::Instance()->GetStadium() == STAD_VICE
 #if defined(VERSION_R4QP01_REV1)
             || GameInfoManager::Instance()->GetStadium() == STAD_BATTLEDOME
@@ -551,7 +551,7 @@ void UpdateStadium(float fDeltaT)
     }
 #if defined(VERSION_R4QP01_REV1)
     if (GameInfoManager::Instance() != 0
-        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && lbl_806DEE60
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && gUseReducedStadiumUpdates
         && GameInfoManager::Instance()->GetStadium() == STAD_WASTELANDS)
     {
         bUpdateNPCs = false;
@@ -687,9 +687,9 @@ void InitializeStadiumLighting()
     glGetTexture(name);
     if (glTextureLoad(lightRamp))
     {
-        lbl_806DEE30 = lightRamp;
+        gStadiumLightRampTexture = lightRamp;
     }
-    lbl_806DEE34 = glGetTexture("global/lightramp_sts");
+    gStadiumSTSLightRampTexture = glGetTexture("global/lightramp_sts");
     nlSNPrintf(name, sizeof(name), "_%s/shadowlookup", gStadiumName);
     SetImpostorLightingTexture(glGetTexture(name));
     nlSNPrintf(name, sizeof(name), "_%s/shadowlookup", gStadiumName);
@@ -703,13 +703,13 @@ void LoadStadium(const char* name, bool)
     gSkipGameplayModels = false;
     OnStadiumLightingLoad();
     CreateAttackSideIndicators();
-    lbl_806E1968 = 1;
+    gStadiumLoadStage = 1;
 
     nlSNPrintf(path, sizeof(path), "%s/%s", "art/environments", name);
     SetStadiumName(name);
     BeginLoadStadium(path, false);
 
-    lbl_806E196C = new (nlMalloc(sizeof(StadiumTweaks), 8, true))
+    gStadiumTweaks = new (nlMalloc(sizeof(StadiumTweaks), 8, true))
         StadiumTweaks("/Stadium", name);
 }
 
@@ -737,20 +737,20 @@ static inline void SetNetSoftness(float softness)
 
 bool FinishLoadStadium(bool stadiumViewer)
 {
-    if (lbl_806E1968 == 1)
+    if (gStadiumLoadStage == 1)
     {
         if (IsStadiumResourceDataLoaded())
         {
-            lbl_806E1968 = 2;
+            gStadiumLoadStage = 2;
             BeginLoadStadiumTemporaryResources();
         }
         return false;
     }
-    if (lbl_806E1968 == 2)
+    if (gStadiumLoadStage == 2)
     {
         if (FinishLoadStadiumResources())
         {
-            lbl_806E1968 = 3;
+            gStadiumLoadStage = 3;
             BeginLoadStadiumEffects();
         }
         return false;
@@ -784,20 +784,20 @@ bool FinishLoadStadium(bool stadiumViewer)
         cField::mfPenaltyBoxY = y;
     }
 
-    cNet::SetNetDimensions(lbl_806E196C->fNetWidth, lbl_806E196C->fNetHeight,
-        lbl_806E196C->fGoalpostRadius, lbl_806E196C->fGoalpostOffset);
-    SetPhysicsNetDimensions(lbl_806E196C->fPhysNetWidth,
-        lbl_806E196C->fPhysNetHeight, lbl_806E196C->fPhysNetDepth);
-    if (HasSoftnessOverride(*lbl_806E196C))
+    cNet::SetNetDimensions(gStadiumTweaks->fNetWidth, gStadiumTweaks->fNetHeight,
+        gStadiumTweaks->fGoalpostRadius, gStadiumTweaks->fGoalpostOffset);
+    SetPhysicsNetDimensions(gStadiumTweaks->fPhysNetWidth,
+        gStadiumTweaks->fPhysNetHeight, gStadiumTweaks->fPhysNetDepth);
+    if (HasSoftnessOverride(*gStadiumTweaks))
     {
-        SetNetSoftness(lbl_806E196C->fSoftness);
+        SetNetSoftness(gStadiumTweaks->fSoftness);
     }
-    NetMesh::SetDontUseLowestNetTextureLOD(lbl_806E196C->bDontUseLowest);
+    NetMesh::SetDontUseLowestNetTextureLOD(gStadiumTweaks->bDontUseLowest);
     NetMesh::s_bAnimatedNetMeshEnabled = true;
-    SetCoPlanarZ(lbl_806E196C->fShadowHeight);
-    SetPlanarShadowOpacity(lbl_806E196C->fShadowOpacity);
-    delete lbl_806E196C;
-    lbl_806E196C = 0;
+    SetCoPlanarZ(gStadiumTweaks->fShadowHeight);
+    SetPlanarShadowOpacity(gStadiumTweaks->fShadowOpacity);
+    delete gStadiumTweaks;
+    gStadiumTweaks = 0;
     return true;
 }
 

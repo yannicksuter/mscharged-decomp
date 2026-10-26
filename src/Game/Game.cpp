@@ -294,12 +294,12 @@ void CreateGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     {
         AISandbox::s_pInstance = new (8, false) AISandbox();
     }
-    if (lbl_806E12C8 == 0)
+    if (g_pPhysicsPatchManager == 0)
     {
         PhysicsPatchManager* memory
             = new (nlMalloc(sizeof(PhysicsPatchManager), 8, false))
                 PhysicsPatchManager();
-        lbl_806E12C8 = memory;
+        g_pPhysicsPatchManager = memory;
     }
     if (GameplayCameraEffects::Instance() == 0)
     {
@@ -341,10 +341,10 @@ void DestroyGame()
         delete AISandbox::s_pInstance;
         AISandbox::s_pInstance = 0;
     }
-    if (lbl_806E12C8 != 0)
+    if (g_pPhysicsPatchManager != 0)
     {
-        delete lbl_806E12C8;
-        lbl_806E12C8 = 0;
+        delete g_pPhysicsPatchManager;
+        g_pPhysicsPatchManager = 0;
     }
     if (GameplayCameraEffects::Instance() != 0)
     {
@@ -729,7 +729,7 @@ void cGame::ResetForKickOff()
     ResetBall(g_pBall, false);
     m_bBallInNet = false;
     ResetPowerups(false);
-    lbl_806E12C8->ResetEffects();
+    g_pPhysicsPatchManager->ResetEffects();
     m_pScorer = 0;
     m_pAssister = 0;
 
@@ -1485,7 +1485,7 @@ void cGame::Update(float fDeltaT)
     g_pCurrentlyUpdatingCharacter = 0;
     g_pBall->Update(fDeltaT);
     mpWeatherManager->Update(fDeltaT);
-    lbl_806E12C8->Update(fDeltaT);
+    g_pPhysicsPatchManager->Update(fDeltaT);
 
     if (IsGameplayOrOvertime())
     {
@@ -1908,7 +1908,7 @@ void cGame::SyncLog(void* context, DebugWriteCache* cache)
     mpCrowdRiot->SyncLog(context, cache);
     mpTerrain->SyncLog(context, cache);
     mpWeatherManager->SyncLog(context, cache);
-    lbl_806E12C8->SyncLog(context, cache);
+    g_pPhysicsPatchManager->SyncLog(context, cache);
     NetMesh::spPositiveXNetMesh->SyncLog(context, cache);
     NetMesh::spNegativeXNetMesh->SyncLog(context, cache);
 }
@@ -2609,7 +2609,7 @@ void cGame::OnSuddenDeath()
 }
 void cGame::OnGameOver()
 {
-    lbl_806E12C8->ResetEffects();
+    g_pPhysicsPatchManager->ResetEffects();
     StopSuddenDeathMusic();
 }
 void SetFieldTilt(int relative, float xTilt, float yTilt)

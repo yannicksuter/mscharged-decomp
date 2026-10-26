@@ -194,6 +194,7 @@ unsigned int GetNumBallTrails();
 
 extern cBall* g_pBall;
 extern float gHeaderTargetPredictionHeight;
+extern bool gHeaderTargetEnabled;
 
 
 // Shared functions and data from Game/Ball.cpp.
