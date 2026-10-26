@@ -390,8 +390,7 @@ static void DWCi_SendStateChanged(qr2_t object)
     qr2_think(object);
     if (object->userstatechangerequested)
         return;
-    // Polling retains this match-type read even when no notification is pending.
-    (void)DWCi_GetMatchCnt()->matchType;
+    assert(DWCi_GetMatchCnt()->matchType < DWC_MATCH_TYPE_NUM);
 }
 
 static DWCNodeInfo* DWCi_GetLocalNode(void)
