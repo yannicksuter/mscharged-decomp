@@ -7,6 +7,8 @@
 
 class cPoseAccumulator;
 class cSAnim;
+template <typename T>
+class SlotPool;
 
 enum ePlayMode
 {
@@ -23,6 +25,8 @@ public:
     void (*m_funcCallback)(cSAnim*, unsigned int);
     cSAnimCallback* next;
 };
+
+extern SlotPool<cSAnimCallback> gSAnimCallbackPool;
 
 struct PackedScale
 {

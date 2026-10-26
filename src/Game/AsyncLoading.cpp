@@ -145,8 +145,6 @@ void ShutdownWarbleRendering(void*);
 
 void DestroyCharacters();
 
-extern SlotPool<cSAnimCallback> gSAnimCallbackPool;
-
 bool g_VerboseAudio;
 bool g_bDumpMemoryStatsOnLoad;
 float g_fScriptBlockingWarningMS = 50.0f;
