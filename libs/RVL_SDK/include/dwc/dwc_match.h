@@ -316,8 +316,8 @@ extern "C"
     void DWCi_SetNumValidConnection(void);
 #if defined(VERSION_R4QK01)
     GPResult DWCi_GPSetServerStatus(int status);
-    void fn_8046F920(int profileID);
-    void fn_8046F930(void);
+    void DWCi_SetMatchProfileID(int profileID);
+    void DWCi_RegisterMatchQR2Keys(void);
 #else
     GPResult DWCi_GPSetServerStatus(void);
 #endif
