@@ -1030,7 +1030,7 @@ Game/Physics.cpp:
 	.sbss       start:0x806DFDA8 end:0x806DFDB8
 	.sdata2     start:0x806E33C8 end:0x806E33E0
 
-Game/tu_8013E2EC.cpp:
+Game/WorldInitialization.cpp:
 	.text       start:0x8013D900 end:0x8013D970
 	.ctors      start:0x804DA83C end:0x804DA840
 	.data       start:0x8050D3C8 end:0x8050D400

@@ -4507,7 +4507,7 @@ DeleteEntry__79ListContainerBase<P13PhysicsObject,41NewAdapter<27ListEntry<P13Ph
 __dt__33nlListContainer<P13PhysicsObject>Fv = .text:0x8013DB60; // type:function size:0xAC scope:weak
 __dt__33cInventory<19LoadablePhysicsMesh>Fv = .text:0x8013DC0C; // type:function size:0x1F0 scope:weak
 OnBeforeCreatePhysicsWorld__Fv = .text:0x8013DDFC; // type:function size:0x8
-__sinit_\tu_8013E2EC_cpp = .text:0x8013DE04; // type:function size:0x68 scope:local
+__sinit_\WorldInitialization_cpp = .text:0x8013DE04; // type:function size:0x68 scope:local
 __ct__13PhysicsAIBallFf = .text:0x8013DE6C; // type:function size:0x80
 __dt__11PhysicsBallFv = .text:0x8013DEEC; // type:function size:0x5C scope:weak
 Unknown0__13PhysicsAIBallFv = .text:0x8013DF48; // type:function size:0x64
