@@ -76,7 +76,7 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 bool Goalie::mbPosGoalieNetCheck;
 bool Goalie::mbNegGoalieNetCheck;
 u8 Goalie::mbActionDataSetup;
-u8 lbl_806E0D13;
+u8 gbDisableLateGoalieReposition;
 float Goalie::mfGoalieStepDist = -1.0f;
 float Goalie::mfGoalieStrafeDist = -1.0f;
 float Goalie::mfGoalieRunDist = -1.0f;
@@ -92,34 +92,34 @@ float gfLooseBallNetRange = 13.0f;
 #endif
 float gfPassThreatNetRange = 9.5f;
 float gfLobSaveNetRange = 6.0f;
-float lbl_806DBB34 = 0.5f;
+float gfLooseBallTeamControlThreshold = 0.5f;
 float gfDeflectSpinScale = 0.6f;
 float gfDekeAttackRange = 2.33f;
 float gfDekeAttackRangeLong = 3.8f;
 float gfBallCarrierRange = 3.5f;
-float lbl_806DBB48 = 5.0f;
-float lbl_806DBB4C = 5.0f;
+float gfShotChargeAttackRangeEasy = 5.0f;
+float gfShotChargeAttackRangeHard = 5.0f;
 float gfBallCarrierNetRange = 11.0f;
 float gfPounceRangeMargin = 0.8f;
-float lbl_806DBB58 = 8.0f;
-float lbl_806DBB5C = 2.5f;
+float gfDekeAttackTypeSwitchFrame = 8.0f;
+float gfShotChargeAttackChanceRange = 2.5f;
 float gfDekeAttackChanceMinCharge = 95.0f;
 float gfDekeAttackChanceMaxCharge = 60.0f;
 float gfSTSAttackCloseMargin = 2.2f;
 float gfSTSAttackFarMargin = 3.6f;
 float gfSTSAttackFarChance = 0.05f;
-float lbl_806DBB74 = 0.3f;
-float lbl_806DBB78 = 0.1f;
-float lbl_806DBB7C = 8.0f;
-float lbl_806DBB80 = 4.0f;
-float lbl_806DBB84 = 1.6f;
-float lbl_806DBB88 = 6.0f;
-float lbl_806DBB8C = 2.0f;
-float lbl_806DBB90 = 2.5f;
-float lbl_806DBB94 = 10.0f;
-float lbl_806DBB98 = 20.0f;
-float lbl_806DBB9C = 8.0f;
-float lbl_806DBBA0 = 12.0f;
+float gfDekeLaunchContactHeightOffset = 0.3f;
+float gfDekeLaunchContactTrackTime = 0.1f;
+float gfGoalieKickLaunchBaseSpeed = 8.0f;
+float gfGoalieKickLaunchSpeedRange = 4.0f;
+float gfGoalieKickLaunchVerticalRatio = 1.6f;
+float gfGoalieEarlyDekeLaunchBaseSpeed = 6.0f;
+float gfGoalieEarlyDekeLaunchSpeedRange = 2.0f;
+float gfGoalieEarlyDekeLaunchVerticalRatio = 2.5f;
+float gfGoalieDeflectedBallMinSpeed = 10.0f;
+float gfGoalieDeflectedBallMaxSpeed = 20.0f;
+float gfGoalieDeflectedBallMinVerticalSpeed = 8.0f;
+float gfGoalieDeflectedBallMaxVerticalSpeed = 12.0f;
 float gfRepositionLeadDist = 0.6f;
 float gfLobRepositionDist = 0.2f;
 #if defined(VERSION_R4QK01)
@@ -1748,7 +1748,7 @@ extern "C" float CalcOpponentProximity(Goalie* pGoalie,
 
 bool Goalie::ShouldReposition()
 {
-    if (mfWaitTime < 0.07f && lbl_806E0D13)
+    if (mfWaitTime < 0.07f && gbDisableLateGoalieReposition)
         return false;
     mUrgency = URGENCY_HIGH;
     bool bDesiredDirSet = false;
@@ -2084,7 +2084,7 @@ bool Goalie::CheckForDekeAttack()
                     {
                         float fFrame = pFielder->m_pCurrentAnimController->m_fTime
                             * pFielder->m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
-                        if (fFrame >= lbl_806DBB58)
+                        if (fFrame >= gfDekeAttackTypeSwitchFrame)
                             nType = 4;
                         else
                             nType = 3;
@@ -2497,12 +2497,12 @@ bool Goalie::CheckForSTSAttack()
             || ((int)pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
                 && (int)pFielder->m_eActionState == ACTION_SKILLSHOT))
         {
-            if (nlRandomf(lbl_806DBB5C) < fDifficulty)
+            if (nlRandomf(gfShotChargeAttackChanceRange) < fDifficulty)
             {
                 const nlVector3& v3OwnerPos = pFielder->m_DetChar.m_v3Position;
                 if (IsCloseToNet(v3OwnerPos, gfBallCarrierNetRange))
                 {
-                    float fRange = InterpolateRangeClamped(lbl_806DBB4C, lbl_806DBB48,
+                    float fRange = InterpolateRangeClamped(gfShotChargeAttackRangeHard, gfShotChargeAttackRangeEasy,
                         1.0f, 0.2f, fDifficulty);
                     if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position, v3OwnerPos)
                         < nlGetLengthSquared1D(fRange))
@@ -2576,7 +2576,7 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
                 return false;
         }
         else if ((absBallX < goalLineX - 3.0f || absBallY > penaltyY)
-            && TeamBallControlConfidence(m_pTeam) > lbl_806DBB34)
+            && TeamBallControlConfidence(m_pTeam) > gfLooseBallTeamControlThreshold)
             return false;
         nlVector3 v3ProjectedPosition;
         nlVec3ScaleAdd(v3ProjectedPosition, 0.3f, g_pBall->m_v3Velocity, v3BallPos);
@@ -4158,21 +4158,21 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
                     {
                         nlVector3 v3BallVelocity;
                         nlPolarToCartesian(v3BallVelocity.x, v3BallVelocity.y, aDirection,
-                            lbl_806DBB94 + nlRandomf(lbl_806DBB98 - lbl_806DBB94));
-                        v3BallVelocity.z = lbl_806DBB9C + nlRandomf(lbl_806DBBA0 - lbl_806DBB9C);
+                            gfGoalieDeflectedBallMinSpeed + nlRandomf(gfGoalieDeflectedBallMaxSpeed - gfGoalieDeflectedBallMinSpeed));
+                        v3BallVelocity.z = gfGoalieDeflectedBallMinVerticalSpeed + nlRandomf(gfGoalieDeflectedBallMaxVerticalSpeed - gfGoalieDeflectedBallMinVerticalSpeed);
                         SetNoPickUpTime(0.3f);
                         g_pBall->m_tNoPickupTimer.SetSeconds(0.3f);
                         g_pBall->SetVelocity(v3BallVelocity, SPINTYPE_NONE, NULL);
                     }
                     return;
                 }
-                fScale = lbl_806DBB7C + nlRandomf(lbl_806DBB80);
-                v3Velocity.z = lbl_806DBB84;
+                fScale = gfGoalieKickLaunchBaseSpeed + nlRandomf(gfGoalieKickLaunchSpeedRange);
+                v3Velocity.z = gfGoalieKickLaunchVerticalRatio;
                 break;
             case 1:
             case 2:
-                fScale = lbl_806DBB88 + nlRandomf(lbl_806DBB8C);
-                v3Velocity.z = lbl_806DBB90;
+                fScale = gfGoalieEarlyDekeLaunchBaseSpeed + nlRandomf(gfGoalieEarlyDekeLaunchSpeedRange);
+                v3Velocity.z = gfGoalieEarlyDekeLaunchVerticalRatio;
                 break;
             case 4:
             case 7:
@@ -4280,7 +4280,7 @@ void Goalie::UpdateLaunchedDekeTarget(float fDeltaT)
     }
 
     mfTargetTime += fDeltaT;
-    if (mfTargetTime < lbl_806DBB78)
+    if (mfTargetTime < gfDekeLaunchContactTrackTime)
     {
         int nGoalieJointIndex;
         if (mpLooseBallInfo->mAnimType == LOOSEBALL_ANIM_ATTACK)
@@ -4300,7 +4300,7 @@ void Goalie::UpdateLaunchedDekeTarget(float fDeltaT)
         nlVector3 v3GoalieJointPosition
             = GetJointPosition(nGoalieJointIndex);
 
-        float fOffset = lbl_806DBB74
+        float fOffset = gfDekeLaunchContactHeightOffset
                       + (v3GoalieJointPosition.z - v3TargetJointPosition.z);
         if (fOffset > 0.0f)
         {
