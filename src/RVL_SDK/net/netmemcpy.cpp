@@ -1,170 +1,256 @@
 #include <revolution/net/NETMem.h>
 
-template <unsigned long Shift>
-static inline void NETMemCpy_Unaligned(void* dst, const void* src, unsigned long loopSize)
-{
-    unsigned long tmp0;
-    unsigned long tmp1;
-    unsigned long tmp2;
-    unsigned long tmp3;
-    unsigned long tmp4;
-    unsigned long tmp5;
-    src = (const unsigned char*)src - (Shift / 8);
-    tmp2 = ((const unsigned long*)src)[0];
-    tmp2 = tmp2 << Shift;
-    src = (const unsigned char*)src + 4;
-    do
-    {
-        __dcbz(dst, 0);
-        tmp0 = ((const unsigned long*)src)[0];
-        tmp3 = tmp0 << Shift;
-        tmp2 = __rlwimi(tmp2, tmp0, Shift, 32 - Shift, 31);
-        tmp1 = ((const unsigned long*)src)[1];
-        ((unsigned long*)dst)[0] = tmp2;
-        tmp4 = tmp1 << Shift;
-        tmp3 = __rlwimi(tmp3, tmp1, Shift, 32 - Shift, 31);
-        tmp0 = ((const unsigned long*)src)[2];
-        ((unsigned long*)dst)[1] = tmp3;
-        tmp5 = tmp0 << Shift;
-        tmp4 = __rlwimi(tmp4, tmp0, Shift, 32 - Shift, 31);
-        tmp1 = ((const unsigned long*)src)[3];
-        ((unsigned long*)dst)[2] = tmp4;
-        tmp2 = tmp1 << Shift;
-        tmp5 = __rlwimi(tmp5, tmp1, Shift, 32 - Shift, 31);
-        tmp0 = ((const unsigned long*)src)[4];
-        ((unsigned long*)dst)[3] = tmp5;
-        tmp3 = tmp0 << Shift;
-        tmp2 = __rlwimi(tmp2, tmp0, Shift, 32 - Shift, 31);
-        tmp1 = ((const unsigned long*)src)[5];
-        ((unsigned long*)dst)[4] = tmp2;
-        tmp4 = tmp1 << Shift;
-        tmp3 = __rlwimi(tmp3, tmp1, Shift, 32 - Shift, 31);
-        tmp0 = ((const unsigned long*)src)[6];
-        ((unsigned long*)dst)[5] = tmp3;
-        tmp5 = tmp0 << Shift;
-        tmp4 = __rlwimi(tmp4, tmp0, Shift, 32 - Shift, 31);
-        tmp1 = ((const unsigned long*)src)[7];
-        ((unsigned long*)dst)[6] = tmp4;
-        tmp2 = tmp1 << Shift;
-        tmp5 = __rlwimi(tmp5, tmp1, Shift, 32 - Shift, 31);
-        src = (const unsigned char*)src + 32;
-        ((unsigned long*)dst)[7] = tmp5;
-        dst = (unsigned char*)dst + 32;
-    } while (--loopSize);
-}
-
-static inline void NETMemCpy_DstSize32Aligned(void* dst, const void* src, unsigned long size)
-{
-    unsigned long tmp0;
-    unsigned long tmp1;
-    unsigned long loopSize = size >> 5;
+// clang-format off
+static inline void NETMemCpy_DstSize32Aligned(register void* dst, register const void* src, unsigned long size) {
+    register unsigned long tmp0;
+    register unsigned long tmp1;
+    register unsigned long tmp2;
+    register unsigned long tmp3;
+    register unsigned long tmp4;
+    register unsigned long tmp5;
+    register unsigned long loopSize = size >> 5;
     unsigned long shift = (unsigned long)src & 3;
 
-    switch (shift)
-    {
+    switch (shift) {
     case 0:
-        do
-        {
-            __dcbz(dst, 0);
-            tmp0 = ((const unsigned long*)src)[0];
-            tmp1 = ((const unsigned long*)src)[1];
-            ((unsigned long*)dst)[0] = tmp0;
-            ((unsigned long*)dst)[1] = tmp1;
-            tmp0 = ((const unsigned long*)src)[2];
-            tmp1 = ((const unsigned long*)src)[3];
-            ((unsigned long*)dst)[2] = tmp0;
-            ((unsigned long*)dst)[3] = tmp1;
-            tmp0 = ((const unsigned long*)src)[4];
-            tmp1 = ((const unsigned long*)src)[5];
-            ((unsigned long*)dst)[4] = tmp0;
-            ((unsigned long*)dst)[5] = tmp1;
-            tmp0 = ((const unsigned long*)src)[6];
-            tmp1 = ((const unsigned long*)src)[7];
-            ((unsigned long*)dst)[6] = tmp0;
-            ((unsigned long*)dst)[7] = tmp1;
-            src = (const unsigned char*)src + 32;
-            dst = (unsigned char*)dst + 32;
-        } while (--loopSize);
+        asm {
+            mtctr loopSize
+        aligned_loop:
+            dcbz 0, dst
+            lwz tmp0, 0(src)
+            lwz tmp1, 4(src)
+            stw tmp0, 0(dst)
+            stw tmp1, 4(dst)
+            lwz tmp0, 8(src)
+            lwz tmp1, 12(src)
+            stw tmp0, 8(dst)
+            stw tmp1, 12(dst)
+            lwz tmp0, 16(src)
+            lwz tmp1, 20(src)
+            stw tmp0, 16(dst)
+            stw tmp1, 20(dst)
+            lwz tmp0, 24(src)
+            lwz tmp1, 28(src)
+            stw tmp0, 24(dst)
+            stw tmp1, 28(dst)
+            addi src, src, 32
+            addi dst, dst, 32
+            bdnz aligned_loop
+        }
         break;
     case 1:
-        NETMemCpy_Unaligned<8>(dst, src, loopSize);
+        src = (const unsigned char*)src - 1;
+        asm {
+            lwz tmp2, 0(src)
+            mtctr loopSize
+            slwi tmp2, tmp2, 8
+            addi src, src, 4
+        shift8_loop:
+            dcbz 0, dst
+            lwz tmp0, 0(src)
+            slwi tmp3, tmp0, 8
+            rlwimi tmp2, tmp0, 8, 24, 31
+            lwz tmp1, 4(src)
+            stw tmp2, 0(dst)
+            slwi tmp4, tmp1, 8
+            rlwimi tmp3, tmp1, 8, 24, 31
+            lwz tmp0, 8(src)
+            stw tmp3, 4(dst)
+            slwi tmp5, tmp0, 8
+            rlwimi tmp4, tmp0, 8, 24, 31
+            lwz tmp1, 12(src)
+            stw tmp4, 8(dst)
+            slwi tmp2, tmp1, 8
+            rlwimi tmp5, tmp1, 8, 24, 31
+            lwz tmp0, 16(src)
+            stw tmp5, 12(dst)
+            slwi tmp3, tmp0, 8
+            rlwimi tmp2, tmp0, 8, 24, 31
+            lwz tmp1, 20(src)
+            stw tmp2, 16(dst)
+            slwi tmp4, tmp1, 8
+            rlwimi tmp3, tmp1, 8, 24, 31
+            lwz tmp0, 24(src)
+            stw tmp3, 20(dst)
+            slwi tmp5, tmp0, 8
+            rlwimi tmp4, tmp0, 8, 24, 31
+            lwz tmp1, 28(src)
+            stw tmp4, 24(dst)
+            slwi tmp2, tmp1, 8
+            rlwimi tmp5, tmp1, 8, 24, 31
+            addi src, src, 32
+            stw tmp5, 28(dst)
+            addi dst, dst, 32
+            bdnz shift8_loop
+        }
         break;
     case 2:
-        NETMemCpy_Unaligned<16>(dst, src, loopSize);
+        src = (const unsigned char*)src - 2;
+        asm {
+            lwz tmp2, 0(src)
+            mtctr loopSize
+            slwi tmp2, tmp2, 16
+            addi src, src, 4
+        shift16_loop:
+            dcbz 0, dst
+            lwz tmp0, 0(src)
+            slwi tmp3, tmp0, 16
+            rlwimi tmp2, tmp0, 16, 16, 31
+            lwz tmp1, 4(src)
+            stw tmp2, 0(dst)
+            slwi tmp4, tmp1, 16
+            rlwimi tmp3, tmp1, 16, 16, 31
+            lwz tmp0, 8(src)
+            stw tmp3, 4(dst)
+            slwi tmp5, tmp0, 16
+            rlwimi tmp4, tmp0, 16, 16, 31
+            lwz tmp1, 12(src)
+            stw tmp4, 8(dst)
+            slwi tmp2, tmp1, 16
+            rlwimi tmp5, tmp1, 16, 16, 31
+            lwz tmp0, 16(src)
+            stw tmp5, 12(dst)
+            slwi tmp3, tmp0, 16
+            rlwimi tmp2, tmp0, 16, 16, 31
+            lwz tmp1, 20(src)
+            stw tmp2, 16(dst)
+            slwi tmp4, tmp1, 16
+            rlwimi tmp3, tmp1, 16, 16, 31
+            lwz tmp0, 24(src)
+            stw tmp3, 20(dst)
+            slwi tmp5, tmp0, 16
+            rlwimi tmp4, tmp0, 16, 16, 31
+            lwz tmp1, 28(src)
+            stw tmp4, 24(dst)
+            slwi tmp2, tmp1, 16
+            rlwimi tmp5, tmp1, 16, 16, 31
+            addi src, src, 32
+            stw tmp5, 28(dst)
+            addi dst, dst, 32
+            bdnz shift16_loop
+        }
         break;
     case 3:
-        NETMemCpy_Unaligned<24>(dst, src, loopSize);
+        src = (const unsigned char*)src - 3;
+        asm {
+            lwz tmp2, 0(src)
+            mtctr loopSize
+            slwi tmp2, tmp2, 24
+            addi src, src, 4
+        shift24_loop:
+            dcbz 0, dst
+            lwz tmp0, 0(src)
+            slwi tmp3, tmp0, 24
+            rlwimi tmp2, tmp0, 24, 8, 31
+            lwz tmp1, 4(src)
+            stw tmp2, 0(dst)
+            slwi tmp4, tmp1, 24
+            rlwimi tmp3, tmp1, 24, 8, 31
+            lwz tmp0, 8(src)
+            stw tmp3, 4(dst)
+            slwi tmp5, tmp0, 24
+            rlwimi tmp4, tmp0, 24, 8, 31
+            lwz tmp1, 12(src)
+            stw tmp4, 8(dst)
+            slwi tmp2, tmp1, 24
+            rlwimi tmp5, tmp1, 24, 8, 31
+            lwz tmp0, 16(src)
+            stw tmp5, 12(dst)
+            slwi tmp3, tmp0, 24
+            rlwimi tmp2, tmp0, 24, 8, 31
+            lwz tmp1, 20(src)
+            stw tmp2, 16(dst)
+            slwi tmp4, tmp1, 24
+            rlwimi tmp3, tmp1, 24, 8, 31
+            lwz tmp0, 24(src)
+            stw tmp3, 20(dst)
+            slwi tmp5, tmp0, 24
+            rlwimi tmp4, tmp0, 24, 8, 31
+            lwz tmp1, 28(src)
+            stw tmp4, 24(dst)
+            slwi tmp2, tmp1, 24
+            rlwimi tmp5, tmp1, 24, 8, 31
+            addi src, src, 32
+            stw tmp5, 28(dst)
+            addi dst, dst, 32
+            bdnz shift24_loop
+        }
         break;
     }
 }
+// clang-format on
 
-static inline void NETMemCpy_SimpleFwd(void* dst, const void* src, unsigned long size)
-{
-    unsigned char* dst_u8;
-    const unsigned char* src_u8;
-    unsigned long numWords;
-    unsigned long remainBytes;
-    unsigned long tmp;
+// clang-format off
+static inline void NETMemCpy_SimpleFwd(void* dst, const void* src, unsigned long size) {
+    register unsigned char* dst_u8;
+    register const unsigned char* src_u8;
+    register unsigned long numWords;
+    register unsigned long remainBytes;
 
     src_u8 = (const unsigned char*)src;
     dst_u8 = (unsigned char*)dst;
     numWords = size >> 2;
     remainBytes = size & 3;
-    if (numWords != 0)
-    {
-        do
-        {
-            tmp = ((const unsigned long*)src_u8)[0];
-            src_u8 += 4;
-            ((unsigned long*)dst_u8)[0] = tmp;
-            dst_u8 += 4;
-        } while (--numWords);
+    if (numWords != 0) {
+        register unsigned long tmp;
+        asm {
+            mtctr numWords
+        word_loop:
+            lwz tmp, 0(src_u8)
+            addi src_u8, src_u8, 4
+            stw tmp, 0(dst_u8)
+            addi dst_u8, dst_u8, 4
+            bdnz word_loop
+        }
     }
-    if (remainBytes != 0)
-    {
-        do
-        {
-            tmp = *src_u8;
-            src_u8 += 1;
-            *dst_u8 = (unsigned char)tmp;
-            dst_u8 += 1;
-        } while (--remainBytes);
+    if (remainBytes != 0) {
+        register unsigned long tmp;
+        asm {
+            mtctr remainBytes
+        byte_loop:
+            lbz tmp, 0(src_u8)
+            addi src_u8, src_u8, 1
+            stb tmp, 0(dst_u8)
+            addi dst_u8, dst_u8, 1
+            bdnz byte_loop
+        }
     }
 }
+// clang-format on
 
-static inline void NETMemCpy_SimpleRev(void* dst, const void* src, unsigned long size)
-{
-    unsigned char* dst_u8;
-    const unsigned char* src_u8;
-    unsigned long numWords;
-    unsigned long remainBytes;
-    unsigned long tmp;
+// clang-format off
+static inline void NETMemCpy_SimpleRev(void* dst, const void* src, unsigned long size) {
+    register unsigned char* dst_u8;
+    register const unsigned char* src_u8;
+    register unsigned long numWords;
+    register unsigned long remainBytes;
 
     src_u8 = (const unsigned char*)src + size;
     dst_u8 = (unsigned char*)dst + size;
     numWords = size >> 2;
     remainBytes = size & 3;
-    if (remainBytes != 0)
-    {
-        do
-        {
-            src_u8 -= 1;
-            tmp = *src_u8;
-            dst_u8 -= 1;
-            *dst_u8 = (unsigned char)tmp;
-        } while (--remainBytes);
+    if (remainBytes != 0) {
+        register unsigned long tmp;
+        asm {
+            mtctr remainBytes
+        byte_loop:
+            lbzu tmp, -1(src_u8)
+            stbu tmp, -1(dst_u8)
+            bdnz byte_loop
+        }
     }
-    if (numWords != 0)
-    {
-        do
-        {
-            src_u8 -= 4;
-            tmp = ((const unsigned long*)src_u8)[0];
-            dst_u8 -= 4;
-            ((unsigned long*)dst_u8)[0] = tmp;
-        } while (--numWords);
+    if (numWords != 0) {
+        register unsigned long tmp;
+        asm {
+            mtctr numWords
+        word_loop:
+            lwzu tmp, -4(src_u8)
+            stwu tmp, -4(dst_u8)
+            bdnz word_loop
+        }
     }
 }
+// clang-format on
 
 void* NETMemCpy(void* dst, const void* src, unsigned long size)
 {
@@ -183,6 +269,7 @@ void* NETMemCpy(void* dst, const void* src, unsigned long size)
     }
     else
     {
+
         if (((unsigned char*)dst <= (const unsigned char*)src - 0x20 || (unsigned char*)dst >= (const unsigned char*)src) && size >= 0x40)
         {
             headSize = (unsigned long)dst & 0x1F;
