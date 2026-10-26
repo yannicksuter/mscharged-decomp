@@ -54,7 +54,7 @@ float GetRemoteReplaySpeed();
 
 bool gbDebugReplayFixedStepMode;
 bool gbReplayFlashError;
-extern float lbl_806E14CC;
+extern float gRenderedReplaySimulationTime;
 extern bool gbSavingReplay;
 extern bool gbLoadingReplay;
 
@@ -481,7 +481,7 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
     }
 }
 
-float lbl_806E14CC;
+float gRenderedReplaySimulationTime;
 bool gbSavingReplay;
 bool gbLoadingReplay;
 
@@ -546,7 +546,7 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
     }
 
     mRender->Render(deltaTime);
-    lbl_806E14CC = mRender->mSimulationTime;
+    gRenderedReplaySimulationTime = mRender->mSimulationTime;
 
     if (nlTaskManager::m_pInstance->mCurrentState == TASK_DEBUG_REPLAY)
     {
