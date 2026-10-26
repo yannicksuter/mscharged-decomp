@@ -22,8 +22,8 @@ public:
 
     /* 0x04 */ const char* m_pName;
     /* 0x08 */ bool (*m_pConditionFunc)();
-    /* 0x0C */ float m_fThreshold;
-    /* 0x10 */ int m_unk10;
+    /* 0x0C */ float m_fTotalFrameTime;
+    /* 0x10 */ int m_nFrameCount;
     /* 0x14 */ Histogram m_Histogram;
 };
 

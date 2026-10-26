@@ -1923,11 +1923,11 @@ void DestroyGameState(AsyncLoadingManager* manager)
     if (IsSmokeTestEnabled())
     {
         SmokeTestLogGraphValue("FrameTime_GamePlay", "ms",
-            pGamePlayTimeRegion->m_fThreshold / (float)pGamePlayTimeRegion->m_unk10);
+            pGamePlayTimeRegion->m_fTotalFrameTime / (float)pGamePlayTimeRegion->m_nFrameCount);
         SmokeTestLogGraphValue("FrameTime_NIS", "ms",
-            pNISTimeRegion->m_fThreshold / (float)pNISTimeRegion->m_unk10);
+            pNISTimeRegion->m_fTotalFrameTime / (float)pNISTimeRegion->m_nFrameCount);
         SmokeTestLogGraphValue("FrameTime_AutoReplay", "ms",
-            pAutoReplayTimeRegion->m_fThreshold / (float)pAutoReplayTimeRegion->m_unk10);
+            pAutoReplayTimeRegion->m_fTotalFrameTime / (float)pAutoReplayTimeRegion->m_nFrameCount);
         g_FrameCounter.LogGameplayFrameTimes();
     }
 

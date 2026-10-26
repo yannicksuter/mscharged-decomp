@@ -86,8 +86,8 @@ inline TimeRegion::TimeRegion(
     const char* pName, bool (*pConditionFunc)())
     : m_pName(pName)
     , m_pConditionFunc(pConditionFunc)
-    , m_fThreshold(0.0f)
-    , m_unk10(0)
+    , m_fTotalFrameTime(0.0f)
+    , m_nFrameCount(0)
     , m_Histogram(pName, 5, gTimeRegionHistogramMinValue, gTimeRegionHistogramBinSize)
 {
     ListEntry<TimeRegion*>* entry

@@ -114,9 +114,9 @@ void FrameCounter::FinishTiming()
         TimeRegion* region = iterator.Current();
         if (region->m_pConditionFunc())
         {
-            region->m_unk10++;
+            region->m_nFrameCount++;
             region->m_Histogram.AddSample(totalFrameTime);
-            region->m_fThreshold += totalFrameTime;
+            region->m_fTotalFrameTime += totalFrameTime;
         }
 
         iterator.Next();
