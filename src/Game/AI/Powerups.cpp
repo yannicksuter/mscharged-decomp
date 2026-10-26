@@ -42,45 +42,45 @@
 void UpdateBobombEmitter(EmissionController&);
 
 
-u8 lbl_806DBDA0 = true;
-float lbl_806DBDA4 = 6.0f;
-float lbl_806DBDA8 = 0.175f;
-float lbl_806DBDAC = 0.225f;
-float lbl_806DBDB0 = -40.0f;
-float lbl_806DBDB4 = 1.0f;
-float lbl_806DBDB8 = 0.4f;
-float lbl_806DBDBC = 0.95f;
-float lbl_806DBDC0 = 0.4f;
-float lbl_806DBDC4 = 1.0f;
-float lbl_806DBDC8 = 0.15f;
-float lbl_806DBDCC = 2.5f;
-float lbl_806DBDD0 = 5.1f;
-float lbl_806DBDD4 = 5.1f;
-bool lbl_806DBDD8 = true;
-float lbl_806DBDDC = 6.0f;
-static float lbl_806DBDE0 = 0.5f;
-int lbl_806DBDE4 = 12;
-float lbl_806DBDE8 = 0.4f;
-int lbl_806DBDEC = 12;
-float lbl_806DBDF0 = 10.0f;
-int lbl_806DBDF4 = 12;
-float lbl_806DBDF8 = 2.0f;
-int lbl_806DBDFC = 13;
-float lbl_806DBE00 = 1.35f;
-int lbl_806DBE04 = 12;
-float lbl_806DBE08 = 0.4f;
-int lbl_806DBE0C = 13;
-float lbl_806DBE10 = 2.0f;
-int lbl_806DBE14 = 1;
-float lbl_806DBE18 = -0.5f;
-float lbl_806DBE1C = -1.1f;
-int lbl_806DBE20 = 13;
-float lbl_806DBE24 = 4.0f;
-int lbl_806DBE28 = 20;
-float lbl_806DBE2C = -0.6f;
+u8 gPowerupAutoAimEnabled = true;
+float gRedShellSteeringStrength = 6.0f;
+float gBobombInitialDropTime = 0.175f;
+float gBobombDropTimeSpacing = 0.225f;
+float gBobombDropVelocityZ = -40.0f;
+float gPowerupThrowSpacing = 1.0f;
+float gPowerupArrowThrowSpacing = 0.4f;
+float gPowerupDampingVelocityScale = 0.95f;
+float gPowerupInitialNoHitTime = 0.4f;
+float gBananaInitialNoHitTime = 1.0f;
+float gPowerupSpawnGrowTime = 0.15f;
+float gSmallBobombExplosionRadius = 2.5f;
+float gMediumBobombExplosionRadius = 5.1f;
+float gLargeBobombExplosionRadius = 5.1f;
+bool gBobombTargetingEnabled = true;
+float gBobombMinimumPredictionSpeed = 6.0f;
+static float sBobombMineLifetime = 0.5f;
+int gBobombBaseAwardWeight = 12;
+float gBobombScoreAwardWeight = 0.4f;
+int gBananaBaseAwardWeight = 12;
+float gBananaScoreAwardWeight = 10.0f;
+int gSpinyShellBaseAwardWeight = 12;
+float gSpinyShellScoreAwardWeight = 2.0f;
+int gFreezeShellBaseAwardWeight = 13;
+float gFreezeShellScoreAwardWeight = 1.35f;
+int gRedShellBaseAwardWeight = 12;
+float gRedShellScoreAwardWeight = 0.4f;
+int gGreenShellBaseAwardWeight = 13;
+float gGreenShellScoreAwardWeight = 2.0f;
+int gChainChompBaseAwardWeight = 1;
+float gChainChompScoreAwardWeight = -0.5f;
+float gStarScoreAwardWeight = -1.1f;
+int gMushroomBaseAwardWeight = 13;
+float gMushroomScoreAwardWeight = 4.0f;
+int gCaptainPowerupBaseAwardWeight = 20;
+float gCaptainPowerupScoreAwardWeight = -0.6f;
 static int gBobombAnticipationVoiceID = -1;
 
-static int lbl_806E0DA8;
+static int sStarBaseAwardWeight;
 
 unsigned long uPowerupTexID[21] = {
     nlStringLowerHash("fe/shell_green"),
@@ -299,11 +299,11 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         = 2.0f * ((PhysicsSphere*)pFirstPowerup->m_pPhysicsObject)->GetRadius();
     if (eStyle == THROW_ARROW)
     {
-        fPowerupOffSet += lbl_806DBDB8;
+        fPowerupOffSet += gPowerupArrowThrowSpacing;
     }
     else
     {
-        fPowerupOffSet += lbl_806DBDB4;
+        fPowerupOffSet += gPowerupThrowSpacing;
     }
 
     switch (eStyle)
@@ -644,7 +644,7 @@ inline Bobomb::Bobomb(cFielder* pTarget, int nIndex, float fRadius,
 {
     pMovementEmitter = 0;
     mbIsMine = false;
-    m_fMineTimeRemaining = lbl_806DBDE0;
+    m_fMineTimeRemaining = sBobombMineLifetime;
 }
 
 inline GreenShell::GreenShell(cFielder* pTarget, int nIndex, float fRadius,
@@ -1005,14 +1005,14 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
 
     if (eType != POWER_UP_BANANA)
     {
-        mtNoHitTimer.SetSeconds(lbl_806DBDC0);
+        mtNoHitTimer.SetSeconds(gPowerupInitialNoHitTime);
     }
     else
     {
-        mtNoHitTimer.SetSeconds(lbl_806DBDC4);
+        mtNoHitTimer.SetSeconds(gBananaInitialNoHitTime);
     }
 
-    m_fSpawnGrowTimeRemaining = lbl_806DBDC8;
+    m_fSpawnGrowTimeRemaining = gPowerupSpawnGrowTime;
     m_v3Position.x = 0.0f;
     m_v3Position.y = 0.0f;
     m_v3Position.z = fRadius;
@@ -1210,14 +1210,14 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     }
 
     int nChanceForChainChomp
-        = lbl_806DBE14 + (int)(nDifference * lbl_806DBE18);
+        = gChainChompBaseAwardWeight + (int)(nDifference * gChainChompScoreAwardWeight);
     if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == GS_OVERTIME)
     {
         nChanceForChainChomp = 0;
     }
 
     int nChanceForStar
-        = lbl_806E0DA8 + (int)(nDifference * lbl_806DBE1C);
+        = sStarBaseAwardWeight + (int)(nDifference * gStarScoreAwardWeight);
     if (nChanceForStar < 0)
     {
         nChanceForStar = 0;
@@ -1250,7 +1250,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     ePowerUpType powerUpType = POWER_UP_NONE;
 
     int nChanceForCaptainPowerup
-        = lbl_806DBE28 + (int)(nDifference * lbl_806DBE2C);
+        = gCaptainPowerupBaseAwardWeight + (int)(nDifference * gCaptainPowerupScoreAwardWeight);
     if (nChanceForCaptainPowerup < 0)
     {
         nChanceForCaptainPowerup = 0;
@@ -1261,49 +1261,49 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     }
 
     int nChanceForSpinyShell
-        = lbl_806DBDF4 + (int)(nDifference * lbl_806DBDF8);
+        = gSpinyShellBaseAwardWeight + (int)(nDifference * gSpinyShellScoreAwardWeight);
     if (nChanceForSpinyShell < 0)
     {
         nChanceForSpinyShell = 0;
     }
 
     int nChanceForRedShell
-        = lbl_806DBE04 + (int)(nDifference * lbl_806DBE08);
+        = gRedShellBaseAwardWeight + (int)(nDifference * gRedShellScoreAwardWeight);
     if (nChanceForRedShell < 0)
     {
         nChanceForRedShell = 0;
     }
 
     int nChanceForBoBomb
-        = lbl_806DBDE4 + (int)(nDifference * lbl_806DBDE8);
+        = gBobombBaseAwardWeight + (int)(nDifference * gBobombScoreAwardWeight);
     if (nChanceForBoBomb < 0)
     {
         nChanceForBoBomb = 0;
     }
 
     int nChanceForBanana
-        = lbl_806DBDEC + (int)(nDifference * lbl_806DBDF0);
+        = gBananaBaseAwardWeight + (int)(nDifference * gBananaScoreAwardWeight);
     if (nChanceForBanana < 0)
     {
         nChanceForBanana = 0;
     }
 
     int nChanceForMushroom
-        = lbl_806DBE20 + (int)(nDifference * lbl_806DBE24);
+        = gMushroomBaseAwardWeight + (int)(nDifference * gMushroomScoreAwardWeight);
     if (nChanceForMushroom < 0)
     {
         nChanceForMushroom = 0;
     }
 
     int nChanceForGreenShell
-        = lbl_806DBE0C + (int)(nDifference * lbl_806DBE10);
+        = gGreenShellBaseAwardWeight + (int)(nDifference * gGreenShellScoreAwardWeight);
     if (nChanceForGreenShell < 0)
     {
         nChanceForGreenShell = 0;
     }
 
     int nChanceForFreezeShell
-        = lbl_806DBDFC + (int)(nDifference * lbl_806DBE00);
+        = gFreezeShellBaseAwardWeight + (int)(nDifference * gFreezeShellScoreAwardWeight);
     if (nChanceForFreezeShell < 0)
     {
         nChanceForFreezeShell = 0;
@@ -1706,7 +1706,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             && !pBobomb->mbIsMine)
         {
             pBobomb->mbIsMine = true;
-            pBobomb->m_fMineTimeRemaining = lbl_806DBDE0;
+            pBobomb->m_fMineTimeRemaining = sBobombMineLifetime;
             pObj->m_v3Velocity = v3Zero;
             pObj->m_pPhysicsObject->SetLinearVelocity(v3Zero);
 
@@ -1889,7 +1889,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
 
     float fSpeed = GetShellSpeed(pThrower->GetTweaks());
 
-    if (lbl_806DBDA0 || pThrower->GetGlobalPad() == 0)
+    if (gPowerupAutoAimEnabled || pThrower->GetGlobalPad() == 0)
     {
         nlVector3 v3Direction;
         nlVec3Sub(v3Direction, v3TargetPos, m_v3Position);
@@ -2104,13 +2104,13 @@ void PowerupBase::Destroy(bool bSilent)
         switch (meSize)
         {
         case POWERUPSIZE_SMALL:
-            fExplosionRadius = lbl_806DBDCC;
+            fExplosionRadius = gSmallBobombExplosionRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fExplosionRadius = lbl_806DBDD0;
+            fExplosionRadius = gMediumBobombExplosionRadius;
             break;
         case POWERUPSIZE_LARGE:
-            fExplosionRadius = lbl_806DBDD4;
+            fExplosionRadius = gLargeBobombExplosionRadius;
             break;
         }
         CreatePowerupShockwave(&m_v3Position, m_pThrower,
@@ -2171,8 +2171,8 @@ void PowerupBase::UpdatePhysicsState()
     if (m_unk34.m_uPackedTime != 0)
     {
         nlVector3 velocity = m_v3Velocity;
-        velocity.x *= lbl_806DBDBC;
-        velocity.y *= lbl_806DBDBC;
+        velocity.x *= gPowerupDampingVelocityScale;
+        velocity.y *= gPowerupDampingVelocityScale;
         m_v3Velocity = velocity;
         m_pPhysicsObject->SetLinearVelocity(velocity);
     }
@@ -2338,7 +2338,7 @@ void PowerupBase::UpdateTransform()
     if (m_fSpawnGrowTimeRemaining > 0.0f)
     {
         m_scale = InterpolateRangeClamped(
-            0.33f, m_scale, lbl_806DBDC8, 0.0f, m_fSpawnGrowTimeRemaining);
+            0.33f, m_scale, gPowerupSpawnGrowTime, 0.0f, m_fSpawnGrowTimeRemaining);
         ((PhysicsSphere*)m_pPhysicsObject)->SetRadius(m_scale * fNormalRadius);
 
         if (m_pBlurHandler != 0 && m_scale <= 1.0f)
@@ -2661,7 +2661,7 @@ void RedShell::SeekTarget()
     nlVec2Length(v2Delta);
 
     nlVec2Scale(v2Direction, v2Delta, 1.0f / nlVec2Length(v2Delta));
-    nlVec2Scale(v2Delta, v2Direction, lbl_806DBDA4);
+    nlVec2Scale(v2Delta, v2Direction, gRedShellSteeringStrength);
     fCurrSpeed = nlSqrt(nlGetLengthSquared1D(m_v3Velocity.x)
             + nlGetLengthSquared1D(m_v3Velocity.y),
         true);
@@ -2979,26 +2979,26 @@ void Bobomb::Update(float dt)
 void Bobomb::ThrowInSequence(PowerupBase*, int nThrowOrder)
 {
     cFielder* pTarget = m_pThrower;
-    if (lbl_806DBDD8 && m_pTarget != 0)
+    if (gBobombTargetingEnabled && m_pTarget != 0)
     {
         pTarget = m_pTarget;
     }
 
-    float t = (float)nThrowOrder * lbl_806DBDAC + lbl_806DBDA8;
+    float t = (float)nThrowOrder * gBobombDropTimeSpacing + gBobombInitialDropTime;
     nlVector3 v3TargetPos = pTarget->m_DetChar.m_v3Position;
     nlVector3 v3TargetVel = pTarget->m_DetChar.m_v3Velocity;
 
-    if (nlVec3Length(v3TargetVel) < lbl_806DBDDC)
+    if (nlVec3Length(v3TargetVel) < gBobombMinimumPredictionSpeed)
     {
         if (nlVec3Length(v3TargetVel) < 0.01f)
         {
-            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->m_DetChar.m_aActualFacingDirection, lbl_806DBDDC);
+            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->m_DetChar.m_aActualFacingDirection, gBobombMinimumPredictionSpeed);
             v3TargetVel.z = 0.0f;
         }
         else
         {
             nlVec3Normalize(v3TargetVel, v3TargetVel);
-            nlVec3Scale(v3TargetVel, v3TargetVel, lbl_806DBDDC);
+            nlVec3Scale(v3TargetVel, v3TargetVel, gBobombMinimumPredictionSpeed);
         }
     }
 
@@ -3010,19 +3010,19 @@ void Bobomb::ThrowInSequence(PowerupBase*, int nThrowOrder)
     // stripped executable.
     const float fHalf = 0.5f;
     float fGravity = m_pPhysicsObject->m_gravity;
-    v3TargetPos.z = -(t * t * (fHalf * fGravity)) + -lbl_806DBDB0 * t;
+    v3TargetPos.z = -(t * t * (fHalf * fGravity)) + -gBobombDropVelocityZ * t;
 
     float radius = 0.0f;
     switch (meSize)
     {
     case POWERUPSIZE_SMALL:
-        radius = lbl_806DBDCC;
+        radius = gSmallBobombExplosionRadius;
         break;
     case POWERUPSIZE_MEDIUM:
-        radius = lbl_806DBDD0;
+        radius = gMediumBobombExplosionRadius;
         break;
     case POWERUPSIZE_LARGE:
-        radius = lbl_806DBDD4;
+        radius = gLargeBobombExplosionRadius;
         break;
     }
 
@@ -3032,7 +3032,7 @@ void Bobomb::ThrowInSequence(PowerupBase*, int nThrowOrder)
     m_pPhysicsObject->SetPosition(m_v3Position, PhysicsObject::WORLD_COORDINATES);
 
     nlVector3 v3BobombVelocity = v3Zero;
-    v3BobombVelocity.z = lbl_806DBDB0;
+    v3BobombVelocity.z = gBobombDropVelocityZ;
     m_v3Velocity = v3BobombVelocity;
     m_pPhysicsObject->SetLinearVelocity(v3BobombVelocity);
 
