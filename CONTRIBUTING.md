@@ -25,18 +25,12 @@ code.
 
 ## Where the project stands
 
-The USA `R4QE01` revision has reached 100% code matching and source linking.
-The EU `R4QP01_rev1` and `R4QP01_rev2` revisions are in progress. Their symbols
-and splits are checked in, and their builds combine verified source units with
-extracted objects for unresolved differences. Work on the EU revisions includes:
-
-- Identify translation-unit and library boundaries.
-- Replace generated split objects with matching C and C++ source.
-- Correct symbol names, function signatures, types, and data structures.
-- Document compiler, ABI, and engine behavior as it is discovered.
-
-Changes that establish reliable structure for later matching work are just as
-valuable as completed function matches.
+All five supported versions have reached 100% code matching and source linking:
+USA `R4QE01`, Europe `R4QP01_rev1` and `R4QP01_rev2`, Japan `R4QJ01`, and Korea
+`R4QK01`. Readable names, consistent declarations, accurate types and source
+organization remain active review work. Preserve every version's matching
+results when changing shared code; follow the
+[source review and regional verification process](README.md#source-review-and-regional-verification).
 
 ## Before you start
 
@@ -63,14 +57,14 @@ python3 configure.py
 ninja
 ```
 
-This selects USA by default. For EU, configure with
-`python3 configure.py --version R4QP01_rev1` or
-`python3 configure.py --version R4QP01_rev2` before running `ninja`.
+This selects USA by default. Select another supported version with
+`python3 configure.py --version <version>` before running `ninja`.
 Keep the original files for each revision in its separate `orig/<version>`
 directory and verify against that revision's DOL hash.
 
 For differences in C or C++ source, use `#if defined(VERSION_R4QE01)`,
-`VERSION_R4QP01_REV2`, or `VERSION_R4QP01_REV1`, as defined by `configure.py`.
+`VERSION_R4QP01_REV2`, `VERSION_R4QP01_REV1`, `VERSION_R4QJ01`, or
+`VERSION_R4QK01`, as defined by `configure.py`.
 Keep common code shared and gate only the behavior or data that differs in the
 retail executables. Add a version to a unit's `MatchingFor(...)` list only after
 linking its compiled source and verifying that version's complete DOL hash.
