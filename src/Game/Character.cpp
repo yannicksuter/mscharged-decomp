@@ -106,21 +106,21 @@ inline float ClampMin(float speedRatio, const float min);
 inline float ClampMax(float speedRatio, const float max);
 
 
-float lbl_806DB5D8 = 12.5f;
-float lbl_806DB5DC = 0.4f;
-float lbl_806DB5E0 = 0.5f;
-float lbl_806DB5E4 = 5.0f;
-float lbl_806DB5E8 = 7.0f;
-float lbl_806DB5EC = 0.5f;
-float lbl_806DB5F0 = 0.8f;
-float lbl_806DB5F4 = 1.5f;
-float lbl_806DB5F8 = 15.0f;
-float lbl_806E0C18;
-float lbl_806E0C1C;
-bool lbl_806E0C20;
-bool lbl_806E0C21;
-unsigned char lbl_806E0C22;
-unsigned long lbl_8056B7B0[10] = {
+float gMaxCharacterSlideVelocityDelta = 12.5f;
+float gLargeCharacterTiltForceScale = 0.4f;
+float gSmallCharacterTiltForceScale = 0.5f;
+float gCharacterExternalForceMinSpeed = 5.0f;
+float gCharacterExternalForceMaxSpeed = 7.0f;
+float gGroundImpactKnockdownRadiusScale = 0.5f;
+float gMontyReappearBlastRadiusScale = 0.8f;
+float gHammerGroundImpactRadius = 1.5f;
+float gCharacterDirtFadeTime = 15.0f;
+float gLargeCharacterWindForceScale;
+float gSmallCharacterWindForceScale;
+bool gClearAllPowerupsAfterGoal;
+bool gClearScoringTeamPowerupsAfterGoal;
+unsigned char gCharacterDirtFadeMode;
+unsigned long gCharacterTextureParameterIds[10] = {
     nlStringLowerHash("NLG_DIFFUSE"),
     nlStringLowerHash("NLG_DETAIL"),
     nlStringLowerHash("NLG_SPECULAR"),
@@ -510,9 +510,9 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
         nlVector3* unidentifiedValue;
         if (m_JointPositionCache.FindGet(unidentifiedKey.GetBits(), &unidentifiedValue))
         {
-            static unsigned int lbl_806E0C24;
+            static unsigned int sJointPositionCacheHits;
             *v3Out = *unidentifiedValue;
-            ++lbl_806E0C24;
+            ++sJointPositionCacheHits;
             unidentifiedPose = false;
         }
     }
@@ -1059,9 +1059,9 @@ void cCharacter::Update(float fDeltaT)
             m_bIsUsingElectrocutionTexture = false;
         }
     }
-    if (lbl_806E0C22 == 1)
+    if (gCharacterDirtFadeMode == 1)
     {
-        float unidentifiedRate = 1.0f / lbl_806DB5F8;
+        float unidentifiedRate = 1.0f / gCharacterDirtFadeTime;
         if (m_Dirt > 0.0f)
         {
             m_Dirt -= unidentifiedRate * fDeltaT;
@@ -1351,10 +1351,10 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         nlVec2Sub(unidentifiedDelta, *(const nlVector2*)&m_DetChar.m_v3PrevVelocity,
             *(const nlVector2*)&m_DetChar.m_v3Velocity);
         float unidentifiedLengthSquared = nlVec2LengthSquared(unidentifiedDelta);
-        if (unidentifiedLengthSquared > lbl_806DB5D8 * lbl_806DB5D8)
+        if (unidentifiedLengthSquared > gMaxCharacterSlideVelocityDelta * gMaxCharacterSlideVelocityDelta)
         {
             nlVec2Scale(unidentifiedDelta, unidentifiedDelta,
-                lbl_806DB5D8 * nlRecipSqrt(unidentifiedLengthSquared, true));
+                gMaxCharacterSlideVelocityDelta * nlRecipSqrt(unidentifiedLengthSquared, true));
         }
         nlVector2 unidentifiedPosition = *(const nlVector2*)&m_DetChar.m_v3Position;
         nlVec2Set(unidentifiedPosition,
@@ -1376,23 +1376,23 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             {
                 nlVec3Add(unidentifiedForce, unidentifiedBall->mv3TiltForce, unidentifiedBall->mv3WindForce);
                 unidentifiedForceScale = InterpolateClamped(
-                    lbl_806E0C1C + lbl_806DB5E0, lbl_806E0C18 + lbl_806DB5DC,
+                    gSmallCharacterWindForceScale + gSmallCharacterTiltForceScale, gLargeCharacterWindForceScale + gLargeCharacterTiltForceScale,
                     pFielder->GetTweaks()->fDefenseSize);
             }
             else if (unidentifiedBall->mbUseTiltForce)
             {
                 unidentifiedForce = unidentifiedBall->mv3TiltForce;
-                unidentifiedForceScale = InterpolateClamped(lbl_806DB5E0, lbl_806DB5DC,
+                unidentifiedForceScale = InterpolateClamped(gSmallCharacterTiltForceScale, gLargeCharacterTiltForceScale,
                     pFielder->GetTweaks()->fDefenseSize);
             }
             else
             {
                 unidentifiedForce = unidentifiedBall->mv3WindForce;
-                unidentifiedForceScale = InterpolateClamped(lbl_806E0C1C, lbl_806E0C18,
+                unidentifiedForceScale = InterpolateClamped(gSmallCharacterWindForceScale, gLargeCharacterWindForceScale,
                     pFielder->GetTweaks()->fDefenseSize);
             }
             unidentifiedForceScale = InterpolateRangeClamped(0.0f, unidentifiedForceScale,
-                lbl_806DB5E4, lbl_806DB5E8, nlVec3Length(m_DetChar.m_v3Velocity));
+                gCharacterExternalForceMinSpeed, gCharacterExternalForceMaxSpeed, nlVec3Length(m_DetChar.m_v3Velocity));
             unidentifiedForceScale = fDeltaT * unidentifiedForceScale;
             nlVec2Set(*(nlVector2*)&m_DetChar.m_v3Position,
                 unidentifiedForceScale * unidentifiedForce.x + m_DetChar.m_v3Position.x,
@@ -1483,18 +1483,18 @@ void cCharacter::PerformBlinking(GLSkinMesh* skinMesh, glModel* model) const
     }
 }
 
-int lbl_806E0C28;
+int gHammerPropJointIndex;
 
 void cCharacter::CaptureHammerTransform()
 {
     cSHierarchy* hierarchy;
-    if (lbl_806E0C28 == 0)
+    if (gHammerPropJointIndex == 0)
     {
         hierarchy = m_pPoseAccumulator->m_BaseSHierarchy;
-        lbl_806E0C28 = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 r prop"));
+        gHammerPropJointIndex = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 r prop"));
     }
-    m_qFrozenHammerRotation = m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
-    const nlMatrix4& m = m_pPoseAccumulator->GetNodeMatrix(lbl_806E0C28);
+    m_qFrozenHammerRotation = m_pPoseAccumulator->GetNodeQuaternion(gHammerPropJointIndex);
+    const nlMatrix4& m = m_pPoseAccumulator->GetNodeMatrix(gHammerPropJointIndex);
     m_v3FrozenHammerTranslation = m.GetTranslation();
     m_fFrozenHammerScale = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
 }
@@ -1589,8 +1589,8 @@ void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
     InvalidateSkinMeshPoses();
 }
 
-u16 lbl_806DB602 = 0xFFFF;
-u16 lbl_806DB604 = 0xFFFF;
+u16 gCharacterAnimationDebugType = 0xFFFF;
+u16 gDeterministicCharacterDebugType = 0xFFFF;
 
 #define REGISTER_CHARACTER_FIELD(type, base, field, name) \
     cache->AddField(type, gDebugFieldTypes[type].size, \
@@ -1598,9 +1598,9 @@ u16 lbl_806DB604 = 0xFFFF;
 
 inline void DetChar::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DB604 == 0xFFFF)
+    if (gDeterministicCharacterDebugType == 0xFFFF)
     {
-        lbl_806DB604 = cache->BeginType("DetChar");
+        gDeterministicCharacterDebugType = cache->BeginType("DetChar");
         REGISTER_CHARACTER_FIELD(14, m_eCharacterClass,
             m_eCharacterClass, "m_eCharacterClass");
         REGISTER_CHARACTER_FIELD(14, m_eCharacterClass,
@@ -1661,8 +1661,8 @@ inline void DetChar::SyncLog(void* context, DebugWriteCache* cache)
             m_tScaleTimer, "m_tScaleTimer");
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DB604, &m_eCharacterClass, context);
-    cache->WriteData(lbl_806DB604, &m_eCharacterClass,
+    cache->ChecksumData(gDeterministicCharacterDebugType, &m_eCharacterClass, context);
+    cache->WriteData(gDeterministicCharacterDebugType, &m_eCharacterClass,
         sizeof(*this));
 }
 
@@ -1699,9 +1699,9 @@ inline void cHeadTrack::SyncLog(void* context, DebugWriteCache* cache)
 
 inline void CharAnim::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DB602 == 0xFFFF)
+    if (gCharacterAnimationDebugType == 0xFFFF)
     {
-        lbl_806DB602 = cache->BeginType("CharAnim");
+        gCharacterAnimationDebugType = cache->BeginType("CharAnim");
         REGISTER_CHARACTER_FIELD(17, *this, m_fFrame, "m_fFrame");
         REGISTER_CHARACTER_FIELD(17, *this, m_fTotalFrames, "m_fTotalFrames");
         REGISTER_CHARACTER_FIELD(17, *this, m_fPlaybackSpeedScale, "m_fPlaybackSpeedScale");
@@ -1713,8 +1713,8 @@ inline void CharAnim::SyncLog(void* context, DebugWriteCache* cache)
         REGISTER_CHARACTER_FIELD(17, *this, m_fLinearSpeed, "m_fLinearSpeed");
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DB602, this, context);
-    cache->WriteData(lbl_806DB602, this, sizeof(*this));
+    cache->ChecksumData(gCharacterAnimationDebugType, this, context);
+    cache->WriteData(gCharacterAnimationDebugType, this, sizeof(*this));
 }
 
 void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
@@ -1857,11 +1857,11 @@ void OnCharactersGoalScored(GoalScoredData* pEventData)
         for (s32 i = 0; i < 2; i++)
         {
             cTeam* pTeam = g_pTeams[i];
-            if (lbl_806E0C20)
+            if (gClearAllPowerupsAfterGoal)
             {
                 pTeam->ClearAllPowerUps();
             }
-            else if (lbl_806E0C21
+            else if (gClearScoringTeamPowerupsAfterGoal
                 && pEventData->uTeamIndex == pTeam->m_nSide)
             {
                 pTeam->ClearAllPowerUps();
@@ -1987,7 +1987,7 @@ void OnCharacterGroundImpact(CharacterImpactEvent* pEventData)
                         float fDistance = nlVec3Length(v3Delta);
                         if (fDistance < pEventData->fRadius)
                         {
-                            if (fDistance >= pEventData->fRadius * lbl_806DB5EC)
+                            if (fDistance >= pEventData->fRadius * gGroundImpactKnockdownRadiusScale)
                             {
                                 pFielder->ApplyCharacterHitReaction(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
@@ -2025,7 +2025,7 @@ void OnMontyReappear(CharacterImpactEvent* pEventData)
                         float fDistance = nlVec3Length(v3Delta);
                         if (fDistance < pEventData->fRadius)
                         {
-                            if (fDistance >= pEventData->fRadius * lbl_806DB5F0)
+                            if (fDistance >= pEventData->fRadius * gMontyReappearBlastRadiusScale)
                             {
                                 pFielder->ApplyCharacterHitReaction(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
@@ -2525,7 +2525,7 @@ void OnCollisionHammerGround(CollisionProjectileData* pEventData)
     CharacterImpactEvent event;
     event.v3Position = pEventData->v3Position;
     event.v3Position.z = 0.0f;
-    event.fRadius = lbl_806DB5F4;
+    event.fRadius = gHammerGroundImpactRadius;
     event.pCharacter = pEventData->pFielder;
     DeliverHammerBroHammerEvent(g_pGame, &event);
     pEventData->pFielder->PlayImpactCameraRumble();
@@ -2659,11 +2659,11 @@ void cCharacter::ResolveTextures()
                     {
                         for (int k = 0; k < 10; ++k)
                         {
-                            if (glHasMaterialParameter(packet, lbl_8056B7B0[k]))
+                            if (glHasMaterialParameter(packet, gCharacterTextureParameterIds[k]))
                             {
-                                unsigned long texture = glGetMaterialUnsignedParameter(packet, lbl_8056B7B0[k]);
+                                unsigned long texture = glGetMaterialUnsignedParameter(packet, gCharacterTextureParameterIds[k]);
                                 unsigned long resolvedTexture = glGetTextureManager()->GetTextureIndex(texture);
-                                glSetMaterialTextureIndexParameter(packet, lbl_8056B7B0[k], &resolvedTexture);
+                                glSetMaterialTextureIndexParameter(packet, gCharacterTextureParameterIds[k], &resolvedTexture);
                             }
                         }
                         if (packet->materialProgram == GXCharacterDamageMaterialProgram::Instance)
