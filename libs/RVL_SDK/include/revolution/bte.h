@@ -11,8 +11,8 @@ extern "C" {
 /*
  * The Revolution SDK's WPAD and WUD layers sit on Broadcom's BTE Bluetooth
  * stack and use a handful of its public types. Only the declarations those
- * two headers actually need are reproduced here; the BTE stack itself is not
- * part of this project and none of it is compiled.
+ * two headers actually need are reproduced here. The stack implementation
+ * and its internal headers live under RVL_SDK/bte and private/bte.
  *
  * Names, widths and BD_ADDR_LEN follow Broadcom's published BTE/Bluedroid
  * headers (bt_types.h, bta_hh_api.h, gki data_types.h).

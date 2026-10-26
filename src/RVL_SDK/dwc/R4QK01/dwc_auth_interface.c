@@ -618,7 +618,7 @@ void DWCi_Auth_GetGameSpyToken(char* authToken, char* partnerChallenge)
     strcpy(partnerChallenge, s_auth_result.challenge);
 }
 
-void fn_80475700(void)
+void DWCi_Auth_ReleaseResult(void)
 {
 }
 
@@ -627,7 +627,7 @@ u64 DWCi_Auth_GetConsoleUserId(void)
     return s_save_data.userid;
 }
 
-BOOL fn_80475730(void)
+BOOL DWCi_Auth_IsConsoleUserIdAuthentic(void)
 {
     return TRUE;
 }

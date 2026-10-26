@@ -444,7 +444,7 @@ static u8 WUDiTryConnecting(void) {
     if (WUD_DEV_NAME_IS_CNT(_discResp.devName)) {
         _work.status = 2;
         BTA_HhOpen(_work.devAddr, BTA_HH_PROTO_RPT_MODE, BTA_SEC_AUTHENTICATE);
-        nextState = WUD_STATE_SYNC_6;
+        nextState = WUD_STATE_SYNC_WAIT_FOR_CONNECTION;
     }
 
     return nextState;
@@ -514,7 +514,7 @@ static void WUDiSaveFlush(void) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    p->syncState = WUD_STATE_SYNC_13;
+    p->syncState = WUD_STATE_SYNC_WAIT_FOR_SC_FLUSH;
     OSRestoreInterrupts(enabled);
 
     SCFlushAsync(SyncFlushCallback);
@@ -810,8 +810,8 @@ static void SyncHandler(void) {
         break;
     }
 
-    case WUD_STATE_SYNC_6:
-    case WUD_STATE_SYNC_13:
+    case WUD_STATE_SYNC_WAIT_FOR_CONNECTION:
+    case WUD_STATE_SYNC_WAIT_FOR_SC_FLUSH:
     case WUD_STATE_SYNC_WAIT_FOR_INCOMING:
     case WUD_STATE_SYNC_CANCEL_SEARCH: {
         break;
@@ -900,7 +900,7 @@ static void WUDiCleanUp(void) {
     success |= SCSetBtDeviceInfoArray(&_scArray);
 
     if (success) {
-        p->deleteState = WUD_STATE_DELETE_6;
+        p->deleteState = WUD_STATE_DELETE_WAIT_FOR_SC_FLUSH;
         SCFlushAsync(DeleteFlushCallback);
     }
 }

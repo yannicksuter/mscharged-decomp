@@ -80,7 +80,7 @@ void DWCi_InitGPProcessCount(void);
 void DWCi_GT2ConnectedCallback(GT2Connection, GT2Result, GT2Byte*, int);
 void DWCi_RecvCallback(GT2Connection, GT2Byte*, int, GT2Bool);
 void DWCi_PingCallback(GT2Connection, int);
-void fn_80455E60(GT2Connection, GT2CloseReason, BOOL, u8);
+void DWCi_ProcessConnectionClosed(GT2Connection, GT2CloseReason, BOOL, u8);
 static void DWCi_GT2ReceivedCallback(GT2Connection, GT2Byte*, int, GT2Bool);
 static void DWCi_GT2ClosedCallback(GT2Connection, GT2CloseReason);
 static void DWCi_GT2PingCallback(GT2Connection, int);
@@ -93,7 +93,6 @@ void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection,
     unsigned int ip, unsigned short port, int latency, GT2Byte* message, int len);
 GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket,
     unsigned int ip, unsigned short port, GT2Byte* message, int len);
-int fn_8046F650(void);
 
 #define MULTIPLIER -1664117991
 
@@ -471,7 +470,7 @@ BOOL DWC_ConnectToAnybodyAsync(int topology, u8 numEntry, const char* addFilter,
     stpDwcCnt->matchedParam = matchedParam;
     DWCi_SetState(DWC_STATE_MATCHING);
     stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_ANYBODY;
-    stpDwcCnt->matchcnt._8C8 = 0;
+    stpDwcCnt->matchcnt.groupReconnect = 0;
     DWCi_ConnectToAnybodyAsync(topology, (u8)(numEntry - 1), addFilter,
         DWCi_MatchedCallback, NULL, newClientCallback, newClientParam,
         evalCallback, evalParam, reservationCallback, reservationData, reservationParam);
@@ -504,7 +503,7 @@ BOOL DWC_ConnectToFriendsAsync(int topology, const u8 friendIdxList[],
     stpDwcCnt->matchedParam = matchedParam;
     DWCi_SetState(DWC_STATE_MATCHING);
     stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_FRIEND;
-    stpDwcCnt->matchcnt._8C8 = 0;
+    stpDwcCnt->matchcnt.groupReconnect = 0;
 
     if (friendIdxList)
     {
@@ -569,7 +568,7 @@ BOOL DWC_SetupGameServer(int topology, u8 maxEntry,
     stpDwcCnt->matchedParam = matchedParam;
     DWCi_SetState(DWC_STATE_MATCHING);
     stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_SC_SV;
-    stpDwcCnt->matchcnt._8C8 = 0;
+    stpDwcCnt->matchcnt.groupReconnect = 0;
     DWCi_SetupGameServer(topology, (u8)(maxEntry - 1), DWCi_MatchedCallback, NULL,
         newClientCallback, newClientParam, reservationCallback, reservationData, reservationParam);
     return TRUE;
@@ -631,7 +630,7 @@ BOOL DWC_ConnectToGameServerAsync(int topology, int serverIndex,
         }
     }
     stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_SC_CL;
-    stpDwcCnt->matchcnt._8C8 = 0;
+    stpDwcCnt->matchcnt.groupReconnect = 0;
     DWCi_ConnectToGameServerAsync(topology, profileID, DWCi_MatchedCallback, NULL,
         newClientCallback, newClientParam, reservationCallback, reservationData, reservationParam);
     return TRUE;
@@ -663,7 +662,7 @@ BOOL DWC_ConnectToGameServerByGroupID(int topology, u32 groupID,
     stpDwcCnt->matchedParam = matchedParam;
     DWCi_SetState(DWC_STATE_MATCHING);
     stpDwcCnt->matchcnt.qr2MatchType = DWC_MATCH_TYPE_SC_CL;
-    stpDwcCnt->matchcnt._8C8 = 0;
+    stpDwcCnt->matchcnt.groupReconnect = 0;
     DWCi_ConnectToGameServerByGroupID(topology, groupID,
         DWCi_MatchedCallback, NULL, newClientCallback, newClientParam,
         reservationCallback, reservationData, reservationParam);
@@ -727,7 +726,7 @@ int DWC_CloseAllConnectionsHard(void)
         {
             DWCNodeInfo* node = DWCi_GetNodeByIndex(i);
             if (node->profileID != stpDwcCnt->profileID)
-                fn_80455E60(NULL, GT2LocalClose, TRUE, node->aid);
+                DWCi_ProcessConnectionClosed(NULL, GT2LocalClose, TRUE, node->aid);
         }
     }
     stpDwcCnt->ownCloseFlag = FALSE;
@@ -1112,7 +1111,7 @@ int DWCi_CloseConnectionHard(u8 aid)
             DWC_Printf(DWC_REPORTFLAG_DEBUG, "No connection!\n");
             return -2;
         }
-        fn_80455E60(NULL, GT2LocalClose, TRUE, node->aid);
+        DWCi_ProcessConnectionClosed(NULL, GT2LocalClose, TRUE, node->aid);
         return 0;
     }
     gt2CloseConnectionHard(connection);
@@ -1397,7 +1396,7 @@ static void DWCi_RemoveNodeIfPresent(u8 aid)
         DWCi_RemoveNodeByAID(aid);
 }
 
-void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
+void DWCi_ProcessConnectionClosed(GT2Connection connection, GT2CloseReason reason,
     BOOL pseud, u8 pseudAID)
 {
     u8 aid;
@@ -1458,9 +1457,9 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
                 "**** SC server was dead....****\n");
         }
         profileID = DWCi_DeleteNodeAID(aid);
-        stpDwcCnt->matchcnt._01C &= ~(1u << aid);
-        if (stpDwcCnt->matchcnt._04C && isServer && !DWCi_IsBackupMine())
-            stpDwcCnt->matchcnt._048 = 1;
+        stpDwcCnt->matchcnt.suspendAIDBitmap &= ~(1u << aid);
+        if (stpDwcCnt->matchcnt.suspendRequestPending && isServer && !DWCi_IsBackupMine())
+            stpDwcCnt->matchcnt.restartSuspendRequest = 1;
         if (!profileID)
         {
             profileID = ((DWCConnectionInfo*)gt2GetConnectionData(
@@ -1472,15 +1471,15 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
             stGt2ConnectionList[conninfo->index] = NULL;
     }
 
-    if (stpDwcCnt->matchcnt._8F4 == 1 && DWC_IsServerMyself())
-        stpDwcCnt->matchcnt._8F4 = 1;
+    if (stpDwcCnt->matchcnt.acceptNewClients == 1 && DWC_IsServerMyself())
+        stpDwcCnt->matchcnt.acceptNewClients = 1;
     else if (stpDwcCnt->matchcnt.qr2MatchType == DWC_MATCH_TYPE_SC_CL
         || stpDwcCnt->matchcnt.qr2MatchType == DWC_MATCH_TYPE_SC_SV)
-        stpDwcCnt->matchcnt._8F4 = 0;
+        stpDwcCnt->matchcnt.acceptNewClients = 0;
     else if (DWC_GetNumConnectionHost() == 1)
-        stpDwcCnt->matchcnt._8F4 = 1;
+        stpDwcCnt->matchcnt.acceptNewClients = 1;
     else
-        stpDwcCnt->matchcnt._8F4 = 0;
+        stpDwcCnt->matchcnt.acceptNewClients = 0;
 
     if (DWCi_IsBackupMine())
     {
@@ -1511,8 +1510,8 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
 
     if (reason != GT2LocalClose && DWC_IsServerMyself() == TRUE)
     {
-        stpDwcCnt->matchcnt._8D0 = 0;
-        if (fn_8046F8A0()
+        stpDwcCnt->matchcnt.lastServerPollTick = 0;
+        if (DWCi_UsesExplicitClientLinks()
             && stpDwcCnt->matchcnt.state == DWC_MATCH_STATE_SV_WAIT_CL_LINK
             && stpDwcCnt->matchcnt.cmdCnt.command == 8)
             stpDwcCnt->matchcnt.cmdCnt.sendTime = 0;
@@ -1571,7 +1570,7 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
     if (!stpDwcCnt->ownCloseFlag
         && stpDwcCnt->matchcnt.matchType == DWC_MATCH_TYPE_SC_SV)
         return;
-    if (fn_8046F650() == 1)
+    if (DWCi_StopMeshConnection() == 1)
         DWCi_SetMatchStatus(DWC_MATCH_STATE_CL_WAITING);
     if (DWCi_GetNodeCount() == 1)
     {
@@ -1588,7 +1587,7 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
     else if (stpDwcCnt->matchcnt.matchType == DWC_MATCH_TYPE_SC_CL
         && isServer && DWCi_GetNodeCount() >= 1)
     {
-        if (DWCi_GetNodeCount() == 1 && fn_8046F180())
+        if (DWCi_GetNodeCount() == 1 && DWCi_IsServerMigrationEnabled())
             DWCi_SetMatchStatus(DWC_MATCH_STATE_CL_SVDOWN_3);
         else
             DWCi_SetMatchStatus(DWC_MATCH_STATE_CL_SVDOWN_1);
@@ -1597,7 +1596,7 @@ void fn_80455E60(GT2Connection connection, GT2CloseReason reason,
 
 static void DWCi_GT2ClosedCallback(GT2Connection connection, GT2CloseReason reason)
 {
-    fn_80455E60(connection, reason, FALSE, 0xFF);
+    DWCi_ProcessConnectionClosed(connection, reason, FALSE, 0xFF);
 }
 
 static void DWCi_GT2PingCallback(GT2Connection connection, int latency)

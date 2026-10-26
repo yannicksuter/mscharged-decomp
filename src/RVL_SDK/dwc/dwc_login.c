@@ -60,7 +60,7 @@ void DWCi_LoginInit(DWCLoginControl* logcnt, DWCUserData* userdata,
         DWCi_Acc_GetPlayerId(&userdata->authentic));
 #if defined(VERSION_R4QK01)
     DWC_Printf(0x20, "console::\n");
-    if (fn_80475730())
+    if (DWCi_Auth_IsConsoleUserIdAuthentic())
     {
         DWC_Printf(0x20, "  authentic UserID   : %016llx\n",
             DWCi_Auth_GetConsoleUserId());
@@ -164,7 +164,7 @@ static void DWCi_CloseLogin(void)
     }
 
 #if defined(VERSION_R4QK01)
-    fn_80475700();
+    DWCi_Auth_ReleaseResult();
 #endif
     stpLoginCnt->state = DWC_LOGIN_STATE_INIT;
     stpLoginCnt->connectFlag = FALSE;
@@ -267,8 +267,8 @@ static void DWCi_GPConnectCallback(
                 if (!DWCi_GT2Startup())
                 {
 #if defined(VERSION_R4QK01)
-                    fn_8046F920(arg->profile);
-                    fn_8046F930();
+                    DWCi_SetMatchProfileID(arg->profile);
+                    DWCi_RegisterMatchQR2Keys();
                     return;
 #else
                     if (DWCi_QR2Startup(arg->profile))
@@ -401,7 +401,7 @@ static void DWCi_RemoteLoginProcess(void)
             DWCi_Auth_GetGameSpyToken(
                 stpLoginCnt->authToken, stpLoginCnt->partnerChallenge);
 #if defined(VERSION_R4QK01)
-            fn_80475700();
+            DWCi_Auth_ReleaseResult();
 #endif
 
             if (DWCi_Acc_IsAuthentic(stpLoginCnt->userdata))

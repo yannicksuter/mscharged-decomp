@@ -32,8 +32,8 @@ Nintendo Wii, developed by Next Level Games and published by Nintendo.
 > [!NOTE]
 > Version **1.0.0** of the [native PC port](https://github.com/yannicksuter/mscharged-port) has been released and is available now. Based on this decompilation, the port uses the decompiled source directly and does not rely on recompilation ("recomp"). This approach enables bug fixes and modding.
 
-This repository does **not** contain game assets or assembly. You must provide
-your own legally obtained copy of the game.
+This repository does **not** contain game assets or the original executable.
+You must provide your own legally obtained copy of the game.
 
 ## Supported versions
 
@@ -43,16 +43,15 @@ your own legally obtained copy of the game.
 | [2007-05-25](https://www.nintendo.com/en-gb/Games/Wii/Mario-Strikers-Charged-Football-281892.html) | `R4QP01_rev2` | Europe - *Mario Strikers Charged Football* | Rev 2 | **Complete: 100% code / 100% linked** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
 | [2007-07-30](https://www.nintendo.co.jp/ir/pdf/2008/080125e.pdf#page=8) | `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code / 100% linked** | `e96d2298067b70652752145b4e63644e6e1b1560` |
 | [2007-09-20](https://www.nintendo.co.jp/wii/softlist/n2007_2006.html) | `R4QJ01` | Japan - *Mario Strikers Charged* | Rev 0 | **Complete: 100% code / 100% linked** | `74be723403329158b1645d9961a3cd6be755cdb8` |
-| [2010-03-18](https://www.inven.co.kr/webzine/news/?news=26630) | `R4QK01` | Korea - *Mario Power Soccer* | Rev 0 | **In progress: 84.84% code / 81.21% linked** | `c2f893aa71911c4ad4dcead1474e517e8e598fcb` |
+| [2010-03-18](https://www.inven.co.kr/webzine/news/?news=26630) | `R4QK01` | Korea - *Mario Power Soccer* | Rev 0 | **Complete: 100% code / 100% linked** | `c2f893aa71911c4ad4dcead1474e517e8e598fcb` |
 
 Dates are the original regional Wii releases, sorted chronologically. Separate
 release dates for the EU disc revisions have not been verified; both EU rows
 show the regional launch date. The linked Nintendo release information and
 Nintendo Korea announcement provide the date sources.
 
-`R4QE01` remains the default. USA and both EU revisions link entirely from
-reconstructed source. Japan and Korea reuse verified source units; unresolved
-regional differences still use extracted objects. Each version has its own
+`R4QE01` remains the default. All five versions link entirely from reconstructed
+source and reproduce their retail executables. Each version has its own
 symbols, splits, progress report and retail DOL hash. The revision numbers
 above are the revision bytes recorded in the disc headers.
 
@@ -65,9 +64,6 @@ Decompilation
 =============
 
 Decompilation is the process of reverse-engineering compiled machine code back into human-readable source code. Unlike disassembly, which produces assembly language, decompilation aims to reconstruct high-level code (like C or C++) that closely matches what the original developers wrote. This process involves analyzing the binary executable, understanding its structure and behavior, and translating it back into source code that compiles to produce identical machine code. In this project, the goal is not just a close match, but a **100% match**—the decompiled source code must compile to produce byte-for-byte identical machine code to the original. This is why diffing (see the [Diffing](#diffing) section below) is an essential piece of the process, as it allows us to verify that our decompiled code produces exactly the same binary output as the original game. Decompilation projects like this one enable deeper understanding of game mechanics, facilitate modding and preservation, and serve as valuable learning resources for understanding how games were built.
-
-> [!NOTE]
-> **On the use of AI.** *Mario Strikers Charged* shipped without any debug information. After finishing the [*Super Mario Strikers* decompilation](https://github.com/yannicksuter/smstrikers-decomp), I was fairly certain that a large part of its code had been carried over into the sequel. AI was used mainly to correlate this game's translation units with likely donor classes from the predecessor, and to review the matches found this way. This gave the project a substantial head start and allowed it to progress quickly.
 
 Progress
 ========
@@ -127,8 +123,8 @@ be removed from `orig/<version>` to save space.
 For USA, Europe and Japan, Ninja also generates the disc-message image include
 from that version's `main.dol`. The generated `DiscMessageImages.inc` stays in
 the build directory and is ignored by Git, including when using `--build-dir`.
-Korea has a different
-disc-message implementation, which currently uses extracted objects.
+Korea uses its separate source implementation in
+`src/RVL_SDK/dvd/R4QK01/dvdFatal.c`.
 
 The reconstructed `config/<version>/symbols.txt` and
 `config/<version>/splits.txt` are checked into the repository. Disc images,
@@ -167,6 +163,52 @@ its comparison object in `build/<version>/compare/`, preserving the local
 object's definitions and adding missing weak definitions from the providers.
 The ordinary compiled objects remain the linker inputs. This accounts for
 shared method matches; source-linking a TU still requires matching its layout.
+
+## Source review and regional verification
+
+Matching the executable and reviewing the source are separate checks. A matching
+DOL verifies the retained instructions and data; it does not establish original
+names, types or source organization. Source review continues after a version
+reaches 100% matching and linking.
+
+For a source cleanup or regional change:
+
+1. Build the unchanged revision and preserve its report and affected compiled
+   objects as the baseline.
+2. Read the implementation, declarations, callers and referenced data. Check
+   behavior, ABI, layout, lifetime and ownership against the relevant retail
+   executable. Use descriptive names supported by those uses; keep an uncertain
+   identity neutral. Reconstructed names are not recovered original symbols.
+3. Update definitions, owning headers, consumers and the applicable regional
+   symbol files together. A file move also updates its build entry and splits.
+   Compiler-generated pools, alignment gaps and anonymous labels do not need
+   invented source names. Keep changes to algorithms separate from naming work.
+4. Rebuild every affected consumer, including indirect users of shared headers.
+   For a naming cleanup, compare allocated bytes, section alignment, symbol
+   positions and bindings, and relocation targets after accounting for the
+   intended renames. Preserve each existing function and data result, rather
+   than relying on an aggregate percentage.
+5. Verify that the linker consumes the compiled source objects, generate fresh
+   reports, and require the retail DOL hash for every affected version. Shared
+   source changes require all five regional checks; USA and both EU revisions
+   must preserve their established behavior and matching results.
+
+With the extracted originals available for every version, run the build matrix
+from the repository root:
+
+```sh
+set -e
+for version in R4QE01 R4QP01_rev1 R4QP01_rev2 R4QJ01 R4QK01; do
+    python3 configure.py --version "$version"
+    ninja all_source
+    ninja
+done
+```
+
+Keep comparison reports and build artifacts under the ignored build directory.
+Document the affected scope and verification results with the change. Low-level
+SDK and runtime code can use assembly; a byte match alone does not prove its
+historical source form or justify a construct used only to force code generation.
 
 ## Contributing
 

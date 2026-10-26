@@ -499,10 +499,10 @@ cGame::~cGame()
         delete mpBoundaryAvoidables[i];
     }
 
-    if (lbl_806E0C74 != 0)
+    if (g_pShotLaneAvoidancePolygon != 0)
     {
-        delete lbl_806E0C74;
-        lbl_806E0C74 = 0;
+        delete g_pShotLaneAvoidancePolygon;
+        g_pShotLaneAvoidancePolygon = 0;
     }
 
     gNextAvoidableObjectId = 0;

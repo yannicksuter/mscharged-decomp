@@ -909,7 +909,7 @@ static u8 WUDiTryConnecting(void)
     {
         _work.status = 2;
         BTA_HhOpen(_work.devAddr, BTA_HH_PROTO_RPT_MODE, BTA_SEC_AUTHENTICATE);
-        nextState = WUD_STATE_SYNC_6;
+        nextState = WUD_STATE_SYNC_WAIT_FOR_CONNECTION;
     }
 
     if (WUDIsLinkedWBC() && WUD_DEV_NAME_IS_WBC(_discResp.devName))
@@ -931,7 +931,7 @@ static u8 WUDiTryConnecting(void)
         }
         _work.status = 2;
         BTA_HhOpen(_work.devAddr, BTA_HH_PROTO_RPT_MODE, BTA_SEC_AUTHENTICATE);
-        nextState = WUD_STATE_SYNC_6;
+        nextState = WUD_STATE_SYNC_WAIT_FOR_CONNECTION;
     }
     return nextState;
 }
@@ -1008,7 +1008,7 @@ static u8 WUDiVirginStandardSync(void)
         memset(&_scArray.devices[WUD_WBC_SC_INDEX], 0, sizeof(SCBtDeviceInfo));
         WUD_BDCPY(_scArray.devices[WUD_WBC_SC_INDEX].addr, pInfo->devAddr);
         memcpy(&_scArray.devices[WUD_WBC_SC_INDEX].info, &pInfo->conf, sizeof(SCDevInfo));
-        memcpy(_scArray.devices[WUD_WBC_SC_INDEX].info.at_0x14, pInfo->linkKey, LINK_KEY_LEN);
+        memcpy(_scArray.devices[WUD_WBC_SC_INDEX].info.wbcLinkKey, pInfo->linkKey, LINK_KEY_LEN);
         WUDiPrepareWbcDevInfo(pInfo->devAddr, pInfo->linkKey, &pInfo->conf);
     }
     WUDiSetDevAddrForHandle(pInfo->devHandle, pInfo->devAddr);
@@ -1186,7 +1186,7 @@ static void WUDiSaveFlush(void)
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    p->syncState = WUD_STATE_SYNC_13;
+    p->syncState = WUD_STATE_SYNC_WAIT_FOR_SC_FLUSH;
     OSRestoreInterrupts(enabled);
 
     SCFlushAsync(SyncFlushCallback);
@@ -1554,8 +1554,8 @@ static void SyncHandler(void)
     case WUD_STATE_WII_FIT_CLOSE:
         CloseWiiFitFile();
         break;
-    case WUD_STATE_SYNC_6:
-    case WUD_STATE_SYNC_13:
+    case WUD_STATE_SYNC_WAIT_FOR_CONNECTION:
+    case WUD_STATE_SYNC_WAIT_FOR_SC_FLUSH:
     case WUD_STATE_SYNC_CANCEL_SEARCH:
     {
         break;
@@ -1699,7 +1699,7 @@ static void WUDiCleanUp(void)
 
     if (success)
     {
-        p->deleteState = WUD_STATE_DELETE_6;
+        p->deleteState = WUD_STATE_DELETE_WAIT_FOR_SC_FLUSH;
         SCFlushAsync(DeleteFlushCallback);
     }
     else
@@ -2010,7 +2010,7 @@ static WUDInitState WUDiGetRegisteredDevice(void)
 
         WUD_BDCPY(p_info->devAddr, _scArray.devices[WUD_WBC_SC_INDEX].addr);
         memcpy(p_info->conf.devName, _scArray.devices[WUD_WBC_SC_INDEX].info.devName, 19);
-        memcpy(p_info->linkKey, _scArray.devices[WUD_WBC_SC_INDEX].info.at_0x14, LINK_KEY_LEN);
+        memcpy(p_info->linkKey, _scArray.devices[WUD_WBC_SC_INDEX].info.wbcLinkKey, LINK_KEY_LEN);
 
         p_info->status = 1;
         p_info->UNK_0x5B = 0;
@@ -2083,7 +2083,7 @@ static WUDInitState WUDiGetRegisteredDevice(void)
     }
 
     _wcb.syncType = WUD_SYNC_TYPE_STANDARD;
-    _wcb.initState = WUD_STATE_INIT_UNK5;
+    _wcb.initState = WUD_STATE_INIT_WAIT_FOR_SC_FLUSH;
 
     memset(&_spArray, 0, sizeof _spArray);
     SCSetBtDeviceInfoArray(&_scArray);
@@ -2142,7 +2142,7 @@ static u32 WUDiCalcWiiFitCrc(void* buffer, u32 bytes)
         hi += *data;
         lo += ~*data;
     }
-    return (u16)hi << 16 | lo;
+    return (u32)(u16)hi << 16 | lo;
 }
 
 static u32 WUDiUpdateWiiFitCrc(void* buffer, u32 bytes, u32 crc)
@@ -2157,7 +2157,7 @@ static u32 WUDiUpdateWiiFitCrc(void* buffer, u32 bytes, u32 crc)
         hi += *data;
         lo += ~*data;
     }
-    return (u16)hi << 16 | lo;
+    return (u32)(u16)hi << 16 | lo;
 }
 
 static WUDInitState WUDiGetWiiFitDevice(void)
@@ -2238,7 +2238,7 @@ static WUDInitState WUDiGetWiiFitDevice(void)
         SCGetBtDeviceInfoArray(&_scArray);
         WUD_BDCPY(_scArray.devices[WUD_WBC_SC_INDEX].addr, _nandWbcInfo.devAddr);
         memcpy(&_scArray.devices[WUD_WBC_SC_INDEX].info, &_nandWbcInfo.info, sizeof(SCDevInfo));
-        memcpy(_scArray.devices[WUD_WBC_SC_INDEX].info.at_0x14, _nandWbcInfo.linkKey, LINK_KEY_LEN);
+        memcpy(_scArray.devices[WUD_WBC_SC_INDEX].info.wbcLinkKey, _nandWbcInfo.linkKey, LINK_KEY_LEN);
         DEBUGPrint("WBC from WiiFit\n");
         DEBUGPrint(" %02x %02x %02x %02x %02x %02x\n",
             _nandWbcInfo.devAddr[0],
