@@ -54,7 +54,6 @@ float GetRemoteReplaySpeed();
 
 bool gbDebugReplayFixedStepMode;
 bool gbReplayFlashError;
-extern float gRenderedReplaySimulationTime;
 extern bool gbSavingReplay;
 extern bool gbLoadingReplay;
 
