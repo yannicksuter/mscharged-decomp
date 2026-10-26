@@ -2153,7 +2153,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
         if (m_DetChar.m_eCharacterClass == YOSHI)
         {
-            lbl_806E12C8
+            g_pPhysicsPatchManager
                 ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, gYoshiTongueStartRadius, gYoshiTongueEndRadius, gYoshiTongueLifetime)
                 ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
@@ -2167,7 +2167,7 @@ void cFielder::ActionHit(float fDeltaT)
     {
         for (int i = 0; i < 0x3C; i++)
         {
-            PhysicsPatch* pEffect = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* pEffect = g_pPhysicsPatchManager->GetPatch(i);
             if (pEffect != 0 && pEffect->m_Type == PATCH_YOSHI_TONGUE)
             {
                 cSHierarchy* pHierarchy = m_pPoseAccumulator->GetBaseHierarchy();

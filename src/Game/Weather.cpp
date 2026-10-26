@@ -1060,7 +1060,7 @@ float BubblingLava::GetStartChance()
         int count = 0;
         for (i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch)
             {
                 if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
@@ -1087,7 +1087,7 @@ void OnLavaCollisionPatchGround(CollisionPatchData* event)
             return;
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
-        lbl_806E12C8->CreatePatch(PATCH_LAVA_HOLE, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
+        g_pPhysicsPatchManager->CreatePatch(PATCH_LAVA_HOLE, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
         event->pPatch->Unknown0();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
@@ -1138,7 +1138,7 @@ void BubblingLava::Start()
         nlVector3 velocity = { 0.0f, 0.0f, 28.0f };
         GetPhysicsPatchInfo(PATCH_LAVA_BALL);
         float time = CalculateLavaTrajectory(position, velocity, gLavaGravity);
-        PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_LAVA_BALL, 0, position, velocity, gLavaBallRadius, gLavaBallRadius, 999.0f);
+        PhysicsPatch* patch = g_pPhysicsPatchManager->CreatePatch(PATCH_LAVA_BALL, 0, position, velocity, gLavaBallRadius, gLavaBallRadius, 999.0f);
         patch->m_Gravity = gLavaGravity;
         maximum = nlMaxEquals(maximum, time);
         minimum = nlMinEquals(minimum, time);
@@ -1251,11 +1251,11 @@ void BubblingLava::Stop(bool initialize)
     m_StartChance = gLavaStartChance;
     m_VolleyCountdown = gLavaVolleyDelay;
     m_FlySoundCountdown = 0.0f;
-    if (lbl_806E12C8 && initialize)
+    if (g_pPhysicsPatchManager && initialize)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch)
             {
                 if (patch->m_Type != PATCH_LAVA_BALL && patch->m_Type != PATCH_LAVA_HOLE)
@@ -1321,7 +1321,7 @@ void StormShipWeather::SyncLog(void* context, DebugWriteCache* cache)
 
 void StormShipWeather::CreateChainLightning(int index)
 {
-    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_CHAIN_LIGHTNING, 0, v3Zero, v3Zero, gStormChainRadius, gStormChainRadius, 10.0f);
+    PhysicsPatch* patch = g_pPhysicsPatchManager->CreatePatch(PATCH_CHAIN_LIGHTNING, 0, v3Zero, v3Zero, gStormChainRadius, gStormChainRadius, 10.0f);
     nlVector3* points;
     int count;
     if (m_bRightSide == true)
@@ -1492,11 +1492,11 @@ void StormShipWeather::ResetLightning(bool initialize)
     m_DarkenTimer = 0.0f;
     m_StopChainLightningSound = 0.0f;
     m_bRightSide = false;
-    if (lbl_806E12C8)
+    if (g_pPhysicsPatchManager)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch && patch->m_Type == PATCH_CHAIN_LIGHTNING)
             {
                 patch->Unknown0();
@@ -1629,11 +1629,11 @@ void SandTombWeather::Stop(bool initialize)
 
 void SandTombWeather::CreateSandPatches()
 {
-    if (lbl_806E12C8)
+    if (g_pPhysicsPatchManager)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch && patch->m_Type == PATCH_SAND)
                 patch->Unknown0();
         }
@@ -1644,7 +1644,7 @@ void SandTombWeather::CreateSandPatches()
         {
             nlVector4 patch = GetSandPatch(this, i, side == 1);
             nlVector3 position = { patch.x, patch.y, patch.z };
-            lbl_806E12C8->CreatePatch(PATCH_SAND, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
+            g_pPhysicsPatchManager->CreatePatch(PATCH_SAND, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
         }
     }
     m_bSandPatchesCreated = true;

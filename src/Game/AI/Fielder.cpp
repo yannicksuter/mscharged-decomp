@@ -393,7 +393,7 @@ static inline void ClearPhysicsPatchesOfType(int type)
 {
     for (int i = 0; i < 60; ++i)
     {
-        PhysicsPatch* pPatch = lbl_806E12C8->GetPatch(i);
+        PhysicsPatch* pPatch = g_pPhysicsPatchManager->GetPatch(i);
         if (pPatch != 0 && pPatch->GetType() == type)
         {
             pPatch->Unknown0();

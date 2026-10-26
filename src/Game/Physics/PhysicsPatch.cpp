@@ -46,7 +46,7 @@ unsigned short sPhysicsPatchType = 0xFFFF;
 float gfPatchAirborneHeight = 0.25f;
 
 SlotPool<PhysicsPatch> PhysicsPatch::m_PhysicsPatchSlotPool(16, 16);
-PhysicsPatchManager* lbl_806E12C8;
+PhysicsPatchManager* g_pPhysicsPatchManager;
 
 static void UpdatePatchEffect(EmissionController& controller);
 
@@ -675,7 +675,7 @@ void HandleResetEffects(void*)
 {
     for (int i = 0; i < 60; ++i)
     {
-        PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+        PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
         if (patch != 0)
         {
             patch->KillEffect();

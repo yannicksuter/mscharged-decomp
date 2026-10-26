@@ -134,7 +134,7 @@ public:
     /* 0xF4 */ unsigned int mPaddingF4;
 }; // total size: 0xF8
 
-extern PhysicsPatchManager* lbl_806E12C8;
+extern PhysicsPatchManager* g_pPhysicsPatchManager;
 
 inline void PhysicsPatch::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
 {

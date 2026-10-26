@@ -211,11 +211,11 @@ void RenderSnapshot::Grab()
     }
     mCameraUp = g_CameraWorldUpVector;
 #if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
-    if (lbl_806E12C8 != 0)
+    if (g_pPhysicsPatchManager != 0)
     {
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch != 0)
                 mPatchPositions[i] = patch->GetPosition();
             else
@@ -492,13 +492,13 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
     nlVecLerp(mCameraUp, lhs.mCameraUp, rhs.mCameraUp, blendFactors[0]);
     nlVec3Normalize(mCameraUp, mCameraUp);
 #if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
-    if (lbl_806E12C8 != 0 && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) == 0)
+    if (g_pPhysicsPatchManager != 0 && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) == 0)
     {
         const RenderSnapshot& previous = lhs;
         const RenderSnapshot& current = rhs;
         for (int i = 0; i < 60; i++)
         {
-            PhysicsPatch* patch = lbl_806E12C8->GetPatch(i);
+            PhysicsPatch* patch = g_pPhysicsPatchManager->GetPatch(i);
             if (patch != 0)
             {
                 if (previous.mPatchPositions[i].z > -100.0f && current.mPatchPositions[i].z > -100.0f)
