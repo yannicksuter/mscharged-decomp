@@ -65,25 +65,25 @@ cPlayer* FindClosestTeamPlayer(
     nlVector3* pPosition, bool bParam);
 
 
-float lbl_806DBD80 = 0.75f;
-float lbl_806DBD84 = 0.4f;
-float lbl_806DBD88 = 6.5f;
-bool lbl_806DBD8C = true;
+float gFlashlightDistanceWeightWithBall = 0.75f;
+float gFlashlightDistanceWeightWithoutBall = 0.4f;
+float gPeachPhotoFreezeDuration = 6.5f;
+bool gPeachPhotoEffectEnabled = true;
 
 static u8 sbNoBallPickups;
 static const u16 g_aOOIConstraint = (u16)DegreesToAngle(180.0f);
 static const int g_nHeadTiltMax = DegreesToAngle(45.0f);
 static const int g_nHeadSpinMax = DegreesToAngle(85.0f);
-static const int lbl_806E0D7C = DegreesToAngle(65.0f);
-static const int lbl_806E0D80 = DegreesToAngle(65.0f);
-static const int lbl_806E0D84 = DegreesToAngle(70.0f);
-static const int lbl_806E0D88 = DegreesToAngle(10.0f);
-static const int lbl_806E0D8C = DegreesToAngle(30.0f);
-static const int lbl_806E0D90 = DegreesToAngle(45.0f);
-static const int lbl_806E0D94 = DegreesToAngle(10.0f);
-static const int lbl_806E0D98 = DegreesToAngle(45.0f);
-static const int lbl_806E0D9C = DegreesToAngle(75.0f);
-static const int lbl_806E0DA0 = DegreesToAngle(85.0f);
+static const int g_nBirdoHeadTiltMax = DegreesToAngle(65.0f);
+static const int g_nBirdoHeadSpinMax = DegreesToAngle(65.0f);
+static const int g_nWaluigiHeadSpinMax = DegreesToAngle(70.0f);
+static const int g_nWarioHeadTiltMax = DegreesToAngle(10.0f);
+static const int g_nWarioHeadSpinMax = DegreesToAngle(30.0f);
+static const int g_nBowserHeadSpinMax = DegreesToAngle(45.0f);
+static const int g_nDonkeyKongHeadTiltMax = DegreesToAngle(10.0f);
+static const int g_nDonkeyKongHeadSpinMax = DegreesToAngle(45.0f);
+static const int g_nGoalieHeadTiltMax = DegreesToAngle(75.0f);
+static const int g_nGoalieHeadSpinMax = DegreesToAngle(85.0f);
 
 cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
     const int* nModelID, cSHierarchy* hierarchy, cAnimInventory* animInventory,
@@ -482,7 +482,7 @@ float cPlayer::DoFlashLight(const nlVector3& Position, unsigned short aDirection
     short aDifference = nlAngleDiff(aDirection, aTarget);
     unsigned short aAbsolute = aDifference < 0 ? -aDifference : aDifference;
     short aAngle = aAbsolute;
-    float fWeight = m_pBall != NULL ? lbl_806DBD80 : lbl_806DBD84;
+    float fWeight = m_pBall != NULL ? gFlashlightDistanceWeightWithBall : gFlashlightDistanceWeightWithoutBall;
     float fDistanceScore = InterpolateRangeClamped(0.0f, 1.0f, fIgnoreObjectCloserThanThis, fIgnoreObjectFartherThanThis, fDistBetween);
     float fAngleScore = InterpolateRangeClamped(1.0f, 0.0f, 21845.0f, 2048.0f, aAngle);
     return fDistanceScore * fWeight + fAngleScore * (1.0f - fWeight);
@@ -1058,34 +1058,34 @@ void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
     eClassTypes classType = self.m_eClassType;
     if (classType == GOALIE)
     {
-        nHeadSpinMax = lbl_806E0DA0;
-        nHeadTiltMax = lbl_806E0D9C;
+        nHeadSpinMax = g_nGoalieHeadSpinMax;
+        nHeadTiltMax = g_nGoalieHeadTiltMax;
     }
     else
     {
         cc = self.m_DetChar.m_eCharacterClass;
         if (cc == WARIO)
         {
-            nHeadSpinMax = lbl_806E0D8C;
-            nHeadTiltMax = lbl_806E0D88;
+            nHeadSpinMax = g_nWarioHeadSpinMax;
+            nHeadTiltMax = g_nWarioHeadTiltMax;
         }
         else if (cc == WALUIGI)
         {
-            nHeadSpinMax = lbl_806E0D84;
+            nHeadSpinMax = g_nWaluigiHeadSpinMax;
         }
         else if (cc == BOWSER)
         {
-            nHeadSpinMax = lbl_806E0D90;
+            nHeadSpinMax = g_nBowserHeadSpinMax;
         }
         else if (cc == BIRDO)
         {
-            nHeadTiltMax = lbl_806E0D7C;
-            nHeadSpinMax = lbl_806E0D80;
+            nHeadTiltMax = g_nBirdoHeadTiltMax;
+            nHeadSpinMax = g_nBirdoHeadSpinMax;
         }
         else if (cc == DONKEYKONG)
         {
-            nHeadTiltMax = lbl_806E0D94;
-            nHeadSpinMax = lbl_806E0D98;
+            nHeadTiltMax = g_nDonkeyKongHeadTiltMax;
+            nHeadSpinMax = g_nDonkeyKongHeadSpinMax;
         }
     }
     if (classType == GOALIE || (classType == FIELDER && !((cFielder*)&self)->IsStuck()))
@@ -1325,7 +1325,7 @@ void RegisterPlayerEventCallbacks()
     FindEvent<ResetEffectsData>("ResetEffects", -1)->Add(Function<ResetEffectsData*>(OnPlayerResetEffects), 0, -1);
 }
 
-static nlVector3 lbl_804FF5C8[] = {
+static nlVector3 sPeachPhotoRegionPoints[] = {
     { 0.156f, 0.973f, 0.0f },
     { 0.156f, 0.555f, 0.0f },
     { 0.004f, 0.223f, 0.0f },
@@ -1365,7 +1365,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
     for (int i = 0; i < 9; i++)
     {
         nlVector3& point = points[i];
-        point = lbl_804FF5C8[i];
+        point = sPeachPhotoRegionPoints[i];
         point.x *= width;
         point.x -= width / 2.0f;
         point.x += pData->v3Position.x;
@@ -1376,9 +1376,9 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
     }
     if (g_pGame != NULL && g_pGame->IsGameplayOrOvertime())
     {
-        if (lbl_806DBD8C)
+        if (gPeachPhotoEffectEnabled)
         {
-            StartPeachPhoto(&gPeachPhotoState, &pData->v3Position, lbl_806DBD88, pData->fHalfWidth, pData->fHalfHeight);
+            StartPeachPhoto(&gPeachPhotoState, &pData->v3Position, gPeachPhotoFreezeDuration, pData->fHalfWidth, pData->fHalfHeight);
         }
         for (int i = 0; i < 2; i++)
         {
@@ -1392,7 +1392,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pFielder->m_DetChar.m_v3Position.x;
                     position.y = pFielder->m_DetChar.m_v3Position.y;
                     if (region.ContainsPoint2D(position))
-                        pFielder->FreezeWithPeachPhoto(lbl_806DBD88);
+                        pFielder->FreezeWithPeachPhoto(gPeachPhotoFreezeDuration);
                 }
             }
         }
@@ -1408,7 +1408,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
             CancelBallShot(g_pBall, true);
         }
-        g_pGame->BlowUpPowerups(region, lbl_806DBD88);
+        g_pGame->BlowUpPowerups(region, gPeachPhotoFreezeDuration);
         if (gNPCManager != NULL)
         {
             ChainChomp* pChain;
@@ -1420,7 +1420,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                 position.x = pChain->mv3Position.x;
                 position.y = pChain->mv3Position.y;
                 if (region.ContainsPoint2D(position))
-                    gNPCManager->GetChainChomp()->Freeze(lbl_806DBD88, false);
+                    gNPCManager->GetChainChomp()->Freeze(gPeachPhotoFreezeDuration, false);
             }
             for (unsigned int i = 0; i < gNPCManager->GetNumBulletBills(); i++)
             {
@@ -1444,7 +1444,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pPosition->x;
                     position.y = pPosition->y;
                     if (region.ContainsPoint2D(position))
-                        pHammer->Freeze(lbl_806DBD88);
+                        pHammer->Freeze(gPeachPhotoFreezeDuration);
                 }
             }
             for (unsigned int i = 0; i < 3; i++)
@@ -1456,7 +1456,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pNPC->mv3Position.x;
                     position.y = pNPC->mv3Position.y;
                     if (region.ContainsPoint2D(position))
-                        pNPC->Freeze(lbl_806DBD88);
+                        pNPC->Freeze(gPeachPhotoFreezeDuration);
                 }
             }
             for (unsigned int i = 0; i < 8; i++)
@@ -1469,7 +1469,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pPosition->x;
                     position.y = pPosition->y;
                     if (region.ContainsPoint2D(position))
-                        pThwomp->Freeze(lbl_806DBD88);
+                        pThwomp->Freeze(gPeachPhotoFreezeDuration);
                 }
             }
             for (unsigned int i = 0; i < 60; i++)
@@ -1482,7 +1482,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = v3Position.x;
                     position.y = v3Position.y;
                     if (region.ContainsPoint2D(position))
-                        pPatch->ClearMuckHole(lbl_806DBD88);
+                        pPatch->ClearMuckHole(gPeachPhotoFreezeDuration);
                 }
             }
         }
@@ -1509,16 +1509,16 @@ void cPlayer::CollideWithPatchCallback(const CollisionPatchData*)
 {
 }
 
-u16 lbl_806DBD96 = 0xFFFF;
+u16 gDeterministicPlayerDebugType = 0xFFFF;
 
 #define REGISTER_PLAYER_FIELD(type, field) \
     cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&field - (u8*)&m_ID, #field)
 
 inline void PlayerGameplayState::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DBD96 == 0xFFFF)
+    if (gDeterministicPlayerDebugType == 0xFFFF)
     {
-        lbl_806DBD96 = cache->BeginType("DetPlayer");
+        gDeterministicPlayerDebugType = cache->BeginType("DetPlayer");
         REGISTER_PLAYER_FIELD(8, m_ID);
         REGISTER_PLAYER_FIELD(8, m_nFeatherAnimID);
         REGISTER_PLAYER_FIELD(16, m_bIsContactingWall);
@@ -1545,8 +1545,8 @@ inline void PlayerGameplayState::SyncLog(void* context, DebugWriteCache* cache)
         REGISTER_PLAYER_FIELD(17, m_UserControlledTime);
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DBD96, &m_ID, context);
-    cache->WriteData(lbl_806DBD96, &m_ID, sizeof(*this));
+    cache->ChecksumData(gDeterministicPlayerDebugType, &m_ID, context);
+    cache->WriteData(gDeterministicPlayerDebugType, &m_ID, sizeof(*this));
 }
 
 void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
