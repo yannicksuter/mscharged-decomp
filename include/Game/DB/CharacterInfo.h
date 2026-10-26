@@ -9,10 +9,10 @@
  * the twelve goalie rows share one runtime-initialised value. These copies
  * establish the storage layout, without identifying the original grouping.
  */
-struct CharacterValuePair
+struct CharacterShadowDimensions
 {
-    /* 0x0 */ float unknown_0x0;
-    /* 0x4 */ float unknown_0x4;
+    /* 0x0 */ float mHeight;
+    /* 0x4 */ float mRadius;
 };
 
 enum eCharacterPlayStyle
@@ -47,12 +47,12 @@ struct CharacterInfo
     /* 0x20 */ int unknown_0x20;
     /* 0x24 */ int mRandomSelectionAvailability;
     /* 0x28 */ int unknown_0x28;
-    /* 0x2C */ int unknown_0x2C;
-    /* 0x30 */ CharacterValuePair unknown_0x30;
-    /* 0x38 */ float unknown_0x38;
-    /* 0x3C */ float unknown_0x3C;
-    /* 0x40 */ float unknown_0x40;
-    /* 0x44 */ float unknown_0x44;
+    /* 0x2C */ int mShadowUpdateCategory;
+    /* 0x30 */ CharacterShadowDimensions mShadowDimensions;
+    /* 0x38 */ float mMovementRating;
+    /* 0x3C */ float mShootingRating;
+    /* 0x40 */ float mPassingRating;
+    /* 0x44 */ float mDefenseRating;
     /* 0x48 */ eCharacterPlayStyle mPlayStyle;
     /* 0x4C */ int mColourMask;
     /* 0x50 */ int mColourRank;

@@ -1072,9 +1072,9 @@ void DrawableCharacter::RenderCharacterShadow(const cCharacter& source, glModel*
     static float s_fHeightFudge = 1.125f;
     params.fScalar = 1.0f;
     info = source.m_pCharacterInfo;
-    float shadowRadius = info->unknown_0x30.unknown_0x4;
-    float shadowHeight = info->unknown_0x30.unknown_0x0;
-    characterSizeIndex = info->unknown_0x2C;
+    float shadowRadius = info->mShadowDimensions.mRadius;
+    float shadowHeight = info->mShadowDimensions.mHeight;
+    characterSizeIndex = info->mShadowUpdateCategory;
     fRadius = g_fRadiusScale * shadowRadius;
     fHeight = s_fHeightFudge * shadowHeight;
     float characterScale = source.m_DetChar.m_fPlayerScale;

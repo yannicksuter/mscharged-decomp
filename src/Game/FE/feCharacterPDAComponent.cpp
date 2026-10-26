@@ -309,10 +309,10 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
     mTimers.RemoveAllTimers();
     if (!mSlideAnimating)
     {
-        StartAttributeAnimation(this, mCaptainAttributeBars[0], info.unknown_0x38);
-        StartAttributeAnimation(this, mCaptainAttributeBars[1], info.unknown_0x3C);
-        StartAttributeAnimation(this, mCaptainAttributeBars[2], info.unknown_0x40);
-        StartAttributeAnimation(this, mCaptainAttributeBars[3], info.unknown_0x44);
+        StartAttributeAnimation(this, mCaptainAttributeBars[0], info.mMovementRating);
+        StartAttributeAnimation(this, mCaptainAttributeBars[1], info.mShootingRating);
+        StartAttributeAnimation(this, mCaptainAttributeBars[2], info.mPassingRating);
+        StartAttributeAnimation(this, mCaptainAttributeBars[3], info.mDefenseRating);
     }
     TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mCaptainAttributes->GetActiveSlide(), "attributes_captains", "overall");
     if (overall != 0)
@@ -370,10 +370,10 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
         component->SetActiveSlide(GetSidekickName((eSidekickID)sidekick), true, false);
     }
     mTimers.RemoveAllTimers();
-    StartAttributeAnimation(this, mSidekickAttributeBars[0], info.unknown_0x38);
-    StartAttributeAnimation(this, mSidekickAttributeBars[1], info.unknown_0x3C);
-    StartAttributeAnimation(this, mSidekickAttributeBars[2], info.unknown_0x40);
-    StartAttributeAnimation(this, mSidekickAttributeBars[3], info.unknown_0x44);
+    StartAttributeAnimation(this, mSidekickAttributeBars[0], info.mMovementRating);
+    StartAttributeAnimation(this, mSidekickAttributeBars[1], info.mShootingRating);
+    StartAttributeAnimation(this, mSidekickAttributeBars[2], info.mPassingRating);
+    StartAttributeAnimation(this, mSidekickAttributeBars[3], info.mDefenseRating);
     TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mSidekickAttributes->GetActiveSlide(), "attributes_sidekicks", "overall");
     if (overall != 0)
     {
