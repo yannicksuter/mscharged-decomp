@@ -167,7 +167,7 @@ extern const float lbl_806E35D4[1];
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
 
-extern bool lbl_806DB5A8;
+extern bool gHeaderTargetEnabled;
 
 
 
@@ -2908,7 +2908,7 @@ void cFielder::ActionLooseBallShot(float fDeltaT)
 
 void FreezeEveryoneButCaptain(cFielder* pFielder)
 {
-    lbl_806DB5A8 = false;
+    gHeaderTargetEnabled = false;
 
     for (int i = 0; i < 2; i++)
     {
@@ -2927,7 +2927,7 @@ void FreezeEveryoneButCaptain(cFielder* pFielder)
 
 void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
 {
-    lbl_806DB5A8 = true;
+    gHeaderTargetEnabled = true;
 
     for (int i = 0; i < 2; i++)
     {

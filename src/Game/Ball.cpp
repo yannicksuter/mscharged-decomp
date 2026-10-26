@@ -58,15 +58,15 @@
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
-extern unsigned int lbl_806E0C10;
+extern unsigned int gNumBallTrails;
 
 cBall* g_pBall = NULL;
-unsigned char lbl_806E0BC4;
-float lbl_806E0BC8;
-unsigned char lbl_806E0BCC;
-float lbl_806E0BD0;
-float lbl_806E0BD4;
-float lbl_806E0BD8;
+unsigned char gRandomizeBallChargeOnReset;
+float gInitialKickoffBallHeight;
+unsigned char gForceFullBallCharge;
+float gKickoffBallLateralSpeedRange;
+float gKickoffBallVerticalSpeed;
+float gKickoffBallSpeedRandomness;
 bool gbUseShotClock;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -102,56 +102,56 @@ static const char szWarioShootToScoreBallBlurTexture[]
     = "global/warioshoottoscorestreak";
 static const char szYoshiShootToScoreBallBlurTexture[]
     = "global/yoshishoottoscorestreak";
-extern const nlVector3 lbl_804DBE30 = { 12.5f, 0.0f, 0.18f };
+extern const nlVector3 gDefaultSkillshotDeflectionTarget = { 12.5f, 0.0f, 0.18f };
 static nlMatrix3 m3Ident
     = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 bool gbUsePassCharging = true;
 bool gbUseShotCharging = true;
-float lbl_806DB504 = .55f;
-float lbl_806DB508 = .55f;
-float lbl_806DB50C = 6.0f;
-float lbl_806DB510 = 1.1f;
-static float lbl_806DB514 = 2.5f;
-float lbl_806DB518 = .075f;
-float lbl_806DB51C = .105f;
-float lbl_806DB520 = .05f;
-float lbl_806DB524 = 1.33f;
-float lbl_806DB528 = 1.0f;
-float lbl_806DB52C = 35.0f;
-float lbl_806DB530 = 8.0f;
-float lbl_806DB534 = 12.5f;
-float lbl_806DB538 = 35.0f;
-float lbl_806DB53C = .85f;
-float lbl_806DB540 = 1.75f;
-unsigned char lbl_806DB544 = 1;
-float lbl_806DB548 = 2.0f;
-float lbl_806DB54C = .1f;
-float lbl_806DB550 = 2.2f;
-int lbl_806DB554 = 150;
+float gMinPlaymakerPassCharge = .55f;
+float gMaxPlaymakerPassCharge = .55f;
+float gFullBallChargeDecayTime = 6.0f;
+float gMaxBallChargeScale = 1.1f;
+static float sBallContactRadiusScale = 2.5f;
+float gDefaultSkillshotDeflectionTimeScale = .075f;
+float gKoopaSkillshotDeflectionTimeScale = .105f;
+float gBirdoSkillshotDeflectionTimeScale = .05f;
+float gShyGuySkillshotDeflectionTime = 1.33f;
+float gDryBonesSkillshotDeflectionSpread = 1.0f;
+float gKoopaSkillshotDeflectionSpread = 35.0f;
+float gBirdoSkillshotDeflectionSpread = 8.0f;
+float gShyGuySkillshotDeflectionSpread = 12.5f;
+float gDefaultSkillshotDeflectionSpread = 35.0f;
+float gMinSkillshotDeflectionTime = .85f;
+float gMaxSkillshotDeflectionTime = 1.75f;
+unsigned char gPreserveBallChargeOnReset = 1;
+float gKickoffBallLongitudinalSpeed = 2.0f;
+float gBallTrailFadeTime = .1f;
+float gBallTrailWidthScale = 2.2f;
+int gBallTrailMaxPositionEntries = 150;
 float gfShotClockTime = 10.0f;
 float gfShotClockFrozenTime = 10.0f;
-float lbl_806DB560 = .8f;
-float lbl_806DB564 = 7.5f;
-float lbl_806DB568 = 22.5f;
-float lbl_806DB56C = 11.5f;
-float lbl_806DB570 = 24.0f;
-float lbl_806DB574 = 15.0f;
-float lbl_806DB578 = 30.0f;
-float lbl_806DB57C = 40.0f;
-float lbl_806DB580 = 50.0f;
-float lbl_806DB584 = 1.0f;
-float lbl_806DB588 = 1.025f;
-float lbl_806DB58C = .5f;
-float lbl_806DB590 = -3.0f;
-float lbl_806DB594 = 1.0f;
-float lbl_806DB598 = 18.0f;
-float lbl_806DB59C = 9.0f;
-float lbl_806DB5A0 = .2f;
+float gBallSidelineSteeringStrength = .8f;
+float gMinBallSidelineSpeed = 7.5f;
+float gMaxBallSidelineSpeed = 22.5f;
+float gBallSidelineTargetY = 11.5f;
+float gLowRatingShotAirResistanceScale = 24.0f;
+float gClearBallAirResistanceScale = 15.0f;
+float gBallHitDamageSpeed = 30.0f;
+float gBallMediumHitReactionSpeed = 40.0f;
+float gBallHeavyHitReactionSpeed = 50.0f;
+float gBallPredictionAirResistanceScale = 1.0f;
+float gBallPredictionGravityScale = 1.025f;
+float gBallForwardSpinBase = .5f;
+float gBallBackSpinBase = -3.0f;
+float gLavaBallHorizontalSpeedScale = 1.0f;
+float gLavaBallVerticalSpeed = 18.0f;
+float gMaxLavaBallHorizontalSpeed = 9.0f;
+float gLavaBallRandomDirectionSpeedThreshold = .2f;
 float gHeaderTargetPredictionHeight = .8f;
-bool lbl_806DB5A8 = true;
-float lbl_806DB5AC = .33f;
-float lbl_806DB5B0 = .33f;
+bool gHeaderTargetEnabled = true;
+float gHeaderTargetRedisplayDelay = .33f;
+float gHeaderTargetInitialDelay = .33f;
 
 static TweakBoolBinding sUsePassChargingTweak(
     "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &gbUsePassCharging, true);
@@ -163,7 +163,7 @@ static TweakFloatBinding sShotClockFrozenTimeTweak(
     "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &gfShotClockFrozenTime, true);
 static TweakBoolBinding sUseShotClockTweak(
     "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &gbUseShotClock, true);
-LiveBallTrail lbl_8056B518[10];
+LiveBallTrail gBallTrails[10];
 
 static inline float FullBallCharge()
 {
@@ -318,7 +318,7 @@ void cBall::CollideWithCharacterCallback(
     switch (meBallState)
     {
     case BALL_STATE_SHOT:
-        if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB578)
+        if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > gBallHitDamageSpeed)
         {
             bCanDamage = true;
         }
@@ -386,11 +386,11 @@ void cBall::CollideWithCharacterCallback(
             if (bReactToHit)
             {
                 int nReact = HIT_REACTION_LIGHT;
-                if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB580)
+                if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > gBallHeavyHitReactionSpeed)
                 {
                     nReact = HIT_REACTION_HEAVY;
                 }
-                else if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB57C)
+                else if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > gBallMediumHitReactionSpeed)
                 {
                     nReact = HIT_REACTION_MEDIUM;
                 }
@@ -865,7 +865,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     {
     case BALL_STATE_SHOT:
         if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true)
-            > lbl_806DB578)
+            > gBallHitDamageSpeed)
         {
             bCanDamage = true;
         }
@@ -1077,7 +1077,7 @@ bool IsBallDangerousShot(cBall* pBall)
     {
     case BALL_STATE_SHOT:
         return nlSqrt(pBall->m_v3Velocity.GetLengthSq3D(), true)
-            > lbl_806DB578;
+            > gBallHitDamageSpeed;
     case BALL_STATE_SKILLSHOT:
         return true;
     default:
@@ -1130,7 +1130,7 @@ nlVector3* cBall::GetDrawablePosition() const
 
 float cBall::GetScaledContactRadius(float fScale) const
 {
-    return fScale * (0.18f * lbl_806DB514);
+    return fScale * (0.18f * sBallContactRadiusScale);
 }
 
 cFielder* cBall::GetOwnerFielder()
@@ -1287,7 +1287,7 @@ void ResetBallCharge(cBall* pBall, bool bParam)
     KillBallShot("skillshot_ball_drybones", 0);
     KillBallShot("skillshot_ball_boo", 0);
 
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
+    if (gForceFullBallCharge || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -1296,7 +1296,7 @@ void ResetBallCharge(cBall* pBall, bool bParam)
         pBall->mfChargeValue = 0.0f;
     }
 
-    float fMaxCharge = lbl_806DB510 * FullBallCharge();
+    float fMaxCharge = gMaxBallChargeScale * FullBallCharge();
     float fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
@@ -1314,7 +1314,7 @@ void ResetBallCharge(cBall* pBall, bool bParam)
 // inline without changing SetBallCharge or its other callers.
 static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
 {
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
+    if (gForceFullBallCharge || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -1324,7 +1324,7 @@ static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
     }
 
     float fMaxChargeScale = 4.0f;
-    float fMaxCharge = lbl_806DB510 * fMaxChargeScale;
+    float fMaxCharge = gMaxBallChargeScale * fMaxChargeScale;
     float fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
@@ -1340,7 +1340,7 @@ static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
 
 void SetBallCharge(cBall* pBall, float fParam)
 {
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
+    if (gForceFullBallCharge || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -1349,7 +1349,7 @@ void SetBallCharge(cBall* pBall, float fParam)
         pBall->mfChargeValue = fParam;
     }
 
-    float fMaxCharge = lbl_806DB510 * FullBallCharge();
+    float fMaxCharge = gMaxBallChargeScale * FullBallCharge();
     float fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
@@ -1408,8 +1408,8 @@ static inline void ShootAtFastImpl(cBall* pBall, nlVector3& v3Vel,
 {
     float gravity = pBall->m_pPhysicsBall->m_gravity;
     float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
-    float k = lbl_806DB584 * airResistance;
-    float g = lbl_806DB588 * gravity;
+    float k = gBallPredictionAirResistanceScale * airResistance;
+    float g = gBallPredictionGravityScale * gravity;
     float eToTheNegativeKT = Exp(-k * fDesiredTime);
     float kSquaredOverOneMinusEToTheNegativeKT
         = (k * k) / (1.0f - eToTheNegativeKT);
@@ -1429,7 +1429,7 @@ void DeflectSkillshotBall(cBall*, cPlayer* pShooter)
 {
     g_pBall->m_pPhysicsBall->RestoreBallForces();
 
-    nlVector3 v3Position = lbl_804DBE30;
+    nlVector3 v3Position = gDefaultSkillshotDeflectionTarget;
     v3Position.x *= AIsgn(g_pBall->m_v3Position.x);
 
     eCharacterClass eClass = CHARACTER_CLASS_INVALID;
@@ -1445,39 +1445,39 @@ void DeflectSkillshotBall(cBall*, cPlayer* pShooter)
     {
     case CHARACTER_CLASS_INVALID:
     default:
-        v3Position.x += nlRandomf(lbl_806DB538)
-            - 0.5f * lbl_806DB538;
-        v3Position.y += nlRandomf(lbl_806DB538)
-            - 0.5f * lbl_806DB538;
-        fTimeScale = lbl_806DB518;
+        v3Position.x += nlRandomf(gDefaultSkillshotDeflectionSpread)
+            - 0.5f * gDefaultSkillshotDeflectionSpread;
+        v3Position.y += nlRandomf(gDefaultSkillshotDeflectionSpread)
+            - 0.5f * gDefaultSkillshotDeflectionSpread;
+        fTimeScale = gDefaultSkillshotDeflectionTimeScale;
         break;
     case KOOPA:
-        v3Position.x += nlRandomf(lbl_806DB52C)
-            - 0.5f * lbl_806DB52C;
-        v3Position.y += nlRandomf(lbl_806DB52C)
-            - 0.5f * lbl_806DB52C;
-        fTimeScale = lbl_806DB51C;
+        v3Position.x += nlRandomf(gKoopaSkillshotDeflectionSpread)
+            - 0.5f * gKoopaSkillshotDeflectionSpread;
+        v3Position.y += nlRandomf(gKoopaSkillshotDeflectionSpread)
+            - 0.5f * gKoopaSkillshotDeflectionSpread;
+        fTimeScale = gKoopaSkillshotDeflectionTimeScale;
         break;
     case BIRDO:
-        v3Position.x += nlRandomf(lbl_806DB530)
-            - 0.5f * lbl_806DB530;
-        v3Position.y += nlRandomf(lbl_806DB530)
-            - 0.5f * lbl_806DB530;
-        fTimeScale = lbl_806DB520;
+        v3Position.x += nlRandomf(gBirdoSkillshotDeflectionSpread)
+            - 0.5f * gBirdoSkillshotDeflectionSpread;
+        v3Position.y += nlRandomf(gBirdoSkillshotDeflectionSpread)
+            - 0.5f * gBirdoSkillshotDeflectionSpread;
+        fTimeScale = gBirdoSkillshotDeflectionTimeScale;
         break;
     case DRYBONES:
-        v3Position.x += nlRandomf(lbl_806DB528)
-            - 0.5f * lbl_806DB528;
-        v3Position.y += nlRandomf(lbl_806DB528)
-            - 0.5f * lbl_806DB528;
-        fTimeScale = lbl_806DB518;
+        v3Position.x += nlRandomf(gDryBonesSkillshotDeflectionSpread)
+            - 0.5f * gDryBonesSkillshotDeflectionSpread;
+        v3Position.y += nlRandomf(gDryBonesSkillshotDeflectionSpread)
+            - 0.5f * gDryBonesSkillshotDeflectionSpread;
+        fTimeScale = gDefaultSkillshotDeflectionTimeScale;
         break;
     case SHYGUY:
-        v3Position.x += nlRandomf(lbl_806DB534)
-            - 0.5f * lbl_806DB534;
-        v3Position.y += nlRandomf(lbl_806DB534)
-            - 0.5f * lbl_806DB534;
-        fTimeScale = lbl_806DB524;
+        v3Position.x += nlRandomf(gShyGuySkillshotDeflectionSpread)
+            - 0.5f * gShyGuySkillshotDeflectionSpread;
+        v3Position.y += nlRandomf(gShyGuySkillshotDeflectionSpread)
+            - 0.5f * gShyGuySkillshotDeflectionSpread;
+        fTimeScale = gShyGuySkillshotDeflectionTime;
         break;
     }
 
@@ -1507,13 +1507,13 @@ void DeflectSkillshotBall(cBall*, cPlayer* pShooter)
     {
         fDesiredTime = fTimeScale;
     }
-    else if (fDesiredTime < lbl_806DB53C)
+    else if (fDesiredTime < gMinSkillshotDeflectionTime)
     {
-        fDesiredTime = lbl_806DB53C;
+        fDesiredTime = gMinSkillshotDeflectionTime;
     }
-    else if (fDesiredTime > lbl_806DB540)
+    else if (fDesiredTime > gMaxSkillshotDeflectionTime)
     {
-        fDesiredTime = lbl_806DB540;
+        fDesiredTime = gMaxSkillshotDeflectionTime;
     }
 
     ShootAtFastImpl(g_pBall, v3Velocity, v3Position, fDesiredTime);
@@ -1692,7 +1692,7 @@ void ChangeBallState(cBall* pBall, int nBallState)
             && pBall->m_pPrevOwner->m_eClassType == FIELDER)
         {
             pBall->m_pPhysicsBall->mfBallAirResistance
-                = pBall->m_pPhysicsBall->GetDefaultBallAirResistance() * lbl_806DB574;
+                = pBall->m_pPhysicsBall->GetDefaultBallAirResistance() * gClearBallAirResistanceScale;
         }
         break;
     case BALL_STATE_SHOT:
@@ -1705,7 +1705,7 @@ void ChangeBallState(cBall* pBall, int nBallState)
             PlayerTweaks* tweaks
                 = ((cFielder*)pPrevOwner)->GetTweaks();
             pBall->m_pPhysicsBall->mfBallAirResistance
-                = resistance * Interpolate(lbl_806DB570, 1.0f,
+                = resistance * Interpolate(gLowRatingShotAirResistanceScale, 1.0f,
                     (float)tweaks->fShooting);
         }
         break;
@@ -1906,7 +1906,7 @@ void cBall::SetVelocity(const nlVector3& velocity, eSpinType spin,
     }
     else if (spin == SPINTYPE_FORWARD)
     {
-        fSpinRand = lbl_806DB58C + nlRandomf(2.0f);
+        fSpinRand = gBallForwardSpinBase + nlRandomf(2.0f);
 
         nlVector3 v3Up = { 0.0f, 0.0f, 0.0f };
         v3Up.z = fSpinRand;
@@ -1916,7 +1916,7 @@ void cBall::SetVelocity(const nlVector3& velocity, eSpinType spin,
     }
     else if (spin == SPINTYPE_BACK)
     {
-        fSpinRand = lbl_806DB590 + nlRandomf(2.0f);
+        fSpinRand = gBallBackSpinBase + nlRandomf(2.0f);
 
         nlVector3 v3Up = { 0.0f, 0.0f, 0.0f };
         v3Up.z = fSpinRand;
@@ -2043,9 +2043,9 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
         float fValue = GetPlaymakerRating(((cFielder*)pPlayer)->GetTweaks());
         float fPercent = InterpolateRangeClamped(
             0.0f, 1.0f, 0.5f, 1.0f, fValue);
-        float fCharge = Interpolate(lbl_806DB504, lbl_806DB508, fPercent);
+        float fCharge = Interpolate(gMinPlaymakerPassCharge, gMaxPlaymakerPassCharge, fPercent);
         float fCurrentCharge = pBall->mfChargeValue;
-        if (lbl_806E0BCC
+        if (gForceFullBallCharge
             || GameInfoManager::Instance()->IsWhiteBallEnabled())
         {
             pBall->mfChargeValue = 4.0f;
@@ -2055,7 +2055,7 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
             pBall->mfChargeValue = fCharge + fCurrentCharge;
         }
 
-        float fMaxCharge = lbl_806DB510 * FullBallCharge();
+        float fMaxCharge = gMaxBallChargeScale * FullBallCharge();
         fValue = pBall->mfChargeValue;
         if (fValue >= fMaxCharge)
         {
@@ -2088,8 +2088,8 @@ static inline void CalculateFastShotVelocity(cBall* pBall, nlVector3& v3Vel,
     float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
     float g;
     float k;
-    k = lbl_806DB584 * airResistance;
-    g = lbl_806DB588 * gravity;
+    k = gBallPredictionAirResistanceScale * airResistance;
+    g = gBallPredictionGravityScale * gravity;
     float eToTheNegativeKT = Exp(-k * fDesiredTime);
     float kSquaredOverOneMinusEToTheNegativeKT
         = (k * k) / (1.0f - eToTheNegativeKT);
@@ -2121,7 +2121,7 @@ static inline float BallVelocityLength(float x, float y, float z)
 
 void SteerBallToSideline(cBall* pBall)
 {
-    if (nlAbs(pBall->m_v3Position.y) - lbl_806DB56C < 0.0f)
+    if (nlAbs(pBall->m_v3Position.y) - gBallSidelineTargetY < 0.0f)
     {
         HandleBallGroundContactImpl(pBall);
         return;
@@ -2135,23 +2135,23 @@ void SteerBallToSideline(cBall* pBall)
     }
 
     nlVector3 v3Position = pBall->m_v3Position;
-    v3Position.y = AIsgn(v3Position.y) * lbl_806DB56C;
+    v3Position.y = AIsgn(v3Position.y) * gBallSidelineTargetY;
     cField::FixOutOfBoundsX(v3Position, true, 3.0f);
 
     nlVector3 v3Direction;
     nlVec3Sub(v3Direction, v3Position, pBall->m_v3Position);
     nlVec3Scale(v3Direction,
         nlRecipSqrt(v3Direction.GetLengthSq3D(), true));
-    nlVec3Scale(v3Direction, lbl_806DB560);
+    nlVec3Scale(v3Direction, gBallSidelineSteeringStrength);
 
     float fSpeed = BallVelocityLength(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y, pBall->m_v3Velocity.z);
-    if (fSpeed < lbl_806DB564)
+    if (fSpeed < gMinBallSidelineSpeed)
     {
-        fSpeed = lbl_806DB564;
+        fSpeed = gMinBallSidelineSpeed;
     }
-    else if (fSpeed > lbl_806DB568)
+    else if (fSpeed > gMaxBallSidelineSpeed)
     {
-        fSpeed = lbl_806DB568;
+        fSpeed = gMaxBallSidelineSpeed;
     }
 
     nlVector3 v3Velocity;
@@ -2268,7 +2268,7 @@ void cBall::Update(float fDeltaT)
 
         if (bIsGameplay)
         {
-            if (lbl_806DB5A8
+            if (gHeaderTargetEnabled
                 && meBallState != BALL_STATE_SHOT
                 && meBallState != BALL_STATE_CHIP_SHOT
                 && meBallState != BALL_STATE_SKILLSHOT
@@ -2296,14 +2296,14 @@ void cBall::Update(float fDeltaT)
             {
                 KillHeaderTarget(this, false);
                 sHeaderTargetVisible = false;
-                tHeaderTargetTimer.SetSeconds(lbl_806DB5AC);
+                tHeaderTargetTimer.SetSeconds(gHeaderTargetRedisplayDelay);
             }
         }
         else
         {
             KillHeaderTarget(this, false);
             sHeaderTargetVisible = false;
-            tHeaderTargetTimer.SetSeconds(lbl_806DB5B0);
+            tHeaderTargetTimer.SetSeconds(gHeaderTargetInitialDelay);
         }
 
         if (meBallState != BALL_STATE_VOLLEY_PASS
@@ -2499,8 +2499,8 @@ void DecayBallCharge(cBall* pBall)
     }
 
     float fValue = pBall->mfChargeValue;
-    float fChargeLoss = (g_fSimulationTick / lbl_806DB50C) * FullBallCharge();
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsWhiteBallEnabled())
+    float fChargeLoss = (g_fSimulationTick / gFullBallChargeDecayTime) * FullBallCharge();
+    if (gForceFullBallCharge || GameInfoManager::Instance()->IsWhiteBallEnabled())
     {
         pBall->mfChargeValue = 4.0f;
     }
@@ -2509,7 +2509,7 @@ void DecayBallCharge(cBall* pBall)
         pBall->mfChargeValue = fValue - fChargeLoss;
     }
 
-    float fMaxCharge = lbl_806DB510 * FullBallCharge();
+    float fMaxCharge = gMaxBallChargeScale * FullBallCharge();
     fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
@@ -2539,8 +2539,8 @@ void PredictBallPosition(
     float gravity = pBall->m_pPhysicsBall->m_gravity;
     float g;
     float k;
-    k = lbl_806DB584 * airResistance;
-    g = lbl_806DB588 * gravity;
+    k = gBallPredictionAirResistanceScale * airResistance;
+    g = gBallPredictionGravityScale * gravity;
     float eToTheNegativeKT = Exp(-k * fTime);
     float oneMinusEToTheNegativeKTOverK
         = (1.0f / k) * (1.0f - eToTheNegativeKT);
@@ -2603,8 +2603,8 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
             return -9999.9f;
         }
 
-        float k = lbl_806DB584 * m_pPhysicsBall->GetBallAirResistance();
-        float g = lbl_806DB588 * m_pPhysicsBall->GetGravity();
+        float k = gBallPredictionAirResistanceScale * m_pPhysicsBall->GetBallAirResistance();
+        float g = gBallPredictionGravityScale * m_pPhysicsBall->GetGravity();
         float eToTheNegativeKT = Exp(-k * fTime);
         float oneOverK = 1.0f / k;
         float oneMinusEToTheNegativeKTOverK
@@ -2633,11 +2633,11 @@ void ResetBall(cBall* pBall, bool bParam)
     nlVector3 v3Pos = { 0.0f, 0.0f, 0.18f };
     if (g_pTeams[0]->m_nScore == 0 && g_pTeams[1]->m_nScore == 0)
     {
-        v3Pos.z = lbl_806E0BC8;
+        v3Pos.z = gInitialKickoffBallHeight;
     }
 
     float fChargeValue = 0.0f;
-    if (lbl_806DB544)
+    if (gPreserveBallChargeOnReset)
     {
         fChargeValue = pBall->mfChargeValue;
     }
@@ -2722,11 +2722,11 @@ void ResetBall(cBall* pBall, bool bParam)
         pBall->mtShotClockTimer.SetSeconds(0.0f);
     }
 
-    if (lbl_806DB544 && bParam)
+    if (gPreserveBallChargeOnReset && bParam)
     {
         SetBallCharge(pBall, fChargeValue);
     }
-    else if (lbl_806E0BC4)
+    else if (gRandomizeBallChargeOnReset)
     {
         SetBallCharge(pBall, nlRandomf(4.0f));
     }
@@ -2756,9 +2756,9 @@ void RegisterBallEventCallbacks()
     FindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
     FindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
 
-    lbl_806E0C10 = 0;
+    gNumBallTrails = 0;
     unsigned int i = 0;
-    LiveBallTrail* pBallTrail = lbl_8056B518;
+    LiveBallTrail* pBallTrail = gBallTrails;
     for (; i < 10; ++i)
     {
         pBallTrail->visible = false;
@@ -2768,7 +2768,7 @@ void RegisterBallEventCallbacks()
                 (unsigned long)pBallTrail, NULL);
             if (pBallTrail->blurHandler != NULL)
             {
-                pBallTrail->blurHandler->Die(lbl_806DB54C);
+                pBallTrail->blurHandler->Die(gBallTrailFadeTime);
                 pBallTrail->blurHandler = NULL;
             }
         }
@@ -2929,19 +2929,19 @@ void OnBallKickoff()
     }
 
     float fSpeedX
-        = nlRandomf(lbl_806DB548 * lbl_806E0BD8)
-        + lbl_806DB548 * (1.0f - lbl_806E0BD8);
+        = nlRandomf(gKickoffBallLongitudinalSpeed * gKickoffBallSpeedRandomness)
+        + gKickoffBallLongitudinalSpeed * (1.0f - gKickoffBallSpeedRandomness);
     float fSpreadY
-        = nlRandomf(lbl_806E0BD0 * lbl_806E0BD8)
-        + lbl_806E0BD0 * (1.0f - lbl_806E0BD8);
+        = nlRandomf(gKickoffBallLateralSpeedRange * gKickoffBallSpeedRandomness)
+        + gKickoffBallLateralSpeedRange * (1.0f - gKickoffBallSpeedRandomness);
 
     nlVector3 v3Velocity = { fSpeedX, 0.0f, 0.0f };
     v3Velocity.y
         = 0.5f * fSpreadY - nlRandomf(fSpreadY);
     v3Velocity.x = 0.0f;
     v3Velocity.z
-        = 0.75f * lbl_806E0BD4
-        + nlRandomf(0.25f * lbl_806E0BD4);
+        = 0.75f * gKickoffBallVerticalSpeed
+        + nlRandomf(0.25f * gKickoffBallVerticalSpeed);
 
     g_pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
 }
@@ -3138,23 +3138,23 @@ void OnBallPatchCollision(PhysicsPatch* pPatch)
     g_pBall->m_pPhysicsBall->GetLinearVelocity(&v3Velocity);
     v3Velocity.z = 0.0f;
     float fLengthSquared = v3Velocity.GetLengthSq3D();
-    if (fLengthSquared < lbl_806DB5A0 * lbl_806DB5A0)
+    if (fLengthSquared < gLavaBallRandomDirectionSpeedThreshold * gLavaBallRandomDirectionSpeedThreshold)
     {
-        MakeRandomDirection2D(v3Velocity, lbl_806DB59C);
+        MakeRandomDirection2D(v3Velocity, gMaxLavaBallHorizontalSpeed);
     }
     else
     {
         float fLength = nlSqrt(fLengthSquared, true);
-        if (fLength > lbl_806DB59C)
+        if (fLength > gMaxLavaBallHorizontalSpeed)
         {
-            fLength = lbl_806DB59C;
+            fLength = gMaxLavaBallHorizontalSpeed;
         }
         nlVec3Scale(v3Velocity,
             nlRecipSqrt(v3Velocity.GetLengthSq3D(), false));
-        nlVec3Scale(v3Velocity, fLength * lbl_806DB594);
+        nlVec3Scale(v3Velocity, fLength * gLavaBallHorizontalSpeedScale);
     }
 
-    v3Velocity.z = lbl_806DB598;
+    v3Velocity.z = gLavaBallVerticalSpeed;
     g_pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
 }
 
@@ -3257,7 +3257,7 @@ void OnBallStateChange(int previousState, int currentState)
         cBall* pBall = g_pBall;
         if (IsDryBonesSkillshot(pBall))
         {
-            if (lbl_806E0BCC
+            if (gForceFullBallCharge
                 || GameInfoManager::Instance()->IsWhiteBallEnabled())
             {
                 pBall->mfChargeValue = 4.0f;
@@ -3268,7 +3268,7 @@ void OnBallStateChange(int previousState, int currentState)
             }
 
             float fMaxChargeScale = 4.0f;
-            float fMaxCharge = lbl_806DB510 * fMaxChargeScale;
+            float fMaxCharge = gMaxBallChargeScale * fMaxChargeScale;
             if (pBall->mfChargeValue >= fMaxCharge)
             {
                 pBall->mfChargeValue = fMaxCharge;
@@ -3309,7 +3309,7 @@ void OnBallStateChange(int previousState, int currentState)
     }
 }
 
-static unsigned short lbl_806DB5C0 = 0xFFFF;
+static unsigned short sBallDebugType = 0xFFFF;
 char gTweakFloatBindingFormat[] __attribute__((aligned(4))) = "%.3f";
 
 inline void RegisterBallDebugFields(cBall* ball, DebugWriteCache* cache)
@@ -3403,14 +3403,14 @@ inline void RegisterBallDebugFields(cBall* ball, DebugWriteCache* cache)
 
 void cBall::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DB5C0 == 0xFFFF)
+    if (sBallDebugType == 0xFFFF)
     {
-        lbl_806DB5C0 = cache->BeginType("DetBall");
+        sBallDebugType = cache->BeginType("DetBall");
         RegisterBallDebugFields(this, cache);
         cache->EndType();
     }
 
-    cBall* copy = (cBall*)cache->WriteData(lbl_806DB5C0, this, offsetof(cBall, m_pBlurHandler));
+    cBall* copy = (cBall*)cache->WriteData(sBallDebugType, this, offsetof(cBall, m_pBlurHandler));
     if (copy != NULL)
     {
         *(int*)&copy->m_pOwner
@@ -3425,7 +3425,7 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
             = m_pShooter == NULL ? -1 : m_pShooter->m_nCharacterIndex;
         *(int*)&copy->mpDamageTarget
             = mpDamageTarget == NULL ? -1 : mpDamageTarget->m_nCharacterIndex;
-        cache->ChecksumData(lbl_806DB5C0, copy, context);
+        cache->ChecksumData(sBallDebugType, copy, context);
     }
 }
 
@@ -3458,7 +3458,7 @@ LiveBallTrail::~LiveBallTrail()
 {
     if (blurHandler != NULL)
     {
-        blurHandler->Die(lbl_806DB54C);
+        blurHandler->Die(gBallTrailFadeTime);
         blurHandler = NULL;
     }
 }
@@ -3472,7 +3472,7 @@ void SetBallTrailVisible(LiveBallTrail* pBallTrail, bool bParam)
             (unsigned long)pBallTrail, NULL);
         if (pBallTrail->blurHandler != NULL)
         {
-            pBallTrail->blurHandler->Die(lbl_806DB54C);
+            pBallTrail->blurHandler->Die(gBallTrailFadeTime);
             pBallTrail->blurHandler = NULL;
         }
     }
@@ -3566,7 +3566,7 @@ void InitializeMegaStrikeBallTrail(
 
     if (pBallTrail->blurHandler != NULL)
     {
-        pBallTrail->blurHandler->Die(lbl_806DB54C);
+        pBallTrail->blurHandler->Die(gBallTrailFadeTime);
         pBallTrail->blurHandler = NULL;
     }
 
@@ -3636,20 +3636,20 @@ void InitializeMegaStrikeBallTrail(
 
     pBallTrail->blurHandler = BlurManager::GetNewHandler(
         textureName,
-        0.18f * lbl_806DB550 * 0.925f,
-        lbl_806DB554,
+        0.18f * gBallTrailWidthScale * 0.925f,
+        gBallTrailMaxPositionEntries,
         true);
 }
 
 LiveBallTrail* GetBallTrail(unsigned int nIndex)
 {
-    return &lbl_8056B518[nIndex];
+    return &gBallTrails[nIndex];
 }
 
 void UpdateBallTrails(float fParam)
 {
-    LiveBallTrail* pBallTrail = lbl_8056B518;
-    for (unsigned int i = 0; i < lbl_806E0C10; ++i)
+    LiveBallTrail* pBallTrail = gBallTrails;
+    for (unsigned int i = 0; i < gNumBallTrails; ++i)
     {
         if (pBallTrail->visible)
         {
@@ -3661,18 +3661,18 @@ void UpdateBallTrails(float fParam)
 
 unsigned int GetNumBallTrails()
 {
-    return lbl_806E0C10;
+    return gNumBallTrails;
 }
 
 void InitializeBallTrails(unsigned int nNumTrails)
 {
-    lbl_806E0C10 = nNumTrails;
+    gNumBallTrails = nNumTrails;
     nlVector3 v3ZeroValue = v3Zero;
 
     unsigned int i = 0;
     for (; i < nNumTrails; ++i)
     {
-        LiveBallTrail* pBallTrail = &lbl_8056B518[i];
+        LiveBallTrail* pBallTrail = &gBallTrails[i];
         SetBallTrailVisible(pBallTrail, false);
         pBallTrail->position = v3ZeroValue;
         pBallTrail->velocity = v3ZeroValue;
@@ -3681,9 +3681,9 @@ void InitializeBallTrails(unsigned int nNumTrails)
 
     for (; i < 10; ++i)
     {
-        LiveBallTrail* pBallTrail = &lbl_8056B518[i];
+        LiveBallTrail* pBallTrail = &gBallTrails[i];
         SetBallTrailVisible(pBallTrail, false);
     }
 }
 
-unsigned int lbl_806E0C10 = 0;
+unsigned int gNumBallTrails = 0;
