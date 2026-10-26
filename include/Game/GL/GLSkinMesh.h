@@ -24,7 +24,7 @@ public:
     GLSkinMesh()
         : pModel(0)
         , mHierarchyID(0)
-        , m_Unknown0C(0)
+        , modelIndex(0)
         , mMorphWeights(0)
         , numMorphs(0)
         , mNumActiveMorphs(0)
@@ -46,7 +46,7 @@ public:
 
     /* 0x04 */ glModel* pModel;
     /* 0x08 */ unsigned long mHierarchyID;
-    /* 0x0C */ int m_Unknown0C;
+    /* 0x0C */ int modelIndex;
     /* 0x10 */ GLMorphWeight* mMorphWeights;
     /* 0x14 */ unsigned long numMorphs;
     /* 0x18 */ unsigned long mNumActiveMorphs;

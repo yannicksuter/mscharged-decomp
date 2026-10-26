@@ -51,7 +51,7 @@ ImpostorModel::ImpostorModel(cSHierarchy& hierarchy,
             modelID, &hierarchy);
         if (mSkinMesh != 0)
         {
-            mSkinMesh->m_Unknown0C = 1;
+            mSkinMesh->modelIndex = 1;
         }
     }
 
@@ -85,7 +85,7 @@ ImpostorModel::ImpostorModel(cSHierarchy& hierarchy,
             modelID, &hierarchy);
         if (mSkinMesh != 0)
         {
-            mSkinMesh->m_Unknown0C = 1;
+            mSkinMesh->modelIndex = 1;
         }
     }
 
@@ -259,7 +259,7 @@ void ImpostorModel::ResolveTextures()
         glModelPacket* packet;
         for (int i = 0; i < 2; ++i)
         {
-            mSkinMesh->m_Unknown0C = i;
+            mSkinMesh->modelIndex = i;
             if (mSkinMesh->GetModel() != 0)
             {
                 for (packet = mSkinMesh->GetModel()->packets;
@@ -281,7 +281,7 @@ void ImpostorModel::ResolveTextures()
                 }
             }
         }
-        mSkinMesh->m_Unknown0C = modelIndex;
+        mSkinMesh->modelIndex = modelIndex;
     }
     mTexturesResolved = true;
 }

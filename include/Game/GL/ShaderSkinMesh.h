@@ -74,7 +74,7 @@ public:
     GLSkinMesh()
         : pModel(0)
         , hierarchySignature(0)
-        , m_Unknown0C(0)
+        , modelIndex(0)
         , morphWeights(0)
         , numMorphs(0)
         , numActiveMorphs(0)
@@ -90,7 +90,7 @@ public:
     virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex) = 0;
 
     unsigned long GetNumPackets() { return GetModel()->GetNumPackets(); }
-    int GetModelIndex() const { return m_Unknown0C; }
+    int GetModelIndex() const { return modelIndex; }
 
     void SetNumMorphs(unsigned long count);
     void SetMorphID(unsigned long index, unsigned long id);
@@ -112,7 +112,7 @@ public:
 
     /* 0x04 */ glModel* pModel;
     /* 0x08 */ unsigned long hierarchySignature;
-    /* 0x0C */ int m_Unknown0C;
+    /* 0x0C */ int modelIndex;
     /* 0x10 */ MorphWeight* morphWeights;
     /* 0x14 */ unsigned long numMorphs;
     /* 0x18 */ unsigned long numActiveMorphs;
@@ -163,7 +163,7 @@ public:
     virtual glModel* GetModel()
     {
         bool softwareSkinning = false;
-        if (!rigidSkin && m_Unknown0C == 0)
+        if (!rigidSkin && modelIndex == 0)
         {
             softwareSkinning = true;
         }
