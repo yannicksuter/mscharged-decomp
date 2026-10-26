@@ -199,7 +199,7 @@ void RenderSnapshot::Grab()
         }
     }
     mBall.Grab();
-    mGoalLight = lbl_806E1960;
+    mGoalLight = gStadiumGoalLightEnabled;
     if (NetMesh::s_bAnimatedNetMeshEnabled)
     {
         if (mpNetMeshPositiveX != 0)
