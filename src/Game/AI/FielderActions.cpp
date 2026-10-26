@@ -166,12 +166,6 @@ extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
-
-extern bool gHeaderTargetEnabled;
-
-
-
-
 extern int gHitReactAnims[3][4];
 
 extern int gShellAttackReactAnims[4];
