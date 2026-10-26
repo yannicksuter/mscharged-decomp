@@ -145,37 +145,37 @@ void ShutdownWarbleRendering(void*);
 
 void DestroyCharacters();
 
-extern SlotPool<cSAnimCallback> lbl_805840D8;
+extern SlotPool<cSAnimCallback> gSAnimCallbackPool;
 
 bool g_VerboseAudio;
 bool g_bDumpMemoryStatsOnLoad;
 float g_fScriptBlockingWarningMS = 50.0f;
 float g_fYieldScriptBlockingTimeMS = 45.0f;
 
-static const char* lbl_806E103C;
-static BaseSceneHandler* lbl_806E1040;
-static u8 lbl_806E1044;
-static u32 lbl_806E1048;
-static float lbl_806E104C;
-static WorldNPCManager* lbl_806E1050;
+static const char* sPreviousLoadingComment;
+static BaseSceneHandler* sLoadingScene;
+static u8 sIntroMovieStarted;
+static u32 sFrontEndBankLoadStartTick;
+static float sFrontEndBankLoadTimeMs;
+static WorldNPCManager* sWorldNPCManager;
 static GLResourcePool* sPersistentResourcePool;
-static int lbl_806E1058;
-static float lbl_806E105C;
-static void* lbl_806E1060;
-static void* lbl_806E1064;
-static bool lbl_806E1068;
-static bool lbl_806E1069;
-static bool lbl_806E106A;
+static int sPendingSoundBankLoads;
+static float sTotalLoadTimeMs;
+static void* sFrontEndTextureBundleData;
+static void* sFrontEndTextureBundleSize;
+static bool sPermanentFrontEndBundleLoaded;
+static bool sOnDemandFrontEndBundleLoaded;
+static bool sLoadingSoundBankLoaded;
 
-static TweakBoolBinding lbl_8056E458(
+static TweakBoolBinding sVerboseAudioBinding(
     "g_VerboseAudio", "Audio", &g_VerboseAudio, true);
-static TweakBoolBinding lbl_8056E478(
+static TweakBoolBinding sDumpMemoryStatsOnLoadBinding(
     "g_bDumpMemoryStatsOnLoad", "General/Memory",
     &g_bDumpMemoryStatsOnLoad, true);
-static TweakFloatBinding lbl_8056E498(
+static TweakFloatBinding sScriptBlockingWarningBinding(
     "g_fScriptBlockingWarningMS", "Loading",
     &g_fScriptBlockingWarningMS, true);
-static TweakFloatBinding lbl_8056E4B8(
+static TweakFloatBinding sYieldScriptBlockingTimeBinding(
     "g_fYieldScriptBlockingTimeMS", "Loading",
     &g_fYieldScriptBlockingTimeMS, true);
 
@@ -249,13 +249,13 @@ void OnAsyncSoundBankLoaded(AudioResourceLoadOwner*, void* context)
     const char* bankName = (const char*)context;
     if (nlStrCmp<char>(bankName, "FE_GEN") == 0)
     {
-        lbl_806E104C = nlGetTickerDifference(lbl_806E1048, nlGetTicker());
-        tDebugPrintManager::Print(DC_LOADER, "Loaded in %f MS big bank FE_GEN\n", lbl_806E104C);
+        sFrontEndBankLoadTimeMs = nlGetTickerDifference(sFrontEndBankLoadStartTick, nlGetTicker());
+        tDebugPrintManager::Print(DC_LOADER, "Loaded in %f MS big bank FE_GEN\n", sFrontEndBankLoadTimeMs);
     }
 
     nlPrintf("Bank load complete \"%s\"\n", bankName);
-    lbl_806E1058--;
-    nlPrintf("Remaining loads %d\n", lbl_806E1058);
+    sPendingSoundBankLoads--;
+    nlPrintf("Remaining loads %d\n", sPendingSoundBankLoads);
 }
 
 template <typename T>
@@ -309,7 +309,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 7:
         SetLoadingComment("AsyncFEGameResourceLoadFinalize");
-        if (lbl_806E1068 && lbl_806E1069)
+        if (sPermanentFrontEndBundleLoaded && sOnDemandFrontEndBundleLoaded)
         {
             FEResourceManager::Instance()->m_bPermanentBundleLoadInProgress = false;
             FinishLoadingStep(this);
@@ -322,17 +322,17 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 8:
         if (gAudioEnabled)
         {
-            lbl_806E106A = false;
+            sLoadingSoundBankLoaded = false;
             LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_TO_GAME_LOOP, 0x14,
                 OnLoadingSoundBankLoaded, (void*)"FE2GameLoop");
         }
         else
         {
-            lbl_806E106A = true;
+            sLoadingSoundBankLoaded = true;
         }
         break;
     case 9:
-        if (lbl_806E106A)
+        if (sLoadingSoundBankLoaded)
         {
             if (FEMusic::IsEnabled())
             {
@@ -348,9 +348,9 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 10:
         g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(1);
-        lbl_806E1058 += gAudioEnabled ? 2 : 0;
-        lbl_806E1048 = nlGetTicker();
-        lbl_806E104C = 0.0f;
+        sPendingSoundBankLoads += gAudioEnabled ? 2 : 0;
+        sFrontEndBankLoadStartTick = nlGetTicker();
+        sFrontEndBankLoadTimeMs = 0.0f;
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN, 0x15,
             OnAsyncSoundBankLoaded, (void*)"FE_GEN");
 #if defined(VERSION_R4QP01_REV1)
@@ -374,33 +374,33 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 12:
-        if (!lbl_806E1044)
+        if (!sIntroMovieStarted)
         {
             if (gAudioEnabled)
             {
-                lbl_806E106A = false;
+                sLoadingSoundBankLoaded = false;
                 LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x17,
                     OnLoadingSoundBankLoaded, (void*)"FE_GEN_SPLASH");
             }
         }
         else if (gAudioEnabled)
         {
-            lbl_806E106A = false;
+            sLoadingSoundBankLoaded = false;
             g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
             LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_SOUND_LOOP, 0x17,
                 OnLoadingSoundBankLoaded, (void*)"FESoundLoop");
         }
         else
         {
-            lbl_806E106A = true;
+            sLoadingSoundBankLoaded = true;
         }
         break;
     case 13:
-        if (!lbl_806E1044)
+        if (!sIntroMovieStarted)
         {
-            FinishLoadingStepOrUndo(this, lbl_806E106A);
+            FinishLoadingStepOrUndo(this, sLoadingSoundBankLoaded);
         }
-        else if (lbl_806E106A)
+        else if (sLoadingSoundBankLoaded)
         {
             MovieInit();
             if (FEMusic::IsEnabled())
@@ -438,7 +438,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
                 GameSceneManager::Instance()->GetScene(SCENE_BOOT_LOADING));
         }
 #endif
-        if (lbl_806E1068 && lbl_806E1069
+        if (sPermanentFrontEndBundleLoaded && sOnDemandFrontEndBundleLoaded
 #if defined(VERSION_R4QE01) || defined(VERSION_R4QJ01) || defined(VERSION_R4QK01)
             && (loadingScene == 0 || !loadingScene->IsBootScreenPending())
 #endif
@@ -453,15 +453,15 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     }
     case 17:
-        lbl_806E1058 += gAudioEnabled ? 1 : 0;
-        lbl_806E1048 = nlGetTicker();
-        lbl_806E104C = 0.0f;
+        sPendingSoundBankLoads += gAudioEnabled ? 1 : 0;
+        sFrontEndBankLoadStartTick = nlGetTicker();
+        sFrontEndBankLoadTimeMs = 0.0f;
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_FE_GEN_SPLASH, 0x15,
             OnAsyncSoundBankLoaded, (void*)"FE_GEN_SPLASH");
         FEAudio::SetSoundCategory(0x15);
         break;
     case 18:
-        lbl_806E1058 += gAudioEnabled ? 1 : 0;
+        sPendingSoundBankLoads += gAudioEnabled ? 1 : 0;
         g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x12);
         LoadSoundBank((GameAudio*)g_pAudioSystem, AUDIO_BANK_MUSIC_STREAMS, 0x12,
             OnAsyncSoundBankLoaded, (void*)"MUSICSTREAMS");
@@ -483,15 +483,15 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStepOrUndo(this, ApplyFuzzyByteCode());
         break;
     case 23:
-        if (lbl_806E1060 == 0)
+        if (sFrontEndTextureBundleData == 0)
         {
             StopWithUndo();
             break;
         }
-        glEndLoadTextureBundle(lbl_806E1060, (unsigned long)lbl_806E1064,
+        glEndLoadTextureBundle(sFrontEndTextureBundleData, (unsigned long)sFrontEndTextureBundleSize,
             glGetCurrentResourcePool(), 0);
-        nlFree(lbl_806E1060);
-        lbl_806E1060 = 0;
+        nlFree(sFrontEndTextureBundleData);
+        sFrontEndTextureBundleData = 0;
         FrontEnd::Initialize();
         FinishLoadingStep(this);
         break;
@@ -595,8 +595,8 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 42:
         SetLoadingComment("AsyncStartLoadingGameFE");
-        lbl_806E1060 = 0;
-        lbl_806E1064 = 0;
+        sFrontEndTextureBundleData = 0;
+        sFrontEndTextureBundleSize = 0;
         glBeginLoadTextureBundle("art/fe/fe.rlt", OnFrontEndTextureBundleLoaded, 0,
             glGetCurrentResourcePool());
         FinishLoadingStep(this);
@@ -628,7 +628,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
         else
         {
-            FinishLoadingStepOrUndo(this, lbl_806E1058 == 0);
+            FinishLoadingStepOrUndo(this, sPendingSoundBankLoads == 0);
         }
         break;
     case 48:
@@ -772,7 +772,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 80:
         SetLoadingComment("FinalizeLoadingWorldNPCs");
-        if (lbl_806E1050->UpdateModelLoading())
+        if (sWorldNPCManager->UpdateModelLoading())
         {
             SetStadiumBannerTextures();
             FinishLoadingStep(this);
@@ -892,7 +892,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     }
     case 100:
         SetLoadingComment("InitializeWorldNPCTemplates");
-        lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
+        sWorldNPCManager->LoadTemplates("ini/WorldNPCs.ini");
         break;
     case 101:
     {
@@ -1093,7 +1093,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 142:
         SetLoadingComment("StartLoadingWorldNPCs");
-        lbl_806E1050->BeginModelLoading();
+        sWorldNPCManager->BeginModelLoading();
         FinishLoadingStep(this);
         break;
     case 143:
@@ -1135,7 +1135,7 @@ AsyncLoadingManager::AsyncLoadingManager()
     mPreviousStageTick = 0;
     mSequenceStartTime = 0;
     mStageStartTick = 0;
-    lbl_806E103C = 0;
+    sPreviousLoadingComment = 0;
     SetLoadingComment("No Loading Comment");
 }
 
@@ -1296,13 +1296,13 @@ u32 UpdateAsyncLoadingSequence(AsyncLoadingManager* manager)
         return result;
     }
 
-    if (manager->mLoadingComment != lbl_806E103C)
+    if (manager->mLoadingComment != sPreviousLoadingComment)
     {
         u32 ticker = nlGetTicker();
         tDebugPrintManager::Print(DC_LOADER, "Processed %f, %s -> %s\n",
             nlGetTickerDifference(manager->mPreviousStageTick, ticker),
-            lbl_806E103C, manager->mLoadingComment);
-        lbl_806E103C = manager->mLoadingComment;
+            sPreviousLoadingComment, manager->mLoadingComment);
+        sPreviousLoadingComment = manager->mLoadingComment;
         manager->mPreviousStageTick = ticker;
     }
 
@@ -1315,11 +1315,11 @@ u32 UpdateAsyncLoadingSequence(AsyncLoadingManager* manager)
 
     if (completed)
     {
-        lbl_806E105C = nlGetTimeDifference(manager->mSequenceStartTime, nlGetTime());
+        sTotalLoadTimeMs = nlGetTimeDifference(manager->mSequenceStartTime, nlGetTime());
         char buffer[200];
-        nlSNPrintf(buffer, sizeof(buffer), "Total Load Time %f MS\n", lbl_806E105C);
+        nlSNPrintf(buffer, sizeof(buffer), "Total Load Time %f MS\n", sTotalLoadTimeMs);
         tDebugPrintManager::Print(DC_LOADER, buffer);
-        SmokeTestLogGraphValue("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
+        SmokeTestLogGraphValue("Total Load Time", "seconds", sTotalLoadTimeMs / 1000.0f);
     }
     return result;
 }
@@ -1327,7 +1327,7 @@ u32 UpdateAsyncLoadingSequence(AsyncLoadingManager* manager)
 static inline void BeginLoadingSequence(AsyncLoadingManager* manager, u32 state)
 {
     manager->mSequenceState = state;
-    lbl_806E103C = 0;
+    sPreviousLoadingComment = 0;
     manager->mPreviousStageTick = nlGetTicker();
     manager->mSequenceStartTime = nlGetTime();
 }
@@ -1354,7 +1354,7 @@ void BeginGameToFrontEndLoading(AsyncLoadingManager* manager)
 
 void BeginGameToTitleLoading(AsyncLoadingManager* manager)
 {
-    lbl_806E1044 = false;
+    sIntroMovieStarted = false;
     BeginLoadingSequence(manager, ASYNC_LOADING_GAME_TO_FE_BEGIN);
 }
 
@@ -1397,7 +1397,7 @@ void DestroyFrontEndFast(AsyncLoadingManager* manager)
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
     cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
-    lbl_805840D8.FreeBlocks();
+    gSAnimCallbackPool.FreeBlocks();
     if (g_bTweaking)
     {
         ToggleTweaking();
@@ -1451,9 +1451,9 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
     BaseSceneHandler* scene = GameSceneManager::Instance()->Push(SCENE_NAVIGATION, SCREEN_NOTHING, false);
     FESceneManager::Instance()->SetTopMostScene(scene);
     SetPointerEnabled(false);
-    if (!lbl_806E1044)
+    if (!sIntroMovieStarted)
     {
-        lbl_806E1044 = true;
+        sIntroMovieStarted = true;
         GameSceneManager::Instance()->Push(SCENE_INTRO_MOVIE, SCREEN_NOTHING, false);
         FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
     }
@@ -1590,7 +1590,7 @@ void InitializeFrontEndState2(AsyncLoadingManager* manager)
 
     GameInfoManager::Instance()->mFrontEndReturnMode = 0;
     manager->mLoadingState = ASYNC_RESOURCES_LOADED;
-    lbl_806E1040->SetVisible(false);
+    sLoadingScene->SetVisible(false);
     ResetHallOfFameImagePreload();
     FinishLoadingStep(manager);
 }
@@ -1675,7 +1675,7 @@ void DestroyFrontEndState(AsyncLoadingManager* manager)
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
     cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
-    lbl_805840D8.FreeBlocks();
+    gSAnimCallbackPool.FreeBlocks();
     if (g_bTweaking)
     {
         ToggleTweaking();
@@ -1737,10 +1737,10 @@ void InitializeGameState1(AsyncLoadingManager* manager)
     ReplayManager::Instance()->Initialize();
     manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
-    lbl_806E1050 = new (8, false) WorldNPCManager;
-    lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
-    lbl_806E1050->mModelCallback = SetImpostorShadowLevel;
-    lbl_806E1050->mRenderFilter = ShouldRenderStadiumNPC;
+    sWorldNPCManager = new (8, false) WorldNPCManager;
+    sWorldNPCManager->LoadTemplates("ini/WorldNPCs.ini");
+    sWorldNPCManager->mModelCallback = SetImpostorShadowLevel;
+    sWorldNPCManager->mRenderFilter = ShouldRenderStadiumNPC;
     FinishLoadingStep(manager);
 }
 
@@ -1776,8 +1776,8 @@ void InitializeGameState2(AsyncLoadingManager* manager)
 
 void OnFrontEndTextureBundleLoaded(void* value0, unsigned long value1, void*)
 {
-    lbl_806E1060 = value0;
-    lbl_806E1064 = (void*)value1;
+    sFrontEndTextureBundleData = value0;
+    sFrontEndTextureBundleSize = (void*)value1;
 }
 
 void StartAsyncGameWorldLoading(AsyncLoadingManager* manager)
@@ -1786,7 +1786,7 @@ void StartAsyncGameWorldLoading(AsyncLoadingManager* manager)
     int stadium = GameInfoManager::Instance()->GetStadium();
     LoadStadium(GetStadiumName(stadium), false);
     fxSetTerrain(nlStringLowerHash(GetStadiumTerrain(stadium)));
-    lbl_806E1058 += gAudioEnabled ? 7 : 0;
+    sPendingSoundBankLoads += gAudioEnabled ? 7 : 0;
     GameAudio* audio = static_cast<GameAudio*>(g_pAudioSystem);
     LoadSoundBank(audio, GetStadiumAudioBank(stadium), 0xB, OnAsyncSoundBankLoaded, (void*)"STAD_*");
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_STAD_GEN, 0xA, OnAsyncSoundBankLoaded, (void*)"STAD_GEN");
@@ -1844,7 +1844,7 @@ void InitializeInGameFrontEnd(AsyncLoadingManager* manager)
     manager->SetLoadingComment("InitializeGameStateInGameFE1");
     g_pOverlayManager->Push(OVERLAY_IN_GAME_TEXT, SCREEN_NOTHING, false);
     g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
-    lbl_806E1058 += gAudioEnabled ? 2 : 0;
+    sPendingSoundBankLoads += gAudioEnabled ? 2 : 0;
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_GEN, 0xF, OnAsyncSoundBankLoaded, (void*)"HUD_GEN");
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), AUDIO_BANK_HUD_PU, 0x10, OnAsyncSoundBankLoaded, (void*)"HUD_PU");
     FEAudio::SetSoundCategory(0xF);
@@ -1882,7 +1882,7 @@ void FinalizeGameStateLoading(AsyncLoadingManager* manager)
     UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
 
     manager->mLoadingState = ASYNC_RESOURCES_LOADED;
-    lbl_806E1040->SetVisible(false);
+    sLoadingScene->SetVisible(false);
     g_pNetworkSession->mGameLoadComplete = true;
 
     float mem1Free = (float)StandardAllocator.TotalFreeMemory();
@@ -2053,7 +2053,7 @@ void DestroyGameState(AsyncLoadingManager* manager)
     }
 
     nlFree(g_pLocalization->m_pFile);
-    delete lbl_806E1050;
+    delete sWorldNPCManager;
     DestroyPadBackends();
 
     cPN_SAnimController::m_SAnimControllerSlotPool.FreeBlocks();
@@ -2061,7 +2061,7 @@ void DestroyGameState(AsyncLoadingManager* manager)
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
     cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
-    lbl_805840D8.FreeBlocks();
+    gSAnimCallbackPool.FreeBlocks();
 
     if (g_bTweaking)
     {
@@ -2113,9 +2113,9 @@ void InitializeLegalScreenAndMovies(AsyncLoadingManager* manager)
 void BeginAsyncFrontEndResourceLoad(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("AsyncFEResourceLoadBeing");
-    lbl_806E1068 = false;
-    lbl_806E1069 = false;
-    if (!lbl_806E1044)
+    sPermanentFrontEndBundleLoaded = false;
+    sOnDemandFrontEndBundleLoaded = false;
+    if (!sIntroMovieStarted)
     {
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
@@ -2133,25 +2133,25 @@ void BeginAsyncFrontEndResourceLoad(AsyncLoadingManager* manager)
     if (GameSceneManager::s_pInstance == 0)
     {
         CreateInstance(GameSceneManager::s_pInstance);
-        if (!lbl_806E1044)
+        if (!sIntroMovieStarted)
         {
             if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
             {
-                lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING_JPN, SCREEN_NOTHING, false);
+                sLoadingScene = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING_JPN, SCREEN_NOTHING, false);
             }
             else
             {
-                lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING, SCREEN_NOTHING, false);
+                sLoadingScene = GameSceneManager::Instance()->Push(SCENE_BOOT_LOADING, SCREEN_NOTHING, false);
             }
         }
         else
         {
-            lbl_806E1040 = GameSceneManager::Instance()->Push(SCENE_ASYNC_LOADING, SCREEN_NOTHING, false);
+            sLoadingScene = GameSceneManager::Instance()->Push(SCENE_ASYNC_LOADING, SCREEN_NOTHING, false);
         }
     }
     FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/MainUI.Dmn", OnPermanentFrontEndBundleLoaded);
-    lbl_806E1068 = false;
-    lbl_806E1069 = true;
+    sPermanentFrontEndBundleLoaded = false;
+    sOnDemandFrontEndBundleLoaded = true;
     CreatePadBackends();
     EnableAutoPressed();
 }
@@ -2159,8 +2159,8 @@ void BeginAsyncFrontEndResourceLoad(AsyncLoadingManager* manager)
 void BeginAsyncInGameFrontEndResourceLoad(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("AsyncFEGameResourceLoadBegin");
-    lbl_806E1068 = false;
-    lbl_806E1069 = false;
+    sPermanentFrontEndBundleLoaded = false;
+    sOnDemandFrontEndBundleLoaded = false;
     InitializeFunctionMemory();
     PushFunctionMemoryState();
     PushEventConnectionState();
@@ -2171,14 +2171,14 @@ void BeginAsyncInGameFrontEndResourceLoad(AsyncLoadingManager* manager)
     if (g_e3_Build)
     {
         LoadFEMiniBundle("art/fe/LoadingUIE3.res");
-        lbl_806E1040 = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
+        sLoadingScene = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
     }
     else
     {
         LoadFEMiniBundle("art/fe/GameLoadingUI.res");
-        lbl_806E1040 = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
+        sLoadingScene = g_pOverlayManager->Push(SCENE_WIDESCREEN_LOADING, SCREEN_NOTHING, false);
     }
-    FESceneManager::Instance()->SetTopMostScene(lbl_806E1040);
+    FESceneManager::Instance()->SetTopMostScene(sLoadingScene);
     FEResourceManager::Instance()->m_bPermanentBundleLoadInProgress = true;
     FEResourceManager::Instance()->LoadPermanentResourceBundle("art/fe/InGameUI.Res", OnPermanentFrontEndBundleLoaded);
     FEResourceManager::Instance()->OpenOnDemandResourceBundle("art/fe/InGameUI.Dmn", OnOnDemandFrontEndBundleLoaded);
@@ -2186,17 +2186,17 @@ void BeginAsyncInGameFrontEndResourceLoad(AsyncLoadingManager* manager)
 
 void OnLoadingSoundBankLoaded(AudioResourceLoadOwner*, void*)
 {
-    lbl_806E106A = true;
+    sLoadingSoundBankLoaded = true;
 }
 
 void OnPermanentFrontEndBundleLoaded()
 {
-    lbl_806E1068 = true;
+    sPermanentFrontEndBundleLoaded = true;
 }
 
 void OnOnDemandFrontEndBundleLoaded(void*, unsigned long, unsigned long)
 {
-    lbl_806E1069 = true;
+    sOnDemandFrontEndBundleLoaded = true;
 }
 
 void AsyncLoadingManager::LoadTrophyTemplates()
@@ -2255,7 +2255,7 @@ void InitializeStadiumViewer(AsyncLoadingManager* manager)
     GameInfoManager::Instance()->SetupGameFromConfig();
     ReplayManager::Instance()->Initialize();
     CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
-    lbl_806E1050 = new (8, false) WorldNPCManager;
+    sWorldNPCManager = new (8, false) WorldNPCManager;
     manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
 }
