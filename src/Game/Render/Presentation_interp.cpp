@@ -66,9 +66,9 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 2:
-        ++lbl_806E2130;
+        ++gGameplayContextDepth;
         g_pGame->CleanupMegaStrikeGameplay();
-        --lbl_806E2130;
+        --gGameplayContextDepth;
         break;
     case 3:
     {
@@ -230,10 +230,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 25:
-        ++lbl_806E2130;
+        ++gGameplayContextDepth;
         gpNumberDisplay->mVisible = false;
         g_pGame->InitMegaStrikeGameplay();
-        --lbl_806E2130;
+        --gGameplayContextDepth;
         break;
     case 26:
     {

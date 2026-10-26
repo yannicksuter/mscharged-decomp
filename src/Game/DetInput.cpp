@@ -16,7 +16,7 @@ static u8 PadPressureToByte(float pressure)
 }
 
 u16 gDetInputDebugType = 0xFFFF;
-int lbl_806E2130;
+int gGameplayContextDepth;
 
 u8 DetInput::GetConnectionStatus()
 {

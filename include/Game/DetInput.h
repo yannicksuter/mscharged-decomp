@@ -68,6 +68,6 @@ public:
 }; // size: 0x8C
 
 extern u16 gDetInputDebugType;
-extern int lbl_806E2130;
+extern int gGameplayContextDepth;
 
 #endif // GAME_DET_INPUT_H

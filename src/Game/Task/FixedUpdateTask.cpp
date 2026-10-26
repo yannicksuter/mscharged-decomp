@@ -424,7 +424,7 @@ static void PostPhysicsAITask(float fDeltaT)
 
 void FixedUpdateTask::CallFixedUpdateTasks()
 {
-    ++lbl_806E2130;
+    ++gGameplayContextDepth;
     mFrame++;
     mSimulationTime += g_fSimulationTick;
 
@@ -466,6 +466,6 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     }
 
     mEventDispatcher.Dispatch(true);
-    UpdatePeachPhoto(&gPeachPhotoState, g_fSimulationTick, lbl_806E2130--);
+    UpdatePeachPhoto(&gPeachPhotoState, g_fSimulationTick, gGameplayContextDepth--);
     ReplayManager::Instance()->GrabSnapshot();
 }
