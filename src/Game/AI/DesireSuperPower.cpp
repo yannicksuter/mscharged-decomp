@@ -1554,7 +1554,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         m_pFielder->m_DetChar.m_aActualFacingDirection, gWarioGasOffset);
                     offset.z = 0.0f;
                     const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
-                        m_pFielder->m_nBip01JointIndex_0xA4);
+                        m_pFielder->m_nBip01JointIndex);
                     nlVec3Add(pos, (const nlVector3&)mat.m41, offset);
                     g_pPhysicsPatchManager->CreatePatch(PATCH_GAS_BALL, m_pFielder, pos, gSuperPowerZeroVector,
                         gWarioGasStartRadius, gWarioGasEndRadius, gWarioGasLifetime);
@@ -1709,7 +1709,7 @@ void HandleMuckBallCollision(void* context)
             g_pPhysicsPatchManager->CreatePatch(PATCH_MUCK_HOLE, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
-        event->pPatch->Unknown0();
+        event->pPatch->ResetState();
     }
 }
 

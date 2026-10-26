@@ -94,8 +94,8 @@ public:
     /* 0x15 */ bool mAwayPowerupsEnabled;
     /* 0x16 */ bool mHomeMegastrikeEnabled;
     /* 0x17 */ bool mAwayMegastrikeEnabled;
-    /* 0x18 */ bool m_unk18;
-    /* 0x19 */ bool m_unk19;
+    /* 0x18 */ bool mHomeSkillshotEnabled;
+    /* 0x19 */ bool mAwaySkillshotEnabled;
     /* 0x1A */ bool m_unk1A;
 };
 

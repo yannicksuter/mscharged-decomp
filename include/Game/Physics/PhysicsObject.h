@@ -85,7 +85,7 @@ public:
     PhysicsObject(PhysicsWorld*);
     virtual ~PhysicsObject();
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const = 0;
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PreUpdate();

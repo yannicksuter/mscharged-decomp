@@ -77,9 +77,9 @@ void PhysicsBall::RestoreBallForces()
     m_gravity = -22.5f;
 }
 
-void PhysicsBall::Unknown0()
+void PhysicsBall::ResetState()
 {
-    PhysicsObject::Unknown0();
+    PhysicsObject::ResetState();
     SetCategory(0x20);
     SetCollide(0xAF);
 

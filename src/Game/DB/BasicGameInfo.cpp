@@ -11,7 +11,7 @@ enum
     NUM_CHARACTERS = 32,
 };
 
-static CharacterValuePair kGoalieValues = { 1.5f, 2.0f };
+static CharacterShadowDimensions kGoalieValues = { 1.5f, 2.0f };
 
 static CharacterInfo sCharacterInfo[NUM_CHARACTERS + 1] = {
     { 0, "mario", "NAME_MARIO", 2, TEAM_MARIO, POWER_UP_MARIO, SK_INVALID, 7, 7, 1, 0, 0,

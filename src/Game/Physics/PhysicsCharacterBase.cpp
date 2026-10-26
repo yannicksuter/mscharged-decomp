@@ -138,9 +138,9 @@ void PhysicsCharacterBase::SetFacingDirection(unsigned short angle)
     SetRotation(rotation);
 }
 
-void PhysicsCharacterBase::Unknown0()
+void PhysicsCharacterBase::ResetState()
 {
-    PhysicsCompositeObject::Unknown0();
+    PhysicsCompositeObject::ResetState();
     for (ListEntry<PhysicsBoneVolume*>* entry = m_BoneVolumes.m_Head;
         entry != 0;
         entry = entry->next)

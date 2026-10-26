@@ -76,7 +76,7 @@ public:
     PhysicsCharacterBase(CollisionSpace*, PhysicsWorld*, float);
     virtual ~PhysicsCharacterBase();
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const;
     virtual void SyncLog(void*, DebugWriteCache*);
     virtual void UpdatePose(cPoseAccumulator*, float, bool);

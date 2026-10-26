@@ -12,7 +12,7 @@ public:
     PhysicsCharacter(float radius, float heightScale);
     virtual ~PhysicsCharacter() { }
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const { return PHYSOBJ_CHARACTER; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PostUpdate();

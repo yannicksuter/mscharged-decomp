@@ -64,9 +64,9 @@ PhysicsAIBall::PhysicsAIBall(float radius)
     m_prevPosition.z = 0.0f;
 }
 
-void PhysicsAIBall::Unknown0()
+void PhysicsAIBall::ResetState()
 {
-    PhysicsBall::Unknown0();
+    PhysicsBall::ResetState();
     m_goalieContactFramesAgo = 9999;
     mbIsInsideNet = false;
     mbGoalPlaneContact = false;

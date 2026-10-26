@@ -175,8 +175,8 @@ public:
         AnimRetargetList* pAnimRetargetList, int nIndex,
         eClassTypes eNewClassType);
     virtual void PostPhysicsUpdate();
-    virtual void PrePhysicsUpdate();
-    virtual void Unknown7(float dt);
+    virtual void EndPhysicsStep();
+    virtual void BeginPhysicsStep(float dt);
     virtual void PreUpdate(float dt);
     virtual void ResetAnimState();
     virtual void ResetEffects();
@@ -307,7 +307,7 @@ public:
     }
     /* 0x004 */ const CharacterPhysicsData* m_pPhysicsData;
     /* 0x008 */ GLSkinMesh* m_pSkinMesh[4];
-    /* 0x018 */ bool unknown_0x018[4];
+    /* 0x018 */ bool m_bSkinMeshPosed[4];
     /* 0x01C */ int m_ModelType;
     /* 0x020 */ PhysicsCharacter* m_pPhysicsCharacter;
     /* 0x024 */ DetChar m_DetChar;
@@ -320,7 +320,7 @@ public:
     /* 0x0D0 */ AnimRetargetList* m_pAnimRetargetList;
     /* 0x0D4 */ cHeadTrack* m_pHeadTrack;
     /* 0x0D8 */ int m_nHeadJointIndex;
-    /* 0x0DC */ int m_nBip01JointIndex_0xA4;
+    /* 0x0DC */ int m_nBip01JointIndex;
     /* 0x0E0 */ int m_nSpine1JointIndex;
     /* 0x0E4 */ int m_nLFootJointIndex;
     /* 0x0E8 */ int m_nRFootJointIndex;

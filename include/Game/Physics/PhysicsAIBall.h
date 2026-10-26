@@ -11,7 +11,7 @@ class PhysicsAIBall : public PhysicsBall
 public:
     PhysicsAIBall(float radius);
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const { return PHYSOBJ_AI_BALL; }
     virtual void PreUpdate();
     virtual void PostUpdate();

@@ -8,12 +8,12 @@ PhysicsTransform::PhysicsTransform()
     m_SubObject = 0;
 }
 
-void PhysicsTransform::Unknown0()
+void PhysicsTransform::ResetState()
 {
-    PhysicsObject::Unknown0();
+    PhysicsObject::ResetState();
     if (m_SubObject != 0)
     {
-        m_SubObject->Unknown0();
+        m_SubObject->ResetState();
     }
 }
 

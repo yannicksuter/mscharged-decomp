@@ -976,7 +976,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             && pFielder->mActionBooSkillshot.bFollowingBall)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
-                pFielder->m_nBip01JointIndex_0xA4);
+                pFielder->m_nBip01JointIndex);
             nlVector2 v2Delta;
             v2Delta.x = v3JointPosition.x - pFielder->m_DetChar.m_v3Position.x;
             v2Delta.y = v3JointPosition.y - pFielder->m_DetChar.m_v3Position.y;
@@ -2647,7 +2647,7 @@ void ResetBall(cBall* pBall, bool bParam)
         pBall->m_pOwner->ReleaseBall(BALL_STATE_LOOSE);
     }
 
-    pBall->m_pPhysicsBall->Unknown0();
+    pBall->m_pPhysicsBall->ResetState();
     CancelBallShotImpl(pBall, false);
 
     pBall->m_bVisible = true;

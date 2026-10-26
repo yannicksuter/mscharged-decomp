@@ -896,7 +896,7 @@ void Goalie::ActionElectrocution(float)
     }
     else
     {
-        int nNodeIndex = m_nBip01JointIndex_0xA4;
+        int nNodeIndex = m_nBip01JointIndex;
         float fWeight
             = nlMinEquals(1.0f, pController->m_fTime / 0.2f);
         while (nNodeIndex >= 0)
@@ -6270,7 +6270,7 @@ void Goalie::InitActionElectrocution()
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = gfGoalieElectrocutionAnimSpeed;
 
-        int nNodeIndex = m_nBip01JointIndex_0xA4;
+        int nNodeIndex = m_nBip01JointIndex;
         mbIsDown = true;
         m_DetPlayer.m_bSkipAnimUpdate = true;
         m_DetPlayer.m_fSkipTimer = 0.0f;

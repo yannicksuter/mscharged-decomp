@@ -1116,7 +1116,7 @@ void cPlayer::PostPhysicsUpdate()
     }
 }
 
-void cPlayer::Unknown7(float)
+void cPlayer::BeginPhysicsStep(float)
 {
     m_pPoseAccumulator->SetBuildNodeMatrixCallback(
         m_nHeadJointIndex, PlayerHeadTrackCallback, (unsigned int)this, 0);
@@ -1133,11 +1133,11 @@ void cPlayer::PreUpdate(float dt)
     m_DetPlayer.m_bCanTestController = true;
 }
 
-void cPlayer::PrePhysicsUpdate()
+void cPlayer::EndPhysicsStep()
 {
     m_pPoseAccumulator->SetBuildNodeMatrixCallback(
         m_nHeadJointIndex, NULL, 0, 0);
-    cCharacter::PrePhysicsUpdate();
+    cCharacter::EndPhysicsStep();
 }
 
 bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)

@@ -12,9 +12,9 @@ PhysicsCompositeObject::PhysicsCompositeObject(PhysicsWorld* physicsWorld)
     dBodySetData(m_bodyID, this);
 }
 
-void PhysicsCompositeObject::Unknown0()
+void PhysicsCompositeObject::ResetState()
 {
-    PhysicsObject::Unknown0();
+    PhysicsObject::ResetState();
 
     nlDLListIterator<PhysicsTransform*> iterator;
     iterator = m_Components.Begin();
@@ -22,7 +22,7 @@ void PhysicsCompositeObject::Unknown0()
     DLListEntry<PhysicsTransform*>* current = iterator.m_Curr;
     while (!nlDLRingIsEnd(head, current))
     {
-        current->entry->Unknown0();
+        current->entry->ResetState();
         if (nlDLRingIsEnd(head, current) || current == 0)
         {
             current = 0;

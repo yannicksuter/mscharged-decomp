@@ -12,7 +12,7 @@ public:
     PhysicsCompositeObject(PhysicsWorld*);
     virtual ~PhysicsCompositeObject();
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const { return PHYSOBJ_COMPOSITE; }
 
     void AdjustTransform(int componentIndex, nlMatrix4& transform,

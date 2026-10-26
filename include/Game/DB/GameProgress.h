@@ -320,8 +320,8 @@ public:
     /* 0x29 */ bool mAwayPowerupsEnabled;
     /* 0x2A */ bool mHomeMegastrikeEnabled;
     /* 0x2B */ bool mAwayMegastrikeEnabled;
-    /* 0x2C */ bool mHomeSkillshotDisabled;
-    /* 0x2D */ bool mAwaySkillshotDisabled;
+    /* 0x2C */ bool mHomeSkillshotEnabled;
+    /* 0x2D */ bool mAwaySkillshotEnabled;
     /* 0x2E */ bool mStunnedHomeGoalies;
     /* 0x2F */ bool mStunnedAwayGoalies;
     /* 0x30 */ int mCustomPowerups;

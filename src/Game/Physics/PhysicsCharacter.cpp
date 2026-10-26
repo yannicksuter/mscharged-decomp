@@ -65,7 +65,7 @@ PhysicsCharacter::PhysicsCharacter(float radius, float heightScale)
     AddObject(m_pPlayerPlayerColumn);
 }
 
-void PhysicsCharacter::Unknown0()
+void PhysicsCharacter::ResetState()
 {
     m_nDKBallStuckHackCounter = 0;
     m_CanCollideWithWall = true;
@@ -76,7 +76,7 @@ void PhysicsCharacter::Unknown0()
     m_CanCollideWithGoalLine = true;
     m_bInsideNet = false;
     m_bWasInsideNet = false;
-    PhysicsCharacterBase::Unknown0();
+    PhysicsCharacterBase::ResetState();
 }
 
 void PhysicsCharacter::DisablePhysicsColumn()

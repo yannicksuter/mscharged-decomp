@@ -277,7 +277,7 @@ float GetGameTickerMilliseconds()
 }
 void CreateGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
 {
-    ++lbl_806E2130;
+    ++gGameplayContextDepth;
 
     cGame* game = new (nlMalloc(sizeof(cGame), 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
     g_pGame = game;
@@ -319,7 +319,7 @@ void CreateGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     }
 
     FormationManager::LoadFormationSets();
-    --lbl_806E2130;
+    --gGameplayContextDepth;
     SetRenderWorldEffects(true);
     WorldDarkening::Instance().Reset();
 }
@@ -714,7 +714,7 @@ void cGame::StopGameClock()
 }
 void cGame::ResetForKickOff()
 {
-    ++lbl_806E2130;
+    ++gGameplayContextDepth;
     if (mbMegaStrikeCleanupPending)
     {
         CleanupMegaStrikeGameplay();
@@ -751,7 +751,7 @@ void cGame::ResetForKickOff()
         camera->SetForceNeutralAndNearZoom(true);
     }
     StopDisplayingElectricFence();
-    --lbl_806E2130;
+    --gGameplayContextDepth;
 }
 void cGame::StartPostResetClock(float seconds)
 {
@@ -772,7 +772,7 @@ void PostResetCallback(unsigned long, unsigned long)
 }
 void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
 {
-    ++lbl_806E2130;
+    ++gGameplayContextDepth;
     FixedUpdateTask::SetTimeScale(1.0f);
     ParticleUpdateTask::sInstance->SetTimeScale(1.0f);
 
@@ -844,7 +844,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         GetPresentation()->PlayGameBegin();
     }
 
-    --lbl_806E2130;
+    --gGameplayContextDepth;
     ReplayManager::Instance()->ResetSnapshots();
     if (IsNetworkOrRecordedGame())
     {
@@ -1383,7 +1383,7 @@ cPlayer* gPlayerDistanceSortReference;
 
 void cGame::SendPlayerVisibility()
 {
-    --lbl_806E2130;
+    --gGameplayContextDepth;
 
     if (g_pNetworkSessionBase->GetLocalMachineId() == 0
         && !gNetworkInputRecording->mPlaybackReady
@@ -1409,7 +1409,7 @@ void cGame::SendPlayerVisibility()
         GetInputRouter()->QueueDetermData(message, sizeof(message));
     }
 
-    ++lbl_806E2130;
+    ++gGameplayContextDepth;
 }
 void cGame::Update(float fDeltaT)
 {

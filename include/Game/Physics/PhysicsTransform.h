@@ -10,7 +10,7 @@ public:
     PhysicsTransform();
     virtual ~PhysicsTransform();
 
-    virtual void Unknown0();
+    virtual void ResetState();
     virtual int GetObjectType() const { return m_SubObject->GetObjectType(); }
 
     void Attach(PhysicsObject*, PhysicsObject*);
