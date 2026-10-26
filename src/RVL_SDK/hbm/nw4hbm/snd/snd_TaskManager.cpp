@@ -75,8 +75,10 @@ void TaskManager::Execute() {
 bool TaskManager::ExecuteSingle() {
     ut::AutoMutexLock lock(mMutex);
 
-    if ((mCurrentTask = PopTask(static_cast<TaskPriority>(PRIORITY_HIGH))) == NULL) {
-        if ((mCurrentTask = PopTask(static_cast<TaskPriority>(PRIORITY_MIDDLE))) == NULL) {
+    mCurrentTask = PopTask(static_cast<TaskPriority>(PRIORITY_HIGH));
+    if (mCurrentTask == NULL) {
+        mCurrentTask = PopTask(static_cast<TaskPriority>(PRIORITY_MIDDLE));
+        if (mCurrentTask == NULL) {
             if ((mCurrentTask = PopTask(static_cast<TaskPriority>(PRIORITY_LOW))) == NULL) {
                 return false;
             }

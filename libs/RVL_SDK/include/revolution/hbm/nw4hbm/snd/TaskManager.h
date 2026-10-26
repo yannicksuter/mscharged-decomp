@@ -27,7 +27,7 @@ public:
     Task* PopTask(TaskPriority priority);
 
     void Execute();
-    bool ExecuteSingle() DECOMP_DONT_INLINE;
+    bool ExecuteSingle();
 
     void CancelByTaskId(u32 taskId);
 
