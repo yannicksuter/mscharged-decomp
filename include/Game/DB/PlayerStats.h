@@ -44,9 +44,9 @@ enum eType
 enum ePlayerStats
 {
     STATS_INVALID = -1,
-    STATS_00 = 0x00,
-    STATS_01 = 0x01,
-    STATS_02 = 0x02,
+    STATS_LOW_CHARGE_SHOTS = 0x00,
+    STATS_MEDIUM_CHARGE_SHOTS = 0x01,
+    STATS_HIGH_CHARGE_SHOTS = 0x02,
     STATS_SHOTS_ON_GOAL = 0x03,
     STATS_STS_ATTEMPTS = 0x04,
     STATS_REGULAR_GOALS = 0x05,
@@ -65,8 +65,8 @@ enum ePlayerStats
     STATS_HITS_MADE = 0x12,
     STATS_ATTACK_ATTEMPTS = 0x13,
     STATS_ATTACK_SUCCESSES = 0x14,
-    STATS_15 = 0x15,
-    STATS_16 = 0x16,
+    STATS_DEKES = 0x15,
+    STATS_BALL_POSSESSION = 0x16,
     STATS_BUTTON_PRESSES = 0x17,
     STATS_GAMES_PLAYED = 0x18,
     STATS_POWERUPS_USED = 0x19,
@@ -129,7 +129,7 @@ struct PlayerStats
     /* 0x32 */ u16 mNumHitsMade;
     /* 0x34 */ u16 mNumAttackAttempts;
     /* 0x36 */ u16 mNumSteals;
-    /* 0x38 */ u16 unknown_0x38;
+    /* 0x38 */ u16 mNumDekes;
     /* 0x3C */ u32 mBallPossessionTime;
     /* 0x40 */ u32 mNumButtonPresses;
     /* 0x44 */ u16 mNumPerfectPasses;
@@ -145,9 +145,9 @@ inline int GetStatValue(const PlayerStats& stats, ePlayerStats stat)
     int value = -1;
     switch (stat)
     {
-    case STATS_00: value = stats.mNumLowChargeShots; break;
-    case STATS_01: value = stats.mNumMediumChargeShots; break;
-    case STATS_02: value = stats.mNumHighChargeShots; break;
+    case STATS_LOW_CHARGE_SHOTS: value = stats.mNumLowChargeShots; break;
+    case STATS_MEDIUM_CHARGE_SHOTS: value = stats.mNumMediumChargeShots; break;
+    case STATS_HIGH_CHARGE_SHOTS: value = stats.mNumHighChargeShots; break;
     case STATS_SHOTS_ON_GOAL: value = stats.mNumShotsOnGoal; break;
     case STATS_REGULAR_GOALS: value = stats.mNumRegularGoals; break;
     case STATS_ONE_TIMER_GOALS: value = stats.mNumOneTimerGoals; break;
@@ -172,8 +172,8 @@ inline int GetStatValue(const PlayerStats& stats, ePlayerStats stat)
     case STATS_HITS_MADE: value = stats.mNumHitsMade; break;
     case STATS_ATTACK_ATTEMPTS: value = stats.mNumAttackAttempts; break;
     case STATS_ATTACK_SUCCESSES: value = stats.mNumSteals; break;
-    case STATS_15: value = stats.unknown_0x38; break;
-    case STATS_16: value = stats.mBallPossessionTime; break;
+    case STATS_DEKES: value = stats.mNumDekes; break;
+    case STATS_BALL_POSSESSION: value = stats.mBallPossessionTime; break;
     case STATS_BUTTON_PRESSES: value = stats.mNumButtonPresses; break;
     case STATS_PERFECT_PASSES: value = stats.mNumPerfectPasses; break;
     case STATS_25: value = stats.unknown_0x46; break;

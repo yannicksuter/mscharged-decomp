@@ -421,13 +421,13 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
         return;
     }
 
-    skinMesh->m_Unknown0C = 1;
+    skinMesh->modelIndex = 1;
     if (g_bForceSoftwareSkinning
         || (nlTaskManager::m_pInstance->mCurrentState & 0x18) != 0
         || (nlTaskManager::m_pInstance->mCurrentState & 8) != 0
         || (nlTaskManager::m_pInstance->mCurrentState & 0x20000) != 0)
     {
-        skinMesh->m_Unknown0C = 0;
+        skinMesh->modelIndex = 0;
     }
     skinMesh->PrepareToRender();
     glModel* pModel = glModelDupNoStreams(skinMesh->GetModel(), false, 0);
@@ -462,13 +462,13 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     GLSkinMesh* shadowMesh = source.GetSkinMesh(3);
     if (shadowMesh != skinMesh)
     {
-        shadowMesh->m_Unknown0C = 1;
+        shadowMesh->modelIndex = 1;
         if (g_bForceSoftwareSkinning
             || (nlTaskManager::m_pInstance->mCurrentState & 0x18) != 0
             || (nlTaskManager::m_pInstance->mCurrentState & 8) != 0
             || (nlTaskManager::m_pInstance->mCurrentState & 0x20000) != 0)
         {
-            shadowMesh->m_Unknown0C = 0;
+            shadowMesh->modelIndex = 0;
         }
         shadowMesh->PrepareToRender();
         pModel = glModelDupNoStreams(shadowMesh->GetModel(), false, 0);

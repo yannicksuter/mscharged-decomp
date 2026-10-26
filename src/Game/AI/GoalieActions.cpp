@@ -4969,7 +4969,7 @@ void Goalie::InitActionPursueDeke(
         break;
     case 1:
     case 2:
-        mpLooseBallInfo = &LooseBallAnims::mUnknownD0BC;
+        mpLooseBallInfo = &LooseBallAnims::mHighPunchAttackInfo;
         break;
     case 3:
     case 4:
@@ -6402,7 +6402,7 @@ void Goalie::InitActionSTSAttack()
     }
     else
     {
-        mpLooseBallInfo = &LooseBallAnims::mUnknownD0BC;
+        mpLooseBallInfo = &LooseBallAnims::mHighPunchAttackInfo;
         float fPickupDist
             = mpLooseBallInfo->mfPickupDistance + fRadius;
         mfTargetDist = gfGoalieSTSLungeReachMargin + fPickupDist;

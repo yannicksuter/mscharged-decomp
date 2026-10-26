@@ -2649,7 +2649,7 @@ void cCharacter::ResolveTextures()
             int modelIndex = m_pSkinMesh[i]->GetModelIndex();
             for (int j = 0; j < 2; ++j)
             {
-                m_pSkinMesh[i]->m_Unknown0C = j;
+                m_pSkinMesh[i]->modelIndex = j;
                 if (m_pSkinMesh[i]->GetModel() != NULL)
                 {
                     for (packet = m_pSkinMesh[i]->GetModel()->packets;
@@ -2678,7 +2678,7 @@ void cCharacter::ResolveTextures()
                     }
                 }
             }
-            m_pSkinMesh[i]->m_Unknown0C = modelIndex;
+            m_pSkinMesh[i]->modelIndex = modelIndex;
         }
     }
     m_bTexturesResolved = true;

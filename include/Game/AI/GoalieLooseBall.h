@@ -47,7 +47,7 @@ public:
     static LooseBallInfo mLooseBallKickInfo[3];
     static LooseBallInfo mTrapBallInfo;
     static LooseBallInfo mAttackSTSInfo;
-    static LooseBallInfo mUnknownD0BC;
+    static LooseBallInfo mHighPunchAttackInfo;
     static LooseBallInfo mDiveBallInfo;
     static LooseBallInfo* mLooseBallDesperationInfo[4];
 };

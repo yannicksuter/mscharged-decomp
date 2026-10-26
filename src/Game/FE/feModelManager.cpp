@@ -707,7 +707,7 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         impostorModel->mModel = new (8, false) ImpostorModel(
             *model->mHierarchy, model->mModelID,
             model->mAnimations, model->mLoader);
-        impostorModel->mModel->mSkinMesh->m_Unknown0C = 0;
+        impostorModel->mModel->mSkinMesh->modelIndex = 0;
 
         ImpostorCharacterParams params;
         int character = handle->mModel->mModelData->cc;

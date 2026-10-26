@@ -3719,15 +3719,15 @@ void cFielder::DoRegularShooting(bool bParam)
         QueueShotAtGoalEvent(g_pGame, pShotData);
         if (nBallState != BALL_STATE_SKILLSHOT)
         {
-            ePlayerStats stat = STATS_00;
+            ePlayerStats stat = STATS_LOW_CHARGE_SHOTS;
             float fCharge = GetBallChargeBonus(g_pBall);
             if (fCharge >= 0.8f)
             {
-                stat = STATS_02;
+                stat = STATS_HIGH_CHARGE_SHOTS;
             }
             else if (fCharge >= 0.4f)
             {
-                stat = STATS_01;
+                stat = STATS_MEDIUM_CHARGE_SHOTS;
             }
             StatsTracker::Instance()->TrackStat(stat, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
         }

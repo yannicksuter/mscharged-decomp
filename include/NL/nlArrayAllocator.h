@@ -19,12 +19,12 @@ public:
     void Init(T* mem, unsigned long count)
     {
         m_pFree = mem;
-        m_Unknown04 = mem;
+        m_pMemory = mem;
         for (unsigned long i = 0; i < count - 1; ++i)
         {
-            *(T**)(m_Unknown04 + i) = m_Unknown04 + i + 1;
+            *(T**)(m_pMemory + i) = m_pMemory + i + 1;
         }
-        *(T**)(m_Unknown04 + count - 1) = 0;
+        *(T**)(m_pMemory + count - 1) = 0;
     }
 
     T* Allocate()
@@ -70,7 +70,7 @@ public:
     }
 
     T* m_pFree;
-    T* m_Unknown04;
+    T* m_pMemory;
 };
 
 template <typename T, int N>
@@ -80,7 +80,7 @@ public:
     nlStaticArrayAllocator()
     {
         this->m_pFree = 0;
-        this->m_Unknown04 = 0;
+        this->m_pMemory = 0;
         this->Init(reinterpret_cast<T*>(m_Memory), N);
     }
 

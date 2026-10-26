@@ -325,7 +325,7 @@ void cPlayer::UpdateGameplayTimers(float fDeltaT)
         if (m_pBall != NULL)
         {
             m_DetPlayer.m_tBallPossessionTimer.Countup(fDeltaT, 10.0f);
-            StatsTracker::Instance()->TrackStat(STATS_16, m_pTeam->m_nSide, m_DetPlayer.m_ID, 100.0f * fDeltaT, 0, 0, 0);
+            StatsTracker::Instance()->TrackStat(STATS_BALL_POSSESSION, m_pTeam->m_nSide, m_DetPlayer.m_ID, 100.0f * fDeltaT, 0, 0, 0);
         }
         else
         {

@@ -38,8 +38,8 @@ void Simulator::SimulateGame()
 
     int possession = RandomRange(0, 15) + 10;
     possession += RandomRange(0, 100 - possession * 2);
-    StatsTracker::Track(STATS_16, 0, 0, possession, 0, 0, 0);
-    StatsTracker::Track(STATS_16, 1, 0, 100 - possession, 0, 0, 0);
+    StatsTracker::Track(STATS_BALL_POSSESSION, 0, 0, possession, 0, 0, 0);
+    StatsTracker::Track(STATS_BALL_POSSESSION, 1, 0, 100 - possession, 0, 0, 0);
 
     for (int team = 0; team < 2; team++)
     {

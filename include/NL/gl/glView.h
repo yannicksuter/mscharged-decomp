@@ -135,7 +135,7 @@ public:
     bool m_Visible;
     u8 m_Pad41[3];
     const char* m_Name;
-    unsigned long m_Unknown48;
+    unsigned long m_LayerID;
     unsigned long m_TriangleCount;
     GLViewInterface* m_Interface;
     GLView* m_Parent;

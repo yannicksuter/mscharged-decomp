@@ -150,7 +150,7 @@ static u32 sCountryCode;
 #endif
 GameAudio* g_pGameAudio;
 bool g_e3_Build;
-bool gUseAlternateTitleScreen;
+bool gOverrideTitleSceneFile;
 nlLocalization::nlLanguage g_Language;
 static s32 sLastVirtualFreeDelta;
 static float sAverageVirtualFreeDelta;

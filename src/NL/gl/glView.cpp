@@ -255,7 +255,7 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
     m_Unknown38 = 0;
     m_Unknown3C = 0;
     m_Name = s_UninitializedViewName;
-    m_Unknown48 = 0;
+    m_LayerID = 0;
     m_TriangleCount = 0;
     m_Interface = interface;
     m_Parent = 0;
@@ -301,7 +301,7 @@ inline GLView::GLView()
     m_Unknown38 = 0;
     m_Unknown3C = 0;
     m_Name = s_UninitializedViewName;
-    m_Unknown48 = 0;
+    m_LayerID = 0;
     m_TriangleCount = 0;
     m_Interface = &gDefaultViewInterface;
     m_Parent = 0;

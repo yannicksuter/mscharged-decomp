@@ -7,7 +7,7 @@
 LooseBallInfo LooseBallAnims::mLooseBallKickInfo[3];
 LooseBallInfo LooseBallAnims::mTrapBallInfo;
 LooseBallInfo LooseBallAnims::mAttackSTSInfo;
-LooseBallInfo LooseBallAnims::mUnknownD0BC;
+LooseBallInfo LooseBallAnims::mHighPunchAttackInfo;
 LooseBallInfo LooseBallAnims::mDiveBallInfo;
 LooseBallInfo* LooseBallAnims::mLooseBallDesperationInfo[4];
 
@@ -83,7 +83,7 @@ void LooseBallAnims::Init(cPlayer* pPlayer)
 
     mTrapBallInfo.InitInstance(pPlayer, 0x85, LOOSEBALL_ANIM_TRAP);
     mAttackSTSInfo.InitInstance(pPlayer, 0x7E, LOOSEBALL_ANIM_ATTACK);
-    mUnknownD0BC.InitInstance(pPlayer, 0x6F, LOOSEBALL_ANIM_ATTACK);
+    mHighPunchAttackInfo.InitInstance(pPlayer, 0x6F, LOOSEBALL_ANIM_ATTACK);
     mDiveBallInfo.InitInstance(pPlayer, 0x80, LOOSEBALL_ANIM_PICKUP);
 
     mLooseBallDesperationInfo[0] = &mTrapBallInfo;

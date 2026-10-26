@@ -233,7 +233,7 @@ void ShaderSkinMesh::PrepareToRender()
             count * sizeof(nlVector3), GLM_VertexData);
     }
 
-    if (!rigidSkin && m_Unknown0C == 0)
+    if (!rigidSkin && modelIndex == 0)
     {
         SoftwareSkinModel(pModel);
         glModel* newModel = (glModel*)glFrameAlloc(sizeof(glModel), GLM_Header);

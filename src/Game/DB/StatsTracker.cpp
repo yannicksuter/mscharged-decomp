@@ -84,13 +84,13 @@ static inline void AddStatValue(
 {
     switch (stat)
     {
-    case STATS_00:
+    case STATS_LOW_CHARGE_SHOTS:
         stats.mNumLowChargeShots += amount;
         break;
-    case STATS_01:
+    case STATS_MEDIUM_CHARGE_SHOTS:
         stats.mNumMediumChargeShots += amount;
         break;
-    case STATS_02:
+    case STATS_HIGH_CHARGE_SHOTS:
         stats.mNumHighChargeShots += amount;
         break;
     case STATS_SHOTS_ON_GOAL:
@@ -173,10 +173,10 @@ static inline void AddStatValue(
         stats.mNumSteals += amount;
         stats.mNumSteals = stats.mNumSteals <= 999U ? stats.mNumSteals : 999U;
         break;
-    case STATS_15:
-        stats.unknown_0x38 += amount;
+    case STATS_DEKES:
+        stats.mNumDekes += amount;
         break;
-    case STATS_16:
+    case STATS_BALL_POSSESSION:
         stats.mBallPossessionTime += amount;
         break;
     case STATS_BUTTON_PRESSES:
@@ -526,9 +526,9 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
         AddStat(STATS_SHOTS_ON_GOAL, homeaway, playerindex, param0);
         AddUserStatByPlayer(STATS_SHOTS_ON_GOAL, homeaway, playerindex, param0);
         break;
-    case STATS_00:
-    case STATS_01:
-    case STATS_02:
+    case STATS_LOW_CHARGE_SHOTS:
+    case STATS_MEDIUM_CHARGE_SHOTS:
+    case STATS_HIGH_CHARGE_SHOTS:
         AddStat(stat, homeaway, playerindex, 1);
         AddUserStatByPlayer(stat, homeaway, playerindex, 1);
         break;
@@ -623,9 +623,9 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
                 CupManager::Instance()->GetCupRecord().mCurrentRecord.mValues[2]++;
         }
         break;
-    case STATS_15:
-        AddStat(STATS_15, homeaway, playerindex, 1);
-        AddUserStatByPlayer(STATS_15, homeaway, playerindex, 1);
+    case STATS_DEKES:
+        AddStat(STATS_DEKES, homeaway, playerindex, 1);
+        AddUserStatByPlayer(STATS_DEKES, homeaway, playerindex, 1);
         break;
     case STATS_POWERUPS_USED:
         AddStat(STATS_POWERUPS_USED, homeaway, playerindex, 1);
@@ -670,9 +670,9 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
     case STATS_PASSES_INTERCEPTED:
         AddStat(STATS_PASSES_INTERCEPTED, homeaway, playerindex, 1);
         break;
-    case STATS_16:
-        AddStat(STATS_16, homeaway, playerindex, param0);
-        AddUserStatByPlayer(STATS_16, homeaway, playerindex, param0);
+    case STATS_BALL_POSSESSION:
+        AddStat(STATS_BALL_POSSESSION, homeaway, playerindex, param0);
+        AddUserStatByPlayer(STATS_BALL_POSSESSION, homeaway, playerindex, param0);
         break;
     case STATS_ATTACK_SUCCESSES:
         AddStat(STATS_ATTACK_SUCCESSES, homeaway, playerindex, 1);
@@ -836,7 +836,7 @@ void StatsTracker::GetSortedStats(PlayerStats* source, int numsource,
                     source[tempsorted[i]].mNumPassesIntercepted,
                     source[tempsorted[nexti]].mNumPassesIntercepted) == 1;
                 break;
-            case STATS_16:
+            case STATS_BALL_POSSESSION:
                 doswap = CompareInt(sortOrder,
                     source[tempsorted[i]].mBallPossessionTime,
                     source[tempsorted[nexti]].mBallPossessionTime) == 1;
@@ -967,7 +967,7 @@ static inline void AccumulateUserStats(PlayerStats* total, const PlayerStats& cu
     total->mNumHitsMade += current.mNumHitsMade;
     total->mNumAttackAttempts += current.mNumAttackAttempts;
     total->mNumSteals += current.mNumSteals;
-    total->unknown_0x38 += current.unknown_0x38;
+    total->mNumDekes += current.mNumDekes;
     total->mBallPossessionTime += current.mBallPossessionTime;
     total->mNumButtonPresses += current.mNumButtonPresses;
     total->mNumPerfectPasses += current.mNumPerfectPasses;
@@ -1378,7 +1378,7 @@ void StatsTracker::WriteStats(
             g_pTeams[team]->GetAverageDefenseRating()));
 
         int possession = GetStatValue(
-            mCumulativeTeamStats[team]->mPlayerTotalStats, STATS_16);
+            mCumulativeTeamStats[team]->mPlayerTotalStats, STATS_BALL_POSSESSION);
         possession = (int)(possession / gameTime);
         int difficulty = GameInfoManager::Instance()->GetDifficulty((short)team);
         stats.AppendInPlace(Format(NLString("{0},"), difficulty));
