@@ -60,6 +60,12 @@ checkout, move the local files from `orig/R4QP01` into `orig/R4QP01_rev2` and
 configure again. Revision 1 needs its own disc image; the two EU revisions are
 not interchangeable.
 
+[comparison.md](comparison.md) compares the five builds in detail: disc and
+system data, build stamps, SDK versions, executable layout, version-specific
+code and disc assets. It shows that EU revision 2 takes part of the US fixes,
+that the Japanese build is US code with interface fixes, and that the 2010
+Korean build is a separate rebuild with its own title logo and goalie tuning.
+
 Decompilation
 =============
 
